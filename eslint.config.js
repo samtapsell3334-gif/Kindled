@@ -37,6 +37,7 @@ const config = [
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
       "no-console": ["warn", { allow: ["warn", "error"] }],
+      "@next/next/no-img-element": "off",
     },
   },
   {
