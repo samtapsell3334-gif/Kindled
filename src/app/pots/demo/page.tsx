@@ -256,25 +256,6 @@ function useAudio() {
   return { thump, chime };
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// TTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function speak(text: string, muted: boolean) {
-  if (typeof window === "undefined" || !window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  if (muted) return;
-  const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.92; u.pitch = 1.05;
-  const voices = window.speechSynthesis.getVoices();
-  const v = voices.find((vv) =>
-    vv.name.includes("Google UK English Female") ||
-    vv.name.includes("Samantha") ||
-    (vv.lang.startsWith("en") && vv.localService),
-  );
-  if (v) u.voice = v;
-  window.speechSynthesis.speak(u);
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 3D TILT HOOK
@@ -1056,6 +1037,119 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
   );
 }
 
+// Gentle ambient music via Web Audio API
+function useAmbientMusic() {
+  const ctxRef = useRef<AudioContext | null>(null);
+  const nodesRef = useRef<AudioNode[]>([]);
+
+  const start = useCallback(() => {
+    try {
+      ctxRef.current ??= new AudioContext();
+      const ctx = ctxRef.current;
+      if (ctx.state === "suspended") void ctx.resume();
+
+      // Pentatonic notes: C4, E4, G4, A4, C5
+      const notes = [261.63, 329.63, 392.0, 440.0, 523.25];
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0, ctx.currentTime);
+      masterGain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 1.5);
+      masterGain.connect(ctx.destination);
+      nodesRef.current.push(masterGain);
+
+      // Soft pad — slow sine waves on pentatonic notes
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        g.gain.value = 0.015 + (i % 2) * 0.008;
+        osc.connect(g);
+        g.connect(masterGain);
+        osc.start();
+        nodesRef.current.push(osc, g);
+      });
+
+      // Gentle arpeggiated melody
+      let t = ctx.currentTime + 0.5;
+      const melody = [0, 2, 4, 3, 1, 4, 2, 0];
+      const loop = () => {
+        melody.forEach((ni, i) => {
+          const freq = notes[ni]! * (i > 4 ? 2 : 1);
+          const osc = ctx.createOscillator();
+          const env = ctx.createGain();
+          osc.type = "triangle";
+          osc.frequency.value = freq;
+          env.gain.setValueAtTime(0, t);
+          env.gain.linearRampToValueAtTime(0.06, t + 0.05);
+          env.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
+          osc.connect(env);
+          env.connect(masterGain);
+          osc.start(t);
+          osc.stop(t + 0.9);
+          t += 0.75;
+        });
+        // Repeat every ~6s
+        setTimeout(() => { if (nodesRef.current.length > 0) loop(); }, (t - ctx.currentTime) * 1000 - 200);
+      };
+      loop();
+    } catch { /* silent */ }
+  }, []);
+
+  const stop = useCallback(() => {
+    try {
+      const ctx = ctxRef.current;
+      if (!ctx) return;
+      // Fade out master gain
+      nodesRef.current.forEach((n) => {
+        if (n instanceof GainNode) {
+          n.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8);
+        }
+      });
+      setTimeout(() => {
+        nodesRef.current.forEach((n) => { try { (n as OscillatorNode).stop?.(); } catch { /* ok */ } });
+        nodesRef.current = [];
+      }, 900);
+    } catch { /* silent */ }
+  }, []);
+
+  return { start, stop };
+}
+
+// Animated caption — reveals words one by one, no overlap
+function AnimatedCaption({ text, playing }: { text: string; playing: boolean }) {
+  const words = text.split(" ");
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  useEffect(() => {
+    setVisibleCount(0);
+    if (!playing) { setVisibleCount(words.length); return; }
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setVisibleCount(i);
+      if (i >= words.length) clearInterval(interval);
+    }, 110);
+    return () => clearInterval(interval);
+  }, [text, playing]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <p className="text-[12px] leading-relaxed text-stone-700 font-medium">
+      {words.map((word, i) => (
+        <span
+          key={i}
+          className="inline-block mr-1 transition-all duration-200"
+          style={{
+            opacity: i < visibleCount ? 1 : 0,
+            transform: i < visibleCount ? "translateY(0)" : "translateY(6px)",
+          }}
+        >
+          {word}
+        </span>
+      ))}
+    </p>
+  );
+}
+
 function ExplainerPlayer() {
   const [open, setOpen] = useState(false);
   const [sceneIdx, setSceneIdx] = useState(0);
@@ -1063,49 +1157,68 @@ function ExplainerPlayer() {
   const [elapsed, setElapsed] = useState(0);
   const [muted, setMuted] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const SCENE_DUR = 24; // seconds per scene
+  const { start: startMusic, stop: stopMusic } = useAmbientMusic();
+  const SCENE_DUR = 24;
   const TOTAL = SCENES.length * SCENE_DUR;
 
   useEffect(() => {
-    if (!playing) { window.speechSynthesis?.pause(); return; }
-    window.speechSynthesis?.resume();
+    if (!playing) return;
+    if (!muted) startMusic();
     intervalRef.current = setInterval(() => {
       setElapsed((e) => {
         if (e >= TOTAL - 1) { setPlaying(false); return TOTAL; }
         return e + 0.25;
       });
     }, 250);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [playing, TOTAL]);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      stopMusic();
+    };
+  }, [playing, muted, startMusic, stopMusic, TOTAL]);
 
   const currentScene = Math.min(SCENES.length - 1, Math.floor(elapsed / SCENE_DUR));
   const sceneProgress = (elapsed % SCENE_DUR) / SCENE_DUR;
 
   useEffect(() => {
-    if (currentScene !== sceneIdx) {
-      setSceneIdx(currentScene);
-      if (playing) speak(SCENES[currentScene]!.caption, muted);
-    }
-  }, [currentScene, sceneIdx, playing, muted]);
+    if (currentScene !== sceneIdx) setSceneIdx(currentScene);
+  }, [currentScene, sceneIdx]);
 
-  const jumpTo = (idx: number) => {
-    setElapsed(idx * SCENE_DUR);
-    window.speechSynthesis?.cancel();
-    if (playing) speak(SCENES[idx]!.caption, muted);
-  };
+  const jumpTo = (idx: number) => setElapsed(idx * SCENE_DUR);
+
+  const togglePlay = useCallback(() => {
+    setPlaying((p) => {
+      if (p) stopMusic();
+      else if (!muted) startMusic();
+      return !p;
+    });
+  }, [muted, startMusic, stopMusic]);
+
+  const toggleMute = useCallback(() => {
+    setMuted((m) => {
+      if (!m) stopMusic();
+      else if (playing) startMusic();
+      return !m;
+    });
+  }, [playing, startMusic, stopMusic]);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    setPlaying(false);
+    stopMusic();
+  }, [stopMusic]);
 
   if (!open) return (
     <div className="mx-4">
       <button
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-left hover:border-amber-500/30 transition-colors active:scale-[0.98]"
+        className="flex w-full items-center gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-left hover:border-amber-300 hover:shadow-md transition-all active:scale-[0.98]"
       >
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
           <Play className="h-5 w-5 translate-x-0.5 text-stone-900" strokeWidth={2.5} fill="currentColor" />
         </div>
         <div>
-          <p className="text-[13px] font-bold text-stone-100">📺 Watch How It Works</p>
-          <p className="text-[11px] text-stone-500">5 scenes · 2 min · with voiceover</p>
+          <p className="text-[13px] font-bold text-stone-800">📺 Watch How It Works</p>
+          <p className="text-[11px] text-stone-400">5 scenes · 2 min · gentle music &amp; captions</p>
         </div>
       </button>
     </div>
@@ -1117,11 +1230,10 @@ function ExplainerPlayer() {
     <div className="mx-4 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-xl shadow-stone-200/60">
       {/* Scene label */}
       <div className="flex items-center justify-between border-b border-stone-100 bg-stone-50 px-4 py-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500">
           Scene {sceneIdx + 1}/5 · {scene.title}
         </span>
-        <button onClick={() => { setOpen(false); setPlaying(false); window.speechSynthesis?.cancel(); }}
-          className="text-stone-500 hover:text-stone-300">
+        <button onClick={handleClose} className="text-stone-400 hover:text-stone-600 transition-colors">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -1131,44 +1243,41 @@ function ExplainerPlayer() {
         <SceneVisual id={sceneIdx + 1} progress={sceneProgress} />
       </div>
 
-      {/* Caption */}
-      <div className="min-h-[56px] border-t border-stone-800/60 px-4 py-3">
-        <p key={sceneIdx} className="text-[11px] leading-relaxed text-stone-600 animate-fade-up line-clamp-3">
-          {scene.caption}
-        </p>
+      {/* Caption — fixed height, no clamp, words animate in */}
+      <div className="min-h-[72px] border-t border-stone-100 bg-amber-50/40 px-5 py-3.5 flex items-center">
+        <AnimatedCaption key={sceneIdx} text={scene.caption} playing={playing} />
       </div>
 
       {/* Controls */}
-      <div className="border-t border-stone-800/60 px-4 pb-4 pt-3 space-y-3">
-        {/* Progress */}
+      <div className="border-t border-stone-100 px-4 pb-4 pt-3 space-y-3">
+        {/* Progress bar */}
         <div
           className="h-1.5 w-full cursor-pointer rounded-full bg-stone-200"
           onClick={(e) => {
             const r = e.currentTarget.getBoundingClientRect();
             const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-            const newT = Math.round(ratio * TOTAL);
-            setElapsed(newT);
-            window.speechSynthesis?.cancel();
-            if (playing) speak(SCENES[Math.min(SCENES.length - 1, Math.floor(newT / SCENE_DUR))]!.caption, muted);
+            setElapsed(Math.round(ratio * TOTAL));
           }}
         >
-          <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-100"
-            style={{ width: `${(elapsed / TOTAL) * 100}%` }} />
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-100"
+            style={{ width: `${(elapsed / TOTAL) * 100}%` }}
+          />
         </div>
 
         {/* Buttons + time */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => { setPlaying((p) => { if (!p) speak(scene.caption, muted); return !p; }); }}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md shadow-amber-900/30 active:scale-90 transition-transform"
+            onClick={togglePlay}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md shadow-amber-200 active:scale-90 transition-transform"
           >
             {playing
               ? <Pause className="h-4 w-4" strokeWidth={2.5} fill="currentColor" />
               : <Play className="h-4 w-4 translate-x-0.5" strokeWidth={2.5} fill="currentColor" />}
           </button>
           <button
-            onClick={() => { setMuted((m) => { const n = !m; if (n) window.speechSynthesis?.cancel(); else if (playing) speak(scene.caption, false); return n; }); }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-800 text-stone-400 hover:text-stone-200 active:scale-90 transition-all"
+            onClick={toggleMute}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 text-stone-500 hover:bg-stone-200 active:scale-90 transition-all"
           >
             {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </button>
