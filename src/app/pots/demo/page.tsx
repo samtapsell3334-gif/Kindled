@@ -1762,8 +1762,61 @@ function StarIcon({ size = 20, className = "" }: { size?: number; className?: st
   );
 }
 
+const BURST_EMOJIS = ["⭐", "✨", "🌟", "💫", "⭐", "✨", "🌟", "💫", "⭐", "✨", "🌟", "💫"];
+const BURST_COLORS = ["#fbbf24", "#f59e0b", "#fb923c", "#a78bfa", "#38bdf8", "#4ade80", "#f472b6", "#facc15", "#60a5fa", "#34d399", "#fb7185", "#c084fc"];
+
+function StarBurst({ x, y }: { x: number; y: number }) {
+  const particles = BURST_EMOJIS.map((emoji, i) => {
+    const angle = (i / BURST_EMOJIS.length) * Math.PI * 2 - Math.PI / 2;
+    const dist = 55 + (i % 3) * 22;
+    return { id: i, emoji, color: BURST_COLORS[i]!, tx: Math.cos(angle) * dist, ty: Math.sin(angle) * dist };
+  });
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[200]">
+      {/* Screen flash */}
+      <motion.div
+        initial={{ opacity: 0.5 }} animate={{ opacity: 0 }}
+        transition={{ duration: 0.35 }}
+        className="absolute inset-0 bg-amber-300/30"
+      />
+      {/* Expanding ring × 2 */}
+      {[0, 0.12].map((delay, ri) => (
+        <motion.div key={ri}
+          initial={{ scale: 0.1, opacity: 0.9 }} animate={{ scale: 4.5, opacity: 0 }}
+          transition={{ duration: 0.55, delay, ease: "easeOut" }}
+          className="absolute rounded-full border-[3px] border-amber-400"
+          style={{ left: x - 24, top: y - 24, width: 48, height: 48 }}
+        />
+      ))}
+      {/* Emoji burst particles */}
+      {particles.map((p) => (
+        <motion.span key={p.id}
+          initial={{ x: 0, y: 0, scale: 1.4, opacity: 1 }}
+          animate={{ x: p.tx, y: p.ty, scale: 0, opacity: 0 }}
+          transition={{ duration: 0.6, ease: [0.2, 0.8, 0.4, 1] }}
+          className="absolute text-[18px] select-none"
+          style={{ left: x - 9, top: y - 9, color: p.color }}
+        >
+          {p.emoji}
+        </motion.span>
+      ))}
+      {/* Big pop star in centre */}
+      <motion.span
+        initial={{ scale: 0, opacity: 1 }}
+        animate={{ scale: [0, 2.2, 0], opacity: [1, 1, 0] }}
+        transition={{ duration: 0.5, times: [0, 0.45, 1] }}
+        className="absolute text-[32px] select-none"
+        style={{ left: x - 16, top: y - 16 }}
+      >🌟</motion.span>
+    </div>
+  );
+}
+
 function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void }) {
-  const [totalStars, setTotalStars] = useState(24);
+  const [totalStars, setTotalStars] = useState(6);
+  const [filledCells, setFilledCells] = useState<Set<number>>(() => new Set(Array.from({ length: 6 }, (_, i) => i)));
+  const [newCell, setNewCell] = useState<number | null>(null);
+  const [burst, setBurst] = useState<{ x: number; y: number; key: number } | null>(null);
   const [flyingStars, setFlyingStars] = useState<FlyingStar[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
   const [bouncing, setBouncing] = useState(false);
@@ -1774,6 +1827,23 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
   const starIdRef = useRef(0);
   const EXCHANGE_RATE = 0.50;
   const targetPot = pots.find((p) => p.mode === "LIVE_FEED") ?? pots[0];
+
+  const handleCellTap = useCallback((idx: number, e: React.MouseEvent<HTMLButtonElement>) => {
+    if (filledCells.has(idx)) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    chime();
+    setBurst({ x, y, key: Date.now() });
+    setTimeout(() => {
+      setFilledCells((prev) => new Set([...prev, idx]));
+      setNewCell(idx);
+      setTotalStars((s) => s + 1);
+      setBouncing(true);
+      setTimeout(() => { setBouncing(false); setNewCell(null); }, 800);
+    }, 420);
+    setTimeout(() => setBurst(null), 750);
+  }, [filledCells, chime]);
 
   const handleChore = useCallback((chore: typeof CHORES[0], cardEl: HTMLElement) => {
     if (completedToday.has(chore.id)) return;
@@ -1845,6 +1915,10 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-indigo-950 via-violet-950 to-indigo-900 overflow-hidden pb-32">
+      {/* Star burst overlay */}
+      <AnimatePresence>
+        {burst && <StarBurst key={burst.key} x={burst.x} y={burst.y} />}
+      </AnimatePresence>
       {/* Flying stars overlay */}
       {flyingStars.map((s) => (
         <div
@@ -1992,43 +2066,66 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
             <p className="text-[11px] text-violet-300">Fill 20 stars → unlock your reward! 🚀</p>
           </div>
           <div className="text-right">
-            <p className="text-[11px] font-black text-amber-400">{Math.min(totalStars, 20)}/20</p>
+            <p className="text-[11px] font-black text-amber-400">{filledCells.size}/20</p>
             <p className="text-[9px] text-violet-400">filled</p>
           </div>
         </div>
         {/* 4×5 sticker grid */}
         <div className="grid grid-cols-5 gap-2">
           {Array.from({ length: 20 }, (_, idx) => {
-            const filled = idx < totalStars;
+            const filled = filledCells.has(idx);
+            const isNew = newCell === idx;
             const isMilestone = idx === 4 || idx === 9 || idx === 14 || idx === 19;
             return (
-              <div
+              <motion.button
                 key={idx}
+                onClick={(e) => handleCellTap(idx, e)}
+                disabled={filled}
+                whileTap={!filled ? { scale: 0.85 } : {}}
+                whileHover={!filled ? { scale: 1.08, borderColor: "rgba(251,191,36,0.6)" } : {}}
+                animate={isNew ? { scale: [0.3, 1.35, 0.95, 1.1, 1] } : {}}
+                transition={isNew ? { duration: 0.55, times: [0, 0.35, 0.55, 0.75, 1], type: "tween" } : { type: "spring", stiffness: 400, damping: 22 }}
                 className={cn(
-                  "relative flex aspect-square items-center justify-center rounded-2xl border-2 text-[18px] transition-all duration-500",
+                  "relative flex aspect-square items-center justify-center rounded-2xl border-2 text-[18px] transition-colors",
                   filled
                     ? isMilestone
-                      ? "border-amber-300 bg-gradient-to-br from-amber-400 to-orange-400 shadow-lg shadow-amber-500/40 scale-105"
+                      ? "border-amber-300 bg-gradient-to-br from-amber-400 to-orange-400 shadow-lg shadow-amber-500/40"
                       : "border-amber-400/60 bg-gradient-to-br from-yellow-300/40 to-amber-400/30"
-                    : "border-white/15 bg-white/5",
+                    : "border-white/20 bg-white/5 cursor-pointer active:bg-white/10",
                 )}
               >
                 {filled ? (
-                  isMilestone ? "🌟" : "⭐"
+                  <motion.span
+                    initial={isNew ? { scale: 0, rotate: -30 } : false}
+                    animate={isNew ? { scale: 1, rotate: 0 } : {}}
+                    transition={{ type: "spring", stiffness: 500, damping: 18, delay: 0.05 }}
+                    className="select-none"
+                    style={{ animation: filled && !isNew ? `twinkle ${1.2 + (idx % 5) * 0.25}s ${idx * 0.07}s ease-in-out infinite alternate` : undefined }}
+                  >
+                    {isMilestone ? "🌟" : "⭐"}
+                  </motion.span>
                 ) : (
-                  <span className="text-[10px] font-black text-white/20">{idx + 1}</span>
+                  <span className="text-[10px] font-black text-white/25 select-none">{idx + 1}</span>
                 )}
                 {isMilestone && filled && (
-                  <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[7px] font-black text-white">!</div>
+                  <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[7px] font-black text-white shadow">!</div>
                 )}
-              </div>
+                {/* Pulse ring on empty cells to invite tapping */}
+                {!filled && idx === filledCells.size && (
+                  <motion.div
+                    className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-amber-400/60"
+                    animate={{ opacity: [0.6, 0.1, 0.6], scale: [1, 1.12, 1] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                )}
+              </motion.button>
             );
           })}
         </div>
         <p className="mt-3 text-[10px] text-violet-400 text-center">
-          {totalStars >= 20
+          {filledCells.size >= 20
             ? "🎉 Chart complete! Ask Mum or Dad to redeem your reward!"
-            : `${Math.max(0, 20 - totalStars)} more stars to complete your chart!`}
+            : `Tap the next square to add your star! ${20 - filledCells.size} to go ✨`}
         </p>
       </section>
 
