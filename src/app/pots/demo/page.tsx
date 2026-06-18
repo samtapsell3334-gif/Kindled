@@ -30,6 +30,7 @@ interface DemoPot {
   id: string;
   title: string;
   emoji: string;
+  image?: string;
   goal: number;
   raised: number;
   mode: GiftingMode;
@@ -57,6 +58,7 @@ interface CatalogItem {
   id: string;
   name: string;
   emoji: string;
+  image: string;
   price: number;
   tag: string;
   tagColor: string;
@@ -76,6 +78,7 @@ interface ExplainerScene {
 const INITIAL_POTS: DemoPot[] = [
   {
     id: "p1", title: "Super-Fast Mountain Bike", emoji: "🚵",
+    image: "https://images.unsplash.com/photo-1576435728678-68d0fbf94946?w=400&h=400&fit=crop&q=80",
     goal: 450, raised: 310, mode: "LIVE_FEED", continuous: true,
     eventLabel: "Ongoing", eventDate: "Anytime", eventIso: "2027-01-01T00:00:00Z",
     contributors: 7, boosterEntries: 0,
@@ -84,6 +87,7 @@ const INITIAL_POTS: DemoPot[] = [
   },
   {
     id: "p2", title: "LEGO Star Wars Millennium Falcon", emoji: "🚀",
+    image: "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=400&h=400&fit=crop&q=80",
     goal: 730, raised: 730, mode: "UNDER_THE_TREE", continuous: true,
     eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
     contributors: 9, boosterEntries: 8,
@@ -101,6 +105,7 @@ const INITIAL_POTS: DemoPot[] = [
   },
   {
     id: "p3", title: "Retro Arcade Cabinet", emoji: "🕹️",
+    image: "https://images.unsplash.com/photo-1511882150382-421056c89033?w=400&h=400&fit=crop&q=80",
     goal: 250, raised: 80, mode: "LIVE_FEED", continuous: true,
     eventLabel: "Ongoing", eventDate: "Anytime", eventIso: "2027-01-01T00:00:00Z",
     contributors: 3, boosterEntries: 0,
@@ -109,6 +114,7 @@ const INITIAL_POTS: DemoPot[] = [
   },
   {
     id: "p4", title: "Ultimate 10th Birthday Party", emoji: "🎂",
+    image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=400&fit=crop&q=80",
     goal: 300, raised: 300, mode: "WRAPPED_UP", continuous: false,
     eventLabel: "Birthday", eventDate: "Jun 28", eventIso: "2026-06-28T10:00:00Z",
     contributors: 5, boosterEntries: 3,
@@ -142,12 +148,24 @@ const CHECKLIST: ChecklistItem[] = [
 ];
 
 const CATALOGUE: CatalogItem[] = [
-  { id: "c1", name: "Nintendo Switch OLED", emoji: "🎮", price: 309.99, tag: "Popular", tagColor: "bg-red-100 text-red-600", glowColor: "#ef4444" },
-  { id: "c2", name: "Electric Scooter Pro", emoji: "🛴", price: 399.99, tag: "Trending", tagColor: "bg-emerald-100 text-emerald-600", glowColor: "#10b981" },
-  { id: "c3", name: "Meta Quest 3 VR", emoji: "🥽", price: 499.99, tag: "High Intent", tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6" },
-  { id: "c4", name: "LEGO Technic Ferrari", emoji: "🏎️", price: 189.99, tag: "Bestseller", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
-  { id: "c5", name: "Air Hockey Table", emoji: "🏒", price: 199.99, tag: "New", tagColor: "bg-pink-100 text-pink-600", glowColor: "#ec4899" },
-  { id: "c6", name: "LEGO Star Wars X-Wing", emoji: "✈️", price: 99.99, tag: "Fan Fave", tagColor: "bg-sky-100 text-sky-600", glowColor: "#38bdf8" },
+  { id: "c1", name: "Nintendo Switch OLED", emoji: "🎮",
+    image: "https://images.unsplash.com/photo-1585184394271-4c0a47dc59c9?w=400&h=400&fit=crop&q=80",
+    price: 309.99, tag: "Popular", tagColor: "bg-red-100 text-red-600", glowColor: "#ef4444" },
+  { id: "c2", name: "Electric Scooter Pro", emoji: "🛴",
+    image: "https://images.unsplash.com/photo-1598963516523-4a0b61e2de32?w=400&h=400&fit=crop&q=80",
+    price: 399.99, tag: "Trending", tagColor: "bg-emerald-100 text-emerald-600", glowColor: "#10b981" },
+  { id: "c3", name: "Meta Quest 3 VR", emoji: "🥽",
+    image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=400&h=400&fit=crop&q=80",
+    price: 499.99, tag: "High Intent", tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6" },
+  { id: "c4", name: "LEGO Technic Ferrari", emoji: "🏎️",
+    image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop&q=80",
+    price: 189.99, tag: "Bestseller", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
+  { id: "c5", name: "Air Hockey Table", emoji: "🏒",
+    image: "https://images.unsplash.com/photo-1606503153255-59d5e417bec8?w=400&h=400&fit=crop&q=80",
+    price: 199.99, tag: "New", tagColor: "bg-pink-100 text-pink-600", glowColor: "#ec4899" },
+  { id: "c6", name: "LEGO Star Wars X-Wing", emoji: "✈️",
+    image: "https://images.unsplash.com/photo-1609372332255-611485350f25?w=400&h=400&fit=crop&q=80",
+    price: 99.99, tag: "Fan Fave", tagColor: "bg-sky-100 text-sky-600", glowColor: "#38bdf8" },
 ];
 
 const SCENES: ExplainerScene[] = [
@@ -370,9 +388,14 @@ function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) 
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)]">
-              {pot.emoji}
-            </span>
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl bg-amber-50 shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)]">
+              {pot.image ? (
+                <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center text-2xl">{pot.emoji}</span>
+              )}
+            </div>
             <div className="min-w-0">
               <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium tracking-tight text-stone-900">{pot.title}</h3>
               <div className="flex items-center gap-1.5 mt-0.5">
@@ -435,7 +458,10 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
       <div className="relative z-10 p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black/30 text-xl">🎁</span>
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-black/30">
+              {pot.image && <img src={pot.image} alt="" className="h-full w-full object-cover opacity-30 blur-[2px]" />}
+              <span className="absolute inset-0 flex items-center justify-center text-xl">🎁</span>
+            </div>
             <div className="min-w-0">
               <h3 className="truncate text-[14px] font-bold text-stone-900">{pot.title}</h3>
               <p className={cn("text-[11px] font-medium", th.label)}>{th.modeLabel}</p>
@@ -618,17 +644,22 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
         </div>
       )}
 
-      {/* Icon area — styled product tile */}
-      <div className="relative flex items-center justify-center rounded-t-2xl pt-5 pb-4"
-        style={{ background: `linear-gradient(145deg, ${item.glowColor}16 0%, ${item.glowColor}06 100%)` }}>
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl text-4xl"
-          style={{ background: `linear-gradient(145deg, #ffffff, ${item.glowColor}14)`,
-            boxShadow: `0 2px 12px ${item.glowColor}22, 0 0 0 1px ${item.glowColor}15, inset 0 1px 0 rgba(255,255,255,0.9)` }}>
-          {item.emoji}
-        </div>
-        <span className={cn("absolute top-2 right-2 rounded-lg px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider", item.tagColor)}>
+      {/* Product image tile */}
+      <div className="relative overflow-hidden rounded-t-2xl" style={{ height: 120 }}>
+        <img
+          src={item.image}
+          alt={item.name}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+        />
+        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${item.glowColor}28 0%, transparent 60%)` }} />
+        <span className={cn("absolute top-2 right-2 rounded-lg px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider shadow-sm", item.tagColor)}>
           {item.tag}
         </span>
+        {/* Emoji badge bottom-left */}
+        <div className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 shadow-md text-lg backdrop-blur-sm">
+          {item.emoji}
+        </div>
       </div>
 
       {/* Info */}
@@ -842,16 +873,22 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
 
         {/* ── FIREWORKS ── */}
         {phase === "fireworks" && (
-          <div className="flex flex-col items-center gap-5 px-6 py-10">
+          <div className="flex flex-col items-center gap-4 px-6 py-8">
             <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400">🎉 Fully Funded!</p>
-            <div className="text-center animate-scale-in">
+            {/* Product image reveal */}
+            {pot.image && (
+              <div className="animate-scale-in overflow-hidden rounded-2xl shadow-xl shadow-black/50" style={{ width: 160, height: 120 }}>
+                <img src={pot.image} alt={pot.title} className="h-full w-full object-cover" />
+              </div>
+            )}
+            <div className="text-center animate-fade-up">
               <p style={{ fontFamily: "var(--font-display)", textShadow: "0 0 40px #f59e0b60" }}
-                className="text-[60px] font-semibold text-amber-400 leading-none tabular-nums">
+                className="text-[52px] font-semibold text-amber-400 leading-none tabular-nums">
                 £{pot.goal.toLocaleString()}
               </p>
               <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-300 mt-1">{pot.title}</p>
             </div>
-            <div className="w-full animate-fade-up">
+            <div className="w-full">
               <FundingBar raised={pot.goal} goal={pot.goal} />
               <p className="mt-2 text-center text-[11px] text-emerald-400 font-medium">
                 {pot.contributors} people made this happen 🙌
