@@ -2146,6 +2146,185 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// WOULD YOU RATHER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const RANDOM_GIFTS = [
+  { emoji: "🧦", label: "Socks", price: 8 },
+  { emoji: "🕯️", label: "Candle", price: 12 },
+  { emoji: "🧴", label: "Body lotion", price: 9 },
+  { emoji: "📚", label: "Random book", price: 14 },
+  { emoji: "🍫", label: "Chocolates", price: 7 },
+  { emoji: "🧸", label: "Trinket", price: 11 },
+  { emoji: "🪴", label: "Plant pot", price: 15 },
+  { emoji: "🎭", label: "Picture frame", price: 13 },
+  { emoji: "☕", label: "Mug", price: 10 },
+  { emoji: "🧩", label: "Mini puzzle", price: 16 },
+  { emoji: "🎪", label: "Desk gadget", price: 18 },
+  { emoji: "🌸", label: "Bath salts", price: 12 },
+];
+
+const DREAM_GIFTS = [
+  {
+    name: "MacBook Air M3",
+    price: 649,
+    emoji: "💻",
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop&q=80",
+    contributors: 6,
+    each: 108,
+  },
+  {
+    name: "Nike Air Max 270",
+    price: 110,
+    emoji: "👟",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&q=80",
+    contributors: 4,
+    each: 28,
+  },
+];
+
+function WouldYouRather() {
+  const [side, setSide] = useState<"random" | "dream">("random");
+  const randomTotal = RANDOM_GIFTS.reduce((s, g) => s + g.price, 0);
+  const dreamTotal = DREAM_GIFTS.reduce((s, g) => s + g.price, 0);
+
+  return (
+    <section className="px-4">
+      {/* Header */}
+      <div className="mb-4 text-center">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-1">Stop and think</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[22px] font-semibold text-stone-800 leading-tight">
+          Would you rather…
+        </h2>
+      </div>
+
+      {/* Toggle pill */}
+      <div className="flex rounded-2xl bg-stone-100 p-1 gap-1 mb-4">
+        {(["random", "dream"] as const).map((s) => (
+          <motion.button
+            key={s}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => setSide(s)}
+            className={cn(
+              "flex-1 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
+              side === s ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
+            )}
+          >
+            {s === "random" ? "🎁 15 random gifts" : "✨ The dream gifts"}
+          </motion.button>
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {side === "random" ? (
+          <motion.div
+            key="random"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+          >
+            {/* Random gifts grid */}
+            <div className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm">
+              <div className="grid grid-cols-6 gap-2 mb-4">
+                {RANDOM_GIFTS.map((g, i) => (
+                  <motion.div
+                    key={g.label}
+                    initial={{ opacity: 0, scale: 0.4, rotate: Math.random() * 30 - 15 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    transition={{ delay: i * 0.045, type: "spring", stiffness: 500, damping: 20 }}
+                    className="flex flex-col items-center gap-0.5"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 text-[20px]"
+                      style={{ animation: `wobble ${2.2 + i * 0.15}s ${i * 0.2}s ease-in-out infinite` }}>
+                      {g.emoji}
+                    </div>
+                    <span className="text-[8px] text-stone-400 leading-tight text-center">{g.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="border-t border-stone-100 pt-3 flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] text-stone-400">Total spent</p>
+                  <p style={{ fontFamily: "var(--font-display)" }} className="text-[24px] font-bold text-stone-700">~£{randomTotal}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[11px] text-stone-400 leading-tight max-w-[140px]">
+                    Most forgotten by February.<br/>Half already owned.<br/>One returned.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setSide("dream")}
+              className="mt-3 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3 text-[14px] font-semibold text-stone-900 shadow-sm shadow-amber-200"
+            >
+              Or… see what a list could unlock →
+            </motion.button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="dream"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+            className="space-y-3"
+          >
+            {DREAM_GIFTS.map((g, i) => (
+              <motion.div
+                key={g.name}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1, type: "spring", stiffness: 380, damping: 30 }}
+                className="overflow-hidden rounded-3xl border border-stone-100 bg-white shadow-sm"
+              >
+                <div className="relative h-36 overflow-hidden">
+                  <img src={g.image} alt={g.name} className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+                    <div>
+                      <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-semibold text-white leading-tight">{g.name}</p>
+                      <p className="text-[13px] font-bold text-amber-400">£{g.price}</p>
+                    </div>
+                    <div className="rounded-xl bg-white/15 backdrop-blur-sm px-2.5 py-1.5 text-right">
+                      <p className="text-[10px] text-white/80">{g.contributors} people</p>
+                      <p className="text-[13px] font-black text-white">£{g.each} each</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2.5">
+                  <div className="flex -space-x-1.5">
+                    {Array.from({ length: g.contributors }).map((_, j) => (
+                      <div key={j} className="h-5 w-5 rounded-full border-2 border-white bg-gradient-to-br from-amber-300 to-orange-400 text-[8px] flex items-center justify-center text-stone-900">
+                        {["👩","👨","👵","👴","🧑","👩‍🦰"][j % 6]}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-stone-500">{g.contributors} people kindling together</p>
+                  <span className="ml-auto text-[11px] font-semibold text-emerald-500">✓ No duplicates</span>
+                </div>
+              </motion.div>
+            ))}
+            {/* Summary */}
+            <div className="rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 px-4 py-3 flex items-center justify-between">
+              <div>
+                <p className="text-[11px] text-stone-500">Total value unlocked</p>
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-[26px] font-bold text-amber-600">£{dreamTotal}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-[11px] text-stone-500 leading-tight">Remembered forever.<br/>Exactly what they wanted.<br/>Zero guesswork.</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // WHY KINDLED — STATS COLLATERAL
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -3030,6 +3209,9 @@ export default function DemoPage() {
             </div>
           </section>
         )}
+
+        {/* ── Would You Rather ── */}
+        <WouldYouRather />
 
         {/* ── Kindled Stars entry ── */}
         <section className="px-4">
