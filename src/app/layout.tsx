@@ -15,6 +15,10 @@ const fontMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Kindled",
   description: "Kindled — gifting made magical",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

@@ -306,20 +306,31 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
       <div className="px-4 pt-4 pb-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-xl font-black text-stone-900 shadow-lg shadow-amber-900/30">
-                🌟
-              </div>
-              <span className="absolute -right-1 -bottom-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-stone-950 bg-emerald-400 text-[7px] font-black text-stone-900">
-                ✓
-              </span>
-            </div>
+            {/* Kindled logo mark */}
+            <svg viewBox="0 0 100 100" width="48" height="48" className="shrink-0 drop-shadow-md" role="img" aria-label="Kindled">
+              <defs>
+                <linearGradient id="hdr-tile" x1="0" y1="0" x2="60" y2="100" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#FFB845"/>
+                  <stop offset="100%" stopColor="#F26B2C"/>
+                </linearGradient>
+              </defs>
+              <rect width="100" height="100" rx="22" fill="url(#hdr-tile)"/>
+              <g fill="#FFF4E6">
+                <rect x="28" y="27" width="12" height="46" rx="6"/>
+                <rect x="34" y="33" width="34" height="12" rx="6" transform="rotate(-37 51 39)"/>
+                <rect x="34" y="56" width="34" height="12" rx="6" transform="rotate(37 51 62)"/>
+              </g>
+              <path d="M48 22 C41 14 32 17 35.5 25 C38 30 44 29 48 25.5 Z" fill="#FFF4E6"/>
+              <path d="M48 22 C55 14 64 17 60.5 25 C58 30 52 29 48 25.5 Z" fill="#FFF4E6"/>
+              <circle cx="48" cy="23.5" r="5.5" fill="#FFD27A"/>
+            </svg>
             <div>
-              <h1 className="text-[16px] font-black tracking-tight text-stone-900 leading-tight">
-                Billy&apos;s Dream Board
-              </h1>
+              <div className="flex items-baseline gap-1.5">
+                <h1 className="text-[17px] font-black tracking-tight text-stone-900 leading-tight">Kindled</h1>
+                <span className="text-[11px] font-semibold text-stone-400">· Billy&apos;s List</span>
+              </div>
               <p className="text-[11px] text-stone-400">
-                Managed by <span className="font-semibold text-amber-400">Mum (Sarah)</span>
+                Managed by <span className="font-semibold text-amber-500">Mum (Sarah)</span>
               </p>
             </div>
           </div>

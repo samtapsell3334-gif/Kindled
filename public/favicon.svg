@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Kindled">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="60" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFB845"/>
+      <stop offset="100%" stop-color="#F26B2C"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#tile)"/>
+  <!-- K stem and arms -->
+  <g fill="#FFF4E6">
+    <rect x="28" y="27" width="12" height="46" rx="6"/>
+    <rect x="34" y="33" width="34" height="12" rx="6" transform="rotate(-37 51 39)"/>
+    <rect x="34" y="56" width="34" height="12" rx="6" transform="rotate(37 51 62)"/>
+  </g>
+  <!-- bow left -->
+  <path d="M48 22 C41 14 32 17 35.5 25 C38 30 44 29 48 25.5 Z" fill="#FFF4E6"/>
+  <!-- bow right -->
+  <path d="M48 22 C55 14 64 17 60.5 25 C58 30 52 29 48 25.5 Z" fill="#FFF4E6"/>
+  <!-- bow centre knot -->
+  <circle cx="48" cy="23.5" r="5.5" fill="#FFD27A"/>
+</svg>
