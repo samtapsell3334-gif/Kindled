@@ -1416,10 +1416,346 @@ function InvestorHUD({ pots, logEntries }: { pots: DemoPot[]; logEntries: string
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// KINDLED STARS — KIDS SPACE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Pre-computed twinkling stars
+const TWINKLE_STARS = Array.from({ length: 28 }, (_, i) => ({
+  id: i,
+  cx: 5 + (i * 237) % 90,
+  cy: 2 + (i * 173) % 35,
+  r: 1 + (i % 3),
+  delay: `${(i * 0.31) % 2.8}s`,
+  dur: `${1.4 + (i * 0.19) % 1.2}s`,
+}));
+
+const CHORES = [
+  { id: "c1", emoji: "🪥", title: "Toothbrush Hero", desc: "Brush teeth morning & night", stars: 1, color: "from-sky-400 to-blue-500", shadow: "shadow-sky-200" },
+  { id: "c2", emoji: "🧸", title: "Toy Castle Tidyer", desc: "Put toys back in the box", stars: 2, color: "from-violet-400 to-purple-500", shadow: "shadow-violet-200" },
+  { id: "c3", emoji: "🥦", title: "Veggie Victory", desc: "Eat all your greens at dinner", stars: 1, color: "from-emerald-400 to-green-500", shadow: "shadow-emerald-200" },
+  { id: "c4", emoji: "📚", title: "Storytime Sleepyhead", desc: "Bed on time without a fuss", stars: 2, color: "from-amber-400 to-orange-500", shadow: "shadow-amber-200" },
+];
+
+// Flying star particle type
+interface FlyingStar {
+  id: number;
+  x: number;
+  y: number;
+  tx: number;
+  ty: number;
+}
+
+function useMagicChime() {
+  const ctxRef = useRef<AudioContext | null>(null);
+  return useCallback(() => {
+    try {
+      ctxRef.current ??= new AudioContext();
+      const ctx = ctxRef.current;
+      if (ctx.state === "suspended") void ctx.resume();
+      [880, 1108, 1318, 1760].forEach((f, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "sine"; o.frequency.value = f;
+        const t = ctx.currentTime + i * 0.09;
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.22, t + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t + 0.55);
+      });
+    } catch { /* silent */ }
+  }, []);
+}
+
+function StarIcon({ size = 20, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
+      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function KindledStars({ pots }: { pots: DemoPot[] }) {
+  const [totalStars, setTotalStars] = useState(24);
+  const [flyingStars, setFlyingStars] = useState<FlyingStar[]>([]);
+  const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
+  const [bouncing, setBouncing] = useState(false);
+  const [showRedeem, setShowRedeem] = useState(false);
+  const [impactPot, setImpactPot] = useState<string | null>(null);
+  const potRef = useRef<HTMLDivElement>(null);
+  const chime = useMagicChime();
+  const starIdRef = useRef(0);
+  const EXCHANGE_RATE = 0.50;
+  const GOAL_STARS = 30;
+  const targetPot = pots.find((p) => p.mode === "LIVE_FEED") ?? pots[0];
+
+  const handleChore = useCallback((chore: typeof CHORES[0], cardEl: HTMLElement) => {
+    if (completedToday.has(chore.id)) return;
+    chime();
+    setCompletedToday((s) => new Set([...s, chore.id]));
+
+    const cardRect = cardEl.getBoundingClientRect();
+    const potEl = potRef.current;
+    const potRect = potEl ? potEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: 200, width: 40, height: 40 };
+
+    // Spawn flying stars
+    const newStars: FlyingStar[] = Array.from({ length: chore.stars * 3 }, (_) => ({
+      id: starIdRef.current++,
+      x: cardRect.left + cardRect.width / 2 + (Math.random() - 0.5) * 40,
+      y: cardRect.top + cardRect.height / 2 + (Math.random() - 0.5) * 20,
+      tx: potRect.left + potRect.width / 2,
+      ty: potRect.top + potRect.height / 2,
+    }));
+    setFlyingStars((prev) => [...prev, ...newStars]);
+
+    setTimeout(() => {
+      setTotalStars((s) => s + chore.stars);
+      setBouncing(true);
+      setImpactPot(targetPot?.id ?? null);
+      setTimeout(() => { setBouncing(false); setImpactPot(null); }, 700);
+      setFlyingStars((prev) => prev.filter((s) => !newStars.find((n) => n.id === s.id)));
+    }, 900);
+  }, [completedToday, chime, targetPot]);
+
+  if (showRedeem) return (
+    <div className="min-h-screen bg-gradient-to-b from-indigo-950 via-violet-950 to-indigo-950 px-4 pt-6 pb-32">
+      <button onClick={() => setShowRedeem(false)} className="mb-4 flex items-center gap-2 text-violet-300 text-[13px] font-bold">
+        <span>←</span> Back to Stars
+      </button>
+      <div className="rounded-3xl bg-white/10 border border-white/20 p-5 text-center">
+        <p className="text-4xl mb-2">🎁</p>
+        <h2 className="text-[18px] font-black text-white mb-1">Redeem Stars</h2>
+        <p className="text-[12px] text-violet-300 mb-5">Ask Mum or Dad to approve your gift card!</p>
+        {[
+          { brand: "Amazon", emoji: "📦", val: 10, stars: 20 },
+          { brand: "Smyths Toys", emoji: "🧸", val: 5, stars: 10 },
+          { brand: "LEGO Store", emoji: "🧱", val: 15, stars: 30 },
+        ].map((gc) => (
+          <div key={gc.brand} className="mb-3 flex items-center justify-between rounded-2xl bg-white/10 border border-white/15 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{gc.emoji}</span>
+              <div className="text-left">
+                <p className="text-[13px] font-bold text-white">{gc.brand} Gift Card</p>
+                <p className="text-[11px] text-violet-300">£{gc.val} · 0% fees</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[11px] font-black text-amber-400">{gc.stars} ⭐</p>
+              <button className={cn(
+                "mt-1 rounded-xl px-3 py-1 text-[11px] font-bold",
+                totalStars >= gc.stars
+                  ? "bg-amber-400 text-stone-900"
+                  : "bg-white/10 text-white/40 cursor-not-allowed",
+              )}>
+                {totalStars >= gc.stars ? "Redeem" : "Need more ⭐"}
+              </button>
+            </div>
+          </div>
+        ))}
+        <p className="mt-4 text-[10px] text-violet-400">Parent approval required · Powered by Kindled × Tillo</p>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="relative min-h-screen bg-gradient-to-b from-indigo-950 via-violet-950 to-indigo-900 overflow-hidden pb-32">
+      {/* Flying stars overlay */}
+      {flyingStars.map((s) => (
+        <div
+          key={s.id}
+          className="pointer-events-none fixed z-50 text-amber-400"
+          style={{
+            left: s.x, top: s.y,
+            animation: `fly-to-pot 0.9s cubic-bezier(0.25,0.46,0.45,0.94) forwards`,
+            ["--tx" as string]: `${s.tx - s.x}px`,
+            ["--ty" as string]: `${s.ty - s.y}px`,
+          }}
+        >
+          <StarIcon size={18} />
+        </div>
+      ))}
+
+      {/* Twinkling star background */}
+      <div className="pointer-events-none absolute inset-0">
+        <svg className="w-full h-40" viewBox="0 0 100 40" preserveAspectRatio="xMidYMid slice">
+          {TWINKLE_STARS.map((s) => (
+            <circle key={s.id} cx={s.cx} cy={s.cy} r={s.r} fill="white"
+              style={{ animation: `twinkle ${s.dur} ${s.delay} ease-in-out infinite alternate`, opacity: 0.6 }} />
+          ))}
+        </svg>
+        {/* Clouds */}
+        {[{ x: "5%", y: 48 }, { x: "55%", y: 28 }, { x: "75%", y: 60 }].map((c, i) => (
+          <div key={i} className="absolute" style={{ left: c.x, top: c.y }}>
+            <div className="flex">
+              {[28, 38, 28].map((w, j) => (
+                <div key={j} className="rounded-full bg-white/8" style={{ width: w, height: w * 0.6, marginLeft: j > 0 ? -8 : 0 }} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Header */}
+      <header className="relative z-10 px-4 pt-6 pb-4 text-center">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-violet-400 mb-1">✨ Kindled Stars</p>
+        <h1 className="text-[22px] font-black text-white leading-tight">Billy&apos;s Star Dashboard 🚀</h1>
+        <p className="text-[12px] text-violet-300 mt-1">Complete adventures to earn stars!</p>
+
+        {/* Giant star counter */}
+        <div className={cn(
+          "mt-4 inline-flex flex-col items-center gap-1 rounded-3xl bg-white/10 border border-white/20 px-8 py-4 transition-transform",
+          bouncing && "animate-bounce",
+        )}>
+          <div className="flex items-center gap-2">
+            <StarIcon size={32} className={cn("text-amber-400 drop-shadow-lg", bouncing && "animate-spin")} />
+            <span className="text-[48px] font-black text-amber-400 leading-none tabular-nums">{totalStars}</span>
+            <StarIcon size={32} className={cn("text-amber-400 drop-shadow-lg", bouncing && "animate-spin")} />
+          </div>
+          <p className="text-[12px] font-bold text-amber-300">Stars Earned</p>
+          <p className="text-[10px] text-violet-400">= £{(totalStars * EXCHANGE_RATE).toFixed(2)} towards your dream!</p>
+        </div>
+      </header>
+
+      {/* Star exchange rate */}
+      <div className="relative z-10 mx-4 mb-4 rounded-2xl bg-white/8 border border-white/15 px-4 py-3">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">💰</span>
+          <div>
+            <p className="text-[12px] font-bold text-white">Star Exchange Rate</p>
+            <p className="text-[11px] text-violet-300">1 ⭐ = £{EXCHANGE_RATE.toFixed(2)} funded by Mum &amp; Dad</p>
+          </div>
+          <div className="ml-auto text-right">
+            <p className="text-[11px] font-black text-emerald-400">£{(totalStars * EXCHANGE_RATE).toFixed(2)}</p>
+            <p className="text-[9px] text-violet-400">total earned</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Target pot */}
+      {targetPot && (
+        <div ref={potRef} className="relative z-10 mx-4 mb-5 rounded-2xl bg-white/10 border-2 border-amber-400/40 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">{targetPot.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[12px] font-bold text-white truncate">{targetPot.title}</p>
+              <div className="mt-1.5 h-3 w-full rounded-full bg-white/15 overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500", impactPot === targetPot.id && "animate-pulse")}
+                  style={{ width: `${Math.min(100, Math.round((targetPot.raised / targetPot.goal) * 100))}%` }}
+                />
+              </div>
+              <p className="text-[10px] text-violet-300 mt-1">£{targetPot.raised} / £{targetPot.goal} · Stars splash here! 🌟</p>
+            </div>
+            {impactPot === targetPot.id && (
+              <div className="text-2xl animate-bounce">✨</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Daily Adventures */}
+      <section className="relative z-10 px-4 mb-6">
+        <h2 className="text-[14px] font-black text-white mb-1">🗺️ Daily Adventures</h2>
+        <p className="text-[11px] text-violet-400 mb-3">Tap to complete · Stars fly to your pot!</p>
+        <div className="grid grid-cols-2 gap-3">
+          {CHORES.map((chore) => {
+            const done = completedToday.has(chore.id);
+            return (
+              <button
+                key={chore.id}
+                onClick={(e) => handleChore(chore, e.currentTarget)}
+                disabled={done}
+                className={cn(
+                  "relative flex flex-col items-center gap-2 rounded-3xl p-4 text-center transition-all duration-300 active:scale-95",
+                  done
+                    ? "bg-white/15 border-2 border-white/30 opacity-80"
+                    : `bg-gradient-to-br ${chore.color} shadow-lg ${chore.shadow}`,
+                )}
+              >
+                {done && (
+                  <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-black/20">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-400 text-stone-900 text-2xl font-black shadow-lg">
+                      ✓
+                    </div>
+                  </div>
+                )}
+                <span className="text-4xl">{chore.emoji}</span>
+                <p className="text-[12px] font-black text-white leading-tight">{chore.title}</p>
+                <p className="text-[10px] text-white/80 leading-tight">{chore.desc}</p>
+                <div className="flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 mt-1">
+                  <StarIcon size={12} className="text-amber-300" />
+                  <span className="text-[11px] font-black text-white">+{chore.stars}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Goal milestone track */}
+      <section className="relative z-10 mx-4 mb-5 rounded-3xl bg-white/8 border border-white/15 p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-xl">🏆</span>
+          <div>
+            <p className="text-[13px] font-black text-white">Next Milestone</p>
+            <p className="text-[11px] text-violet-300">Star Wars LEGO Pack 🚀</p>
+          </div>
+          <div className="ml-auto text-right">
+            <p className="text-[11px] font-black text-amber-400">{totalStars}/{GOAL_STARS} ⭐</p>
+            <p className="text-[9px] text-violet-400">Unlocks at {GOAL_STARS}</p>
+          </div>
+        </div>
+        {/* Progress track */}
+        <div className="relative h-5 rounded-full bg-white/10 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300 transition-all duration-700"
+            style={{ width: `${Math.min(100, (totalStars / GOAL_STARS) * 100)}%` }}
+          />
+          {/* Stars along the track */}
+          {[10, 20, 30].map((milestone) => (
+            <div
+              key={milestone}
+              className="absolute top-1/2 -translate-y-1/2"
+              style={{ left: `${(milestone / GOAL_STARS) * 100}%` }}
+            >
+              <div className={cn(
+                "flex h-5 w-5 -translate-x-1/2 items-center justify-center rounded-full border-2 text-[8px]",
+                totalStars >= milestone
+                  ? "border-amber-400 bg-amber-400 text-stone-900"
+                  : "border-white/30 bg-indigo-900 text-white/50",
+              )}>
+                ⭐
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[10px] text-violet-400 text-center">
+          {totalStars >= GOAL_STARS ? "🎉 Milestone unlocked! Ask Mum to redeem!" : `${GOAL_STARS - totalStars} more stars to unlock your reward!`}
+        </p>
+      </section>
+
+      {/* Redeem CTA */}
+      <div className="relative z-10 mx-4">
+        <button
+          onClick={() => setShowRedeem(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-3xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-black text-stone-900 shadow-xl shadow-amber-900/30 active:scale-[0.97] transition-transform"
+        >
+          <StarIcon size={20} />
+          Exchange Stars for Gift Cards
+        </button>
+        <p className="mt-2 text-center text-[10px] text-violet-500">Parent approval required · 0% fees · Instant delivery</p>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default function DemoPage() {
+  const [tab, setTab] = useState<"parent" | "kids">("parent");
   const [pots, setPots] = useState<DemoPot[]>(INITIAL_POTS);
   const [revealPot, setRevealPot] = useState<DemoPot | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -1474,10 +1810,44 @@ export default function DemoPage() {
   const surprisePots = pots.filter((p) => p.mode !== "LIVE_FEED");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 text-stone-900">
+    <div className="min-h-screen text-stone-900">
       {revealPot && <RevealModal pot={revealPot} onClose={() => setRevealPot(null)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
+      {/* ── Tab switcher ── */}
+      <div className={cn(
+        "sticky top-0 z-40 flex border-b",
+        tab === "kids" ? "bg-indigo-950 border-white/10" : "bg-white/95 border-orange-100",
+      )}>
+        <button
+          onClick={() => setTab("parent")}
+          className={cn(
+            "flex-1 py-3.5 text-[13px] font-bold transition-all",
+            tab === "parent"
+              ? "text-orange-500 border-b-2 border-orange-500 bg-white/5"
+              : tab === "kids" ? "text-white/40" : "text-stone-400",
+          )}
+        >
+          👨‍👩‍👧 Parent Dashboard
+        </button>
+        <button
+          onClick={() => setTab("kids")}
+          className={cn(
+            "flex-1 py-3.5 text-[13px] font-bold transition-all",
+            tab === "kids"
+              ? "text-amber-400 border-b-2 border-amber-400"
+              : "text-stone-400",
+          )}
+        >
+          ⭐ Kindled Stars
+        </button>
+      </div>
+
+      {/* ── Kids Space ── */}
+      {tab === "kids" && <KindledStars pots={pots} />}
+
+      {/* ── Parent Dashboard ── */}
+      {tab === "parent" && <>
       <ProfileHeader
         potCount={pots.length}
         totalGoal={pots.reduce((s, p) => s + p.goal, 0)}
@@ -1538,6 +1908,7 @@ export default function DemoPage() {
       </main>
 
       <InvestorHUD pots={pots} logEntries={logEntries} />
+      </>}
     </div>
   );
 }
