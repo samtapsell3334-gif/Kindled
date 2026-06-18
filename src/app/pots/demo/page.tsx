@@ -1476,7 +1476,7 @@ function StarIcon({ size = 20, className = "" }: { size?: number; className?: st
   );
 }
 
-function KindledStars({ pots }: { pots: DemoPot[] }) {
+function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void }) {
   const [totalStars, setTotalStars] = useState(24);
   const [flyingStars, setFlyingStars] = useState<FlyingStar[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
@@ -1487,7 +1487,6 @@ function KindledStars({ pots }: { pots: DemoPot[] }) {
   const chime = useMagicChime();
   const starIdRef = useRef(0);
   const EXCHANGE_RATE = 0.50;
-  const GOAL_STARS = 30;
   const targetPot = pots.find((p) => p.mode === "LIVE_FEED") ?? pots[0];
 
   const handleChore = useCallback((chore: typeof CHORES[0], cardEl: HTMLElement) => {
@@ -1597,10 +1596,15 @@ function KindledStars({ pots }: { pots: DemoPot[] }) {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 px-4 pt-6 pb-4 text-center">
+      <header className="relative z-10 px-4 pt-5 pb-4">
+        <button onClick={onClose} className="mb-3 flex items-center gap-1.5 text-[13px] font-bold text-violet-300 active:opacity-70">
+          <span>←</span> Back to Dashboard
+        </button>
+        <div className="text-center">
         <p className="text-[11px] font-bold uppercase tracking-widest text-violet-400 mb-1">✨ Kindled Stars</p>
         <h1 className="text-[22px] font-black text-white leading-tight">Billy&apos;s Star Dashboard 🚀</h1>
         <p className="text-[12px] text-violet-300 mt-1">Complete adventures to earn stars!</p>
+        </div>
 
         {/* Giant star counter */}
         <div className={cn(
@@ -1693,45 +1697,52 @@ function KindledStars({ pots }: { pots: DemoPot[] }) {
         </div>
       </section>
 
-      {/* Goal milestone track */}
+      {/* 20-step sticker chart */}
       <section className="relative z-10 mx-4 mb-5 rounded-3xl bg-white/8 border border-white/15 p-4">
         <div className="flex items-center gap-2 mb-3">
           <span className="text-xl">🏆</span>
-          <div>
-            <p className="text-[13px] font-black text-white">Next Milestone</p>
-            <p className="text-[11px] text-violet-300">Star Wars LEGO Pack 🚀</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-black text-white">Star Chart</p>
+            <p className="text-[11px] text-violet-300">Fill 20 stars → unlock your reward! 🚀</p>
           </div>
-          <div className="ml-auto text-right">
-            <p className="text-[11px] font-black text-amber-400">{totalStars}/{GOAL_STARS} ⭐</p>
-            <p className="text-[9px] text-violet-400">Unlocks at {GOAL_STARS}</p>
+          <div className="text-right">
+            <p className="text-[11px] font-black text-amber-400">{Math.min(totalStars, 20)}/20</p>
+            <p className="text-[9px] text-violet-400">filled</p>
           </div>
         </div>
-        {/* Progress track */}
-        <div className="relative h-5 rounded-full bg-white/10 overflow-hidden">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-300 transition-all duration-700"
-            style={{ width: `${Math.min(100, (totalStars / GOAL_STARS) * 100)}%` }}
-          />
-          {/* Stars along the track */}
-          {[10, 20, 30].map((milestone) => (
-            <div
-              key={milestone}
-              className="absolute top-1/2 -translate-y-1/2"
-              style={{ left: `${(milestone / GOAL_STARS) * 100}%` }}
-            >
-              <div className={cn(
-                "flex h-5 w-5 -translate-x-1/2 items-center justify-center rounded-full border-2 text-[8px]",
-                totalStars >= milestone
-                  ? "border-amber-400 bg-amber-400 text-stone-900"
-                  : "border-white/30 bg-indigo-900 text-white/50",
-              )}>
-                ⭐
+        {/* 4×5 sticker grid */}
+        <div className="grid grid-cols-5 gap-2">
+          {Array.from({ length: 20 }, (_, idx) => {
+            const filled = idx < totalStars;
+            const isMilestone = idx === 4 || idx === 9 || idx === 14 || idx === 19;
+            return (
+              <div
+                key={idx}
+                className={cn(
+                  "relative flex aspect-square items-center justify-center rounded-2xl border-2 text-[18px] transition-all duration-500",
+                  filled
+                    ? isMilestone
+                      ? "border-amber-300 bg-gradient-to-br from-amber-400 to-orange-400 shadow-lg shadow-amber-500/40 scale-105"
+                      : "border-amber-400/60 bg-gradient-to-br from-yellow-300/40 to-amber-400/30"
+                    : "border-white/15 bg-white/5",
+                )}
+              >
+                {filled ? (
+                  isMilestone ? "🌟" : "⭐"
+                ) : (
+                  <span className="text-[10px] font-black text-white/20">{idx + 1}</span>
+                )}
+                {isMilestone && filled && (
+                  <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[7px] font-black text-white">!</div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-        <p className="mt-2 text-[10px] text-violet-400 text-center">
-          {totalStars >= GOAL_STARS ? "🎉 Milestone unlocked! Ask Mum to redeem!" : `${GOAL_STARS - totalStars} more stars to unlock your reward!`}
+        <p className="mt-3 text-[10px] text-violet-400 text-center">
+          {totalStars >= 20
+            ? "🎉 Chart complete! Ask Mum or Dad to redeem your reward!"
+            : `${Math.max(0, 20 - totalStars)} more stars to complete your chart!`}
         </p>
       </section>
 
@@ -1755,7 +1766,7 @@ function KindledStars({ pots }: { pots: DemoPot[] }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default function DemoPage() {
-  const [tab, setTab] = useState<"parent" | "kids">("parent");
+  const [showStars, setShowStars] = useState(false);
   const [pots, setPots] = useState<DemoPot[]>(INITIAL_POTS);
   const [revealPot, setRevealPot] = useState<DemoPot | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -1814,40 +1825,15 @@ export default function DemoPage() {
       {revealPot && <RevealModal pot={revealPot} onClose={() => setRevealPot(null)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
-      {/* ── Tab switcher ── */}
-      <div className={cn(
-        "sticky top-0 z-40 flex border-b",
-        tab === "kids" ? "bg-indigo-950 border-white/10" : "bg-white/95 border-orange-100",
-      )}>
-        <button
-          onClick={() => setTab("parent")}
-          className={cn(
-            "flex-1 py-3.5 text-[13px] font-bold transition-all",
-            tab === "parent"
-              ? "text-orange-500 border-b-2 border-orange-500 bg-white/5"
-              : tab === "kids" ? "text-white/40" : "text-stone-400",
-          )}
-        >
-          👨‍👩‍👧 Parent Dashboard
-        </button>
-        <button
-          onClick={() => setTab("kids")}
-          className={cn(
-            "flex-1 py-3.5 text-[13px] font-bold transition-all",
-            tab === "kids"
-              ? "text-amber-400 border-b-2 border-amber-400"
-              : "text-stone-400",
-          )}
-        >
-          ⭐ Kindled Stars
-        </button>
-      </div>
-
-      {/* ── Kids Space ── */}
-      {tab === "kids" && <KindledStars pots={pots} />}
+      {/* ── Kids Space (full-screen overlay) ── */}
+      {showStars && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <KindledStars pots={pots} onClose={() => setShowStars(false)} />
+        </div>
+      )}
 
       {/* ── Parent Dashboard ── */}
-      {tab === "parent" && <>
+      {<>
       <ProfileHeader
         potCount={pots.length}
         totalGoal={pots.reduce((s, p) => s + p.goal, 0)}
@@ -1885,6 +1871,35 @@ export default function DemoPage() {
 
         {/* ── Mum Knows Best ── */}
         <MumChecklist onClaim={handleClaim} />
+
+        {/* ── Kindled Stars entry ── */}
+        <section className="px-4">
+          <button
+            onClick={() => setShowStars(true)}
+            className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 p-5 text-left shadow-xl shadow-indigo-900/30 active:scale-[0.98] transition-transform"
+          >
+            {/* Twinkling dots */}
+            <div className="pointer-events-none absolute inset-0">
+              {[{l:"12%",t:"18%"},{l:"78%",t:"12%"},{l:"55%",t:"65%"},{l:"88%",t:"55%"},{l:"30%",t:"75%"}].map((p,i)=>(
+                <span key={i} className="absolute text-[10px]" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.3}s ${i*0.4}s ease-in-out infinite alternate`,opacity:0.7}}>⭐</span>
+              ))}
+            </div>
+            <div className="relative flex items-center gap-4">
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20 text-3xl">
+                🌟
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-violet-200 mb-0.5">Kids Rewards</p>
+                <h3 className="text-[17px] font-black text-white leading-tight">Kindled Stars</h3>
+                <p className="text-[12px] text-violet-200 mt-0.5">Billy&apos;s star chart · 4 adventures today</p>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <span className="rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-black text-stone-900">Open →</span>
+                <span className="text-[10px] text-violet-300">24 ⭐ earned</span>
+              </div>
+            </div>
+          </button>
+        </section>
 
         {/* ── Catalogue ── */}
         <CatalogueGrid onAdd={handleAddItem} />
