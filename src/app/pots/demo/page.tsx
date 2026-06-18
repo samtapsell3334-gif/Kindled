@@ -78,7 +78,7 @@ interface ExplainerScene {
 const INITIAL_POTS: DemoPot[] = [
   {
     id: "p1", title: "Super-Fast Mountain Bike", emoji: "🚵",
-    image: "https://images.unsplash.com/photo-1576435728678-68d0fbf94946?w=400&h=400&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&q=80",
     goal: 450, raised: 310, mode: "LIVE_FEED", continuous: true,
     eventLabel: "Ongoing", eventDate: "Anytime", eventIso: "2027-01-01T00:00:00Z",
     contributors: 7, boosterEntries: 0,
@@ -105,7 +105,7 @@ const INITIAL_POTS: DemoPot[] = [
   },
   {
     id: "p3", title: "Retro Arcade Cabinet", emoji: "🕹️",
-    image: "https://images.unsplash.com/photo-1511882150382-421056c89033?w=400&h=400&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop&q=80",
     goal: 250, raised: 80, mode: "LIVE_FEED", continuous: true,
     eventLabel: "Ongoing", eventDate: "Anytime", eventIso: "2027-01-01T00:00:00Z",
     contributors: 3, boosterEntries: 0,
@@ -149,19 +149,19 @@ const CHECKLIST: ChecklistItem[] = [
 
 const CATALOGUE: CatalogItem[] = [
   { id: "c1", name: "Nintendo Switch OLED", emoji: "🎮",
-    image: "https://images.unsplash.com/photo-1585184394271-4c0a47dc59c9?w=400&h=400&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=400&fit=crop&q=80",
     price: 309.99, tag: "Popular", tagColor: "bg-red-100 text-red-600", glowColor: "#ef4444" },
   { id: "c2", name: "Electric Scooter Pro", emoji: "🛴",
-    image: "https://images.unsplash.com/photo-1598963516523-4a0b61e2de32?w=400&h=400&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=400&h=400&fit=crop&q=80",
     price: 399.99, tag: "Trending", tagColor: "bg-emerald-100 text-emerald-600", glowColor: "#10b981" },
   { id: "c3", name: "Meta Quest 3 VR", emoji: "🥽",
     image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=400&h=400&fit=crop&q=80",
     price: 499.99, tag: "High Intent", tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6" },
   { id: "c4", name: "LEGO Technic Ferrari", emoji: "🏎️",
-    image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=400&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1560961911-ba7ef651a56c?w=400&h=400&fit=crop&q=80",
     price: 189.99, tag: "Bestseller", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
   { id: "c5", name: "Air Hockey Table", emoji: "🏒",
-    image: "https://images.unsplash.com/photo-1606503153255-59d5e417bec8?w=400&h=400&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1526888935184-a82d2a4b7e67?w=400&h=400&fit=crop&q=80",
     price: 199.99, tag: "New", tagColor: "bg-pink-100 text-pink-600", glowColor: "#ec4899" },
   { id: "c6", name: "LEGO Star Wars X-Wing", emoji: "✈️",
     image: "https://images.unsplash.com/photo-1609372332255-611485350f25?w=400&h=400&fit=crop&q=80",
@@ -459,12 +459,15 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2.5">
             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-black/30">
-              {pot.image && <img src={pot.image} alt="" className="h-full w-full object-cover opacity-30 blur-[2px]" />}
-              <span className="absolute inset-0 flex items-center justify-center text-xl">🎁</span>
+              {pot.image
+                ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                : <span className="flex h-full w-full items-center justify-center text-xl">{pot.emoji}</span>}
+              <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-tl-lg bg-black/60 text-[9px]">🎁</span>
             </div>
             <div className="min-w-0">
-              <h3 className="truncate text-[14px] font-bold text-stone-900">{pot.title}</h3>
-              <p className={cn("text-[11px] font-medium", th.label)}>{th.modeLabel}</p>
+              <h3 className="truncate text-[14px] font-bold text-white">{pot.title}</h3>
+              <p className={cn("text-[11px] font-medium", th.label)}>{th.modeLabel} · 🤫 secret</p>
             </div>
           </div>
           <div className="shrink-0 rounded-xl bg-black/20 px-2.5 py-1.5 text-right">
