@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/samueltapsell/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/01386347-399e-448d-8167-4ca3fb4c113e/eb300e52-4434-4c65-b769-c875534abc1d/skills/pptx/**)",
+      "Bash(python3 scripts/extract-text.py \"/Users/samueltapsell/untitled folder/Final.pptx\")",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c ' *)",
+      "Bash(npm install *)",
+      "Read(//usr/local/bin/**)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(find /opt /usr/local /Users/samueltapsell -name \"node\" -type f 2>/dev/null | head -5)",
+      "Bash(mdfind \"kMDItemFSName == 'node' && kMDItemContentType == 'public.unix-executable'\")",
+      "Bash(/bin/zsh -l -c 'npm run dev 2>&1')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/pots)",
+      "Bash(/bin/zsh -l -c 'npx prisma generate 2>&1')",
+      "Bash(/bin/zsh -l -c 'npx prisma generate 2>&1 | tail -4')",
+      "Bash(/bin/zsh -l -c 'npx tsc --noEmit 2>&1')",
+      "Bash(/bin/zsh -l -c 'npm run build 2>&1 | tail -20')",
+      "Bash(/bin/zsh -l -c 'npm run build 2>&1 | tail -15')",
+      "Bash(/bin/zsh -l -c 'npx tsc --noEmit 2>&1 | head -60')",
+      "Bash(/bin/zsh -l -c 'npx tsc --noEmit 2>&1 | head -40')",
+      "Bash(/bin/zsh -l -c 'npm run dev')",
+      "Bash(/bin/zsh -l -c 'npm run dev -- --port 3002')",
+      "Bash(echo \"PID: $!\")",
+      "Bash(sleep 4 && tail -15 /tmp/kindling-dev.log)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/pots/demo)",
+      "Bash(/bin/zsh -l -c 'npm run build 2>&1 | tail -40')",
+      "Bash(/bin/zsh -l -c 'npm run build 2>&1')",
+      "Bash(/bin/zsh -l -c 'npm run dev > /tmp/kindling-dev.log 2>&1 &')",
+      "Bash(gh auth *)",
+      "Bash(git --version)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

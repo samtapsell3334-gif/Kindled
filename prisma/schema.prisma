@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ─────────────────────────────────────────────────────────────────
+
+enum PotStatus {
+  ACTIVE   // Pot is live, accepting contributions
+  HALFWAY  // ≥ 50% of targetAmount reached
+  FUNDED   // targetAmount reached or exceeded
+  STALLED  // No contribution activity for a configured period
+}
+
+enum PaymentMethod {
+  OPEN_BANKING
+  CASHBACK
+  CARD
+}
+
+enum ContributionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+/// Controls both the UX reveal mechanic and the B2B AdTech temporal-window strategy.
+///
+/// LIVE_FEED      — standard public pot; progress always visible to all viewers.
+/// UNDER_THE_TREE — Christmas / seasonal surprise; receiver sees locked gift box until
+///                  eventDate. Contributors always see the live progress bar.
+///                  Generates a programmatic 10–20-day "Temporal Advantage" window for
+///                  the reverse-auction cashback engine between funding date and reveal.
+/// WRAPPED_UP     — Birthday / personal milestone surprise. Same privacy rules as
+///                  UNDER_THE_TREE but with distinct theming (plum palette, confetti,
+///                  birthday bow reveal ceremony) and independent AdTech segmentation.
+enum GiftingMode {
+  LIVE_FEED
+  UNDER_THE_TREE
+  WRAPPED_UP
+}
+
+enum ItemCategory {
+  ELECTRONICS
+  FASHION
+  HOME_GARDEN
+  SPORTS_OUTDOORS
+  BEAUTY_HEALTH
+  TOYS_GAMES
+  TRAVEL
+  EXPERIENCES
+  FOOD_DRINK
+  OTHER
+}
+
+// ─── Models ────────────────────────────────────────────────────────────────
+
+model User {
+  id                    String   @id @default(cuid())
+  phone                 String?  @unique
+  email                 String?  @unique
+  name                  String?
+  avatarUrl             String?
+  /// Whether the user has completed onboarding (phone verified, profile set)
+  isRegistered          Boolean  @default(false)
+  cashbackWalletBalance Decimal  @default(0) @db.Decimal(10, 2)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  potsCreated   Pot[]            @relation("PotCreator")
+  contributions Contribution[]   @relation("ContributionGiver")
+  intentNodes   IntentDataNode[]
+
+  @@index([phone])
+  @@index([email])
+  @@index([isRegistered, createdAt])
+  @@map("users")
+}
+
+/// Continuous Pot — persists across multiple gifting cycles (e.g. the same
+/// "Mountain Bike" pot can receive contributions at Christmas AND a birthday).
+/// The pot accumulates a lifetime balance; eventDate represents the *next*
+/// target reveal milestone, not a deletion deadline.
+model Pot {
+  id             String      @id @default(cuid())
+  creatorId      String
+  /// Human-readable name for the item/goal — persists across gifting cycles.
+  title          String
+  description    String?
+  targetAmount   Decimal     @db.Decimal(10, 2)
+  currentBalance Decimal     @default(0) @db.Decimal(10, 2)
+  status         PotStatus   @default(ACTIVE)
+  /// Determines reveal mechanic, UX theming, and AdTech segmentation bucket.
+  /// See GiftingMode enum for full semantics.
+  mode           GiftingMode @default(LIVE_FEED)
+  /// When true, this pot persists across multiple gifting cycles (the same goal
+  /// can receive contributions at Christmas AND a birthday without being closed).
+  /// Enables the continuous-pot architecture central to the Kindling flywheel.
+  continuous     Boolean     @default(true)
+  /// The next milestone reveal date (e.g. Christmas morning or a birthday).
+  /// Null for LIVE_FEED pots with no fixed deadline.
+  eventDate      DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  creator       User             @relation("PotCreator", fields: [creatorId], references: [id])
+  items         PotItem[]
+  contributions Contribution[]
+  intentNodes   IntentDataNode[]
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([status, eventDate])
+  @@index([creatorId, status])
+  // AdTech: segment programmatic bids by gifting mode and status
+  @@index([mode, status])
+  @@map("pots")
+}
+
+model PotItem {
+  id          String       @id @default(cuid())
+  potId       String
+  productName String
+  category    ItemCategory
+  price       Decimal      @db.Decimal(10, 2)
+  externalUrl String?
+  isSponsored Boolean      @default(false)
+  /// Screen X coordinate for visual pin on the pot board (0–1 normalised)
+  pinX        Float?
+  /// Screen Y coordinate for visual pin on the pot board (0–1 normalised)
+  pinY        Float?
+  addedAt     DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  pot         Pot              @relation(fields: [potId], references: [id], onDelete: Cascade)
+  intentNodes IntentDataNode[]
+
+  @@index([potId])
+  @@index([category])
+  @@index([potId, category])
+  @@index([isSponsored, category])
+  @@index([isSponsored, price, category])
+  @@map("pot_items")
+}
+
+model Contribution {
+  id              String             @id @default(cuid())
+  potId           String
+  /// Null for anonymous contributions
+  giverId         String?
+  amount          Decimal            @db.Decimal(10, 2)
+  paymentMethod   PaymentMethod
+  status          ContributionStatus @default(PENDING)
+  /// Optional text tribute shown in the reveal ceremony message cards
+  message         String?
+  /// Optional video tribute URL shown in the reveal ceremony showreel
+  videoUrl        String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  pot   Pot   @relation(fields: [potId], references: [id])
+  giver User? @relation("ContributionGiver", fields: [giverId], references: [id])
+
+  @@index([potId])
+  @@index([giverId])
+  @@index([status])
+  @@index([potId, status])
+  @@index([paymentMethod, status])
+  @@index([createdAt, status])
+  @@map("contributions")
+}
+
+/// Analytical ledger for high-intent purchase signals.
+/// Populated when a user adds a PotItem priced ≥ £200 within 24 h of pot creation (Day 1).
+/// Feeds programmatic ad targeting, retargeting audiences, and CPM yield optimisation.
+model IntentDataNode {
+  id                    String       @id @default(cuid())
+  userId                String
+  potId                 String
+  potItemId             String
+  category              ItemCategory
+  /// Captured price at the time of the signal — item price may change later
+  priceAtCapture        Decimal      @db.Decimal(10, 2)
+  /// Hours elapsed between pot creation and item being added
+  hoursAfterPotCreation Float
+  /// Whether this node has been exported to the downstream ad platform
+  isExported            Boolean      @default(false)
+  exportedAt            DateTime?
+  capturedAt            DateTime     @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  pot     Pot     @relation(fields: [potId], references: [id])
+  potItem PotItem @relation(fields: [potItemId], references: [id])
+
+  @@index([isExported, capturedAt])
+  @@index([isExported, category, capturedAt])
+  @@index([userId, capturedAt])
+  @@index([potId])
+  @@index([category, priceAtCapture])
+  @@map("intent_data_nodes")
+}
