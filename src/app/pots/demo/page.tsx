@@ -42,17 +42,14 @@ interface DemoPot {
   boosterEntries: number;
   accentGradient: string;
   tributes: MemoryCard[];
-}
-
-interface ChecklistItem {
-  id: string;
-  name: string;
-  price: number;
-  status: "claimed" | "available";
+  // Parent Knows Best / checklist pots
+  tag?: string;
+  isClaimed?: boolean;
   claimedBy?: string;
   claimedEmoji?: string;
-  shippingNote?: string;
+  claimedNote?: string;
 }
+
 
 interface CatalogItem {
   id: string;
@@ -130,20 +127,38 @@ const INITIAL_POTS: DemoPot[] = [
   },
 ];
 
-const CHECKLIST: ChecklistItem[] = [
+const CHECKLIST_POTS: DemoPot[] = [
   {
-    id: "cl1", name: "LEGO Space Shuttle Explorer", price: 25,
-    status: "claimed", claimedBy: "Grandma Linda", claimedEmoji: "👵",
-    shippingNote: "Shipped directly from Amazon · Arrives Dec 23",
+    id: "cl1", title: "LEGO Space Shuttle Explorer", emoji: "🚀",
+    goal: 25, raised: 25, mode: "LIVE_FEED", continuous: false,
+    eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
+    contributors: 1, boosterEntries: 0,
+    accentGradient: "from-emerald-400 to-teal-500",
+    tributes: [],
+    tag: "Grandma Linda",
+    isClaimed: true, claimedBy: "Grandma Linda", claimedEmoji: "👵",
+    claimedNote: "Shipped directly from Amazon · Arrives Dec 23",
   },
   {
-    id: "cl2", name: "Adventure Book Series (x3)", price: 15,
-    status: "claimed", claimedBy: "Uncle Steve", claimedEmoji: "👨‍🦲",
-    shippingNote: "Bringing to the party in person",
+    id: "cl2", title: "Adventure Book Series (x3)", emoji: "📚",
+    goal: 15, raised: 15, mode: "LIVE_FEED", continuous: false,
+    eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
+    contributors: 1, boosterEntries: 0,
+    accentGradient: "from-sky-400 to-blue-500",
+    tributes: [],
+    tag: "Uncle Steve",
+    isClaimed: true, claimedBy: "Uncle Steve", claimedEmoji: "👨‍🦲",
+    claimedNote: "Bringing to the party in person",
   },
   {
-    id: "cl3", name: "Marvel Action Figure Set", price: 18,
-    status: "available",
+    id: "cl3", title: "Marvel Action Figure Set", emoji: "🦸",
+    goal: 18, raised: 0, mode: "LIVE_FEED", continuous: false,
+    eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
+    contributors: 0, boosterEntries: 0,
+    accentGradient: "from-rose-400 to-red-500",
+    tributes: [],
+    tag: "Mum Knows Best",
+    isClaimed: false,
   },
 ];
 
@@ -371,9 +386,19 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
 // LIVE POT CARD
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) => void }) {
+const KINDLE_AMOUNTS = [5, 10, 25, 50];
+
+function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
+  pot: DemoPot;
+  onRemove?: (id: string) => void;
+  onKindle?: (id: string, amount: number) => void;
+  onBuy?: (id: string) => void;
+}) {
+  const [kindleOpen, setKindleOpen] = useState(false);
+  const [kindled, setKindled] = useState(false);
   const pct = Math.min(100, Math.round((pot.raised / pot.goal) * 100));
   const statusLabel =
+    pot.isClaimed    ? "Ordered ✓" :
     pct >= 100 ? "Fully Lit 🔥" :
     pct >= 75  ? "Blazing 🔥" :
     pct >= 50  ? "Campfire 🏕️" :
@@ -381,11 +406,19 @@ function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) 
     pct > 0    ? "Embers ✨" :
                  "Spark 🕯️";
   const statusColor =
+    pot.isClaimed    ? "text-emerald-500" :
     pct >= 100 ? "text-emerald-500" :
     pct >= 75  ? "text-orange-500" :
     pct >= 50  ? "text-amber-500" :
     pct >= 25  ? "text-amber-400" :
                  "text-orange-400";
+
+  function handleKindle(amount: number) {
+    setKindled(true);
+    setKindleOpen(false);
+    onKindle?.(pot.id, amount);
+    setTimeout(() => setKindled(false), 2000);
+  }
 
   return (
     <motion.article
@@ -397,6 +430,7 @@ function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) 
     >
       <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
       <div className="p-4">
+        {/* Header row */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-3">
             <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl bg-amber-50 shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)]">
@@ -406,12 +440,24 @@ function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) 
               ) : (
                 <span className="flex h-full w-full items-center justify-center text-2xl">{pot.emoji}</span>
               )}
+              {pot.isClaimed && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-emerald-500/80">
+                  <Check className="h-5 w-5 text-white" strokeWidth={3} />
+                </div>
+              )}
             </div>
-            <div className="min-w-0">
-              <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium tracking-tight text-stone-900">{pot.title}</h3>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium tracking-tight text-stone-900">{pot.title}</h3>
+                {pot.tag && (
+                  <span className="shrink-0 rounded-full bg-violet-50 border border-violet-200 px-2 py-px text-[9px] font-semibold text-violet-600">
+                    {pot.tag}
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <p className={cn("text-[11px] font-medium", statusColor)}>{statusLabel}</p>
-                {pot.continuous && (
+                {pot.continuous && !pot.isClaimed && (
                   <span className="rounded-full bg-teal-50 border border-teal-200 px-1.5 py-px text-[9px] font-semibold text-teal-600">
                     ∞ continuous
                   </span>
@@ -419,18 +465,97 @@ function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) 
               </div>
             </div>
           </div>
-          {onRemove && (
+          {onRemove && !pot.isClaimed && (
             <motion.button whileTap={{ scale: 0.9 }} onClick={() => onRemove(pot.id)}
               className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-400 hover:bg-red-50 hover:text-red-400 transition-colors">
               <X className="h-3 w-3" />
             </motion.button>
           )}
         </div>
-        <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" />
-        <div className="mt-3 flex items-center justify-between">
-          <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
-          <span className="text-[12px] font-semibold text-stone-600">£{pot.raised} <span className="text-stone-300">/</span> £{pot.goal}</span>
-        </div>
+
+        {/* Claimed state */}
+        {pot.isClaimed && pot.claimedBy && (
+          <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2">
+            <span className="text-base">{pot.claimedEmoji ?? "✅"}</span>
+            <div className="min-w-0">
+              <p className="text-[12px] font-semibold text-emerald-700">{pot.claimedBy} — ordered</p>
+              {pot.claimedNote && <p className="text-[11px] text-emerald-600/80 truncate">{pot.claimedNote}</p>}
+            </div>
+          </div>
+        )}
+
+        {/* Progress */}
+        {!pot.isClaimed && (
+          <>
+            <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" />
+            <div className="mt-3 flex items-center justify-between">
+              <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
+              <span className="text-[12px] font-semibold text-stone-600">£{pot.raised} <span className="text-stone-300">/</span> £{pot.goal}</span>
+            </div>
+
+            {/* Action buttons */}
+            <div className="mt-3 flex gap-2">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setKindleOpen((v) => !v)}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
+                  kindled
+                    ? "bg-emerald-500 text-white"
+                    : kindleOpen
+                      ? "bg-amber-500 text-stone-900 shadow-md shadow-amber-200"
+                      : "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900 shadow-sm shadow-amber-200",
+                )}
+              >
+                <span className="text-[15px]">{kindled ? "✓" : "🔥"}</span>
+                {kindled ? "Kindled!" : "Kindle"}
+              </motion.button>
+              {pot.goal <= 60 && (
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => onBuy?.(pot.id)}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 border-stone-200 bg-white py-2.5 text-[13px] font-semibold text-stone-700 transition-colors hover:border-stone-300"
+                >
+                  <span className="text-[13px]">🛒</span>
+                  Buy outright · £{pot.goal}
+                </motion.button>
+              )}
+            </div>
+
+            {/* Inline Kindle amount picker */}
+            <AnimatePresence>
+              {kindleOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-3 grid grid-cols-4 gap-2">
+                    {KINDLE_AMOUNTS.map((amt) => (
+                      <motion.button
+                        key={amt}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleKindle(amt)}
+                        disabled={amt > pot.goal - pot.raised}
+                        className={cn(
+                          "rounded-xl py-2.5 text-[13px] font-bold transition-all",
+                          amt > pot.goal - pot.raised
+                            ? "bg-stone-100 text-stone-300 cursor-not-allowed"
+                            : "bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100",
+                        )}
+                      >
+                        £{amt}
+                      </motion.button>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-center text-[10px] text-stone-400">£{pot.goal - pot.raised} still needed</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </>
+        )}
       </div>
     </motion.article>
   );
@@ -514,91 +639,6 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// MUM KNOWS BEST CHECKLIST
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function MumChecklist({ onClaim }: { onClaim: (name: string) => void }) {
-  const [items, setItems] = useState<ChecklistItem[]>(CHECKLIST);
-  const [claimingId, setClaimingId] = useState<string | null>(null);
-
-  const claim = useCallback((id: string) => {
-    setClaimingId(id);
-    setTimeout(() => {
-      setItems((prev) =>
-        prev.map((it) =>
-          it.id === id
-            ? { ...it, status: "claimed" as const, claimedBy: "You", claimedEmoji: "✋", shippingNote: "Just claimed — great choice!" }
-            : it,
-        ),
-      );
-      const item = items.find((i) => i.id === id);
-      if (item) onClaim(item.name);
-      setClaimingId(null);
-    }, 450);
-  }, [items, onClaim]);
-
-  return (
-    <section className="px-4">
-      <div className="mb-3">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Parent Knows Best</p>
-        <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">Cheaper gift ideas 🛍️</p>
-        <p className="text-[11px] text-stone-400 mt-0.5">Claim one to prevent duplicates</p>
-      </div>
-      <div className="flex flex-col gap-2">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className={cn(
-              "flex items-center gap-3 rounded-2xl border p-3.5 transition-all duration-300",
-              claimingId === item.id && "animate-claim-pop",
-              item.status === "claimed"
-                ? "border-emerald-200 bg-emerald-50"
-                : "border-stone-200 bg-white",
-            )}
-          >
-            <div className={cn(
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base transition-all",
-              item.status === "claimed" ? "bg-emerald-500" : "border-2 border-stone-300 bg-stone-50",
-            )}>
-              {item.status === "claimed" ? "✓" : "○"}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-2">
-                <p className={cn(
-                  "text-[13px] font-semibold",
-                  item.status === "claimed" ? "line-through text-stone-400" : "text-stone-800",
-                )}>
-                  {item.name}
-                </p>
-                <span className="text-[11px] font-bold text-amber-400">£{item.price}</span>
-              </div>
-              {item.status === "claimed" && item.claimedBy && (
-                <p className="text-[11px] text-emerald-400 font-medium">
-                  {item.claimedEmoji} {item.claimedBy} — {item.shippingNote}
-                </p>
-              )}
-              {item.status === "available" && (
-                <p className="text-[11px] text-stone-500">Available — tap to claim &amp; prevent duplicates</p>
-              )}
-            </div>
-            {item.status === "available" && (
-              <motion.button
-                whileTap={{ scale: 0.92 }}
-                whileHover={{ scale: 1.04 }}
-                transition={{ type: "spring", stiffness: 500, damping: 28 }}
-                onClick={() => claim(item.id)}
-                className="shrink-0 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1.5 text-[11px] font-semibold text-stone-900 shadow-sm shadow-amber-200"
-              >
-                Claim
-              </motion.button>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CATALOGUE CARD (SVG circle + 3D tilt)
@@ -2422,7 +2462,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
 export default function DemoPage() {
   const [showStars, setShowStars] = useState(false);
   const [showNewGift, setShowNewGift] = useState(false);
-  const [pots, setPots] = useState<DemoPot[]>(INITIAL_POTS);
+  const [pots, setPots] = useState<DemoPot[]>([...INITIAL_POTS, ...CHECKLIST_POTS]);
   const [revealPot, setRevealPot] = useState<DemoPot | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [logEntries, setLogEntries] = useState<string[]>([]);
@@ -2438,11 +2478,6 @@ export default function DemoPage() {
     void navigator.clipboard.writeText("https://kindledgift.co.uk/list/billys-dreams").catch(() => null);
     showToast("📋 Link copied to share with family!");
     addLog("🔗 Wishlist link shared — referral tracking engaged");
-  }, [showToast, addLog]);
-
-  const handleClaim = useCallback((name: string) => {
-    showToast(`✅ "${name}" claimed — duplicates prevented!`);
-    addLog(`🛍️ Gift claim: "${name}" secured by family member`);
   }, [showToast, addLog]);
 
   const handleAddItem = useCallback((item: CatalogItem) => {
@@ -2471,6 +2506,22 @@ export default function DemoPage() {
       : `📊 Catalogue add: "${item.name}" (£${item.price.toFixed(2)}) — tracking engaged`;
     addLog(intentMsg);
   }, [addedIds, showToast, addLog]);
+
+  const handleKindle = useCallback((id: string, amount: number) => {
+    setPots((prev) => prev.map((p) =>
+      p.id === id ? { ...p, raised: Math.min(p.goal, p.raised + amount), contributors: p.contributors + 1 } : p,
+    ));
+    showToast(`🔥 £${amount} kindled!`);
+    addLog(`🔥 Contribution: £${amount} added to pot`);
+  }, [showToast, addLog]);
+
+  const handleBuy = useCallback((id: string) => {
+    setPots((prev) => prev.map((p) =>
+      p.id === id ? { ...p, raised: p.goal, isClaimed: true, claimedBy: "You", claimedEmoji: "✋", claimedNote: "Bought outright — no duplicate risk!" } : p,
+    ));
+    showToast("🛒 Bought outright — duplicate prevented!");
+    addLog("🛒 Outright purchase: item fully claimed");
+  }, [showToast, addLog]);
 
   const handleAddNewGift = useCallback((pot: DemoPot) => {
     setPots((prev) => [pot, ...prev]);
@@ -2506,15 +2557,19 @@ export default function DemoPage() {
         {/* ── Live Pots ── */}
         <section className="px-4">
           <div className="mb-3">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Live Pots</p>
-            <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">{livePots.length} active gifts</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Gift List</p>
+            <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">{livePots.length} gifts · kindle or buy</p>
           </div>
           <div className="flex flex-col gap-3">
-            {livePots.map((pot) =>
-              pot.id.startsWith("new_")
-                ? <LivePotCard key={pot.id} pot={pot} onRemove={(id) => setPots((p) => p.filter((x) => x.id !== id))} />
-                : <LivePotCard key={pot.id} pot={pot} />
-            )}
+            {livePots.map((pot) => (
+              <LivePotCard
+                key={pot.id}
+                pot={pot}
+                {...((pot.id.startsWith("new_") || pot.id.startsWith("p")) && { onRemove: (id: string) => setPots((p) => p.filter((x) => x.id !== id)) })}
+                onKindle={handleKindle}
+                onBuy={handleBuy}
+              />
+            ))}
             {/* Add new gift card */}
             <motion.button
               whileHover={{ scale: 1.01, y: -1 }}
@@ -2548,9 +2603,6 @@ export default function DemoPage() {
             </div>
           </section>
         )}
-
-        {/* ── Parent Knows Best ── */}
-        <MumChecklist onClaim={handleClaim} />
 
         {/* ── Kindled Stars entry ── */}
         <section className="px-4">
