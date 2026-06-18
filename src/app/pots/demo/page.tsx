@@ -364,6 +364,7 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
             Guide Buyers
           </motion.button>
         </div>
+        <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">by sharing your list with the people who love them</p>
 
         <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
           {[
@@ -2145,6 +2146,95 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// WHY KINDLED — STATS COLLATERAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const WHY_STATS = [
+  {
+    stat: "1 in 3",
+    label: "people dread buying gifts",
+    body: "Gift-buying anxiety is real. Decision paralysis, fear of getting it wrong, no idea where to start.",
+    icon: "😰",
+    color: "from-rose-50 to-pink-50",
+    accent: "text-rose-500",
+    border: "border-rose-100",
+  },
+  {
+    stat: "£3.2bn",
+    label: "in unwanted gifts every Christmas",
+    body: "Nearly 1 in 4 gifts ends up unused, regifted, or returned — money and effort wasted on both sides.",
+    icon: "📦",
+    color: "from-orange-50 to-amber-50",
+    accent: "text-orange-500",
+    border: "border-orange-100",
+  },
+  {
+    stat: "+30%",
+    label: "seasonal waste spike",
+    body: "Packaging, returns logistics, and landfill surge every December. Guided wishlists eliminate the guesswork and the waste.",
+    icon: "🌍",
+    color: "from-emerald-50 to-teal-50",
+    accent: "text-emerald-600",
+    border: "border-emerald-100",
+  },
+  {
+    stat: "0",
+    label: "duplicates when you guide your buyers",
+    body: "Real-time claim locking means no two people can buy the same thing. Everyone contributes with confidence.",
+    icon: "✅",
+    color: "from-sky-50 to-blue-50",
+    accent: "text-sky-500",
+    border: "border-sky-100",
+  },
+];
+
+function WhyKindled() {
+  return (
+    <section className="px-4">
+      <div className="mb-4">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Why it matters</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-stone-800 leading-tight mt-0.5">
+          Guiding your buyers helps everyone
+        </h2>
+        <p className="text-[13px] text-stone-500 mt-1 leading-relaxed">
+          One shared list. No more guessing, overspending to compensate, or gifts that miss the mark.
+          Your loved one gets one step closer to what they really want — and the people who love them feel good giving it.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        {WHY_STATS.map((s) => (
+          <motion.div
+            key={s.stat}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            className={cn("rounded-2xl border p-4 bg-gradient-to-br", s.color, s.border)}
+          >
+            <span className="text-2xl">{s.icon}</span>
+            <p className={cn("mt-2 text-[26px] font-black leading-none", s.accent)} style={{ fontFamily: "var(--font-display)" }}>
+              {s.stat}
+            </p>
+            <p className="text-[11px] font-semibold text-stone-700 mt-0.5 leading-tight">{s.label}</p>
+            <p className="text-[10px] text-stone-500 mt-1.5 leading-relaxed">{s.body}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="mt-4 rounded-2xl bg-gradient-to-r from-amber-400/10 to-orange-400/10 border border-amber-200 px-4 py-4">
+        <p className="text-[13px] font-semibold text-stone-800 leading-relaxed text-center">
+          No more guessing. No overspending to compensate. No awkward returns.
+        </p>
+        <p className="text-[12px] text-stone-500 text-center mt-1">
+          Just one list — and everyone who loves them, finally able to help.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // NEW GIFT SHEET
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -2979,6 +3069,9 @@ export default function DemoPage() {
         {/* ── Explainer ── */}
         <ExplainerPlayer />
 
+        {/* ── Why Kindled stats ── */}
+        <WhyKindled />
+
         {/* ── Bottom CTA ── */}
         <div className="mx-4">
           <motion.button
@@ -2986,15 +3079,12 @@ export default function DemoPage() {
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 26 }}
             onClick={() => setRevealPot(surprisePots[0] ?? pots[0]!)}
-            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 shadow-xl shadow-amber-200"
-            style={{ boxShadow: "0 4px 24px rgba(251,146,60,0.45), 0 0 0 1px rgba(251,146,60,0.2)" }}
+            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-500 py-4 shadow-xl"
+            style={{ boxShadow: "0 4px 24px rgba(220,38,38,0.35), 0 0 0 1px rgba(220,38,38,0.2)" }}
           >
-            <Zap className="h-5 w-5 text-stone-900" strokeWidth={2.5} />
-            <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-stone-900">Launch Reveal Ceremony</span>
+            <span className="text-[20px]">🎁</span>
+            <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white">Unwrap all · Open on Christmas Day</span>
           </motion.button>
-          <p className="mt-2.5 text-center text-[10px] text-stone-400 tracking-wide">
-            Cinematic full-screen reveal · touch-optimised · no database required
-          </p>
         </div>
       </main>
 
