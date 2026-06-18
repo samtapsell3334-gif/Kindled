@@ -13,12 +13,12 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kindling",
-  description: "Kindling MVP",
+  title: "Kindled",
+  description: "Kindled — gifting made magical",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Kindling",
+    title: "Kindled",
   },
 };
 
