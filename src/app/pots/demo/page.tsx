@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown,
   Play, Pause, SkipForward, Volume2, VolumeX, X, Zap,
-  ShoppingBag, RefreshCw, CreditCard, Gift,
+  ShoppingBag, RefreshCw, CreditCard, Gift, Flame,
+  Package, Leaf, ShieldCheck,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
@@ -401,13 +403,13 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
   const [kindled, setKindled] = useState(false);
   const pct = Math.min(100, Math.round((pot.raised / pot.goal) * 100));
   const statusLabel =
-    pot.isClaimed    ? "Ordered ✓" :
-    pct >= 100 ? "Fully Lit 🔥" :
-    pct >= 75  ? "Blazing 🔥" :
-    pct >= 50  ? "Campfire 🏕️" :
-    pct >= 25  ? "Kindling 🪵" :
-    pct > 0    ? "Embers ✨" :
-                 "Spark 🕯️";
+    pot.isClaimed    ? "Ordered" :
+    pct >= 100 ? "Fully Lit" :
+    pct >= 75  ? "Blazing" :
+    pct >= 50  ? "Campfire" :
+    pct >= 25  ? "Kindling" :
+    pct > 0    ? "Embers" :
+                 "Spark";
   const statusColor =
     pot.isClaimed    ? "text-emerald-500" :
     pct >= 100 ? "text-emerald-500" :
@@ -494,13 +496,13 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
             <div className="mt-3 flex items-center justify-between">
               <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
               <span className="text-[12px] font-semibold text-stone-500">
-                {pct < 15 ? "Spark Level: Just Lit 🕯️" :
-                 pct < 30 ? "Spark Level: Smoldering 🌿" :
-                 pct < 50 ? "Kindle Progress: Catching Sparks 🔥" :
-                 pct < 70 ? "Flame Level: Growing Bright 🔥🔥" :
-                 pct < 85 ? "Flame Intensity: Stoking Up! 🔥🔥" :
-                 pct < 95 ? "Combustion Level: Blazing Hot! 🔥🔥🔥" :
-                            "Inferno: Fully Ablaze! 🌋"}
+                {pct < 15 ? "Just a Spark" :
+                 pct < 30 ? "Starting to Smolder" :
+                 pct < 50 ? "Catching Fire" :
+                 pct < 70 ? "Flames Growing" :
+                 pct < 85 ? "Stoking Up" :
+                 pct < 95 ? "Blazing" :
+                            "Fully Lit"}
               </span>
             </div>
             <div className="mt-1 text-right">
@@ -521,7 +523,9 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
                       : "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900 shadow-sm shadow-amber-200",
                 )}
               >
-                <span className="text-[15px]">{kindled ? "✓" : "🔥"}</span>
+                {kindled
+                  ? <Check className="h-4 w-4" />
+                  : <Flame className="h-4 w-4" />}
                 {kindled ? "Kindled!" : "Kindle"}
               </motion.button>
               {pot.goal <= 60 && (
@@ -584,10 +588,10 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
   const th = isXmas
     ? { bg: "bg-[#1a0f0f]", border: "border-red-700/30", glow: "animate-gift-glow",
         box: "from-red-800/30 to-amber-700/20", emoji: "🎁", label: "text-amber-400",
-        modeLabel: "Under the Tree 🎄", btn: "from-amber-400 to-orange-500 shadow-amber-900/40" }
+        modeLabel: "Under the Tree", btn: "from-amber-400 to-orange-500 shadow-amber-900/40" }
     : { bg: "bg-[#1a1028]", border: "border-violet-500/30", glow: "animate-gift-glow-plum",
         box: "from-violet-600/25 to-fuchsia-700/20", emoji: "🎀", label: "text-violet-400",
-        modeLabel: "Wrapped Up ✨", btn: "from-violet-500 to-fuchsia-500 shadow-violet-900/40" };
+        modeLabel: "Wrapped Up", btn: "from-violet-500 to-fuchsia-500 shadow-violet-900/40" };
 
   return (
     <article className={cn("relative overflow-hidden rounded-2xl border shadow-lg shadow-black/50", th.bg, th.border)}>
@@ -613,11 +617,11 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
                 ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 : <span className="flex h-full w-full items-center justify-center text-xl">{pot.emoji}</span>}
-              <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-tl-lg bg-black/60 text-[9px]">🎁</span>
+              <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-tl-lg bg-black/60"><Lock className="h-2.5 w-2.5 text-white/60" /></span>
             </div>
             <div className="min-w-0">
               <h3 className="truncate text-[14px] font-bold text-white">{pot.title}</h3>
-              <p className={cn("text-[11px] font-medium", th.label)}>{th.modeLabel} · 🤫 secret</p>
+              <p className={cn("text-[11px] font-medium", th.label)}>{th.modeLabel} · hidden</p>
             </div>
           </div>
           <div className="shrink-0 rounded-xl bg-black/20 px-2.5 py-1.5 text-right">
@@ -641,7 +645,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
             )}
           >
             <Zap className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Open my gift 🎁
+            Open my gift
           </button>
         </div>
         <div className="mt-3 flex items-center gap-1.5 text-stone-500">
@@ -885,7 +889,7 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
         {phase === "idle" && (
           <div className="flex flex-col items-center gap-5 px-6 py-9">
             <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400 mb-1.5">✨ A gift awaits</p>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400 mb-1.5">A gift awaits</p>
               <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">{pot.title}</p>
             </div>
             {/* Gift box with pulsing rings */}
@@ -897,14 +901,14 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
               <div className={cn("relative z-10 rounded-3xl p-7 border",
                 isXmas ? "bg-gradient-to-br from-red-950 to-red-900/80 border-red-700/40 animate-gift-glow"
                         : "bg-gradient-to-br from-violet-950 to-indigo-900/80 border-violet-500/40 animate-gift-glow-plum")}>
-                <span className="text-7xl select-none">{isXmas ? "🎁" : "🎀"}</span>
+                <Gift className={cn("h-16 w-16", isXmas ? "text-amber-400" : "text-violet-300")} strokeWidth={1.2} />
               </div>
             </div>
             {/* Contributors */}
             <div className="flex items-center gap-2">
               <div className="flex -space-x-1.5">
-                {["👩","👨","👵","👴"].slice(0, Math.min(4, pot.contributors)).map((e, i) => (
-                  <div key={i} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-stone-900 bg-stone-800 text-sm">{e}</div>
+                {["#f59e0b","#a78bfa","#6ee7b7","#fb923c"].slice(0, Math.min(4, pot.contributors)).map((color, i) => (
+                  <div key={i} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-stone-900 text-[11px] font-bold text-stone-900" style={{ background: color }}>{["M","F","G","S"][i]}</div>
                 ))}
               </div>
               <p className="text-[11px] text-stone-400">{pot.contributors} people chipped in with love</p>
@@ -929,7 +933,7 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
             <div className={cn("animate-box-shake rounded-3xl p-7 border",
               isXmas ? "bg-gradient-to-br from-red-950 to-red-900/80 border-red-700/40"
                       : "bg-gradient-to-br from-violet-950 to-indigo-900/80 border-violet-500/40")}>
-              <span className="text-7xl">{isXmas ? "🎁" : "🎀"}</span>
+              <Gift className={cn("h-16 w-16", isXmas ? "text-amber-400" : "text-violet-300")} strokeWidth={1.2} />
             </div>
             <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-medium text-amber-400 animate-pulse">Something incredible is inside…</p>
             {/* Intensity bar */}
@@ -1221,13 +1225,13 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
               </div>
               {/* Box body */}
               <div className="mt-3 flex-1 rounded-b-lg bg-gradient-to-br from-rose-600 to-pink-700 shadow-xl shadow-rose-900/50 flex items-center justify-center">
-                <span className="text-2xl">🎁</span>
+                <Gift className="h-8 w-8 text-white/80" strokeWidth={1.5} />
               </div>
-              {/* Bow */}
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-2xl">🎀</div>
+              {/* Bow accent */}
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400/80" />
             </div>
             <p className="text-[9px] font-bold text-stone-400">Under Wraps · progress hidden</p>
-            {shaking && <p className="text-[9px] font-black text-amber-400 animate-pulse">🔥 Igniting reveal...</p>}
+            {shaking && <p className="text-[9px] font-black text-amber-400 animate-pulse">Igniting reveal…</p>}
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 animate-scale-in">
@@ -1273,7 +1277,7 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
           {/* Mock WhatsApp bubble */}
           <div className="rounded-2xl rounded-tl-sm bg-emerald-800/60 border border-emerald-700/40 px-4 py-2.5 max-w-[200px]">
             <p className="text-[10px] font-bold text-emerald-300 mb-0.5">💬 WhatsApp · Mum</p>
-            <p className="text-[11px] text-stone-200">Billy&apos;s wishlist 🎁</p>
+            <p className="text-[11px] text-stone-200">Billy&apos;s wishlist</p>
             <p className="text-[9px] text-stone-400 mt-0.5 underline">kindledgift.co.uk/billy</p>
           </div>
           <p className="text-[9px] font-bold text-stone-400">One link · no account needed</p>
@@ -2341,12 +2345,17 @@ function WouldYouRather() {
 // WHY KINDLED — STATS COLLATERAL
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const WHY_STATS = [
+const WHY_STATS: {
+  stat: string; label: string; body: string; Icon: LucideIcon; iconBg: string; iconColor: string;
+  color: string; accent: string; border: string; source: string;
+}[] = [
   {
     stat: "£3.2bn",
     label: "spent on unwanted UK gifts each year",
     body: "Around 1 in 4 gifts ends up unused, regifted, or returned — money and effort wasted on both sides.",
-    icon: "📦",
+    Icon: Package,
+    iconBg: "bg-orange-100",
+    iconColor: "text-orange-500",
     color: "from-orange-50 to-amber-50",
     accent: "text-orange-500",
     border: "border-orange-100",
@@ -2356,7 +2365,9 @@ const WHY_STATS = [
     stat: "+30%",
     label: "seasonal packaging waste spike",
     body: "Packaging, returns logistics, and unnecessary duplicates surge every December — guided lists help cut this down.",
-    icon: "🌍",
+    Icon: Leaf,
+    iconBg: "bg-emerald-100",
+    iconColor: "text-emerald-600",
     color: "from-emerald-50 to-teal-50",
     accent: "text-emerald-600",
     border: "border-emerald-100",
@@ -2366,7 +2377,9 @@ const WHY_STATS = [
     stat: "1 in 5",
     label: "gifts are duplicates or returned",
     body: "Without coordination, duplicates are inevitable. Real-time claim locking means no two people can buy the same thing.",
-    icon: "🔄",
+    Icon: RefreshCw,
+    iconBg: "bg-violet-100",
+    iconColor: "text-violet-500",
     color: "from-violet-50 to-purple-50",
     accent: "text-violet-500",
     border: "border-violet-100",
@@ -2376,7 +2389,9 @@ const WHY_STATS = [
     stat: "0",
     label: "duplicates when you guide your buyers",
     body: "Real-time claim locking means no two people can buy the same thing. Everyone contributes with confidence.",
-    icon: "✅",
+    Icon: ShieldCheck,
+    iconBg: "bg-sky-100",
+    iconColor: "text-sky-500",
     color: "from-sky-50 to-blue-50",
     accent: "text-sky-500",
     border: "border-sky-100",
@@ -2408,7 +2423,9 @@ function WhyKindled() {
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
             className={cn("rounded-2xl border p-4 bg-gradient-to-br", s.color, s.border)}
           >
-            <span className="text-2xl">{s.icon}</span>
+            <div className={cn("inline-flex h-8 w-8 items-center justify-center rounded-xl", s.iconBg)}>
+              <s.Icon className={cn("h-4 w-4", s.iconColor)} />
+            </div>
             <p className={cn("mt-2 text-[26px] font-black leading-none", s.accent)} style={{ fontFamily: "var(--font-display)" }}>
               {s.stat}
             </p>
