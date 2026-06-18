@@ -12,6 +12,7 @@ import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
 import type { GiftingMode } from "@/types/pots";
 import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
+import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -492,7 +493,18 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
             <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" />
             <div className="mt-3 flex items-center justify-between">
               <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
-              <span className="text-[12px] font-semibold text-stone-600">£{pot.raised} <span className="text-stone-300">/</span> £{pot.goal}</span>
+              <span className="text-[12px] font-semibold text-stone-500">
+                {pct < 15 ? "Spark Level: Just Lit 🕯️" :
+                 pct < 30 ? "Spark Level: Smoldering 🌿" :
+                 pct < 50 ? "Kindle Progress: Catching Sparks 🔥" :
+                 pct < 70 ? "Flame Level: Growing Bright 🔥🔥" :
+                 pct < 85 ? "Flame Intensity: Stoking Up! 🔥🔥" :
+                 pct < 95 ? "Combustion Level: Blazing Hot! 🔥🔥🔥" :
+                            "Inferno: Fully Ablaze! 🌋"}
+              </span>
+            </div>
+            <div className="mt-1 text-right">
+              <span className="text-[10px] text-stone-400">Target: £{pot.goal}</span>
             </div>
 
             {/* Action buttons */}
@@ -3196,7 +3208,7 @@ export default function DemoPage() {
           </div>
         </section>
 
-        {/* ── Surprise Pots ── */}
+        {/* ── Surprise Pots + Unwrap CTA ── */}
         {surprisePots.length > 0 && (
           <section className="px-4">
             <div className="mb-3">
@@ -3208,6 +3220,18 @@ export default function DemoPage() {
                 <LockedPotCard key={pot.id} pot={pot} onReveal={setRevealPot} />
               ))}
             </div>
+            {/* ── Unwrap All — sits directly under the pots ── */}
+            <motion.button
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 26 }}
+              onClick={() => setRevealPot(surprisePots[0] ?? pots[0]!)}
+              className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-500 py-4 shadow-xl"
+              style={{ boxShadow: "0 4px 24px rgba(220,38,38,0.35), 0 0 0 1px rgba(220,38,38,0.2)" }}
+            >
+              <span className="text-[20px]">🎁</span>
+              <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white">Unwrap all · Open on Christmas Day</span>
+            </motion.button>
           </section>
         )}
 
@@ -3258,20 +3282,8 @@ export default function DemoPage() {
         {/* ── Gifting Impact Panel (budget chart + metrics + simulator) ── */}
         <GiftingImpactPanel />
 
-        {/* ── Bottom CTA ── */}
-        <div className="mx-4">
-          <motion.button
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 26 }}
-            onClick={() => setRevealPot(surprisePots[0] ?? pots[0]!)}
-            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-500 py-4 shadow-xl"
-            style={{ boxShadow: "0 4px 24px rgba(220,38,38,0.35), 0 0 0 1px rgba(220,38,38,0.2)" }}
-          >
-            <span className="text-[20px]">🎁</span>
-            <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white">Unwrap all · Open on Christmas Day</span>
-          </motion.button>
-        </div>
+        {/* ── First Kindlers Creator Sign-up ── */}
+        <FirstKindlersCTA />
       </main>
 
       <InvestorHUD pots={pots} logEntries={logEntries} />
