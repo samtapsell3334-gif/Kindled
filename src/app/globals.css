@@ -25,6 +25,29 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ── GiftingImpactPanel custom range slider ── */
+.gip-slider {
+  height: 20px;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.gip-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.gip-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    KINDLING ANIMATION PRIMITIVES
    ═══════════════════════════════════════════════════════════════════════════ */

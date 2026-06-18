@@ -11,6 +11,7 @@ import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
 import type { GiftingMode } from "@/types/pots";
+import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -3253,6 +3254,9 @@ export default function DemoPage() {
 
         {/* ── Why Kindled stats ── */}
         <WhyKindled />
+
+        {/* ── Gifting Impact Panel (budget chart + metrics + simulator) ── */}
+        <GiftingImpactPanel />
 
         {/* ── Bottom CTA ── */}
         <div className="mx-4">
