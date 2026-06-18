@@ -2456,10 +2456,239 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ROLE SWITCHER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function RoleSwitcher({ role, onChange }: { role: "parent" | "receiver"; onChange: (r: "parent" | "receiver") => void }) {
+  return (
+    <div className="sticky top-0 z-30 flex justify-center px-4 pt-3 pb-2 bg-[#fdf9f5]/90 backdrop-blur-md border-b border-stone-100">
+      <div className="flex w-full max-w-sm rounded-2xl bg-stone-100 p-1 gap-1 shadow-inner">
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={() => onChange("parent")}
+          className={cn(
+            "relative flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
+            role === "parent" ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
+          )}
+        >
+          {role === "parent" && (
+            <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
+          )}
+          <span className="text-base">👩‍👧</span>
+          <span>Contributor</span>
+        </motion.button>
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={() => onChange("receiver")}
+          className={cn(
+            "relative flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
+            role === "receiver" ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
+          )}
+        >
+          {role === "receiver" && (
+            <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
+          )}
+          <span className="text-base">🧒</span>
+          <span>Billy&apos;s view</span>
+        </motion.button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RECEIVER VIEW
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ReceiverView({ pots, onOpenStars }: {
+  pots: DemoPot[];
+  onOpenStars: () => void;
+}) {
+  const livePots = pots.filter((p) => p.mode === "LIVE_FEED" && !p.isClaimed);
+  const claimedPots = pots.filter((p) => p.mode === "LIVE_FEED" && p.isClaimed);
+  const surpriseCount = pots.filter((p) => p.mode !== "LIVE_FEED").length;
+  const totalRaised = pots.filter((p) => p.mode === "LIVE_FEED").reduce((s, p) => s + p.raised, 0);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#fff8f0] to-[#fdf9f5]">
+      {/* Hero greeting */}
+      <div className="px-5 pt-6 pb-4">
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-orange-400 text-3xl shadow-lg shadow-amber-200">
+            🧒
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500">Your Kindled list</p>
+            <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[24px] font-semibold text-stone-900 leading-tight">Hey Billy! 👋</h1>
+          </div>
+        </div>
+
+        {/* Summary stats */}
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {[
+            { value: `£${totalRaised}`, label: "kindled so far", color: "text-amber-500" },
+            { value: livePots.length, label: "wishes", color: "text-orange-500" },
+            { value: `${surpriseCount}`, label: "surprises 🔒", color: "text-violet-500" },
+          ].map((s) => (
+            <div key={s.label} className="rounded-2xl bg-white px-3 py-3 text-center shadow-sm" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04)" }}>
+              <p className={cn("text-[18px] font-bold", s.color)} style={{ fontFamily: "var(--font-display)" }}>{s.value}</p>
+              <p className="text-[10px] text-stone-400 leading-tight">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-6 pb-20 px-4">
+
+        {/* ── Surprise gifts teaser ── */}
+        {surpriseCount > 0 && (
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Surprises waiting</p>
+            <div className="flex flex-col gap-3">
+              {pots.filter((p) => p.mode !== "LIVE_FEED").map((pot, i) => (
+                <motion.div
+                  key={pot.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08, type: "spring", stiffness: 340, damping: 30 }}
+                  className={cn(
+                    "relative overflow-hidden rounded-2xl border p-4",
+                    pot.mode === "UNDER_THE_TREE"
+                      ? "bg-[#1a0f0f] border-red-700/30"
+                      : "bg-[#1a1028] border-violet-500/30",
+                  )}
+                >
+                  {/* snowflakes / confetti */}
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl opacity-40">
+                    {[20, 45, 70, 85].map((l, j) => (
+                      <span key={j} className="absolute text-white/60 text-[10px]"
+                        style={{ left: `${l}%`, top: 0, animation: `snow-fall ${2 + j * 0.4}s ${j * 0.3}s ease-in infinite` }}>
+                        {pot.mode === "UNDER_THE_TREE" ? "❄️" : "✨"}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="relative flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-3xl">
+                      🎁
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] font-bold text-white/80">
+                        {pot.mode === "UNDER_THE_TREE" ? "🎄 Christmas surprise" : "🎀 Birthday surprise"}
+                      </p>
+                      <p className="text-[11px] text-white/40 mt-0.5">
+                        {pot.eventLabel} · {pot.eventDate} · being secretly planned for you…
+                      </p>
+                    </div>
+                    <div className="text-xl">🔒</div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Live wish list ── */}
+        {livePots.length > 0 && (
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Your wish list</p>
+            <div className="flex flex-col gap-3">
+              {livePots.map((pot, i) => {
+                const pct = Math.min(100, Math.round((pot.raised / pot.goal) * 100));
+                return (
+                  <motion.div
+                    key={pot.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06, type: "spring", stiffness: 340, damping: 30 }}
+                    className="overflow-hidden rounded-2xl bg-white"
+                    style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)" }}
+                  >
+                    <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
+                    <div className="flex items-center gap-3 p-4">
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-amber-50">
+                        {pot.image
+                          ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover" />
+                          : <span className="flex h-full w-full items-center justify-center text-2xl">{pot.emoji}</span>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium text-stone-900">{pot.title}</h3>
+                        <div className="mt-2">
+                          <div className="h-2 w-full overflow-hidden rounded-full bg-stone-100">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${pct}%` }}
+                              transition={{ duration: 1, delay: 0.3 + i * 0.1, ease: "easeOut" }}
+                              className={cn("h-full rounded-full bg-gradient-to-r", pot.accentGradient)}
+                            />
+                          </div>
+                          <div className="mt-1.5 flex items-center justify-between">
+                            <p className="text-[11px] text-stone-400">£{pot.raised} of £{pot.goal}</p>
+                            <p className="text-[11px] font-semibold text-amber-500">{pct}% kindled 🔥</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Ordered / claimed gifts ── */}
+        {claimedPots.length > 0 && (
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Sorted ✓</p>
+            <div className="flex flex-col gap-2">
+              {claimedPots.map((pot) => (
+                <div key={pot.id} className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                  <span className="text-xl">{pot.claimedEmoji ?? "✅"}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-stone-700 truncate">{pot.title}</p>
+                    <p className="text-[11px] text-emerald-600">{pot.claimedBy} — on its way!</p>
+                  </div>
+                  <span className="text-emerald-500 text-[18px]">✓</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Kindled Stars CTA ── */}
+        <motion.button
+          whileHover={{ scale: 1.01, y: -2 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 400, damping: 28 }}
+          onClick={onOpenStars}
+          className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 p-5 text-left shadow-xl shadow-indigo-900/30"
+        >
+          <div className="pointer-events-none absolute inset-0">
+            {[{l:"12%",t:"18%"},{l:"78%",t:"12%"},{l:"55%",t:"65%"},{l:"88%",t:"55%"},{l:"30%",t:"75%"}].map((p,i)=>(
+              <span key={i} className="absolute text-[10px]" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.3}s ${i*0.4}s ease-in-out infinite alternate`,opacity:0.7}}>⭐</span>
+            ))}
+          </div>
+          <div className="relative flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-3xl">🌟</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-violet-200 mb-0.5">Kindled Stars</p>
+              <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[19px] font-semibold text-white leading-tight">Your star chart</h3>
+              <p className="text-[12px] text-violet-200 mt-0.5">24 ⭐ earned · 4 adventures today</p>
+            </div>
+            <span className="rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-black text-stone-900">Open →</span>
+          </div>
+        </motion.button>
+
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default function DemoPage() {
+  const [viewMode, setViewMode] = useState<"parent" | "receiver">("parent");
   const [showStars, setShowStars] = useState(false);
   const [showNewGift, setShowNewGift] = useState(false);
   const [pots, setPots] = useState<DemoPot[]>([...INITIAL_POTS, ...CHECKLIST_POTS]);
@@ -2545,6 +2774,17 @@ export default function DemoPage() {
         </div>
       )}
 
+      {/* ── Role switcher (always visible) ── */}
+      <RoleSwitcher role={viewMode} onChange={setViewMode} />
+
+      {/* ── Receiver view ── */}
+      <AnimatePresence mode="wait">
+      {viewMode === "receiver" ? (
+        <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
+          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} />
+        </motion.div>
+      ) : (
+      <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
       {/* ── Parent Dashboard ── */}
       {<>
       <ProfileHeader
@@ -2663,6 +2903,9 @@ export default function DemoPage() {
 
       <InvestorHUD pots={pots} logEntries={logEntries} />
       </>}
+      </motion.div>
+      )}
+      </AnimatePresence>
     </div>
   );
 }
