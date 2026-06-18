@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown,
   Play, Pause, SkipForward, Volume2, VolumeX, X, Zap,
@@ -2008,11 +2008,420 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// NEW GIFT SHEET
+// ═══════════════════════════════════════════════════════════════════════════════
+
+type EventType = "birthday" | "christmas" | "custom" | "ongoing";
+type FetchState = "idle" | "fetching" | "done" | "error";
+
+function parseProductUrl(raw: string): { title: string; price: string } {
+  try {
+    const u = new URL(raw);
+    const amzMatch = u.pathname.match(/\/([A-Za-z0-9][A-Za-z0-9-]{3,})\/dp\//);
+    if (amzMatch) {
+      const title = (amzMatch[1] ?? "")
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(" ");
+      return { title, price: "" };
+    }
+    const segments = u.pathname.split("/").filter(Boolean);
+    const last = (segments[segments.length - 1] ?? "").replace(/\.(html?|php|aspx?)$/i, "");
+    const title = last
+      ? last.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+      : `Product from ${u.hostname.replace(/^www\./, "")}`;
+    return { title, price: "" };
+  } catch {
+    return { title: "", price: "" };
+  }
+}
+
+const EVENT_OPTIONS: { type: EventType; label: string; emoji: string }[] = [
+  { type: "birthday",  label: "Birthday",  emoji: "🎂" },
+  { type: "christmas", label: "Christmas", emoji: "🎄" },
+  { type: "custom",    label: "Other",     emoji: "🗓️" },
+  { type: "ongoing",   label: "Ongoing",   emoji: "∞"  },
+];
+
+const ACCENT_GRADIENTS = [
+  "from-rose-500 via-pink-400 to-orange-400",
+  "from-sky-500 via-blue-400 to-indigo-400",
+  "from-green-500 via-emerald-400 to-teal-400",
+  "from-amber-500 via-yellow-400 to-orange-400",
+  "from-fuchsia-500 via-purple-400 to-indigo-500",
+];
+
+function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClose: () => void }) {
+  const [mode, setMode] = useState<"link" | "manual">("link");
+  const [url, setUrl] = useState("");
+  const [fetchState, setFetchState] = useState<FetchState>("idle");
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
+  const [eventType, setEventType] = useState<EventType>("birthday");
+  const [isSurprise, setIsSurprise] = useState(true);
+  const [eventDate, setEventDate] = useState("");
+  const [customLabel, setCustomLabel] = useState("");
+  const fetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleUrlChange = useCallback((val: string) => {
+    setUrl(val);
+    setFetchState("idle");
+    setTitle("");
+    setAmount("");
+    if (fetchTimer.current) clearTimeout(fetchTimer.current);
+    const trimmed = val.trim();
+    if (trimmed.startsWith("http") && trimmed.length > 15) {
+      setFetchState("fetching");
+      fetchTimer.current = setTimeout(() => {
+        const parsed = parseProductUrl(trimmed);
+        setTitle(parsed.title);
+        setAmount(parsed.price);
+        setFetchState("done");
+      }, 1400);
+    }
+  }, []);
+
+  const handlePaste = useCallback(async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      handleUrlChange(text);
+    } catch {
+      /* clipboard blocked */
+    }
+  }, [handleUrlChange]);
+
+  const canSubmit = title.trim().length > 0 && amount.length > 0 && parseFloat(amount) > 0;
+
+  function buildPot(): DemoPot {
+    const goal = parseFloat(amount) || 100;
+    const isLocked = isSurprise && eventType !== "ongoing";
+
+    let potMode: DemoPot["mode"] = "LIVE_FEED";
+    let evLabel = "Ongoing";
+    let evDate = "Anytime";
+    let evIso = "2027-01-01T00:00:00Z";
+
+    if (isLocked) {
+      if (eventType === "christmas") {
+        potMode = "UNDER_THE_TREE";
+        evLabel = "Christmas";
+        evDate = "Dec 25";
+        evIso = "2026-12-25T08:00:00Z";
+      } else {
+        potMode = "WRAPPED_UP";
+        const d = eventDate ? new Date(eventDate) : new Date("2026-09-15");
+        evLabel = eventType === "birthday" ? "Birthday" : (customLabel || "Event");
+        evDate = d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+        evIso = d.toISOString();
+      }
+    } else if (eventType !== "ongoing") {
+      if (eventType === "christmas") { evLabel = "Christmas"; evDate = "Dec 25"; evIso = "2026-12-25T08:00:00Z"; }
+      else {
+        const d = eventDate ? new Date(eventDate) : new Date("2026-09-15");
+        evLabel = eventType === "birthday" ? "Birthday" : (customLabel || "Event");
+        evDate = d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+        evIso = d.toISOString();
+      }
+    }
+
+    return {
+      id: `p${Date.now()}`,
+      title: title.trim(),
+      emoji: eventType === "christmas" ? "🎄" : eventType === "birthday" ? "🎂" : "🎁",
+      goal,
+      raised: 0,
+      mode: potMode,
+      continuous: eventType === "ongoing",
+      eventLabel: evLabel,
+      eventDate: evDate,
+      eventIso: evIso,
+      contributors: 0,
+      boosterEntries: 0,
+      accentGradient: ACCENT_GRADIENTS[Math.floor(Math.random() * ACCENT_GRADIENTS.length)]!,
+      tributes: [],
+    };
+  }
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    onAdd(buildPot());
+    onClose();
+  };
+
+  const showDatePicker = eventType !== "ongoing" && eventType !== "christmas";
+  const showSurpriseToggle = eventType !== "ongoing";
+
+  return (
+    <AnimatePresence>
+      {/* Backdrop */}
+      <motion.div
+        key="backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+      />
+      {/* Sheet */}
+      <motion.div
+        key="sheet"
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", stiffness: 340, damping: 36 }}
+        className="fixed bottom-0 left-0 right-0 z-50 flex max-h-[92dvh] flex-col overflow-hidden rounded-t-3xl bg-[#fdf9f5] shadow-2xl"
+      >
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="h-1 w-10 rounded-full bg-stone-300" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pb-3 pt-1">
+          <div>
+            <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-stone-900 leading-tight">New Gift</h2>
+            <p className="text-[12px] text-stone-400">Add something special to the list</p>
+          </div>
+          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 text-stone-500 active:scale-95 transition-transform">
+            <span className="text-[14px] font-bold leading-none">✕</span>
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto px-5 pb-8 space-y-5">
+
+          {/* Mode toggle */}
+          <div className="flex rounded-xl bg-stone-100 p-1 gap-1">
+            {(["link", "manual"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => { setMode(m); setTitle(""); setAmount(""); setUrl(""); setFetchState("idle"); }}
+                className={cn(
+                  "flex-1 rounded-lg py-2 text-[13px] font-semibold transition-all",
+                  mode === m ? "bg-white shadow text-stone-900" : "text-stone-400",
+                )}
+              >
+                {m === "link" ? "🔗  Paste a link" : "✏️  Enter manually"}
+              </button>
+            ))}
+          </div>
+
+          {/* Link mode */}
+          {mode === "link" && (
+            <div className="space-y-3">
+              <div className="relative">
+                <input
+                  type="url"
+                  placeholder="amazon.co.uk/... or any product URL"
+                  value={url}
+                  onChange={(e) => handleUrlChange(e.target.value)}
+                  className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 pr-20 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none transition-colors"
+                />
+                <button
+                  onClick={handlePaste}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-amber-100 px-3 py-1.5 text-[12px] font-semibold text-amber-700 active:scale-95 transition-transform"
+                >
+                  Paste
+                </button>
+              </div>
+
+              {/* Fetch loading state */}
+              {fetchState === "fetching" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3"
+                >
+                  <div className="flex gap-1">
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        key={i}
+                        className="h-2 w-2 rounded-full bg-amber-400"
+                        style={{ animation: `bounce 0.9s ${i * 0.15}s ease-in-out infinite` }}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-[13px] font-medium text-amber-700">Fetching product details…</p>
+                </motion.div>
+              )}
+
+              {/* Fetched result — editable */}
+              {fetchState === "done" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[13px]">✅</span>
+                    <p className="text-[12px] font-semibold text-emerald-700">Product details found — edit if needed</p>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Product name"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none"
+                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-semibold text-stone-400">£</span>
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="w-full rounded-lg border border-stone-200 bg-white pl-7 pr-3 py-2 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </div>
+          )}
+
+          {/* Manual mode */}
+          {mode === "manual" && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-3"
+            >
+              <input
+                type="text"
+                placeholder="Gift name e.g. LEGO Technic Ferrari"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none transition-colors"
+              />
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[15px] font-semibold text-stone-400">£</span>
+                <input
+                  type="number"
+                  placeholder="Goal amount"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full rounded-xl border border-stone-200 bg-white pl-8 pr-4 py-3 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none transition-colors"
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {/* Event type */}
+          <div className="space-y-2">
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-stone-400">For which event?</p>
+            <div className="grid grid-cols-4 gap-2">
+              {EVENT_OPTIONS.map((ev) => (
+                <button
+                  key={ev.type}
+                  onClick={() => setEventType(ev.type)}
+                  className={cn(
+                    "flex flex-col items-center gap-1 rounded-xl py-3 text-center transition-all",
+                    eventType === ev.type
+                      ? "bg-amber-400 text-stone-900 shadow-md shadow-amber-200"
+                      : "bg-stone-100 text-stone-500",
+                  )}
+                >
+                  <span className="text-[18px]">{ev.emoji}</span>
+                  <span className="text-[11px] font-semibold leading-tight">{ev.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Date picker for non-christmas dated events */}
+          <AnimatePresence>
+            {showDatePicker && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-2 overflow-hidden"
+              >
+                {eventType === "custom" && (
+                  <input
+                    type="text"
+                    placeholder="Event name e.g. Graduation"
+                    value={customLabel}
+                    onChange={(e) => setCustomLabel(e.target.value)}
+                    className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none"
+                  />
+                )}
+                <input
+                  type="date"
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Surprise toggle */}
+          <AnimatePresence>
+            {showSurpriseToggle && (
+              <motion.button
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                onClick={() => setIsSurprise((v) => !v)}
+                className={cn(
+                  "flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all",
+                  isSurprise ? "border-amber-300 bg-amber-50" : "border-stone-200 bg-white",
+                )}
+              >
+                <span className="text-2xl">{isSurprise ? "🔒" : "👁️"}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-semibold text-stone-800">
+                    {isSurprise ? "Keep it a surprise" : "Visible to everyone"}
+                  </p>
+                  <p className="text-[12px] text-stone-400 mt-0.5">
+                    {isSurprise
+                      ? "Hidden from the recipient until the big day"
+                      : "Recipient can see progress and contributions"}
+                  </p>
+                </div>
+                <div className={cn(
+                  "h-6 w-11 rounded-full transition-colors relative",
+                  isSurprise ? "bg-amber-400" : "bg-stone-200",
+                )}>
+                  <div className={cn(
+                    "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
+                    isSurprise ? "translate-x-5" : "translate-x-0.5",
+                  )} />
+                </div>
+              </motion.button>
+            )}
+          </AnimatePresence>
+
+          {/* Submit */}
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: canSubmit ? 1.01 : 1 }}
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            className={cn(
+              "flex w-full items-center justify-center gap-2.5 rounded-2xl py-4 text-[16px] font-semibold transition-all",
+              canSubmit
+                ? "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900 shadow-lg shadow-amber-200"
+                : "bg-stone-100 text-stone-400 cursor-not-allowed",
+            )}
+          >
+            <span className="text-[18px]">🎁</span>
+            <span style={{ fontFamily: "var(--font-display)" }}>Add to list</span>
+          </motion.button>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // MAIN PAGE
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default function DemoPage() {
   const [showStars, setShowStars] = useState(false);
+  const [showNewGift, setShowNewGift] = useState(false);
   const [pots, setPots] = useState<DemoPot[]>(INITIAL_POTS);
   const [revealPot, setRevealPot] = useState<DemoPot | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -2063,6 +2472,12 @@ export default function DemoPage() {
     addLog(intentMsg);
   }, [addedIds, showToast, addLog]);
 
+  const handleAddNewGift = useCallback((pot: DemoPot) => {
+    setPots((prev) => [pot, ...prev]);
+    showToast(`🎁 "${pot.title}" added to the list!`);
+    addLog(`✨ New gift created: "${pot.title}" £${pot.goal} — ${pot.mode}`);
+  }, [showToast, addLog]);
+
   const livePots = pots.filter((p) => p.mode === "LIVE_FEED");
   const surprisePots = pots.filter((p) => p.mode !== "LIVE_FEED");
 
@@ -2070,6 +2485,7 @@ export default function DemoPage() {
     <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
       {revealPot && <RevealModal pot={revealPot} onClose={() => setRevealPot(null)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+      {showNewGift && <NewGiftSheet onAdd={handleAddNewGift} onClose={() => setShowNewGift(false)} />}
 
       {/* ── Kids Space (full-screen overlay) ── */}
       {showStars && (
@@ -2099,6 +2515,22 @@ export default function DemoPage() {
                 ? <LivePotCard key={pot.id} pot={pot} onRemove={(id) => setPots((p) => p.filter((x) => x.id !== id))} />
                 : <LivePotCard key={pot.id} pot={pot} />
             )}
+            {/* Add new gift card */}
+            <motion.button
+              whileHover={{ scale: 1.01, y: -1 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 28 }}
+              onClick={() => setShowNewGift(true)}
+              className="flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/60 px-4 py-4 text-left transition-colors hover:border-amber-400 hover:bg-amber-50"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-xl font-bold text-stone-900 shadow">
+                +
+              </div>
+              <div>
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-700">New gift</p>
+                <p className="text-[12px] text-stone-400">Paste a link or enter manually</p>
+              </div>
+            </motion.button>
           </div>
         </section>
 
