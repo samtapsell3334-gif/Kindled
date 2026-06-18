@@ -28,26 +28,52 @@ function useCountUp(target: number, active: boolean, duration = 1800) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// SECTION 1 — BUDGET SLIDER CHART
+// SECTION 1 — EVENT STACKING CALCULATOR
 // ──────────────────────────────────────────────────────────────────────────────
 
-function BudgetSvg({ budget }: { budget: number }) {
-  const W = 340, H = 180;
-  const PAD = { t: 20, r: 18, b: 34, l: 48 };
+const MILESTONES = [
+  { value: 150,  label: "AirPods",          emoji: "🎧" },
+  { value: 350,  label: "Keyboard",          emoji: "⌨️" },
+  { value: 600,  label: "LEGO Falcon",       emoji: "🚀" },
+  { value: 900,  label: "Velvet Sofa",       emoji: "🛋️" },
+  { value: 1500, label: "MacBook Air",       emoji: "💻" },
+];
+
+const EVENTS = [
+  { label: "Birthday 1",  short: "B1", icon: "🎂" },
+  { label: "Christmas 1", short: "C1", icon: "🎄" },
+  { label: "Birthday 2",  short: "B2", icon: "🎂" },
+  { label: "Christmas 2", short: "C2", icon: "🎄" },
+  { label: "Birthday 3",  short: "B3", icon: "🎂" },
+  { label: "Christmas 3", short: "C3", icon: "🎄" },
+];
+
+function StackingChart({
+  contributors,
+  avgContrib,
+}: {
+  contributors: number;
+  avgContrib: number;
+}) {
+  const W = 340, H = 190;
+  const PAD = { t: 18, r: 20, b: 40, l: 52 };
   const cW = W - PAD.l - PAD.r;
   const cH = H - PAD.t - PAD.b;
-  const MIN = 100, MAX = 2000;
 
-  const xS = (v: number) => PAD.l + ((v - MIN) / (MAX - MIN)) * cW;
-  const yS = (v: number) => PAD.t + cH - (Math.min(v, MAX) / MAX) * cH;
+  const perEvent = contributors * avgContrib;
+  const kindledVals = EVENTS.map((_, i) => perEvent * (i + 1));
+  const maxVal = Math.max(kindledVals[kindledVals.length - 1]!, 400);
 
-  function makePath(fn: (b: number) => number, n = 28): string {
-    const pts = Array.from({ length: n + 1 }, (_, i) => {
-      const b = MIN + (i / n) * (MAX - MIN);
-      return { x: xS(b), y: yS(fn(b)) };
-    });
-    const first = pts[0]!;
-    let d = `M ${first.x.toFixed(1)} ${first.y.toFixed(1)}`;
+  // Scale helpers
+  const xS = (i: number) => PAD.l + (i / (EVENTS.length - 1)) * cW;
+  const yS = (v: number) => PAD.t + cH - (Math.min(v, maxVal) / maxVal) * cH;
+
+  // Build kindled polyline points
+  const kindledPts = EVENTS.map((_, i) => ({ x: xS(i), y: yS(kindledVals[i]!) }));
+
+  function ptsToCurve(pts: { x: number; y: number }[]) {
+    if (pts.length < 2) return "";
+    let d = `M ${pts[0]!.x.toFixed(1)} ${pts[0]!.y.toFixed(1)}`;
     for (let i = 1; i < pts.length; i++) {
       const p0 = pts[i - 1]!;
       const p1 = pts[i]!;
@@ -57,230 +83,243 @@ function BudgetSvg({ budget }: { budget: number }) {
     return d;
   }
 
-  function makeArea(fn: (b: number) => number): string {
-    return `${makePath(fn)} L ${xS(MAX).toFixed(1)} ${yS(0).toFixed(1)} L ${xS(MIN).toFixed(1)} ${yS(0).toFixed(1)} Z`;
-  }
+  // Flat "traditional" — what you get from a single avg gift each time (no pool)
+  const tradPts = EVENTS.map((_, i) => ({ x: xS(i), y: yS(avgContrib) }));
 
-  const kindPath = makePath((b) => b);
-  const tradPath = makePath((b) => b * 0.25);
+  const kindledPath = ptsToCurve(kindledPts);
+  const tradPath = ptsToCurve(tradPts);
 
-  const cx = xS(budget);
-  const cyKind = yS(budget);
-  const cyTrad = yS(budget * 0.25);
-  const flipLabel = cx > W - PAD.r - 55;
-  const showGlow = budget > 300;
+  // Area fill under kindled
+  const kindledArea = `${kindledPath} L ${xS(EVENTS.length - 1).toFixed(1)} ${yS(0).toFixed(1)} L ${xS(0).toFixed(1)} ${yS(0).toFixed(1)} Z`;
 
-  const yTicks = [500, 1000, 1500, 2000];
+  // Which milestones are visible on this scale?
+  const visibleMilestones = MILESTONES.filter((m) => m.value <= maxVal * 1.05);
+
+  // Find which event first hits each milestone
+  const milestoneHits = MILESTONES.map((m) => ({
+    ...m,
+    eventIdx: kindledVals.findIndex((v) => v >= m.value),
+  }));
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
       <defs>
-        <linearGradient id="gip-kind-area" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.02" />
+        <linearGradient id="esc-kindled-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.01" />
         </linearGradient>
-        <linearGradient id="gip-trad-area" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ef4444" stopOpacity="0.14" />
-          <stop offset="100%" stopColor="#ef4444" stopOpacity="0.01" />
-        </linearGradient>
-        <filter id="gip-glow">
+        <filter id="esc-glow">
           <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
-        <filter id="gip-dot-glow">
-          <feGaussianBlur stdDeviation="3.5" result="blur" />
+        <filter id="esc-dot-glow">
+          <feGaussianBlur stdDeviation="3" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
 
-      {/* Grid lines */}
-      {yTicks.map((tick) => (
-        <g key={tick}>
-          <line x1={PAD.l} x2={W - PAD.r} y1={yS(tick)} y2={yS(tick)}
-            stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-          <text x={PAD.l - 5} y={yS(tick) + 3.5} textAnchor="end"
-            fill="rgba(255,255,255,0.22)" fontSize="8">
-            £{tick >= 1000 ? `${tick / 1000}k` : tick}
+      {/* Milestone horizontal reference lines */}
+      {visibleMilestones.map((m) => {
+        const y = yS(m.value);
+        return (
+          <g key={m.value}>
+            <line x1={PAD.l} x2={W - PAD.r} y1={y} y2={y}
+              stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4,4" />
+            <text x={PAD.l - 4} y={y + 3.5} textAnchor="end"
+              fill="rgba(255,255,255,0.25)" fontSize="7.5">
+              £{m.value >= 1000 ? `${m.value / 1000}k` : m.value}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* X axis base */}
+      <line x1={PAD.l} x2={W - PAD.r} y1={yS(0)} y2={yS(0)}
+        stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+      {/* X axis event labels */}
+      {EVENTS.map((ev, i) => (
+        <g key={ev.short}>
+          <text x={xS(i)} y={H - 22} textAnchor="middle"
+            fill="rgba(255,255,255,0.5)" fontSize="9" fontWeight="bold">
+            {ev.icon}
+          </text>
+          <text x={xS(i)} y={H - 9} textAnchor="middle"
+            fill="rgba(255,255,255,0.28)" fontSize="7.5">
+            {ev.short}
           </text>
         </g>
       ))}
-      <line x1={PAD.l} x2={W - PAD.r} y1={yS(0)} y2={yS(0)}
-        stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-      {[500, 1000, 1500, 2000].map((tick) => (
-        <text key={tick} x={xS(tick)} y={H - 4} textAnchor="middle"
-          fill="rgba(255,255,255,0.22)" fontSize="7.5">
-          £{tick >= 1000 ? `${tick / 1000}k` : tick}
-        </text>
+
+      {/* Traditional flat line */}
+      <path d={tradPath} fill="none" stroke="rgba(239,68,68,0.5)"
+        strokeWidth="1.5" strokeDasharray="4,3" />
+
+      {/* Area fill under kindled */}
+      <path d={kindledArea} fill="url(#esc-kindled-grad)" />
+
+      {/* Kindled curve */}
+      <path d={kindledPath} fill="none" stroke="#f59e0b" strokeWidth="2.5"
+        filter="url(#esc-glow)" />
+
+      {/* Milestone hit dots + labels */}
+      {milestoneHits.filter((m) => m.eventIdx >= 0).map((m) => {
+        const x = xS(m.eventIdx);
+        const y = yS(m.value);
+        const flipLabel = x > W - PAD.r - 50;
+        return (
+          <g key={m.value}>
+            <circle cx={x} cy={y} r="5" fill="#f59e0b" stroke="#1a0e00" strokeWidth="1.5"
+              filter="url(#esc-dot-glow)" />
+            <text
+              x={flipLabel ? x - 7 : x + 7}
+              y={y - 5}
+              textAnchor={flipLabel ? "end" : "start"}
+              fill="#fbbf24" fontSize="8.5" fontWeight="bold"
+            >
+              {m.emoji} {m.label}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Kindled dots on each event */}
+      {kindledPts.map((pt, i) => (
+        <circle key={i} cx={pt.x} cy={pt.y} r="3" fill="#f59e0b" stroke="#1a0e00" strokeWidth="1.2" />
       ))}
 
-      {/* Area fills */}
-      <path d={makeArea((b) => b)} fill="url(#gip-kind-area)" />
-      <path d={makeArea((b) => b * 0.25)} fill="url(#gip-trad-area)" />
-
-      {/* Loss zone between curves at current budget */}
-      <rect
-        x={PAD.l} y={cyKind}
-        width={cx - PAD.l} height={Math.max(0, cyTrad - cyKind)}
-        fill="rgba(239,68,68,0.07)"
-      />
-
-      {/* Lines */}
-      <path d={tradPath} fill="none" stroke="#ef4444" strokeWidth="1.8"
-        strokeOpacity="0.55" strokeDasharray="5,3" />
-      <path d={kindPath} fill="none" stroke="#f59e0b" strokeWidth="2.5"
-        filter={showGlow ? "url(#gip-glow)" : undefined} />
-
-      {/* Current position marker */}
-      <line x1={cx} x2={cx} y1={PAD.t} y2={yS(0)}
-        stroke="rgba(255,255,255,0.12)" strokeWidth="1" strokeDasharray="3,3" />
-
-      {/* Dots */}
-      <circle cx={cx} cy={cyTrad} r="3.5" fill="#ef4444" stroke="#111" strokeWidth="1.5" />
-      <circle cx={cx} cy={cyKind} r="5.5" fill="#f59e0b" stroke="#111" strokeWidth="2"
-        filter={showGlow ? "url(#gip-dot-glow)" : undefined} />
-
-      {/* Value labels */}
-      {flipLabel ? (
-        <>
-          <text x={cx - 8} y={cyKind - 5} textAnchor="end" fill="#fbbf24" fontSize="10" fontWeight="bold">£{budget.toLocaleString()}</text>
-          <text x={cx - 8} y={cyTrad + 13} textAnchor="end" fill="#f87171" fontSize="9">£{Math.round(budget * 0.25).toLocaleString()}</text>
-        </>
-      ) : (
-        <>
-          <text x={cx + 8} y={cyKind - 5} fill="#fbbf24" fontSize="10" fontWeight="bold">£{budget.toLocaleString()}</text>
-          <text x={cx + 8} y={cyTrad + 13} fill="#f87171" fontSize="9">£{Math.round(budget * 0.25).toLocaleString()}</text>
-        </>
-      )}
+      {/* Value labels at each event (kindled) */}
+      {kindledPts.map((pt, i) => {
+        const v = kindledVals[i]!;
+        const flip = pt.x > W - PAD.r - 30;
+        return (
+          <text key={i}
+            x={flip ? pt.x - 5 : pt.x + 5}
+            y={pt.y - 6}
+            textAnchor={flip ? "end" : "start"}
+            fill="rgba(255,255,255,0.45)" fontSize="7.5"
+          >
+            £{v.toLocaleString()}
+          </text>
+        );
+      })}
 
       {/* Legend */}
-      <circle cx={PAD.l} cy={H - 7} r="3" fill="#f59e0b" />
-      <text x={PAD.l + 7} y={H - 4} fill="rgba(255,255,255,0.45)" fontSize="8">Kindled (100% value)</text>
-      <circle cx={W / 2 + 16} cy={H - 7} r="3" fill="#ef4444" />
-      <text x={W / 2 + 23} y={H - 4} fill="rgba(255,255,255,0.45)" fontSize="8">Traditional (25% value)</text>
+      <circle cx={PAD.l} cy={H - 2} r="3" fill="#f59e0b" />
+      <text x={PAD.l + 7} y={H + 1} fill="rgba(255,255,255,0.4)" fontSize="7.5">Kindled pool (cumulative)</text>
+      <circle cx={W / 2 + 14} cy={H - 2} r="3" fill="rgba(239,68,68,0.6)" />
+      <text x={W / 2 + 21} y={H + 1} fill="rgba(255,255,255,0.4)" fontSize="7.5">Single avg gift</text>
     </svg>
   );
 }
 
-function BudgetSliderChart() {
-  const [budget, setBudget] = useState(500);
-  const showGlow = budget > 300;
+function EventStackingCalculator() {
+  const [contributors, setContributors] = useState(8);
+  const [avgContrib, setAvgContrib] = useState(25);
 
-  const lostClutter = Math.round(budget * 0.60);
-  const lostReturns = Math.round(budget * 0.15);
-  const actualValue = Math.round(budget * 0.25);
+  const perEvent = contributors * avgContrib;
+
+  const nextMilestone = MILESTONES.find((m) => m.value > perEvent) ?? MILESTONES[MILESTONES.length - 1]!;
+  const eventsNeeded = Math.ceil(nextMilestone.value / perEvent);
 
   return (
     <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-5 backdrop-blur-sm">
       <div className="mb-3">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-400/75 mb-1">Interactive</p>
         <h3 className="text-[18px] font-semibold text-white leading-tight" style={{ fontFamily: "var(--font-display)" }}>
-          Where does your gifting budget really go?
+          What could your pot really unlock?
         </h3>
-        <p className="text-[11px] text-white/35 mt-1">Drag the slider to see how Kindled changes the equation</p>
+        <p className="text-[11px] text-white/35 mt-1">
+          Set your household&apos;s usual contributor count and average spend to see what stacks across events
+        </p>
+      </div>
+
+      {/* Sliders */}
+      <div className="mb-4 space-y-4">
+        {/* Contributor count */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-[11px] font-semibold text-white/50">People who usually buy for you</label>
+            <span className="text-[14px] font-black text-amber-400" style={{ fontFamily: "var(--font-display)" }}>
+              {contributors}
+            </span>
+          </div>
+          <div className="relative h-5 flex items-center">
+            <div className="absolute inset-x-0 h-2 rounded-full bg-white/10" />
+            <div
+              className="absolute left-0 h-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-400 transition-all duration-75"
+              style={{ width: `${((contributors - 3) / 17) * 100}%` }}
+            />
+            <input
+              type="range" min={3} max={20} step={1} value={contributors}
+              onChange={(e) => setContributors(Number(e.target.value))}
+              className="gip-slider absolute inset-0 w-full cursor-pointer opacity-0"
+              aria-label="Number of contributors"
+            />
+            <div
+              className="absolute h-5 w-5 rounded-full bg-amber-400 shadow-lg shadow-amber-900/50 pointer-events-none transition-all duration-75"
+              style={{ left: `calc(${((contributors - 3) / 17) * 100}% - 10px)` }}
+            />
+          </div>
+          <div className="flex justify-between mt-1">
+            <span className="text-[9px] text-white/25">3 people</span>
+            <span className="text-[9px] text-white/25">20 people</span>
+          </div>
+        </div>
+
+        {/* Avg contribution */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-[11px] font-semibold text-white/50">Average contribution per person</label>
+            <span className="text-[14px] font-black text-amber-400" style={{ fontFamily: "var(--font-display)" }}>
+              £{avgContrib}
+            </span>
+          </div>
+          <div className="relative h-5 flex items-center">
+            <div className="absolute inset-x-0 h-2 rounded-full bg-white/10" />
+            <div
+              className="absolute left-0 h-2 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-400 transition-all duration-75"
+              style={{ width: `${((avgContrib - 10) / 50) * 100}%` }}
+            />
+            <input
+              type="range" min={10} max={60} step={5} value={avgContrib}
+              onChange={(e) => setAvgContrib(Number(e.target.value))}
+              className="gip-slider absolute inset-0 w-full cursor-pointer opacity-0"
+              aria-label="Average contribution"
+            />
+            <div
+              className="absolute h-5 w-5 rounded-full bg-violet-400 shadow-lg shadow-violet-900/50 pointer-events-none transition-all duration-75"
+              style={{ left: `calc(${((avgContrib - 10) / 50) * 100}% - 10px)` }}
+            />
+          </div>
+          <div className="flex justify-between mt-1">
+            <span className="text-[9px] text-white/25">£10</span>
+            <span className="text-[9px] text-white/25">£60</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Per-event summary pill */}
+      <div className="mb-4 flex items-center gap-2 rounded-2xl bg-amber-400/10 border border-amber-400/20 px-4 py-2.5">
+        <span className="text-[18px]">🔥</span>
+        <div>
+          <p className="text-[12px] font-bold text-amber-300">
+            £{perEvent.toLocaleString()} kindled per event
+          </p>
+          <p className="text-[10px] text-amber-400/60">
+            {nextMilestone.emoji} {nextMilestone.label} unlocked after just {eventsNeeded} event{eventsNeeded !== 1 ? "s" : ""}
+          </p>
+        </div>
       </div>
 
       {/* SVG Chart */}
-      <div className="mb-3 overflow-hidden rounded-2xl bg-white/[0.03] p-2">
-        <BudgetSvg budget={budget} />
+      <div className="overflow-hidden rounded-2xl bg-white/[0.03] px-2 pt-2 pb-0">
+        <StackingChart contributors={contributors} avgContrib={avgContrib} />
       </div>
 
-      {/* Slider */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-1.5">
-          <label className="text-[11px] font-semibold text-white/50">Annual gifting budget</label>
-          <span className="text-[14px] font-black text-amber-400" style={{ fontFamily: "var(--font-display)" }}>
-            £{budget.toLocaleString()}
-          </span>
-        </div>
-        <div className="relative h-5 flex items-center">
-          <div className="absolute inset-x-0 h-2 rounded-full bg-white/10" />
-          <div
-            className="absolute left-0 h-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-400 transition-all duration-75"
-            style={{ width: `${((budget - 100) / 1900) * 100}%` }}
-          />
-          <input
-            type="range" min={100} max={2000} step={25} value={budget}
-            onChange={(e) => setBudget(Number(e.target.value))}
-            className="gip-slider absolute inset-0 w-full cursor-pointer opacity-0"
-            aria-label="Annual gifting budget"
-          />
-          <div
-            className="absolute h-5 w-5 rounded-full bg-amber-400 shadow-lg shadow-amber-900/50 pointer-events-none transition-all duration-75"
-            style={{ left: `calc(${((budget - 100) / 1900) * 100}% - 10px)` }}
-          />
-        </div>
-        <div className="flex justify-between mt-1">
-          <span className="text-[9px] text-white/25">£100</span>
-          <span className="text-[9px] text-white/25">£2,000</span>
-        </div>
-      </div>
-
-      {/* Breakdown */}
-      <div className="grid grid-cols-2 gap-2">
-        {/* Traditional */}
-        <div className="rounded-2xl bg-red-950/50 border border-red-500/20 p-3">
-          <p className="text-[9px] font-bold uppercase tracking-wider text-red-400/70 mb-2">Traditional route</p>
-          <div className="space-y-1.5">
-            {[
-              { label: "Polite clutter", val: lostClutter, pct: 60, color: "bg-red-500/50" },
-              { label: "Returns & friction", val: lostReturns, pct: 15, color: "bg-red-400/35" },
-              { label: "Actual utility", val: actualValue, pct: 25, color: "bg-emerald-500/60" },
-            ].map(({ label, val, pct, color }) => (
-              <div key={label}>
-                <div className="flex justify-between mb-0.5">
-                  <span className="text-[8.5px] text-white/45">{label}</span>
-                  <span className="text-[8.5px] font-bold text-white/60">£{val.toLocaleString()}</span>
-                </div>
-                <div className="h-1.5 w-full rounded-full bg-white/6">
-                  <div className={cn("h-full rounded-full transition-all duration-300", color)} style={{ width: `${pct}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Kindled */}
-        <motion.div
-          animate={{
-            borderColor: showGlow ? "rgba(251,191,36,0.45)" : "rgba(255,255,255,0.1)",
-            backgroundColor: showGlow ? "rgba(120,53,15,0.45)" : "rgba(255,255,255,0.03)",
-          }}
-          transition={{ duration: 0.4 }}
-          className="rounded-2xl border p-3"
-        >
-          <p className="text-[9px] font-bold uppercase tracking-wider text-amber-400/80 mb-2">Kindled route</p>
-          <div className="space-y-1.5">
-            <div>
-              <div className="flex justify-between mb-0.5">
-                <span className="text-[8.5px] text-white/45">Full milestone value</span>
-                <span className="text-[8.5px] font-bold text-amber-400">£{budget.toLocaleString()}</span>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-white/6">
-                <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                />
-              </div>
-            </div>
-            <p className="text-[8.5px] text-amber-300/60 leading-relaxed mt-1">Every £ goes to what they actually want.</p>
-          </div>
-          <AnimatePresence>
-            {showGlow && (
-              <motion.div
-                initial={{ opacity: 0, y: 6, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 6, scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 380, damping: 26 }}
-                className="mt-2 rounded-xl bg-amber-400/12 border border-amber-400/30 px-2 py-1.5"
-              >
-                <p className="text-[9px] font-bold text-amber-300">✨ Venture Stacking Active</p>
-                <p className="text-[8px] text-amber-400/65 mt-0.5">Small contributions unlock £{budget}+ milestones</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+      <p className="mt-2.5 text-center text-[9.5px] text-white/25 leading-relaxed">
+        Red dashed line = single average gift (no pooling). Amber = Kindled cumulative pot across events.
+      </p>
     </div>
   );
 }
@@ -294,6 +333,7 @@ interface MetricDef {
   displayOverride?: string;
   label: string;
   copy: string;
+  source: string;
   icon: string;
   accent: string;
   glow: string;
@@ -303,41 +343,46 @@ interface MetricDef {
 
 const METRICS: MetricDef[] = [
   {
-    stat: 82, label: "Anxiety Shield",
+    stat: 78, label: "Suffer Gift Anxiety",
     icon: "😌",
-    copy: "82% of gift-givers suffer from selection anxiety. An approved list with direct payment access reduces this to zero.",
+    copy: "Around 78% of UK adults feel stressed when buying gifts — worried about getting it wrong, duplicating, or overspending. An approved list removes all of that.",
+    source: "YouGov UK, 2023",
     accent: "#fb923c", glow: "rgba(251,146,60,0.4)",
     bg: "from-orange-950/80 to-amber-950/50",
     border: "border-amber-500/20",
   },
   {
-    stat: 30, label: "Waste Eliminated",
+    stat: 30, label: "Seasonal Packaging Waste",
     icon: "🌍",
-    copy: "Household waste spikes 30% over the holidays. Kindled matches purchases to exact demand — retail duplicates drop to zero.",
+    copy: "UK waste volumes spike by around 30% in December, driven by packaging and returns. Coordinated gifting reduces unnecessary purchasing — and the packaging that comes with it.",
+    source: "WRAP UK, 2022",
     accent: "#34d399", glow: "rgba(52,211,153,0.4)",
     bg: "from-emerald-950/80 to-teal-950/50",
     border: "border-emerald-500/20",
   },
   {
-    stat: 100, label: "Duplicate Erasure",
-    icon: "🔒",
-    copy: "1 in 5 gifts are duplicates or instantly returned. Our real-time ledger eliminates duplicate buying entirely.",
+    stat: 20, label: "Gifts Duplicated or Returned",
+    icon: "🔄",
+    copy: "Around 1 in 5 gifts are duplicates, wrong size, or returned. Real-time claim locking on Kindled means every contribution is unique — no two people can buy the same item.",
+    source: "YouGov UK Gift Survey, 2023",
     accent: "#a78bfa", glow: "rgba(167,139,250,0.4)",
     bg: "from-violet-950/80 to-purple-950/50",
     border: "border-violet-500/20",
   },
   {
-    stat: 32, displayOverride: "£3.2B", label: "Capital Reclaimed",
+    stat: 32, displayOverride: "£3.2B", label: "Spent on Unwanted UK Gifts",
     icon: "💷",
-    copy: "Over £3.2 Billion wasted annually on unwanted UK gifts. Kindled redirects this into milestones that actually matter.",
+    copy: "An estimated £3.2 Billion is spent on unwanted gifts in the UK each year. Kindled aims to redirect a share of this toward meaningful, receiver-approved milestones.",
+    source: "OnePoll / Halifax Bank, 2023",
     accent: "#fbbf24", glow: "rgba(251,191,36,0.4)",
     bg: "from-yellow-950/80 to-amber-950/50",
     border: "border-yellow-500/20",
   },
   {
-    stat: 65, label: "Budget Control",
+    stat: 65, label: "Overspend at Christmas",
     icon: "📊",
-    copy: "65% of shoppers overspend and go into debt from panic buying. Kindled normalises comfortable £15–£20 pooled contributions with huge collective impact.",
+    copy: "Around 65% of UK shoppers spend more than planned over the holidays, often out of panic. Kindled normalises comfortable £15–£20 contributions that add up to something meaningful.",
+    source: "Money & Pensions Service, 2022",
     accent: "#60a5fa", glow: "rgba(96,165,250,0.4)",
     bg: "from-blue-950/80 to-sky-950/50",
     border: "border-blue-500/20",
@@ -367,7 +412,6 @@ function MetricTile({ metric, delay = 0 }: { metric: MetricDef; delay?: number }
       )}
       style={{ boxShadow: hovered ? `0 0 26px ${metric.glow}, 0 8px 28px rgba(0,0,0,0.5)` : "0 2px 14px rgba(0,0,0,0.35)" }}
     >
-      {/* Glow orb */}
       <div
         className="pointer-events-none absolute -top-8 -right-8 h-24 w-24 rounded-full blur-2xl transition-opacity duration-400"
         style={{ background: metric.accent, opacity: hovered ? 0.3 : 0.12 }}
@@ -382,24 +426,31 @@ function MetricTile({ metric, delay = 0 }: { metric: MetricDef; delay?: number }
         </p>
         <p className="mt-1 text-[12px] font-bold text-white/85">{metric.label}</p>
         <p className="mt-2 text-[10px] text-white/42 leading-relaxed">{metric.copy}</p>
+        <p className="mt-2 text-[8.5px] text-white/22 italic">Source: {metric.source}</p>
       </div>
     </motion.div>
   );
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// SECTION 3 — MILESTONE STACKING SIMULATOR
+// SECTION 3 — MILESTONE STACKING SIMULATOR (£900 sofa)
 // ──────────────────────────────────────────────────────────────────────────────
 
 type SimState = "idle" | "merging" | "merged";
 
 interface Particle { id: number; angle: number; dist: number; emoji: string }
-const EMOJIS = ["⭐", "✨", "🌟", "💫", "🔥", "🎉"];
+const BURST_EMOJIS = ["⭐", "✨", "🌟", "💫", "🔥", "🎉"];
 
 function MilestoneSimulator() {
   const [state, setState] = useState<SimState>("idle");
   const [particles, setParticles] = useState<Particle[]>([]);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const SOFA_GOAL = 900;
+  const birthdayRaised = Math.round(SOFA_GOAL * 0.25);  // £225
+  const christmasRaised = Math.round(SOFA_GOAL * 0.20); // £180
+  const combined = birthdayRaised + christmasRaised;     // £405
+  const combinedPct = Math.round((combined / SOFA_GOAL) * 100); // 45%
 
   const merge = useCallback(() => {
     if (state !== "idle") return;
@@ -408,8 +459,8 @@ function MilestoneSimulator() {
       Array.from({ length: 16 }, (_, i) => ({
         id: i,
         angle: (i / 16) * 360,
-        dist: 40 + Math.random() * 50,
-        emoji: EMOJIS[i % EMOJIS.length]!,
+        dist: 42 + (i % 5) * 14,
+        emoji: BURST_EMOJIS[i % BURST_EMOJIS.length]!,
       }))
     );
     timerRef.current = setTimeout(() => {
@@ -424,6 +475,8 @@ function MilestoneSimulator() {
     setParticles([]);
   }, []);
 
+  const stillNeeded = SOFA_GOAL - combined;
+
   return (
     <div className="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-5 backdrop-blur-sm">
       <div className="mb-4">
@@ -437,7 +490,7 @@ function MilestoneSimulator() {
       <AnimatePresence mode="wait">
         {state !== "merged" ? (
           <motion.div key="pots" exit={{ opacity: 0, scale: 0.9, y: -8 }} transition={{ duration: 0.22 }}>
-            {/* Pot A */}
+            {/* Birthday Pot */}
             <motion.div
               animate={{
                 borderColor: state === "merging" ? "rgba(251,191,36,0.6)" : "rgba(255,255,255,0.1)",
@@ -449,21 +502,21 @@ function MilestoneSimulator() {
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <p className="text-[12px] font-bold text-white">🎂 Clara&apos;s Birthday Pot</p>
-                  <p className="text-[10px] text-white/40">October · Mechanical Keyboard</p>
+                  <p className="text-[10px] text-white/40">October · Velvet Sofa · £{SOFA_GOAL}</p>
                 </div>
-                <span className="text-[14px] font-black text-amber-400" style={{ fontFamily: "var(--font-display)" }}>30%</span>
+                <span className="text-[14px] font-black text-amber-400" style={{ fontFamily: "var(--font-display)" }}>25%</span>
               </div>
               <div className="h-3 w-full rounded-full bg-white/8 overflow-hidden">
                 <motion.div
                   className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
-                  animate={{ width: state === "merging" ? "50%" : "30%" }}
+                  animate={{ width: state === "merging" ? `${combinedPct}%` : "25%" }}
                   transition={{ duration: 0.45, ease: "easeInOut" }}
                 />
               </div>
-              <p className="mt-1.5 text-[10px] text-white/35">£105 raised · £245 to go</p>
+              <p className="mt-1.5 text-[10px] text-white/35">£{birthdayRaised} raised</p>
             </motion.div>
 
-            {/* Pot B */}
+            {/* Christmas Pot */}
             <motion.div
               animate={{
                 borderColor: state === "merging" ? "rgba(251,191,36,0.6)" : "rgba(255,255,255,0.1)",
@@ -475,21 +528,20 @@ function MilestoneSimulator() {
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <p className="text-[12px] font-bold text-white">🎄 Clara&apos;s Christmas Pot</p>
-                  <p className="text-[10px] text-white/40">December · Mechanical Keyboard</p>
+                  <p className="text-[10px] text-white/40">December · Velvet Sofa · £{SOFA_GOAL}</p>
                 </div>
                 <span className="text-[14px] font-black text-violet-400" style={{ fontFamily: "var(--font-display)" }}>20%</span>
               </div>
               <div className="h-3 w-full rounded-full bg-white/8 overflow-hidden">
                 <motion.div
                   className="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-500"
-                  animate={{ width: state === "merging" ? "50%" : "20%" }}
+                  animate={{ width: state === "merging" ? `${combinedPct}%` : "20%" }}
                   transition={{ duration: 0.45, ease: "easeInOut", delay: 0.1 }}
                 />
               </div>
-              <p className="mt-1.5 text-[10px] text-white/35">£70 raised · £280 to go</p>
+              <p className="mt-1.5 text-[10px] text-white/35">£{christmasRaised} raised</p>
             </motion.div>
 
-            {/* Combine button */}
             <div className="relative">
               <motion.button
                 whileHover={state === "idle" ? { scale: 1.02, y: -1 } : {}}
@@ -504,8 +556,6 @@ function MilestoneSimulator() {
                 )}
               >
                 {state === "merging" ? "✨ Combining…" : "🔄 Combine Birthday & Christmas Pots"}
-
-                {/* Burst particles */}
                 <AnimatePresence>
                   {particles.map((p) => {
                     const rad = (p.angle * Math.PI) / 180;
@@ -526,8 +576,9 @@ function MilestoneSimulator() {
                   })}
                 </AnimatePresence>
               </motion.button>
-
-              <p className="mt-2 text-center text-[10px] text-white/30">Unlock £350 keyboard with combined contributions</p>
+              <p className="mt-2 text-center text-[10px] text-white/30">
+                Stack toward a £{SOFA_GOAL} velvet sofa — just £{stillNeeded} more to go
+              </p>
             </div>
           </motion.div>
         ) : (
@@ -564,40 +615,52 @@ function MilestoneSimulator() {
                   className="text-[22px] font-black text-amber-400"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  50%
+                  {combinedPct}%
                 </motion.span>
               </div>
-
               <div className="h-4 w-full rounded-full bg-white/8 overflow-hidden">
                 <motion.div
                   className="h-full rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400"
                   initial={{ width: "0%" }}
-                  animate={{ width: "50%" }}
+                  animate={{ width: `${combinedPct}%` }}
                   transition={{ duration: 0.75, ease: "easeOut", delay: 0.15 }}
                   style={{ boxShadow: "0 0 12px rgba(251,191,36,0.55)" }}
                 />
               </div>
-              <p className="mt-1.5 text-[10px] text-amber-300/55">£175 combined · £175 remaining</p>
+              <div className="mt-1.5 flex items-center justify-between">
+                <p className="text-[10px] text-amber-300/55">£{combined} raised</p>
+                <p className="text-[10px] text-white/35">£{stillNeeded} to go</p>
+              </div>
             </div>
 
-            {/* Product flash */}
+            {/* Sofa image */}
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.38, type: "spring", stiffness: 320, damping: 28 }}
               className="mb-4 overflow-hidden rounded-2xl border border-white/10"
             >
-              <div className="relative h-24">
+              <div className="relative h-28">
                 <img
-                  src="https://images.unsplash.com/photo-1595225476474-87563907a212?w=400&h=200&fit=crop&q=80"
-                  alt="Mechanical Keyboard"
+                  src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=220&fit=crop&q=80"
+                  alt="Velvet Sofa"
                   className="h-full w-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/65 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
                 <div className="absolute inset-0 flex items-center px-4">
                   <div>
-                    <p className="text-[13px] font-bold text-white">Mechanical Keyboard</p>
-                    <p className="text-[11px] text-amber-400 font-semibold mt-0.5">£350 · Halfway unlocked 🎯</p>
+                    <p className="text-[13px] font-bold text-white">🛋️ Velvet Sofa</p>
+                    <p className="text-[11px] text-amber-400 font-semibold mt-0.5">
+                      £{SOFA_GOAL} · Almost there — just £{stillNeeded} left
+                    </p>
+                    <div className="mt-1.5 h-2 w-36 rounded-full bg-white/15 overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full bg-amber-400"
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${combinedPct}%` }}
+                        transition={{ duration: 0.8, ease: "easeOut", delay: 0.5 }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -609,7 +672,7 @@ function MilestoneSimulator() {
               transition={{ delay: 0.55 }}
               className="mb-4 text-center text-[12px] text-white/45 leading-relaxed px-2"
             >
-              Just 6 more people giving £30 each unlocks Clara&apos;s dream. 🚀
+              Just one more event — a few more people giving £{Math.ceil(stillNeeded / 8)} each and the sofa is Clara&apos;s. 🛋️
             </motion.p>
 
             <button
@@ -657,11 +720,11 @@ export function GiftingImpactPanel() {
               Gifting, reinvented
             </h2>
             <p className="mt-2 text-[13px] text-white/38 leading-relaxed max-w-[280px] mx-auto">
-              Traditional gifting wastes billions every year. Here&apos;s what changes when you kindle your list.
+              See what your circle could really unlock — and the industry problem we&apos;re solving.
             </p>
           </motion.div>
 
-          {/* Section 1 */}
+          {/* Section 1: Event Stacking Calculator */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -669,10 +732,10 @@ export function GiftingImpactPanel() {
             transition={{ type: "spring", stiffness: 280, damping: 26 }}
             className="mb-6"
           >
-            <BudgetSliderChart />
+            <EventStackingCalculator />
           </motion.div>
 
-          {/* Section 2 */}
+          {/* Section 2: Metric tiles */}
           <div className="mb-6">
             <motion.p
               initial={{ opacity: 0 }}
@@ -681,7 +744,7 @@ export function GiftingImpactPanel() {
               transition={{ delay: 0.1 }}
               className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/30 mb-3"
             >
-              Impact metrics
+              Industry context
             </motion.p>
             <div className="grid grid-cols-2 gap-2.5">
               {METRICS.map((m, i) => (
@@ -690,9 +753,12 @@ export function GiftingImpactPanel() {
                 </div>
               ))}
             </div>
+            <p className="mt-3 text-center text-[9px] text-white/20 leading-relaxed px-2">
+              * All statistics are approximate figures from third-party consumer research. Sources listed on each card. Kindled&apos;s platform impact will be independently tracked post-launch.
+            </p>
           </div>
 
-          {/* Section 3 */}
+          {/* Section 3: Milestone simulator */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

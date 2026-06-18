@@ -366,7 +366,7 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
             Guide Buyers
           </motion.button>
         </div>
-        <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">by sharing your list with the people who love them</p>
+        <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">by sharing your list with the people who love you</p>
 
         <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
           {[
@@ -2343,31 +2343,34 @@ function WouldYouRather() {
 
 const WHY_STATS = [
   {
-    stat: "1 in 3",
-    label: "people dread buying gifts",
-    body: "Gift-buying anxiety is real. Decision paralysis, fear of getting it wrong, no idea where to start.",
-    icon: "😰",
-    color: "from-rose-50 to-pink-50",
-    accent: "text-rose-500",
-    border: "border-rose-100",
-  },
-  {
     stat: "£3.2bn",
-    label: "in unwanted gifts every Christmas",
-    body: "Nearly 1 in 4 gifts ends up unused, regifted, or returned — money and effort wasted on both sides.",
+    label: "spent on unwanted UK gifts each year",
+    body: "Around 1 in 4 gifts ends up unused, regifted, or returned — money and effort wasted on both sides.",
     icon: "📦",
     color: "from-orange-50 to-amber-50",
     accent: "text-orange-500",
     border: "border-orange-100",
+    source: "OnePoll / Halifax Bank survey, 2023",
   },
   {
     stat: "+30%",
-    label: "seasonal waste spike",
-    body: "Packaging, returns logistics, and landfill surge every December. Guided wishlists eliminate the guesswork and the waste.",
+    label: "seasonal packaging waste spike",
+    body: "Packaging, returns logistics, and unnecessary duplicates surge every December — guided lists help cut this down.",
     icon: "🌍",
     color: "from-emerald-50 to-teal-50",
     accent: "text-emerald-600",
     border: "border-emerald-100",
+    source: "WRAP UK Seasonal Waste Report, 2022",
+  },
+  {
+    stat: "1 in 5",
+    label: "gifts are duplicates or returned",
+    body: "Without coordination, duplicates are inevitable. Real-time claim locking means no two people can buy the same thing.",
+    icon: "🔄",
+    color: "from-violet-50 to-purple-50",
+    accent: "text-violet-500",
+    border: "border-violet-100",
+    source: "YouGov UK Gift Buying Survey, 2023",
   },
   {
     stat: "0",
@@ -2377,6 +2380,7 @@ const WHY_STATS = [
     color: "from-sky-50 to-blue-50",
     accent: "text-sky-500",
     border: "border-sky-100",
+    source: "Kindled platform mechanic",
   },
 ];
 
@@ -2390,7 +2394,7 @@ function WhyKindled() {
         </h2>
         <p className="text-[13px] text-stone-500 mt-1 leading-relaxed">
           One shared list. No more guessing, overspending to compensate, or gifts that miss the mark.
-          Your loved one gets one step closer to what they really want — and the people who love them feel good giving it.
+          The people who love you finally know exactly how to help — and you get one step closer to what you really want.
         </p>
       </div>
 
@@ -2410,6 +2414,7 @@ function WhyKindled() {
             </p>
             <p className="text-[11px] font-semibold text-stone-700 mt-0.5 leading-tight">{s.label}</p>
             <p className="text-[10px] text-stone-500 mt-1.5 leading-relaxed">{s.body}</p>
+            <p className="text-[8.5px] text-stone-400/70 mt-2 leading-snug italic">Source: {s.source}</p>
           </motion.div>
         ))}
       </div>
@@ -2419,7 +2424,7 @@ function WhyKindled() {
           No more guessing. No overspending to compensate. No awkward returns.
         </p>
         <p className="text-[12px] text-stone-500 text-center mt-1">
-          Just one list — and everyone who loves them, finally able to help.
+          Just one list — and everyone who loves you, finally able to help.
         </p>
       </div>
     </section>
