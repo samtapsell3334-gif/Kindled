@@ -151,15 +151,15 @@ const CATALOGUE: CatalogItem[] = [
 
 const SCENES: ExplainerScene[] = [
   { id: 1, title: "The Gifting Paradox",
-    caption: "Every year, billions of pounds are wasted on unwanted gifts. Cheap plastic toys pile up... while the things kids actually dream about stay out of reach. There has to be a better way." },
-  { id: 2, title: "The Cash-Ask Friction",
-    caption: "Asking family for cash directly? Incredibly awkward. Studies show 82% of people feel deeply uncomfortable doing it. Kindling removes that friction entirely — no awkward messages, ever." },
-  { id: 3, title: "Continuous Pots",
-    caption: "With Kindling, Billy has one Dream Board. Contributions flow in at every birthday, every Christmas, every occasion — stacking up like coins until his dream becomes real." },
-  { id: 4, title: "Mum Knows Best",
-    caption: "Mum controls the checklist. Grandma claims the LEGO Space Shuttle — it's ticked off instantly. No duplicates. No overspending. Everyone knows exactly what to buy." },
+    caption: "Would you rather your family receive fifteen cheap, duplicate plastic toys forgotten in a landfill... or combine forces to unlock one incredible, life-changing milestone? For kids, that's the dream mountain bike. For adults, it's a cosy log burner, a family sofa, or even a house deposit — completely out of reach for a single buyer's budget." },
+  { id: 2, title: "Mum Knows Best",
+    caption: "We all prefer those meaningful milestones... but directly asking loved ones for cash always feels incredibly awkward. Kindled fixes this — our 'Mum Knows Best' Checklist lets parents list lower-cost items. Relatives click to instantly Claim or Tick Off an item, securing it in real-time across all shared family links. No duplicates. No overspending. Guaranteed to be loved." },
+  { id: 3, title: "Continuous Gifting",
+    caption: "Unlike temporary registries that expire, Kindled is a continuous ledger built to stack up over time. An incomplete birthday pot seamlessly carries over to Christmas... letting grandparents, aunts, and colleagues keep chipping in. By stacking minor contributions, you unlock massive purchasing power — turning ten minor gifts into a beautiful family sofa or a coding camp." },
+  { id: 4, title: "Under Wraps Reveal",
+    caption: "And we protect the surprise until the very end. Toggle on 'Under Wraps' mode and progress bars, totals, and greetings are completely hidden from the receiver. Contributions keep flowing in secretly, while the registry looks like a beautiful locked gift box. On the big day, trigger the cinematic Reveal Ceremony — digital fireworks, glitter, and a floating mosaic of notes from the family." },
   { id: 5, title: "Simple for Grandma",
-    caption: "One WhatsApp link. Two taps on Apple Pay. Done. Grandma just contributed to Billy's Mountain Bike without downloading a single app. That's the magic of Kindling." },
+    caption: "Sharing is beautifully effortless. One simple link on WhatsApp lets family chip in securely in just two taps using Apple Pay or Google Pay. No app downloads, no account setup, and absolutely zero hassle for Grandma. Secured globally by Stripe. Kindled doesn't force a new behaviour — it simply makes collaborative family gifting sustainable, emotional, and powerful." },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -937,111 +937,305 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function SceneVisual({ id, progress }: { id: number; progress: number }) {
-  if (id === 1) return (
-    <div className="flex h-full items-center justify-center gap-3 px-3">
-      <div className="flex-1 flex flex-col items-center gap-1 opacity-60">
-        <div className="flex flex-wrap justify-center gap-1">
-          {["🧦","🕯️","🪆","📦","🧸"].map((e, i) => (
-            <span key={i} className="text-lg grayscale">{e}</span>
+  /* ── Scene 1: The Gifting Paradox ── */
+  if (id === 1) {
+    const dupes = ["🧸","📦","🧦","🪆","🕯️","📦","🧸","🧦"];
+    const dreams = [
+      { e: "🚵", label: "Mountain Bike", val: "£450" },
+      { e: "🔥", label: "Cosy Log Burner", val: "£600" },
+      { e: "✈️", label: "Dream Holiday", val: "£1,200" },
+      { e: "🏠", label: "House Deposit", val: "£5,000" },
+    ];
+    return (
+      <div className="relative flex h-full w-full overflow-hidden">
+        {/* Left: junk pile */}
+        <div className="flex w-[44%] flex-col items-center justify-center gap-2 bg-red-950/40 px-2 py-3 border-r border-stone-700">
+          <div className="flex flex-wrap justify-center gap-1">
+            {dupes.map((e, i) => (
+              <span key={i} className="text-base grayscale opacity-60" style={{ animationDelay: `${i*0.1}s` }}>{e}</span>
+            ))}
+          </div>
+          <div className="mt-1 rounded-full bg-red-500/90 px-2 py-0.5">
+            <p className="text-[9px] font-black text-white tracking-widest">✕ WASTED</p>
+          </div>
+          <p className="text-[8px] text-red-400 text-center leading-tight">Forgotten in landfill</p>
+        </div>
+        {/* Centre VS badge */}
+        <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-stone-900 border-2 border-amber-400 shadow-lg shadow-amber-900/50">
+            <span className="text-[9px] font-black text-amber-400">OR</span>
+          </div>
+        </div>
+        {/* Right: dream cards */}
+        <div className="flex w-[56%] flex-col justify-center gap-1.5 px-2.5 py-3">
+          {dreams.map((d, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-900/40 to-orange-900/30 px-2.5 py-1.5"
+              style={{ opacity: progress > i * 0.18 ? 1 : 0.2, transition: "opacity 0.5s ease", transitionDelay: `${i * 0.1}s` }}
+            >
+              <span className="text-base">{d.e}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[9px] font-black text-amber-300 truncate">{d.label}</p>
+              </div>
+              <span className="text-[9px] font-black text-emerald-400 shrink-0">{d.val}</span>
+            </div>
+          ))}
+          <p className="mt-0.5 text-[8px] text-amber-400 text-center font-bold">✦ Combine forces to unlock</p>
+        </div>
+        {/* WOULD YOU RATHER stamp */}
+        {progress > 0.25 && (
+          <div className="pointer-events-none absolute inset-x-0 top-2 flex justify-center">
+            <div className="rounded-full bg-amber-400 px-3 py-0.5 shadow-lg shadow-amber-900/40 animate-bounce-in-up">
+              <p className="text-[9px] font-black text-stone-900 tracking-widest">WOULD YOU RATHER?</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ── Scene 2: Mum Knows Best Checklist ── */
+  if (id === 2) {
+    const items = [
+      { label: "Storybook Collection", price: "£15", who: "👵 Grandma Linda", claimAt: 0.2 },
+      { label: "Lego Space Set", price: "£25", who: "👨‍🦲 Uncle Steve", claimAt: 0.45 },
+      { label: "Marvel Figure Set", price: "£18", who: "👩 Auntie Jo", claimAt: 0.72 },
+    ];
+    return (
+      <div className="flex h-full flex-col justify-center gap-1.5 px-4 py-3">
+        <div className="mb-1 flex items-center gap-2">
+          <span className="text-base">👩</span>
+          <div>
+            <p className="text-[10px] font-black text-white">Mum&apos;s Checklist</p>
+            <p className="text-[8px] text-stone-400">Real-time duplicate protection</p>
+          </div>
+        </div>
+        {items.map((item, i) => {
+          const claimed = progress > item.claimAt;
+          return (
+            <div
+              key={i}
+              className={cn(
+                "flex items-center gap-2 rounded-xl px-3 py-2 border transition-all duration-500",
+                claimed ? "bg-emerald-900/30 border-emerald-700/50" : "bg-stone-800/70 border-stone-700/50",
+              )}
+            >
+              <div className={cn(
+                "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 text-[10px]",
+                claimed ? "border-emerald-400 bg-emerald-400 text-stone-900" : "border-stone-600 text-stone-600",
+              )}>
+                {claimed ? "✓" : "○"}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={cn("text-[10px] font-semibold transition-all", claimed ? "line-through text-stone-500" : "text-stone-200")}>{item.label}</p>
+                {claimed && <p className="text-[8px] text-emerald-400 font-bold">{item.who} · Secured!</p>}
+              </div>
+              <span className="text-[10px] font-black text-amber-400 shrink-0">{item.price}</span>
+            </div>
+          );
+        })}
+        {progress > 0.8 && (
+          <div className="mt-1 flex items-center gap-1.5 animate-fade-up">
+            <span className="text-[10px]">🛡️</span>
+            <p className="text-[9px] font-bold text-emerald-400">All items secured · Zero duplicates guaranteed</p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ── Scene 3: Continuous Gifting Timeline ── */
+  if (id === 3) {
+    const contributions = [
+      { label: "+£20", from: "Grandma", at: 0.15 },
+      { label: "+£15", from: "Uncle Steve", at: 0.32 },
+      { label: "+£50", from: "Coworkers", at: 0.5 },
+      { label: "+£30", from: "Auntie Jo", at: 0.68 },
+    ];
+    const milestones = ["🎂 Birthday", "🎄 Christmas", "🎓 Graduation"];
+    const totalFilled = Math.min(1, progress * 1.3);
+    return (
+      <div className="flex h-full flex-col justify-center gap-3 px-4 py-3">
+        {/* Timeline */}
+        <div className="relative flex items-center gap-0">
+          {milestones.map((m, i) => (
+            <div key={i} className="flex flex-1 flex-col items-center gap-1">
+              <div className={cn(
+                "rounded-lg px-2 py-1 border text-center transition-all duration-500",
+                progress > i * 0.3 ? "bg-amber-900/40 border-amber-700/50" : "bg-stone-800/50 border-stone-700/40",
+              )}>
+                <p className="text-[8px] font-bold text-stone-300 whitespace-nowrap">{m}</p>
+              </div>
+              {i < 2 && (
+                <div className="absolute" style={{ left: `${(i + 1) * 33}%`, top: "8px" }}>
+                  <span className="text-amber-600 text-[10px]">→</span>
+                </div>
+              )}
+            </div>
           ))}
         </div>
-        <p className="text-[9px] text-red-400 font-semibold">Wasted gifts</p>
-      </div>
-      <span className="text-stone-600 font-bold">vs</span>
-      <div className="flex-1 flex flex-col items-center gap-1">
-        {["🚵 Mountain Bike","🏠 House Deposit","✈️ Family Holiday"].map((label, i) => (
-          <div key={i} className="flex items-center gap-1 rounded-lg bg-amber-400/10 border border-amber-500/20 px-2 py-0.5 w-full">
-            <span className="text-[10px] font-semibold text-amber-300">{label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  if (id === 2) return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 px-4">
-      {progress < 0.5 ? (
-        <div className="rounded-2xl bg-emerald-900/40 border border-emerald-700/30 px-4 py-3 max-w-[200px]">
-          <p className="text-[11px] text-stone-300 italic">
-            &ldquo;Hey Auntie... instead of a gift could you just... send us cash?&rdquo;
-            <span className="inline-block ml-1 animate-pulse">|</span>
-          </p>
+        {/* Contribution chips flying in */}
+        <div className="flex flex-wrap gap-1.5 justify-center">
+          {contributions.map((c, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-900/30 px-2 py-0.5 transition-all duration-500"
+              style={{ opacity: progress > c.at ? 1 : 0, transform: progress > c.at ? "scale(1)" : "scale(0.5)" }}
+            >
+              <span className="text-[9px] font-black text-amber-400">{c.label}</span>
+              <span className="text-[8px] text-stone-400">from {c.from}</span>
+            </div>
+          ))}
         </div>
-      ) : (
-        <div className="text-center">
-          <p className="text-3xl mb-2">💔</p>
-          <div className="rounded-xl bg-red-900/30 border border-red-700/30 px-4 py-2">
-            <p className="text-[11px] font-bold text-red-400">82% feel uncomfortable asking for cash directly</p>
+        {/* Pot fill */}
+        <div className="rounded-xl border border-emerald-700/40 bg-emerald-900/20 px-3 py-2">
+          <div className="flex items-center justify-between mb-1.5">
+            <p className="text-[9px] font-black text-emerald-300">🛋️ Family Sofa Pot</p>
+            <p className="text-[9px] font-black text-amber-400">£{Math.round(totalFilled * 650)} / £650</p>
           </div>
+          <div className="h-2 w-full rounded-full bg-stone-700 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700"
+              style={{ width: `${totalFilled * 100}%` }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── Scene 4: Under Wraps Reveal ── */
+  if (id === 4) {
+    const shaking = progress > 0.25 && progress < 0.55;
+    const revealed = progress > 0.65;
+    const fireworks = progress > 0.72;
+    const messages = ["🎉 Happy Birthday!", "Love you so much!", "From Gran ❤️", "You deserve it!", "Woop woop! 🎊"];
+    return (
+      <div className="relative flex h-full items-center justify-center overflow-hidden bg-stone-950">
+        {/* Stars bg */}
+        <div className="pointer-events-none absolute inset-0">
+          {[{l:"10%",t:"15%"},{l:"80%",t:"10%"},{l:"55%",t:"8%"},{l:"30%",t:"20%"},{l:"90%",t:"35%"},{l:"5%",t:"50%"}].map((p,i)=>(
+            <span key={i} className="absolute text-[8px] text-white/30" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.2}s ${i*0.3}s ease-in-out infinite alternate`}}>✦</span>
+          ))}
+        </div>
+        {!revealed ? (
+          <div
+            className={cn("flex flex-col items-center gap-2 transition-all", shaking && "animate-box-shake")}
+          >
+            <div className="relative flex h-24 w-20 flex-col">
+              {/* Box lid */}
+              <div className="absolute -top-3 left-0 right-0 flex h-6 items-center justify-center rounded-t-lg bg-gradient-to-r from-rose-500 to-pink-600 shadow-lg">
+                <div className="h-2 w-2 rounded-full bg-amber-300" />
+              </div>
+              {/* Box body */}
+              <div className="mt-3 flex-1 rounded-b-lg bg-gradient-to-br from-rose-600 to-pink-700 shadow-xl shadow-rose-900/50 flex items-center justify-center">
+                <span className="text-2xl">🎁</span>
+              </div>
+              {/* Bow */}
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-2xl">🎀</div>
+            </div>
+            <p className="text-[9px] font-bold text-stone-400">Under Wraps · progress hidden</p>
+            {shaking && <p className="text-[9px] font-black text-amber-400 animate-pulse">🔥 Igniting reveal...</p>}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 animate-scale-in">
+            {/* Firework sparks */}
+            {fireworks && FW_SPARKS.slice(0, 12).map((s) => (
+              <div
+                key={s.id}
+                className="pointer-events-none absolute h-2 w-2 rounded-full animate-fw-spark"
+                style={{
+                  left: "50%", top: "40%",
+                  backgroundColor: s.color,
+                  ["--fwx" as string]: `${s.x * 0.6}px`,
+                  ["--fwy" as string]: `${s.y * 0.5}px`,
+                  ["--fw-dur" as string]: s.dur,
+                  animationDelay: s.delay,
+                }}
+              />
+            ))}
+            <p className="text-xl font-black text-amber-400">🎊 Reveal!</p>
+            <div className="flex flex-wrap justify-center gap-1 max-w-[200px]">
+              {messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl bg-gradient-to-br from-stone-800 to-stone-900 border border-stone-700 px-2 py-1 animate-drift-in"
+                  style={{ animationDelay: `${i * 0.1}s`, ["--card-rot" as string]: `${(i % 3 - 1) * 3}deg` }}
+                >
+                  <p className="text-[9px] font-bold text-stone-200">{msg}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ── Scene 5: Simple for Grandma ── */
+  const phase = progress < 0.33 ? 0 : progress < 0.65 ? 1 : 2;
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-3 px-4 py-3">
+      {phase === 0 && (
+        <div className="flex flex-col items-center gap-2 animate-fade-up">
+          {/* Mock WhatsApp bubble */}
+          <div className="rounded-2xl rounded-tl-sm bg-emerald-800/60 border border-emerald-700/40 px-4 py-2.5 max-w-[200px]">
+            <p className="text-[10px] font-bold text-emerald-300 mb-0.5">💬 WhatsApp · Mum</p>
+            <p className="text-[11px] text-stone-200">Billy&apos;s wishlist 🎁</p>
+            <p className="text-[9px] text-stone-400 mt-0.5 underline">kindledgift.co.uk/billy</p>
+          </div>
+          <p className="text-[9px] font-bold text-stone-400">One link · no account needed</p>
         </div>
       )}
-    </div>
-  );
-
-  if (id === 3) return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 px-4">
-      <div className="flex items-center gap-2 w-full">
-        {["🎂 Birthday","🎄 Christmas","🎂 Birthday"].map((label, i) => (
-          <div key={i} className="flex-1 text-center">
-            <div className="rounded-xl bg-stone-800 border border-stone-700 p-2">
-              <p className="text-[9px] font-bold text-stone-300">{label}</p>
-              <p className="text-[11px] text-amber-400 font-black mt-0.5">+£{[120, 200, 130][i]}</p>
-            </div>
-            {i < 2 && <div className="text-stone-600 text-center mt-1">→</div>}
-          </div>
-        ))}
-      </div>
-      <div className="w-full rounded-xl bg-emerald-900/30 border border-emerald-700/30 p-2 text-center">
-        <p className="text-[11px] font-bold text-emerald-400">🚵 £450 Total · Mountain Bike Funded!</p>
-      </div>
-    </div>
-  );
-
-  if (id === 4) return (
-    <div className="flex h-full flex-col justify-center gap-2 px-3">
-      {[
-        { label: "LEGO Space Shuttle", price: "£25", status: "claimed", who: "👵 Grandma Linda", claimed: true },
-        { label: "Adventure Books", price: "£15", status: "claimed", who: "👨 Uncle Steve", claimed: true },
-        { label: "Marvel Figure", price: "£18", status: "available", who: "", claimed: progress > 0.6 },
-      ].map((item, i) => (
-        <div key={i} className={cn("flex items-center gap-2 rounded-xl p-2.5 border transition-all",
-          item.claimed ? "bg-emerald-900/20 border-emerald-800/40" : "bg-stone-800/60 border-stone-700/40")}>
-          <span className={cn("text-sm font-bold", item.claimed ? "text-emerald-400" : "text-stone-500")}>
-            {item.claimed ? "✓" : "○"}
-          </span>
-          <div className="flex-1 min-w-0">
-            <p className={cn("text-[11px] font-semibold", item.claimed && "line-through text-stone-500")}>{item.label}</p>
-            {item.claimed && item.who && <p className="text-[9px] text-emerald-400">{item.who}</p>}
-          </div>
-          <span className="text-[10px] font-bold text-amber-400">{item.price}</span>
-        </div>
-      ))}
-    </div>
-  );
-
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 px-4">
-      <div className="rounded-2xl bg-emerald-900/30 border border-emerald-700/30 p-3 w-full max-w-[200px]">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-lg">💬</span>
-          <p className="text-[10px] font-bold text-emerald-300">WhatsApp from Grandma</p>
-        </div>
-        <p className="text-[11px] text-stone-300">&ldquo;Just clicked the link — paying now!&rdquo;</p>
-      </div>
-      {progress > 0.4 && (
+      {phase === 1 && (
         <div className="flex flex-col items-center gap-2 animate-fade-up">
-          <div className="rounded-2xl bg-stone-800 border border-stone-700 px-5 py-3 text-center">
-            <p className="text-[10px] text-stone-400 mb-1">Apple Pay</p>
-            <p className="text-[13px] font-black text-stone-100">Pay £50.00</p>
+          {/* Stripe badge */}
+          <div className="flex items-center gap-1.5 rounded-xl bg-indigo-900/50 border border-indigo-700/40 px-3 py-1.5">
+            <span className="text-base">🔒</span>
+            <p className="text-[9px] font-black text-indigo-300">Regulated &amp; Secured by Stripe</p>
           </div>
-          {progress > 0.7 && (
-            <div className="flex items-center gap-1.5 animate-scale-in">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500">
-                <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
-              </div>
-              <p className="text-[12px] font-bold text-emerald-400">Payment successful!</p>
+          {/* Apple Pay button */}
+          <div className="flex items-center justify-center gap-2 rounded-2xl bg-stone-100 px-6 py-3 shadow-lg">
+            <span className="text-[16px]"></span>
+            <span className="text-[12px] font-black text-stone-900">Pay</span>
+          </div>
+          <p className="text-[9px] text-stone-400">Two taps · Apple Pay or Google Pay</p>
+        </div>
+      )}
+      {phase === 2 && (
+        <div className="flex flex-col items-center gap-3 animate-scale-in">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 shadow-lg shadow-emerald-900/40">
+              <Check className="h-5 w-5 text-white" strokeWidth={3} />
             </div>
-          )}
+            <p className="text-[12px] font-black text-emerald-400">Payment successful!</p>
+          </div>
+          {/* Mini family tree / logo sign-off */}
+          <div className="flex flex-col items-center gap-1">
+            {[["👵","👴"],["👩","👨","👩‍🦲"],["🧒","👧","🧒"]].map((row, ri) => (
+              <div key={ri} className="flex gap-2">
+                {row.map((e, ei) => (
+                  <span key={ei} className="text-lg animate-bounce" style={{ animationDelay: `${(ri*3+ei)*0.08}s` }}>{e}</span>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <svg viewBox="0 0 100 100" width="18" height="18">
+              <defs><linearGradient id="sc5-tile" x1="0" y1="0" x2="60" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0%" stopColor="#FFB845"/><stop offset="100%" stopColor="#F26B2C"/></linearGradient></defs>
+              <rect width="100" height="100" rx="22" fill="url(#sc5-tile)"/>
+              <g fill="#FFF4E6">
+                <rect x="28" y="27" width="12" height="46" rx="6"/>
+                <rect x="34" y="33" width="34" height="12" rx="6" transform="rotate(-37 51 39)"/>
+                <rect x="34" y="56" width="34" height="12" rx="6" transform="rotate(37 51 62)"/>
+              </g>
+              <path d="M48 22 C41 14 32 17 35.5 25 C38 30 44 29 48 25.5 Z" fill="#FFF4E6"/>
+              <path d="M48 22 C55 14 64 17 60.5 25 C58 30 52 29 48 25.5 Z" fill="#FFF4E6"/>
+              <circle cx="48" cy="23.5" r="5.5" fill="#FFD27A"/>
+            </svg>
+            <span className="text-[13px] font-black text-amber-400">Kindled</span>
+          </div>
         </div>
       )}
     </div>
@@ -1228,8 +1422,8 @@ function ExplainerPlayer() {
           <Play className="h-5 w-5 translate-x-0.5 text-stone-900" strokeWidth={2.5} fill="currentColor" />
         </div>
         <div>
-          <p className="text-[13px] font-bold text-stone-800">📺 Watch How It Works</p>
-          <p className="text-[11px] text-stone-400">5 scenes · 2 min · gentle music &amp; captions</p>
+          <p className="text-[13px] font-bold text-stone-800">📺 Watch How Kindled Works</p>
+          <p className="text-[11px] text-stone-400">5 scenes · multi-seasonal gifting · ambient music</p>
         </div>
       </button>
     </div>
@@ -1791,7 +1985,7 @@ export default function DemoPage() {
   const showToast = useCallback((msg: string) => setToast(msg), []);
 
   const handleShare = useCallback(() => {
-    void navigator.clipboard.writeText("https://kindling.app/list/billys-dreams").catch(() => null);
+    void navigator.clipboard.writeText("https://kindledgift.co.uk/list/billys-dreams").catch(() => null);
     showToast("📋 Link copied to share with family!");
     addLog("🔗 Wishlist link shared — referral tracking engaged");
   }, [showToast, addLog]);
