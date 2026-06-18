@@ -262,22 +262,6 @@ function useAudio() {
 // 3D TILT HOOK
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function useTilt(maxDeg = 16) {
-  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({});
-  const onMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    setTiltStyle({
-      transform: `perspective(700px) rotateY(${x * maxDeg}deg) rotateX(${-y * maxDeg}deg) scale(1.04)`,
-      transition: "transform 0.06s linear",
-    });
-  }, [maxDeg]);
-  const onMouseLeave = useCallback(() => {
-    setTiltStyle({ transform: "perspective(700px) rotateY(0deg) rotateX(0deg) scale(1)", transition: "transform 0.35s ease-out" });
-  }, []);
-  return { tiltStyle, onMouseMove, onMouseLeave };
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TOAST
@@ -584,8 +568,6 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
   const [circling, setCircling] = useState(false);
   const [sparkling, setSparkling] = useState(false);
   const [added, setAdded] = useState(false);
-  const { tiltStyle, onMouseMove, onMouseLeave } = useTilt(14);
-
   const handleClick = useCallback(() => {
     if (circling || added) return;
     setCircling(true);
@@ -601,87 +583,73 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
   }, [circling, added, item, onAdd]);
 
   return (
-    <div
-      className={cn(
-        "relative overflow-visible rounded-2xl border bg-white p-3.5 cursor-pointer shadow-sm",
-        "transition-all duration-300",
-        added ? "border-emerald-400 bg-emerald-50" : "border-stone-200 hover:border-amber-300 hover:shadow-md",
-      )}
-      style={{
-        ...tiltStyle,
-        boxShadow: !added ? `0 0 0 0 transparent` : `0 0 20px 0 ${item.glowColor}30`,
-      }}
+    <motion.div
+      whileHover={!added ? { y: -3 } : {}}
+      whileTap={!added ? { scale: 0.97 } : {}}
+      transition={{ type: "spring", stiffness: 420, damping: 28 }}
+      className={cn("relative overflow-visible rounded-2xl cursor-pointer bg-white")}
+      style={{ boxShadow: added
+        ? `0 0 0 2px #34d399, 0 4px 20px ${item.glowColor}20`
+        : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
       onClick={handleClick}
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
     >
-      {/* SVG circle overlay — draws around the full card */}
+      {/* SVG circle overlay */}
       {circling && (
         <div className="pointer-events-none absolute z-20" style={{ inset: "-5px" }}>
-          <svg
-            style={{ width: "100%", height: "100%" }}
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              x="2" y="2" width="96" height="96"
-              rx="10" ry="10"
-              stroke="#f59e0b"
-              strokeWidth="3.5"
-              strokeLinecap="round"
-              strokeDasharray="400"
-              vectorEffect="non-scaling-stroke"
+          <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
+            <rect x="2" y="2" width="96" height="96" rx="10" ry="10"
+              stroke="#f59e0b" strokeWidth="3.5" strokeLinecap="round"
+              strokeDasharray="400" vectorEffect="non-scaling-stroke"
               className="animate-draw-circle"
               style={{ filter: "drop-shadow(0 0 8px #f59e0b)" }}
             />
           </svg>
         </div>
       )}
-
-      {/* Sparkles */}
       {sparkling && (
         <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center">
           {SPARKLES.map((s) => (
-            <span
-              key={s.id}
-              className="absolute rounded-full animate-sparkle"
-              style={{
-                width: s.size, height: s.size,
-                backgroundColor: s.color,
-                "--spx": s.spx, "--spy": s.spy,
-                animationDelay: s.delay,
-                boxShadow: `0 0 4px ${s.color}`,
-              } as React.CSSProperties}
+            <span key={s.id} className="absolute rounded-full animate-sparkle"
+              style={{ width: s.size, height: s.size, backgroundColor: s.color,
+                "--spx": s.spx, "--spy": s.spy, animationDelay: s.delay,
+                boxShadow: `0 0 4px ${s.color}` } as React.CSSProperties}
             />
           ))}
         </div>
       )}
 
-      <div className="flex items-start justify-between gap-1 mb-2">
-        <span className="text-3xl">{item.emoji}</span>
-        <span className={cn("rounded-lg px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider", item.tagColor)}>
+      {/* Icon area — styled product tile */}
+      <div className="relative flex items-center justify-center rounded-t-2xl pt-5 pb-4"
+        style={{ background: `linear-gradient(145deg, ${item.glowColor}16 0%, ${item.glowColor}06 100%)` }}>
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl text-4xl"
+          style={{ background: `linear-gradient(145deg, #ffffff, ${item.glowColor}14)`,
+            boxShadow: `0 2px 12px ${item.glowColor}22, 0 0 0 1px ${item.glowColor}15, inset 0 1px 0 rgba(255,255,255,0.9)` }}>
+          {item.emoji}
+        </div>
+        <span className={cn("absolute top-2 right-2 rounded-lg px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider", item.tagColor)}>
           {item.tag}
         </span>
       </div>
-      <p className="text-[12px] font-bold leading-tight text-stone-800">{item.name}</p>
-      <div className="mt-2.5 flex items-center justify-between">
-        <span className="text-[15px] font-black text-amber-500">£{item.price.toFixed(2)}</span>
-        {added ? (
-          <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
-            <Check className="h-3 w-3" />Added
-          </span>
-        ) : (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-stone-100 text-stone-500">
-            <Plus className="h-3.5 w-3.5" />
-          </div>
-        )}
+
+      {/* Info */}
+      <div className="px-3 pb-3 pt-2">
+        <p style={{ fontFamily: "var(--font-display)" }} className="text-[13px] font-medium leading-tight text-stone-800 mb-2">{item.name}</p>
+        <div className="flex items-center justify-between">
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-amber-500">£{item.price.toFixed(0)}</span>
+          {added ? (
+            <span className="flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+              <Check className="h-3 w-3" /> Added
+            </span>
+          ) : (
+            <div className="flex h-7 w-7 items-center justify-center rounded-full text-white"
+              style={{ background: `linear-gradient(135deg, ${item.glowColor}ee, ${item.glowColor}99)`,
+                boxShadow: `0 2px 8px ${item.glowColor}40` }}>
+              <Plus className="h-3.5 w-3.5" />
+            </div>
+          )}
+        </div>
       </div>
-      {!added && (
-        <p className="mt-1.5 text-[9px] text-stone-400 text-center">Tap to circle &amp; add</p>
-      )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -709,25 +677,29 @@ function CatalogueGrid({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
 type RevealPhase = "idle" | "shaking" | "flashing" | "fireworks" | "mosaic" | "actions";
 
 function MemoryCardView({ card }: { card: MemoryCard }) {
-  const { tiltStyle, onMouseMove, onMouseLeave } = useTilt(12);
   return (
-    <div
-      className="animate-drift-in rounded-2xl border border-stone-700/70 bg-stone-800/80 p-4 backdrop-blur-sm cursor-default"
-      style={{ "--card-rot": `${card.rot}deg`, animationDelay: `${card.delay}ms`, ...tiltStyle } as React.CSSProperties}
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
+    <motion.div
+      initial={{ opacity: 0, y: 24, rotate: card.rot }}
+      animate={{ opacity: 1, y: 0, rotate: card.rot }}
+      transition={{ type: "spring", stiffness: 320, damping: 28, delay: card.delay / 1000 }}
+      className="overflow-hidden rounded-2xl border border-white/8"
+      style={{ background: "linear-gradient(145deg, #2a2520, #1e1a17)" }}
     >
-      <div className="flex items-center gap-2 mb-2">
+      {/* Postcard header */}
+      <div className="flex items-center gap-2.5 border-b border-white/6 bg-white/5 px-4 py-2.5">
         <span className="text-xl">{card.emoji}</span>
-        <p className="text-[12px] font-bold text-stone-200">{card.name}</p>
-        {card.hasVideo && (
-          <span className="rounded-sm bg-rose-500/20 px-1 py-px text-[9px] font-bold uppercase tracking-wider text-rose-400">
-            VIDEO
-          </span>
-        )}
+        <div>
+          <p style={{ fontFamily: "var(--font-display)" }} className="text-[13px] font-medium text-stone-200">{card.name}</p>
+          {card.hasVideo && (
+            <span className="rounded-sm bg-rose-500/20 px-1 py-px text-[9px] font-bold uppercase tracking-wider text-rose-400">VIDEO</span>
+          )}
+        </div>
       </div>
-      <p className="text-[11px] italic leading-relaxed text-stone-300">&ldquo;{card.message}&rdquo;</p>
-    </div>
+      {/* Message body */}
+      <div className="px-4 py-3">
+        <p className="text-[12px] italic leading-relaxed text-stone-300">&ldquo;{card.message}&rdquo;</p>
+      </div>
+    </motion.div>
   );
 }
 
@@ -761,8 +733,14 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
 
   const isXmas = pot.mode === "UNDER_THE_TREE";
 
+  const defaultTributes = [
+    { id: "g1", name: "The Whole Family", emoji: "👨‍👩‍👧‍👦", message: "We all chipped in with so much love. Enjoy every single moment!", rot: -1, delay: 0 },
+    { id: "g2", name: "Gran & Grandad", emoji: "👵", message: "So proud of you. You deserve this and so much more. ✨", rot: 2, delay: 150 },
+    { id: "g3", name: "Your Best Friends", emoji: "🤝", message: "Couldn't be happier for you — enjoy every second! 🎉", rot: -1, delay: 300 },
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 backdrop-blur-xl p-4">
       {/* Flash overlay */}
       {phase === "flashing" && (
         <div className="pointer-events-none absolute inset-0 bg-white animate-flash z-10" />
@@ -774,89 +752,109 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
           {FW_BURSTS.map((b, bi) => (
             <div key={bi} className="absolute" style={{ left: b.cx, top: b.cy }}>
               {FW_SPARKS.map((s) => (
-                <span
-                  key={s.id}
-                  className="absolute rounded-full animate-fw-spark"
-                  style={{
-                    width: s.size, height: s.size,
-                    backgroundColor: s.color,
-                    "--fwx": `${s.x}px`, "--fwy": `${s.y}px`,
-                    "--fw-dur": s.dur,
+                <span key={s.id} className="absolute rounded-full animate-fw-spark"
+                  style={{ width: s.size, height: s.size, backgroundColor: s.color,
+                    "--fwx": `${s.x}px`, "--fwy": `${s.y}px`, "--fw-dur": s.dur,
                     animationDelay: `${parseFloat(s.delay) + bi * 0.12}s`,
-                    boxShadow: `0 0 5px ${s.color}`,
-                  } as React.CSSProperties}
+                    boxShadow: `0 0 6px ${s.color}` } as React.CSSProperties}
                 />
               ))}
             </div>
           ))}
-          {/* Soundwave rings */}
           {phase === "fireworks" && (
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              {[0, 0.5, 1.1].map((d, i) => (
-                <div
-                  key={i}
-                  className="absolute h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-400/50 animate-sw-ring"
-                  style={{ animationDelay: `${d}s` }}
-                />
+              {[0, 0.6, 1.2].map((d, i) => (
+                <div key={i} className="absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-400/40 animate-sw-ring"
+                  style={{ animationDelay: `${d}s` }} />
               ))}
             </div>
           )}
         </div>
       )}
 
-      <div className="relative z-20 w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-stone-900 shadow-2xl shadow-black/70">
-        <button
+      <div className="relative z-20 w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/80"
+        style={{ background: "linear-gradient(145deg, #1c1917, #171310)" }}>
+        <motion.button
+          whileTap={{ scale: 0.9 }}
           onClick={onClose}
-          className="absolute right-3 top-3 z-30 flex h-8 w-8 items-center justify-center rounded-full bg-stone-800/80 text-stone-400 hover:text-stone-100 transition-colors"
+          className="absolute right-3 top-3 z-30 flex h-8 w-8 items-center justify-center rounded-full bg-white/8 text-stone-400 hover:text-stone-100 transition-colors"
         >
           <X className="h-4 w-4" />
-        </button>
+        </motion.button>
 
         {/* ── IDLE ── */}
         {phase === "idle" && (
-          <div className="flex flex-col items-center gap-6 px-6 py-10">
-            <div className={cn(
-              "rounded-3xl p-6 border",
-              isXmas ? "bg-[#1a0f0f] border-red-700/30 animate-gift-glow" : "bg-[#1a1028] border-violet-500/30 animate-gift-glow-plum",
-            )}>
-              <span className="text-7xl">{isXmas ? "🎁" : "🎀"}</span>
-            </div>
+          <div className="flex flex-col items-center gap-5 px-6 py-9">
             <div className="text-center">
-              <p className="text-[17px] font-black text-stone-100">{pot.title}</p>
-              <p className="mt-1 text-[12px] text-stone-400">Ready for the big reveal?</p>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400 mb-1.5">✨ A gift awaits</p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">{pot.title}</p>
             </div>
-            <button
+            {/* Gift box with pulsing rings */}
+            <div className="relative flex items-center justify-center py-2">
+              {[80, 110, 140].map((size, i) => (
+                <div key={i} className="absolute rounded-full border border-amber-400/15 animate-sw-ring"
+                  style={{ width: size, height: size, animationDelay: `${i * 0.55}s` }} />
+              ))}
+              <div className={cn("relative z-10 rounded-3xl p-7 border",
+                isXmas ? "bg-gradient-to-br from-red-950 to-red-900/80 border-red-700/40 animate-gift-glow"
+                        : "bg-gradient-to-br from-violet-950 to-indigo-900/80 border-violet-500/40 animate-gift-glow-plum")}>
+                <span className="text-7xl select-none">{isXmas ? "🎁" : "🎀"}</span>
+              </div>
+            </div>
+            {/* Contributors */}
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-1.5">
+                {["👩","👨","👵","👴"].slice(0, Math.min(4, pot.contributors)).map((e, i) => (
+                  <div key={i} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-stone-900 bg-stone-800 text-sm">{e}</div>
+                ))}
+              </div>
+              <p className="text-[11px] text-stone-400">{pot.contributors} people chipped in with love</p>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 26 }}
               onClick={startReveal}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-black text-stone-900 shadow-xl shadow-amber-900/30 active:scale-[0.97] transition-transform"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl py-4"
+              style={{ background: "linear-gradient(135deg, #fbbf24, #f97316)", boxShadow: "0 4px 20px rgba(251,146,60,0.45)" }}
             >
-              <Zap className="h-5 w-5" strokeWidth={2.5} />
-              Unwrap Now!
-            </button>
+              <Zap className="h-5 w-5 text-stone-900" strokeWidth={2.5} />
+              <span style={{ fontFamily: "var(--font-display)" }} className="text-[17px] font-semibold text-stone-900">Unwrap Now!</span>
+            </motion.button>
           </div>
         )}
 
         {/* ── SHAKING ── */}
         {(phase === "shaking" || phase === "flashing") && (
-          <div className="flex flex-col items-center gap-4 px-6 py-10 overflow-hidden">
-            <div className={cn("animate-box-shake rounded-3xl p-6 border", isXmas ? "bg-[#1a0f0f] border-red-700/30" : "bg-[#1a1028] border-violet-500/30")}>
+          <div className="flex flex-col items-center gap-5 px-6 py-10 overflow-hidden">
+            <div className={cn("animate-box-shake rounded-3xl p-7 border",
+              isXmas ? "bg-gradient-to-br from-red-950 to-red-900/80 border-red-700/40"
+                      : "bg-gradient-to-br from-violet-950 to-indigo-900/80 border-violet-500/40")}>
               <span className="text-7xl">{isXmas ? "🎁" : "🎀"}</span>
             </div>
-            <p className="text-[14px] font-bold text-amber-400 animate-pulse">Something incredible is inside…</p>
+            <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-medium text-amber-400 animate-pulse">Something incredible is inside…</p>
+            {/* Intensity bar */}
+            <div className="w-full h-1.5 rounded-full bg-stone-800 overflow-hidden">
+              <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 animate-tribute-bar" style={{ "--tribute-dur": "1s" } as React.CSSProperties} />
+            </div>
           </div>
         )}
 
-        {/* ── FIREWORKS: show revealed amount ── */}
+        {/* ── FIREWORKS ── */}
         {phase === "fireworks" && (
           <div className="flex flex-col items-center gap-5 px-6 py-10">
-            <p className="text-[12px] font-bold uppercase tracking-widest text-amber-400">🎉 Fully Funded!</p>
-            <div className="font-mono text-6xl font-black text-amber-400 animate-scale-in tabular-nums" style={{ textShadow: "0 0 30px #f59e0b80" }}>
-              £{pot.goal.toLocaleString()}
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400">🎉 Fully Funded!</p>
+            <div className="text-center animate-scale-in">
+              <p style={{ fontFamily: "var(--font-display)", textShadow: "0 0 40px #f59e0b60" }}
+                className="text-[60px] font-semibold text-amber-400 leading-none tabular-nums">
+                £{pot.goal.toLocaleString()}
+              </p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-300 mt-1">{pot.title}</p>
             </div>
-            <p className="text-[13px] text-stone-300 font-semibold">{pot.title}</p>
             <div className="w-full animate-fade-up">
               <FundingBar raised={pot.goal} goal={pot.goal} />
-              <p className="mt-2 text-center text-[11px] text-emerald-400 font-semibold">
-                {pot.contributors} contributors made this happen 🙌
+              <p className="mt-2 text-center text-[11px] text-emerald-400 font-medium">
+                {pot.contributors} people made this happen 🙌
               </p>
             </div>
           </div>
@@ -864,30 +862,27 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
 
         {/* ── MOSAIC ── */}
         {phase === "mosaic" && (
-          <div className="flex flex-col gap-4 px-4 py-6 max-h-[70vh] overflow-y-auto">
-            <p className="text-center text-[12px] font-bold uppercase tracking-widest text-amber-400">
-              💌 Messages from the people who love you
-            </p>
-            {pot.tributes.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {pot.tributes.map((card) => (
-                  <MemoryCardView key={card.id} card={card} />
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {[
-                  { id: "g1", name: "The Family", emoji: "👨‍👩‍👧‍👦", message: "We all chipped in with love. Enjoy every moment! 🎉", rot: -2, delay: 0 },
-                  { id: "g2", name: "Friends", emoji: "🤝", message: "You deserve this so much! Congratulations! ✨", rot: 3, delay: 120 },
-                ].map((card) => <MemoryCardView key={card.id} card={card} />)}
-              </div>
-            )}
-            <button
+          <div className="flex flex-col gap-4 px-4 py-6 max-h-[72vh] overflow-y-auto">
+            <div className="text-center">
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-white">Messages from the family 💌</p>
+              <p className="text-[11px] text-stone-500 mt-0.5">From everyone who loves you</p>
+            </div>
+            <div className="flex flex-col gap-3">
+              {(pot.tributes.length > 0 ? pot.tributes : defaultTributes).map((card) => (
+                <MemoryCardView key={card.id} card={card} />
+              ))}
+            </div>
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.01 }}
+              transition={{ type: "spring", stiffness: 400, damping: 28 }}
               onClick={() => setPhase("actions")}
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[13px] font-bold text-stone-900 active:scale-[0.97] transition-transform"
+              className="mt-1 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5"
+              style={{ background: "linear-gradient(135deg, #fbbf24, #f97316)", boxShadow: "0 4px 16px rgba(251,146,60,0.35)" }}
             >
-              What happens next? <SkipForward className="h-4 w-4" />
-            </button>
+              <span style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-900">What happens next?</span>
+              <SkipForward className="h-4 w-4 text-stone-900" />
+            </motion.button>
           </div>
         )}
 
@@ -895,28 +890,25 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
         {phase === "actions" && (
           <div className="flex flex-col gap-4 px-4 py-6">
             <div className="text-center">
-              <p className="text-[15px] font-black text-stone-100">What would you like to do?</p>
-              <p className="text-[11px] text-stone-500 mt-0.5">Choose how to use your £{pot.goal.toLocaleString()}</p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-white">What would you like to do?</p>
+              <p className="text-[11px] text-stone-500 mt-0.5">Your £{pot.goal.toLocaleString()} is ready</p>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               {REVEAL_ACTIONS.map(({ icon: Icon, label, desc, gradient, textCol }) => (
-                <button
+                <motion.button
                   key={label}
-                  className={cn(
-                    "flex flex-col items-start gap-1.5 rounded-2xl p-3.5 text-left active:scale-95 transition-transform",
-                    `bg-gradient-to-br ${gradient}`,
-                  )}
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 450, damping: 28 }}
+                  className={cn("flex flex-col items-start gap-1.5 rounded-2xl p-3.5 text-left", `bg-gradient-to-br ${gradient}`)}
                 >
                   <Icon className={cn("h-5 w-5", textCol)} strokeWidth={2} />
-                  <p className={cn("text-[12px] font-bold leading-tight", textCol)}>{label}</p>
-                  <p className={cn("text-[10px] leading-tight opacity-80", textCol)}>{desc}</p>
-                </button>
+                  <p style={{ fontFamily: "var(--font-display)" }} className={cn("text-[13px] font-medium leading-tight", textCol)}>{label}</p>
+                  <p className={cn("text-[10px] leading-tight opacity-75", textCol)}>{desc}</p>
+                </motion.button>
               ))}
             </div>
-            <button
-              onClick={onClose}
-              className="mt-1 text-[11px] text-stone-600 hover:text-stone-400 transition-colors"
-            >
+            <button onClick={onClose} className="mt-1 text-[11px] text-stone-500 hover:text-stone-300 transition-colors text-center">
               Close ceremony
             </button>
           </div>
