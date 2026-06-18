@@ -2218,7 +2218,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 pr-20 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none transition-colors"
                 />
                 <button
-                  onClick={handlePaste}
+                  onClick={() => { void handlePaste(); }}
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-amber-100 px-3 py-1.5 text-[12px] font-semibold text-amber-700 active:scale-95 transition-transform"
                 >
                   Paste
