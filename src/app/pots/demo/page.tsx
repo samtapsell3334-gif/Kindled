@@ -443,7 +443,9 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
                 <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               ) : (
-                <span className="flex h-full w-full items-center justify-center text-2xl">{pot.emoji}</span>
+                <div className="flex h-full w-full items-center justify-center">
+                  <Gift className="h-5 w-5 text-stone-400" strokeWidth={1.5} />
+                </div>
               )}
               {pot.isClaimed && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-emerald-500/80">
@@ -616,7 +618,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
               {pot.image
                 ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                : <span className="flex h-full w-full items-center justify-center text-xl">{pot.emoji}</span>}
+                : <div className="flex h-full w-full items-center justify-center"><Gift className="h-5 w-5 text-stone-500" strokeWidth={1.5} /></div>}
               <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-tl-lg bg-black/60"><Lock className="h-2.5 w-2.5 text-white/60" /></span>
             </div>
             <div className="min-w-0">
@@ -630,7 +632,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           </div>
         </div>
         <div className={cn(th.glow, "mt-4 flex flex-col items-center gap-3 rounded-2xl py-6 border border-white/5 bg-gradient-to-b", th.box)}>
-          <span className="text-6xl select-none" role="img">{th.emoji}</span>
+          <Gift className={cn("h-14 w-14", isXmas ? "text-amber-400" : "text-violet-300")} strokeWidth={1.2} />
           <div className="flex items-center gap-1.5">
             <Lock className="h-3 w-3 text-stone-400" />
             <p className="text-[12px] font-semibold text-stone-200">Locked · Unwraps {pot.eventDate}</p>
@@ -728,9 +730,9 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
         <span className={cn("absolute top-2 right-2 rounded-lg px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider shadow-sm", item.tagColor)}>
           {item.tag}
         </span>
-        {/* Emoji badge bottom-left */}
-        <div className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 shadow-md text-lg backdrop-blur-sm">
-          {item.emoji}
+        {/* Category badge bottom-left */}
+        <div className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 shadow-md backdrop-blur-sm">
+          <Gift className="h-4 w-4 text-stone-500" strokeWidth={1.5} />
         </div>
       </div>
 
@@ -790,7 +792,9 @@ function MemoryCardView({ card }: { card: MemoryCard }) {
     >
       {/* Postcard header */}
       <div className="flex items-center gap-2.5 border-b border-white/6 bg-white/5 px-4 py-2.5">
-        <span className="text-xl">{card.emoji}</span>
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-[11px] font-bold text-amber-300">
+          {card.name.charAt(0)}
+        </div>
         <div>
           <p style={{ fontFamily: "var(--font-display)" }} className="text-[13px] font-medium text-stone-200">{card.name}</p>
           {card.hasVideo && (
@@ -1276,7 +1280,7 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
         <div className="flex flex-col items-center gap-2 animate-fade-up">
           {/* Mock WhatsApp bubble */}
           <div className="rounded-2xl rounded-tl-sm bg-emerald-800/60 border border-emerald-700/40 px-4 py-2.5 max-w-[200px]">
-            <p className="text-[10px] font-bold text-emerald-300 mb-0.5">💬 WhatsApp · Mum</p>
+            <p className="text-[10px] font-bold text-emerald-300 mb-0.5">WhatsApp · Mum</p>
             <p className="text-[11px] text-stone-200">Billy&apos;s wishlist</p>
             <p className="text-[9px] text-stone-400 mt-0.5 underline">kindledgift.co.uk/billy</p>
           </div>
@@ -1646,7 +1650,7 @@ function InvestorHUD({ pots, logEntries }: { pots: DemoPot[]; logEntries: string
 
   const streams = [
     { icon: "🔗", label: "Affiliate Commission", sub: "4.5% on £" + totalGoal.toLocaleString() + " catalogue value", val: affiliate, color: "text-amber-400" },
-    { icon: "🎁", label: "Gift Card Margin", sub: "4% wholesale via Tillo / Prezzee", val: giftCard, color: "text-emerald-400" },
+    { icon: null, label: "Gift Card Margin", sub: "4% wholesale via Tillo / Prezzee", val: giftCard, color: "text-emerald-400" },
     { icon: "🏦", label: "Open Banking Spread", sub: "0.5% minus 5p per A2A transfer", val: ob, color: "text-sky-400" },
     { icon: "📡", label: "Intent Data Leads", sub: "£4.75 CPM × high-ticket nodes", val: intent, color: "text-violet-400" },
   ];
@@ -1734,10 +1738,10 @@ const TWINKLE_STARS = Array.from({ length: 28 }, (_, i) => ({
 }));
 
 const CHORES = [
-  { id: "c1", emoji: "🪥", title: "Toothbrush Hero", desc: "Brush teeth morning & night", stars: 1, color: "from-sky-400 to-blue-500", shadow: "shadow-sky-200" },
-  { id: "c2", emoji: "🧸", title: "Toy Castle Tidyer", desc: "Put toys back in the box", stars: 2, color: "from-violet-400 to-purple-500", shadow: "shadow-violet-200" },
-  { id: "c3", emoji: "🥦", title: "Veggie Victory", desc: "Eat all your greens at dinner", stars: 1, color: "from-emerald-400 to-green-500", shadow: "shadow-emerald-200" },
-  { id: "c4", emoji: "📚", title: "Storytime Sleepyhead", desc: "Bed on time without a fuss", stars: 2, color: "from-amber-400 to-orange-500", shadow: "shadow-amber-200" },
+  { id: "c1", Icon: Zap,         title: "Toothbrush Hero",    desc: "Brush teeth morning & night",   stars: 1, color: "from-sky-400 to-blue-500",       shadow: "shadow-sky-200" },
+  { id: "c2", Icon: Package,     title: "Toy Castle Tidyer",  desc: "Put toys back in the box",       stars: 2, color: "from-violet-400 to-purple-500",  shadow: "shadow-violet-200" },
+  { id: "c3", Icon: Leaf,        title: "Veggie Victory",     desc: "Eat all your greens at dinner",  stars: 1, color: "from-emerald-400 to-green-500",  shadow: "shadow-emerald-200" },
+  { id: "c4", Icon: ShieldCheck, title: "Storytime Sleepyhead", desc: "Bed on time without a fuss",  stars: 2, color: "from-amber-400 to-orange-500",   shadow: "shadow-amber-200" },
 ];
 
 // Flying star particle type
@@ -1780,14 +1784,14 @@ function StarIcon({ size = 20, className = "" }: { size?: number; className?: st
   );
 }
 
-const BURST_EMOJIS = ["⭐", "✨", "🌟", "💫", "⭐", "✨", "🌟", "💫", "⭐", "✨", "🌟", "💫"];
 const BURST_COLORS = ["#fbbf24", "#f59e0b", "#fb923c", "#a78bfa", "#38bdf8", "#4ade80", "#f472b6", "#facc15", "#60a5fa", "#34d399", "#fb7185", "#c084fc"];
 
 function StarBurst({ x, y }: { x: number; y: number }) {
-  const particles = BURST_EMOJIS.map((emoji, i) => {
-    const angle = (i / BURST_EMOJIS.length) * Math.PI * 2 - Math.PI / 2;
+  const particles = BURST_COLORS.map((color, i) => {
+    const angle = (i / BURST_COLORS.length) * Math.PI * 2 - Math.PI / 2;
     const dist = 55 + (i % 3) * 22;
-    return { id: i, emoji, color: BURST_COLORS[i]!, tx: Math.cos(angle) * dist, ty: Math.sin(angle) * dist };
+    const size = 6 + (i % 3) * 4;
+    return { id: i, color, size, tx: Math.cos(angle) * dist, ty: Math.sin(angle) * dist };
   });
   return (
     <div className="pointer-events-none fixed inset-0 z-[200]">
@@ -1806,26 +1810,24 @@ function StarBurst({ x, y }: { x: number; y: number }) {
           style={{ left: x - 24, top: y - 24, width: 48, height: 48 }}
         />
       ))}
-      {/* Emoji burst particles */}
+      {/* Dot burst particles */}
       {particles.map((p) => (
-        <motion.span key={p.id}
+        <motion.div key={p.id}
           initial={{ x: 0, y: 0, scale: 1.4, opacity: 1 }}
           animate={{ x: p.tx, y: p.ty, scale: 0, opacity: 0 }}
           transition={{ duration: 0.6, ease: [0.2, 0.8, 0.4, 1] }}
-          className="absolute text-[18px] select-none"
-          style={{ left: x - 9, top: y - 9, color: p.color }}
-        >
-          {p.emoji}
-        </motion.span>
+          className="absolute rounded-full"
+          style={{ left: x - p.size / 2, top: y - p.size / 2, width: p.size, height: p.size, background: p.color }}
+        />
       ))}
-      {/* Big pop star in centre */}
-      <motion.span
+      {/* Centre pop circle */}
+      <motion.div
         initial={{ scale: 0, opacity: 1 }}
         animate={{ scale: [0, 2.2, 0], opacity: [1, 1, 0] }}
         transition={{ duration: 0.5, times: [0, 0.45, 1] }}
-        className="absolute text-[32px] select-none"
-        style={{ left: x - 16, top: y - 16 }}
-      >🌟</motion.span>
+        className="absolute rounded-full bg-amber-300"
+        style={{ left: x - 16, top: y - 16, width: 32, height: 32 }}
+      />
     </div>
   );
 }
@@ -1897,24 +1899,28 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
         <span>←</span> Back to Stars
       </button>
       <div className="rounded-3xl bg-white/10 border border-white/20 p-5 text-center">
-        <p className="text-4xl mb-2">🎁</p>
+        <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/20 mx-auto">
+          <Gift className="h-7 w-7 text-amber-400" strokeWidth={1.5} />
+        </div>
         <h2 className="text-[18px] font-black text-white mb-1">Redeem Stars</h2>
         <p className="text-[12px] text-violet-300 mb-5">Ask Mum or Dad to approve your gift card!</p>
         {[
-          { brand: "Amazon", emoji: "📦", val: 10, stars: 20 },
-          { brand: "Smyths Toys", emoji: "🧸", val: 5, stars: 10 },
-          { brand: "LEGO Store", emoji: "🧱", val: 15, stars: 30 },
+          { brand: "Amazon", color: "#f59e0b", val: 10, stars: 20 },
+          { brand: "Smyths Toys", color: "#a78bfa", val: 5, stars: 10 },
+          { brand: "LEGO Store", color: "#38bdf8", val: 15, stars: 30 },
         ].map((gc) => (
           <div key={gc.brand} className="mb-3 flex items-center justify-between rounded-2xl bg-white/10 border border-white/15 px-4 py-3">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{gc.emoji}</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: gc.color + "30" }}>
+                <ShoppingBag className="h-4 w-4" style={{ color: gc.color }} />
+              </div>
               <div className="text-left">
                 <p className="text-[13px] font-bold text-white">{gc.brand} Gift Card</p>
                 <p className="text-[11px] text-violet-300">£{gc.val} · 0% fees</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-[11px] font-black text-amber-400">{gc.stars} ⭐</p>
+              <p className="text-[11px] font-black text-amber-400">{gc.stars} stars</p>
               <button className={cn(
                 "mt-1 rounded-xl px-3 py-1 text-[11px] font-bold",
                 totalStars >= gc.stars
@@ -2018,7 +2024,9 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
       {targetPot && (
         <div ref={potRef} className="relative z-10 mx-4 mb-5 rounded-2xl bg-white/10 border-2 border-amber-400/40 px-4 py-3">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">{targetPot.emoji}</span>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/20">
+              <Gift className="h-5 w-5 text-amber-400" strokeWidth={1.5} />
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-[12px] font-bold text-white truncate">{targetPot.title}</p>
               <div className="mt-1.5 h-3 w-full rounded-full bg-white/15 overflow-hidden">
@@ -2027,10 +2035,12 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
                   style={{ width: `${Math.min(100, Math.round((targetPot.raised / targetPot.goal) * 100))}%` }}
                 />
               </div>
-              <p className="text-[10px] text-violet-300 mt-1">£{targetPot.raised} / £{targetPot.goal} · Stars splash here! 🌟</p>
+              <p className="text-[10px] text-violet-300 mt-1">£{targetPot.raised} / £{targetPot.goal} · Stars splash here!</p>
             </div>
             {impactPot === targetPot.id && (
-              <div className="text-2xl animate-bounce">✨</div>
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-400/30 animate-bounce">
+                <Zap className="h-3.5 w-3.5 text-amber-400" />
+              </div>
             )}
           </div>
         </div>
@@ -2038,7 +2048,7 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
 
       {/* Daily Adventures */}
       <section className="relative z-10 px-4 mb-6">
-        <h2 className="text-[14px] font-black text-white mb-1">🗺️ Daily Adventures</h2>
+        <h2 className="text-[14px] font-black text-white mb-1">Daily Adventures</h2>
         <p className="text-[11px] text-violet-400 mb-3">Tap to complete · Stars fly to your pot!</p>
         <div className="grid grid-cols-2 gap-3">
           {CHORES.map((chore) => {
@@ -2062,7 +2072,9 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
                     </div>
                   </div>
                 )}
-                <span className="text-4xl">{chore.emoji}</span>
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/25">
+                  <chore.Icon className="h-5 w-5 text-white" strokeWidth={2} />
+                </div>
                 <p className="text-[12px] font-black text-white leading-tight">{chore.title}</p>
                 <p className="text-[10px] text-white/80 leading-tight">{chore.desc}</p>
                 <div className="flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 mt-1">
@@ -2142,8 +2154,8 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
         </div>
         <p className="mt-3 text-[10px] text-violet-400 text-center">
           {filledCells.size >= 20
-            ? "🎉 Chart complete! Ask Mum or Dad to redeem your reward!"
-            : `Tap the next square to add your star! ${20 - filledCells.size} to go ✨`}
+            ? "Chart complete! Ask Mum or Dad to redeem your reward!"
+            : `Tap the next square to add your star! ${20 - filledCells.size} to go`}
         </p>
       </section>
 
@@ -2166,19 +2178,20 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
 // WOULD YOU RATHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
+const RANDOM_GIFT_COLORS = ["#f59e0b","#a78bfa","#38bdf8","#4ade80","#fb923c","#f472b6","#60a5fa","#34d399","#fbbf24","#c084fc","#fb7185","#6ee7b7"];
 const RANDOM_GIFTS = [
-  { emoji: "🧦", label: "Socks", price: 8 },
-  { emoji: "🕯️", label: "Candle", price: 12 },
-  { emoji: "🧴", label: "Body lotion", price: 9 },
-  { emoji: "📚", label: "Random book", price: 14 },
-  { emoji: "🍫", label: "Chocolates", price: 7 },
-  { emoji: "🧸", label: "Trinket", price: 11 },
-  { emoji: "🪴", label: "Plant pot", price: 15 },
-  { emoji: "🎭", label: "Picture frame", price: 13 },
-  { emoji: "☕", label: "Mug", price: 10 },
-  { emoji: "🧩", label: "Mini puzzle", price: 16 },
-  { emoji: "🎪", label: "Desk gadget", price: 18 },
-  { emoji: "🌸", label: "Bath salts", price: 12 },
+  { label: "Socks", price: 8 },
+  { label: "Candle", price: 12 },
+  { label: "Body lotion", price: 9 },
+  { label: "Random book", price: 14 },
+  { label: "Chocolates", price: 7 },
+  { label: "Trinket", price: 11 },
+  { label: "Plant pot", price: 15 },
+  { label: "Picture frame", price: 13 },
+  { label: "Mug", price: 10 },
+  { label: "Mini puzzle", price: 16 },
+  { label: "Desk gadget", price: 18 },
+  { label: "Bath salts", price: 12 },
 ];
 
 const DREAM_GIFTS = [
@@ -2252,9 +2265,9 @@ function WouldYouRather() {
                     transition={{ delay: i * 0.045, type: "spring", stiffness: 500, damping: 20 }}
                     className="flex flex-col items-center gap-0.5"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-100 text-[20px]"
-                      style={{ animation: `wobble ${2.2 + i * 0.15}s ${i * 0.2}s ease-in-out infinite` }}>
-                      {g.emoji}
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl"
+                      style={{ background: (RANDOM_GIFT_COLORS[i % RANDOM_GIFT_COLORS.length]!) + "22", animation: `wobble ${2.2 + i * 0.15}s ${i * 0.2}s ease-in-out infinite` }}>
+                      <Gift className="h-4 w-4" style={{ color: RANDOM_GIFT_COLORS[i % RANDOM_GIFT_COLORS.length]! }} strokeWidth={1.5} />
                     </div>
                     <span className="text-[8px] text-stone-400 leading-tight text-center">{g.label}</span>
                   </motion.div>
@@ -2477,11 +2490,11 @@ function parseProductUrl(raw: string): { title: string; price: string } {
   }
 }
 
-const EVENT_OPTIONS: { type: EventType; label: string; emoji: string }[] = [
-  { type: "birthday",  label: "Birthday",  emoji: "🎂" },
-  { type: "christmas", label: "Christmas", emoji: "🎄" },
-  { type: "custom",    label: "Other",     emoji: "🗓️" },
-  { type: "ongoing",   label: "Ongoing",   emoji: "∞"  },
+const EVENT_OPTIONS: { type: EventType; label: string; color: string }[] = [
+  { type: "birthday",  label: "Birthday",  color: "#f59e0b" },
+  { type: "christmas", label: "Christmas", color: "#ef4444" },
+  { type: "custom",    label: "Other",     color: "#a78bfa" },
+  { type: "ongoing",   label: "Ongoing",   color: "#38bdf8" },
 ];
 
 const ACCENT_GRADIENTS = [
@@ -2568,7 +2581,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
     return {
       id: `p${Date.now()}`,
       title: title.trim(),
-      emoji: eventType === "christmas" ? "🎄" : eventType === "birthday" ? "🎂" : "🎁",
+      emoji: "",
       goal,
       raised: 0,
       mode: potMode,
@@ -2762,7 +2775,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                       : "bg-stone-100 text-stone-500",
                   )}
                 >
-                  <span className="text-[18px]">{ev.emoji}</span>
+                  <div className="h-5 w-5 rounded-full" style={{ background: ev.color }} />
                   <span className="text-[11px] font-semibold leading-tight">{ev.label}</span>
                 </button>
               ))}
@@ -2962,19 +2975,18 @@ function ReceiverView({ pots, onOpenStars }: {
                   {/* snowflakes / confetti */}
                   <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl opacity-40">
                     {[20, 45, 70, 85].map((l, j) => (
-                      <span key={j} className="absolute text-white/60 text-[10px]"
-                        style={{ left: `${l}%`, top: 0, animation: `snow-fall ${2 + j * 0.4}s ${j * 0.3}s ease-in infinite` }}>
-                        {pot.mode === "UNDER_THE_TREE" ? "❄️" : "✨"}
-                      </span>
+                      <div key={j} className="absolute rounded-full bg-white/60"
+                        style={{ left: `${l}%`, top: 0, width: 4, height: 4, animation: `snow-fall ${2 + j * 0.4}s ${j * 0.3}s ease-in infinite` }}
+                      />
                     ))}
                   </div>
                   <div className="relative flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 text-3xl">
-                      🎁
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                      <Gift className="h-6 w-6 text-white/70" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[12px] font-bold text-white/80">
-                        {pot.mode === "UNDER_THE_TREE" ? "🎄 Christmas surprise" : "🎀 Birthday surprise"}
+                        {pot.mode === "UNDER_THE_TREE" ? "Christmas surprise" : "Birthday surprise"}
                       </p>
                       <p className="text-[11px] text-white/40 mt-0.5">
                         {pot.eventLabel} · {pot.eventDate} · being secretly planned for you…
@@ -3009,7 +3021,7 @@ function ReceiverView({ pots, onOpenStars }: {
                       <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-amber-50">
                         {pot.image
                           ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover" />
-                          : <span className="flex h-full w-full items-center justify-center text-2xl">{pot.emoji}</span>}
+                          : <div className="flex h-full w-full items-center justify-center"><Gift className="h-5 w-5 text-stone-400" strokeWidth={1.5} /></div>}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium text-stone-900">{pot.title}</h3>

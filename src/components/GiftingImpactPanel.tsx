@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
+import { Brain, Leaf, RotateCcw, Banknote, TrendingUp } from "lucide-react";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // HOOKS
@@ -32,20 +34,20 @@ function useCountUp(target: number, active: boolean, duration = 1800) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 const MILESTONES = [
-  { value: 150,  label: "AirPods",          emoji: "🎧" },
-  { value: 350,  label: "Keyboard",          emoji: "⌨️" },
-  { value: 600,  label: "LEGO Falcon",       emoji: "🚀" },
-  { value: 900,  label: "Velvet Sofa",       emoji: "🛋️" },
-  { value: 1500, label: "MacBook Air",       emoji: "💻" },
+  { value: 150,  label: "AirPods Pro" },
+  { value: 350,  label: "Keyboard" },
+  { value: 600,  label: "LEGO Falcon" },
+  { value: 900,  label: "Velvet Sofa" },
+  { value: 1500, label: "MacBook Air" },
 ];
 
 const EVENTS = [
-  { label: "Birthday 1",  short: "B1", icon: "🎂" },
-  { label: "Christmas 1", short: "C1", icon: "🎄" },
-  { label: "Birthday 2",  short: "B2", icon: "🎂" },
-  { label: "Christmas 2", short: "C2", icon: "🎄" },
-  { label: "Birthday 3",  short: "B3", icon: "🎂" },
-  { label: "Christmas 3", short: "C3", icon: "🎄" },
+  { label: "Birthday 1",  short: "B1", letter: "B", color: "#f59e0b" },
+  { label: "Christmas 1", short: "C1", letter: "C", color: "#ef4444" },
+  { label: "Birthday 2",  short: "B2", letter: "B", color: "#f59e0b" },
+  { label: "Christmas 2", short: "C2", letter: "C", color: "#ef4444" },
+  { label: "Birthday 3",  short: "B3", letter: "B", color: "#f59e0b" },
+  { label: "Christmas 3", short: "C3", letter: "C", color: "#ef4444" },
 ];
 
 function StackingChart({
@@ -140,12 +142,13 @@ function StackingChart({
       {/* X axis event labels */}
       {EVENTS.map((ev, i) => (
         <g key={ev.short}>
-          <text x={xS(i)} y={H - 22} textAnchor="middle"
-            fill="rgba(255,255,255,0.5)" fontSize="9" fontWeight="bold">
-            {ev.icon}
+          <circle cx={xS(i)} cy={H - 24} r="7" fill={ev.color} fillOpacity="0.22" />
+          <text x={xS(i)} y={H - 21} textAnchor="middle"
+            fill={ev.color} fontSize="8.5" fontWeight="bold">
+            {ev.letter}
           </text>
           <text x={xS(i)} y={H - 9} textAnchor="middle"
-            fill="rgba(255,255,255,0.28)" fontSize="7.5">
+            fill="rgba(255,255,255,0.28)" fontSize="7">
             {ev.short}
           </text>
         </g>
@@ -177,7 +180,7 @@ function StackingChart({
               textAnchor={flipLabel ? "end" : "start"}
               fill="#fbbf24" fontSize="8.5" fontWeight="bold"
             >
-              {m.emoji} {m.label}
+              {m.label}
             </text>
           </g>
         );
@@ -300,14 +303,16 @@ function EventStackingCalculator() {
       </div>
 
       {/* Per-event summary pill */}
-      <div className="mb-4 flex items-center gap-2 rounded-2xl bg-amber-400/10 border border-amber-400/20 px-4 py-2.5">
-        <span className="text-[18px]">🔥</span>
+      <div className="mb-4 flex items-center gap-3 rounded-2xl bg-amber-400/10 border border-amber-400/20 px-4 py-2.5">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-400/20">
+          <TrendingUp className="h-4 w-4 text-amber-400" />
+        </div>
         <div>
           <p className="text-[12px] font-bold text-amber-300">
             £{perEvent.toLocaleString()} kindled per event
           </p>
           <p className="text-[10px] text-amber-400/60">
-            {nextMilestone.emoji} {nextMilestone.label} unlocked after just {eventsNeeded} event{eventsNeeded !== 1 ? "s" : ""}
+            {nextMilestone.label} unlocked after just {eventsNeeded} event{eventsNeeded !== 1 ? "s" : ""}
           </p>
         </div>
       </div>
@@ -334,7 +339,7 @@ interface MetricDef {
   label: string;
   copy: string;
   source: string;
-  icon: string;
+  Icon: LucideIcon;
   accent: string;
   glow: string;
   bg: string;
@@ -344,7 +349,7 @@ interface MetricDef {
 const METRICS: MetricDef[] = [
   {
     stat: 78, label: "Suffer Gift Anxiety",
-    icon: "😌",
+    Icon: Brain,
     copy: "Around 78% of UK adults feel stressed when buying gifts — worried about getting it wrong, duplicating, or overspending. An approved list removes all of that.",
     source: "YouGov UK, 2023",
     accent: "#fb923c", glow: "rgba(251,146,60,0.4)",
@@ -353,7 +358,7 @@ const METRICS: MetricDef[] = [
   },
   {
     stat: 30, label: "Seasonal Packaging Waste",
-    icon: "🌍",
+    Icon: Leaf,
     copy: "UK waste volumes spike by around 30% in December, driven by packaging and returns. Coordinated gifting reduces unnecessary purchasing — and the packaging that comes with it.",
     source: "WRAP UK, 2022",
     accent: "#34d399", glow: "rgba(52,211,153,0.4)",
@@ -362,7 +367,7 @@ const METRICS: MetricDef[] = [
   },
   {
     stat: 20, label: "Gifts Duplicated or Returned",
-    icon: "🔄",
+    Icon: RotateCcw,
     copy: "Around 1 in 5 gifts are duplicates, wrong size, or returned. Real-time claim locking on Kindled means every contribution is unique — no two people can buy the same item.",
     source: "YouGov UK Gift Survey, 2023",
     accent: "#a78bfa", glow: "rgba(167,139,250,0.4)",
@@ -371,7 +376,7 @@ const METRICS: MetricDef[] = [
   },
   {
     stat: 32, displayOverride: "£3.2B", label: "Spent on Unwanted UK Gifts",
-    icon: "💷",
+    Icon: Banknote,
     copy: "An estimated £3.2 Billion is spent on unwanted gifts in the UK each year. Kindled aims to redirect a share of this toward meaningful, receiver-approved milestones.",
     source: "OnePoll / Halifax Bank, 2023",
     accent: "#fbbf24", glow: "rgba(251,191,36,0.4)",
@@ -380,7 +385,7 @@ const METRICS: MetricDef[] = [
   },
   {
     stat: 65, label: "Overspend at Christmas",
-    icon: "📊",
+    Icon: TrendingUp,
     copy: "Around 65% of UK shoppers spend more than planned over the holidays, often out of panic. Kindled normalises comfortable £15–£20 contributions that add up to something meaningful.",
     source: "Money & Pensions Service, 2022",
     accent: "#60a5fa", glow: "rgba(96,165,250,0.4)",
@@ -417,9 +422,11 @@ function MetricTile({ metric, delay = 0 }: { metric: MetricDef; delay?: number }
         style={{ background: metric.accent, opacity: hovered ? 0.3 : 0.12 }}
       />
       <div className="relative z-10">
-        <span className="text-[22px]">{metric.icon}</span>
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: `${metric.accent}22` }}>
+          <metric.Icon className="h-5 w-5" style={{ color: metric.accent }} />
+        </div>
         <p
-          className="mt-2 text-[36px] font-black leading-none"
+          className="mt-3 text-[36px] font-black leading-none"
           style={{ color: metric.accent, fontFamily: "var(--font-display)" }}
         >
           {display}
@@ -439,7 +446,8 @@ function MetricTile({ metric, delay = 0 }: { metric: MetricDef; delay?: number }
 type SimState = "idle" | "merging" | "merged";
 
 interface Particle { id: number; angle: number; dist: number; emoji: string }
-const BURST_EMOJIS = ["⭐", "✨", "🌟", "💫", "🔥", "🎉"];
+// Burst uses colored CSS dots rather than emoji
+const BURST_COLORS = ["#f59e0b", "#fb923c", "#fbbf24", "#f97316", "#fde68a", "#fed7aa"];
 
 function MilestoneSimulator() {
   const [state, setState] = useState<SimState>("idle");
@@ -460,7 +468,7 @@ function MilestoneSimulator() {
         id: i,
         angle: (i / 16) * 360,
         dist: 42 + (i % 5) * 14,
-        emoji: BURST_EMOJIS[i % BURST_EMOJIS.length]!,
+        emoji: BURST_COLORS[i % BURST_COLORS.length]!,
       }))
     );
     timerRef.current = setTimeout(() => {
@@ -501,7 +509,7 @@ function MilestoneSimulator() {
             >
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <p className="text-[12px] font-bold text-white">🎂 Clara&apos;s Birthday Pot</p>
+                  <p className="text-[12px] font-bold text-white">Clara&apos;s Birthday Pot</p>
                   <p className="text-[10px] text-white/40">October · Velvet Sofa · £{SOFA_GOAL}</p>
                 </div>
                 <span className="text-[14px] font-black text-amber-400" style={{ fontFamily: "var(--font-display)" }}>25%</span>
@@ -527,7 +535,7 @@ function MilestoneSimulator() {
             >
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <p className="text-[12px] font-bold text-white">🎄 Clara&apos;s Christmas Pot</p>
+                  <p className="text-[12px] font-bold text-white">Clara&apos;s Christmas Pot</p>
                   <p className="text-[10px] text-white/40">December · Velvet Sofa · £{SOFA_GOAL}</p>
                 </div>
                 <span className="text-[14px] font-black text-violet-400" style={{ fontFamily: "var(--font-display)" }}>20%</span>
@@ -555,23 +563,22 @@ function MilestoneSimulator() {
                     : "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900 shadow-xl shadow-amber-900/35",
                 )}
               >
-                {state === "merging" ? "✨ Combining…" : "🔄 Combine Birthday & Christmas Pots"}
+                {state === "merging" ? "Combining…" : "Combine Birthday & Christmas Pots"}
                 <AnimatePresence>
                   {particles.map((p) => {
                     const rad = (p.angle * Math.PI) / 180;
                     const tx = Math.cos(rad) * p.dist;
                     const ty = Math.sin(rad) * p.dist - 20;
                     return (
-                      <motion.span
+                      <motion.div
                         key={p.id}
-                        className="pointer-events-none absolute left-1/2 top-1/2 select-none text-[14px]"
+                        className="pointer-events-none absolute left-1/2 top-1/2 rounded-full"
+                        style={{ width: 6 + (p.id % 3) * 3, height: 6 + (p.id % 3) * 3, background: p.emoji }}
                         initial={{ x: "-50%", y: "-50%", scale: 1, opacity: 1 }}
                         animate={{ x: `calc(-50% + ${tx}px)`, y: `calc(-50% + ${ty}px)`, scale: 0, opacity: 0 }}
                         exit={{}}
                         transition={{ duration: 0.55, ease: "easeOut" }}
-                      >
-                        {p.emoji}
-                      </motion.span>
+                      />
                     );
                   })}
                 </AnimatePresence>
@@ -595,16 +602,16 @@ function MilestoneSimulator() {
             >
               <div className="flex items-center justify-between mb-2.5">
                 <div>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <motion.span
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <motion.div
                       initial={{ scale: 0, rotate: -45 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 500, damping: 14, delay: 0.15 }}
-                      className="text-[16px]"
+                      className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400"
                     >
-                      🌟
-                    </motion.span>
-                    <p className="text-[13px] font-black text-white">Clara&apos;s Super-Pot!</p>
+                      <TrendingUp className="h-3 w-3 text-stone-900" />
+                    </motion.div>
+                    <p className="text-[13px] font-black text-white">Clara&apos;s Super-Pot</p>
                   </div>
                   <p className="text-[10px] text-amber-300/65">Birthday + Christmas combined</p>
                 </div>
@@ -651,7 +658,7 @@ function MilestoneSimulator() {
                   <div>
                     <p className="text-[13px] font-bold text-white">🛋️ Velvet Sofa</p>
                     <p className="text-[11px] text-amber-400 font-semibold mt-0.5">
-                      £{SOFA_GOAL} · Almost there — just £{stillNeeded} left
+                      £{SOFA_GOAL} · £{stillNeeded} still needed
                     </p>
                     <div className="mt-1.5 h-2 w-36 rounded-full bg-white/15 overflow-hidden">
                       <motion.div
@@ -672,7 +679,7 @@ function MilestoneSimulator() {
               transition={{ delay: 0.55 }}
               className="mb-4 text-center text-[12px] text-white/45 leading-relaxed px-2"
             >
-              Just one more event — a few more people giving £{Math.ceil(stillNeeded / 8)} each and the sofa is Clara&apos;s. 🛋️
+              One more event — a few more people giving £{Math.ceil(stillNeeded / 8)} each and the sofa is Clara&apos;s.
             </motion.p>
 
             <button
