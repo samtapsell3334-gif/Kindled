@@ -15,7 +15,6 @@ const fontMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Kindling",
   description: "Kindling MVP",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
