@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-family-display: var(--font-display), 'Fredoka', sans-serif;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
@@ -13,7 +17,7 @@
 }
 
 body {
-  background-color: var(--background);
+  background-color: #fdf9f5;
   color: var(--foreground);
 }
 

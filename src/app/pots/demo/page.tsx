@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import {
   Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown,
   Play, Pause, SkipForward, Volume2, VolumeX, X, Zap,
@@ -302,12 +303,13 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
   potCount: number; totalGoal: number; onShare: () => void;
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-orange-100 bg-white/95 backdrop-blur-lg">
-      <div className="px-4 pt-4 pb-3">
+    <header className="sticky top-0 z-30 border-b border-orange-100/80 bg-[#fdf9f5]/95 backdrop-blur-lg">
+      {/* Warm accent line */}
+      <div className="h-0.5 w-full bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400" />
+      <div className="px-4 pt-3.5 pb-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            {/* Kindled logo mark */}
-            <svg viewBox="0 0 100 100" width="48" height="48" className="shrink-0 drop-shadow-md" role="img" aria-label="Kindled">
+            <svg viewBox="0 0 100 100" width="44" height="44" className="shrink-0 drop-shadow-md" role="img" aria-label="Kindled">
               <defs>
                 <linearGradient id="hdr-tile" x1="0" y1="0" x2="60" y2="100" gradientUnits="userSpaceOnUse">
                   <stop offset="0%" stopColor="#FFB845"/>
@@ -326,55 +328,38 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
             </svg>
             <div>
               <div className="flex items-baseline gap-1.5">
-                <h1 className="text-[17px] font-black tracking-tight text-stone-900 leading-tight">Kindled</h1>
-                <span className="text-[11px] font-semibold text-stone-400">· Billy&apos;s List</span>
+                <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold tracking-tight text-stone-900 leading-tight">Kindled</h1>
+                <span className="text-[11px] font-medium text-stone-400">· Billy&apos;s List</span>
               </div>
               <p className="text-[11px] text-stone-400">
                 Managed by <span className="font-semibold text-amber-500">Mum (Sarah)</span>
               </p>
             </div>
           </div>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.94 }}
+            whileHover={{ scale: 1.03 }}
+            transition={{ type: "spring", stiffness: 500, damping: 30 }}
             onClick={onShare}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-2 text-[12px] font-bold text-stone-900 shadow-md shadow-amber-900/30 active:scale-95 transition-transform"
+            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3.5 py-2 text-[12px] font-semibold text-stone-900 shadow-md shadow-amber-200 active:scale-95"
           >
             <Share2 className="h-3.5 w-3.5" />
-            Share List
-          </button>
+            Share
+          </motion.button>
         </div>
 
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="text-center">
-              <p className="text-[17px] font-black text-amber-400 leading-none">{potCount}</p>
-              <p className="text-[9px] font-medium uppercase tracking-wider text-stone-600">pots</p>
+        <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
+          {[
+            { value: potCount, label: "pots", color: "text-amber-500" },
+            { value: `£${totalGoal.toLocaleString()}`, label: "goal", color: "text-orange-500" },
+            { value: "4", label: "events", color: "text-rose-500" },
+          ].map((stat) => (
+            <div key={stat.label} className="px-3 first:pl-0 last:pr-0 text-center">
+              <p style={{ fontFamily: "var(--font-display)" }} className={`text-[18px] font-semibold leading-none ${stat.color}`}>{stat.value}</p>
+              <p className="text-[9px] uppercase tracking-wider text-stone-400 mt-0.5">{stat.label}</p>
             </div>
-            <div className="h-6 w-px bg-stone-200" />
-            <div className="text-center">
-              <p className="text-[17px] font-black text-stone-800 leading-none">£{totalGoal.toLocaleString()}</p>
-              <p className="text-[9px] font-medium uppercase tracking-wider text-stone-400">total goal</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1 rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1">
-            <Lock className="h-2.5 w-2.5 text-emerald-400" />
-            <span className="text-[9px] font-semibold text-stone-400">Regulated &amp; Secured by Stripe</span>
-          </div>
+          ))}
         </div>
-      </div>
-
-      {/* Mode legend */}
-      <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-none">
-        {[
-          { dot: "bg-emerald-400", label: "Live Feed" },
-          { dot: "bg-red-500", label: "Under the Tree 🎄" },
-          { dot: "bg-violet-400", label: "Wrapped Up 🎀" },
-          { dot: "bg-teal-400", label: "∞ Continuous" },
-        ].map(({ dot, label }) => (
-          <span key={label} className="flex shrink-0 items-center gap-1.5 rounded-full bg-white border border-stone-200 px-2.5 py-1 text-[10px] font-medium text-stone-500">
-            <span className={cn("h-1.5 w-1.5 rounded-full", dot)} />
-            {label}
-          </span>
-        ))}
       </div>
     </header>
   );
@@ -387,23 +372,29 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
 function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) => void }) {
   const pct = Math.min(100, Math.round((pot.raised / pot.goal) * 100));
   const statusLabel = pct >= 100 ? "Funded 🎉" : pct >= 50 ? "Halfway there ✨" : "Just getting started";
-  const statusColor = pct >= 100 ? "text-emerald-400" : pct >= 50 ? "text-amber-400" : "text-orange-400";
+  const statusColor = pct >= 100 ? "text-emerald-500" : pct >= 50 ? "text-amber-500" : "text-orange-400";
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-md shadow-stone-200/60">
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+      className="relative overflow-hidden rounded-2xl bg-white"
+      style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
+    >
       <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-xl shadow-inner">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)]">
               {pot.emoji}
             </span>
             <div className="min-w-0">
-              <h3 className="truncate text-[14px] font-bold tracking-tight text-stone-900">{pot.title}</h3>
-              <div className="flex items-center gap-1.5">
+              <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium tracking-tight text-stone-900">{pot.title}</h3>
+              <div className="flex items-center gap-1.5 mt-0.5">
                 <p className={cn("text-[11px] font-medium", statusColor)}>{statusLabel}</p>
                 {pot.continuous && (
-                  <span className="rounded-full bg-teal-900/40 px-1.5 py-px text-[9px] font-semibold text-teal-400 border border-teal-800/40">
+                  <span className="rounded-full bg-teal-50 border border-teal-200 px-1.5 py-px text-[9px] font-semibold text-teal-600">
                     ∞ continuous
                   </span>
                 )}
@@ -411,18 +402,19 @@ function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) 
             </div>
           </div>
           {onRemove && (
-            <button onClick={() => onRemove(pot.id)} className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-800 text-stone-500 hover:text-red-400 transition-colors">
+            <motion.button whileTap={{ scale: 0.9 }} onClick={() => onRemove(pot.id)}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-400 hover:bg-red-50 hover:text-red-400 transition-colors">
               <X className="h-3 w-3" />
-            </button>
+            </motion.button>
           )}
         </div>
         <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" />
-        <div className="mt-3 flex items-center justify-between text-[11px] text-stone-400">
-          <span className="flex items-center gap-1"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
-          <span className="font-medium text-stone-500">£{pot.raised} / £{pot.goal}</span>
+        <div className="mt-3 flex items-center justify-between">
+          <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
+          <span className="text-[12px] font-semibold text-stone-600">£{pot.raised} <span className="text-stone-300">/</span> £{pot.goal}</span>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
@@ -524,12 +516,10 @@ function MumChecklist({ onClaim }: { onClaim: (name: string) => void }) {
 
   return (
     <section className="px-4">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="text-base">🛍️</span>
-        <div>
-          <h2 className="text-[14px] font-bold text-stone-900">Cheaper Gift Ideas</h2>
-          <p className="text-[11px] text-stone-500">Claim one to prevent duplicates</p>
-        </div>
+      <div className="mb-3">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Mum Knows Best</p>
+        <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">Cheaper gift ideas 🛍️</p>
+        <p className="text-[11px] text-stone-400 mt-0.5">Claim one to prevent duplicates</p>
       </div>
       <div className="flex flex-col gap-2">
         {items.map((item) => (
@@ -569,12 +559,15 @@ function MumChecklist({ onClaim }: { onClaim: (name: string) => void }) {
               )}
             </div>
             {item.status === "available" && (
-              <button
+              <motion.button
+                whileTap={{ scale: 0.92 }}
+                whileHover={{ scale: 1.04 }}
+                transition={{ type: "spring", stiffness: 500, damping: 28 }}
                 onClick={() => claim(item.id)}
-                className="shrink-0 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1.5 text-[11px] font-bold text-stone-900 active:scale-95 transition-transform"
+                className="shrink-0 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-1.5 text-[11px] font-semibold text-stone-900 shadow-sm shadow-amber-200"
               >
                 Claim
-              </button>
+              </motion.button>
             )}
           </div>
         ))}
@@ -696,8 +689,9 @@ function CatalogueGrid({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
   return (
     <section className="px-4">
       <div className="mb-3">
-        <h2 className="text-[14px] font-bold text-stone-900">Browse &amp; Add to Your List</h2>
-        <p className="text-[11px] text-stone-400">Tap any card — watch the magic circle draw itself</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Catalogue</p>
+        <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">Browse &amp; add to your list</p>
+        <p className="text-[11px] text-stone-400 mt-0.5">Tap any card — watch the magic circle draw itself</p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {CATALOGUE.map((item) => (
@@ -1414,18 +1408,22 @@ function ExplainerPlayer() {
 
   if (!open) return (
     <div className="mx-4">
-      <button
+      <motion.button
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ type: "spring", stiffness: 400, damping: 28 }}
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-left hover:border-amber-300 hover:shadow-md transition-all active:scale-[0.98]"
+        className="flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left"
+        style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
       >
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
           <Play className="h-5 w-5 translate-x-0.5 text-stone-900" strokeWidth={2.5} fill="currentColor" />
         </div>
         <div>
-          <p className="text-[13px] font-bold text-stone-800">📺 Watch How Kindled Works</p>
+          <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-800">📺 Watch How Kindled Works</p>
           <p className="text-[11px] text-stone-400">5 scenes · multi-seasonal gifting · ambient music</p>
         </div>
-      </button>
+      </motion.button>
     </div>
   );
 
@@ -2026,7 +2024,7 @@ export default function DemoPage() {
   const surprisePots = pots.filter((p) => p.mode !== "LIVE_FEED");
 
   return (
-    <div className="min-h-screen text-stone-900">
+    <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
       {revealPot && <RevealModal pot={revealPot} onClose={() => setRevealPot(null)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
@@ -2045,12 +2043,13 @@ export default function DemoPage() {
         onShare={handleShare}
       />
 
-      <main className="space-y-6 pb-32 pt-4">
+      <main className="space-y-7 pb-36 pt-4">
         {/* ── Live Pots ── */}
         <section className="px-4">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-stone-400">
-            Live Pots · {livePots.length} active
-          </p>
+          <div className="mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Live Pots</p>
+            <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">{livePots.length} active gifts</p>
+          </div>
           <div className="flex flex-col gap-3">
             {livePots.map((pot) =>
               pot.id.startsWith("new_")
@@ -2063,9 +2062,10 @@ export default function DemoPage() {
         {/* ── Surprise Pots ── */}
         {surprisePots.length > 0 && (
           <section className="px-4">
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-stone-400">
-              Surprise Pots · {surprisePots.length} locked
-            </p>
+            <div className="mb-3">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Surprise Pots</p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">{surprisePots.length} locked &amp; waiting</p>
+            </div>
             <div className="flex flex-col gap-3">
               {surprisePots.map((pot) => (
                 <LockedPotCard key={pot.id} pot={pot} onReveal={setRevealPot} />
@@ -2079,9 +2079,12 @@ export default function DemoPage() {
 
         {/* ── Kindled Stars entry ── */}
         <section className="px-4">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.01, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 400, damping: 28 }}
             onClick={() => setShowStars(true)}
-            className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 p-5 text-left shadow-xl shadow-indigo-900/30 active:scale-[0.98] transition-transform"
+            className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 p-5 text-left shadow-xl shadow-indigo-900/30"
           >
             {/* Twinkling dots */}
             <div className="pointer-events-none absolute inset-0">
@@ -2095,7 +2098,7 @@ export default function DemoPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-violet-200 mb-0.5">Kids Rewards</p>
-                <h3 className="text-[17px] font-black text-white leading-tight">Kindled Stars</h3>
+                <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[19px] font-semibold text-white leading-tight">Kindled Stars</h3>
                 <p className="text-[12px] text-violet-200 mt-0.5">Billy&apos;s star chart · 4 adventures today</p>
               </div>
               <div className="flex flex-col items-end gap-1">
@@ -2103,7 +2106,7 @@ export default function DemoPage() {
                 <span className="text-[10px] text-violet-300">24 ⭐ earned</span>
               </div>
             </div>
-          </button>
+          </motion.button>
         </section>
 
         {/* ── Catalogue ── */}
@@ -2114,14 +2117,18 @@ export default function DemoPage() {
 
         {/* ── Bottom CTA ── */}
         <div className="mx-4">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 400, damping: 26 }}
             onClick={() => setRevealPot(surprisePots[0] ?? pots[0]!)}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[14px] font-black text-stone-900 shadow-xl shadow-amber-900/30 active:scale-[0.98] transition-transform"
+            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 shadow-xl shadow-amber-200"
+            style={{ boxShadow: "0 4px 24px rgba(251,146,60,0.45), 0 0 0 1px rgba(251,146,60,0.2)" }}
           >
-            <Zap className="h-5 w-5" strokeWidth={2.5} />
-            Launch Reveal Ceremony
-          </button>
-          <p className="mt-2 text-center text-[10px] text-stone-600">
+            <Zap className="h-5 w-5 text-stone-900" strokeWidth={2.5} />
+            <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-stone-900">Launch Reveal Ceremony</span>
+          </motion.button>
+          <p className="mt-2.5 text-center text-[10px] text-stone-400 tracking-wide">
             Cinematic full-screen reveal · touch-optimised · no database required
           </p>
         </div>
