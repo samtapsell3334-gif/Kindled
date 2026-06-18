@@ -183,7 +183,7 @@ body {
 
 /* ── SVG hand-drawn circle draw-on ── */
 @keyframes draw-circle {
-  from { stroke-dashoffset: 320; }
+  from { stroke-dashoffset: 400; }
   to   { stroke-dashoffset: 0; }
 }
 .animate-draw-circle { animation: draw-circle 0.9s ease-in-out forwards; }

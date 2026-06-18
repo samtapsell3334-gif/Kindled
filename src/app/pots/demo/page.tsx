@@ -141,12 +141,12 @@ const CHECKLIST: ChecklistItem[] = [
 ];
 
 const CATALOGUE: CatalogItem[] = [
-  { id: "c1", name: "Nintendo Switch OLED", emoji: "🎮", price: 309.99, tag: "Popular", tagColor: "bg-red-500/20 text-red-300", glowColor: "#ef4444" },
-  { id: "c2", name: "Electric Scooter Pro", emoji: "🛴", price: 399.99, tag: "Trending", tagColor: "bg-emerald-500/20 text-emerald-300", glowColor: "#10b981" },
-  { id: "c3", name: "Meta Quest 3 VR", emoji: "🥽", price: 499.99, tag: "High Intent", tagColor: "bg-violet-500/20 text-violet-300", glowColor: "#8b5cf6" },
-  { id: "c4", name: "LEGO Technic Ferrari", emoji: "🏎️", price: 189.99, tag: "Bestseller", tagColor: "bg-amber-500/20 text-amber-300", glowColor: "#f59e0b" },
-  { id: "c5", name: "Air Hockey Table", emoji: "🏒", price: 199.99, tag: "New", tagColor: "bg-pink-500/20 text-pink-300", glowColor: "#ec4899" },
-  { id: "c6", name: "LEGO Star Wars X-Wing", emoji: "✈️", price: 99.99, tag: "Fan Fave", tagColor: "bg-sky-500/20 text-sky-300", glowColor: "#38bdf8" },
+  { id: "c1", name: "Nintendo Switch OLED", emoji: "🎮", price: 309.99, tag: "Popular", tagColor: "bg-red-100 text-red-600", glowColor: "#ef4444" },
+  { id: "c2", name: "Electric Scooter Pro", emoji: "🛴", price: 399.99, tag: "Trending", tagColor: "bg-emerald-100 text-emerald-600", glowColor: "#10b981" },
+  { id: "c3", name: "Meta Quest 3 VR", emoji: "🥽", price: 499.99, tag: "High Intent", tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6" },
+  { id: "c4", name: "LEGO Technic Ferrari", emoji: "🏎️", price: 189.99, tag: "Bestseller", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
+  { id: "c5", name: "Air Hockey Table", emoji: "🏒", price: 199.99, tag: "New", tagColor: "bg-pink-100 text-pink-600", glowColor: "#ec4899" },
+  { id: "c6", name: "LEGO Star Wars X-Wing", emoji: "✈️", price: 99.99, tag: "Fan Fave", tagColor: "bg-sky-100 text-sky-600", glowColor: "#38bdf8" },
 ];
 
 const SCENES: ExplainerScene[] = [
@@ -321,7 +321,7 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
   potCount: number; totalGoal: number; onShare: () => void;
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-stone-800/60 bg-stone-950/96 backdrop-blur-lg">
+    <header className="sticky top-0 z-30 border-b border-orange-100 bg-white/95 backdrop-blur-lg">
       <div className="px-4 pt-4 pb-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -334,7 +334,7 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
               </span>
             </div>
             <div>
-              <h1 className="text-[16px] font-black tracking-tight text-stone-100 leading-tight">
+              <h1 className="text-[16px] font-black tracking-tight text-stone-900 leading-tight">
                 Billy&apos;s Dream Board
               </h1>
               <p className="text-[11px] text-stone-400">
@@ -357,13 +357,13 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
               <p className="text-[17px] font-black text-amber-400 leading-none">{potCount}</p>
               <p className="text-[9px] font-medium uppercase tracking-wider text-stone-600">pots</p>
             </div>
-            <div className="h-6 w-px bg-stone-800" />
+            <div className="h-6 w-px bg-stone-200" />
             <div className="text-center">
-              <p className="text-[17px] font-black text-stone-200 leading-none">£{totalGoal.toLocaleString()}</p>
-              <p className="text-[9px] font-medium uppercase tracking-wider text-stone-600">total goal</p>
+              <p className="text-[17px] font-black text-stone-800 leading-none">£{totalGoal.toLocaleString()}</p>
+              <p className="text-[9px] font-medium uppercase tracking-wider text-stone-400">total goal</p>
             </div>
           </div>
-          <div className="flex items-center gap-1 rounded-full border border-stone-700/50 bg-stone-900/60 px-2.5 py-1">
+          <div className="flex items-center gap-1 rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1">
             <Lock className="h-2.5 w-2.5 text-emerald-400" />
             <span className="text-[9px] font-semibold text-stone-400">Regulated &amp; Secured by Stripe</span>
           </div>
@@ -378,7 +378,7 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
           { dot: "bg-violet-400", label: "Wrapped Up 🎀" },
           { dot: "bg-teal-400", label: "∞ Continuous" },
         ].map(({ dot, label }) => (
-          <span key={label} className="flex shrink-0 items-center gap-1.5 rounded-full bg-stone-900/60 border border-stone-800/50 px-2.5 py-1 text-[10px] font-medium text-stone-400">
+          <span key={label} className="flex shrink-0 items-center gap-1.5 rounded-full bg-white border border-stone-200 px-2.5 py-1 text-[10px] font-medium text-stone-500">
             <span className={cn("h-1.5 w-1.5 rounded-full", dot)} />
             {label}
           </span>
@@ -398,16 +398,16 @@ function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) 
   const statusColor = pct >= 100 ? "text-emerald-400" : pct >= 50 ? "text-amber-400" : "text-orange-400";
 
   return (
-    <article className="relative overflow-hidden rounded-2xl border border-stone-800/70 bg-stone-900/80 shadow-lg shadow-black/30 backdrop-blur-sm">
+    <article className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-md shadow-stone-200/60">
       <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-800/80 text-xl shadow-inner">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-100 text-xl shadow-inner">
               {pot.emoji}
             </span>
             <div className="min-w-0">
-              <h3 className="truncate text-[14px] font-bold tracking-tight text-stone-100">{pot.title}</h3>
+              <h3 className="truncate text-[14px] font-bold tracking-tight text-stone-900">{pot.title}</h3>
               <div className="flex items-center gap-1.5">
                 <p className={cn("text-[11px] font-medium", statusColor)}>{statusLabel}</p>
                 {pot.continuous && (
@@ -425,9 +425,9 @@ function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) 
           )}
         </div>
         <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" />
-        <div className="mt-3 flex items-center justify-between text-[11px] text-stone-500">
+        <div className="mt-3 flex items-center justify-between text-[11px] text-stone-400">
           <span className="flex items-center gap-1"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
-          <span className="font-medium text-stone-400">£{pot.raised} / £{pot.goal}</span>
+          <span className="font-medium text-stone-500">£{pot.raised} / £{pot.goal}</span>
         </div>
       </div>
     </article>
@@ -469,7 +469,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           <div className="flex min-w-0 items-center gap-2.5">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black/30 text-xl">🎁</span>
             <div className="min-w-0">
-              <h3 className="truncate text-[14px] font-bold text-stone-100">{pot.title}</h3>
+              <h3 className="truncate text-[14px] font-bold text-stone-900">{pot.title}</h3>
               <p className={cn("text-[11px] font-medium", th.label)}>{th.modeLabel}</p>
             </div>
           </div>
@@ -535,7 +535,7 @@ function MumChecklist({ onClaim }: { onClaim: (name: string) => void }) {
       <div className="mb-3 flex items-center gap-2">
         <span className="text-base">🛍️</span>
         <div>
-          <h2 className="text-[14px] font-bold text-stone-100">Cheaper Gift Ideas</h2>
+          <h2 className="text-[14px] font-bold text-stone-900">Cheaper Gift Ideas</h2>
           <p className="text-[11px] text-stone-500">Claim one to prevent duplicates</p>
         </div>
       </div>
@@ -547,13 +547,13 @@ function MumChecklist({ onClaim }: { onClaim: (name: string) => void }) {
               "flex items-center gap-3 rounded-2xl border p-3.5 transition-all duration-300",
               claimingId === item.id && "animate-claim-pop",
               item.status === "claimed"
-                ? "border-emerald-800/40 bg-emerald-900/20"
-                : "border-stone-800/60 bg-stone-900/60",
+                ? "border-emerald-200 bg-emerald-50"
+                : "border-stone-200 bg-white",
             )}
           >
             <div className={cn(
               "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base transition-all",
-              item.status === "claimed" ? "bg-emerald-500" : "border-2 border-stone-700 bg-stone-800",
+              item.status === "claimed" ? "bg-emerald-500" : "border-2 border-stone-300 bg-stone-50",
             )}>
               {item.status === "claimed" ? "✓" : "○"}
             </div>
@@ -561,7 +561,7 @@ function MumChecklist({ onClaim }: { onClaim: (name: string) => void }) {
               <div className="flex items-baseline gap-2">
                 <p className={cn(
                   "text-[13px] font-semibold",
-                  item.status === "claimed" ? "line-through text-stone-500" : "text-stone-100",
+                  item.status === "claimed" ? "line-through text-stone-400" : "text-stone-800",
                 )}>
                   {item.name}
                 </p>
@@ -618,9 +618,9 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
   return (
     <div
       className={cn(
-        "relative overflow-visible rounded-2xl border bg-stone-900/80 p-3.5 cursor-pointer backdrop-blur-sm",
+        "relative overflow-visible rounded-2xl border bg-white p-3.5 cursor-pointer shadow-sm",
         "transition-all duration-300",
-        added ? "border-emerald-500/50 bg-emerald-900/15" : "border-stone-800/60 hover:border-stone-700",
+        added ? "border-emerald-400 bg-emerald-50" : "border-stone-200 hover:border-amber-300 hover:shadow-md",
       )}
       style={{
         ...tiltStyle,
@@ -630,18 +630,26 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
     >
-      {/* SVG circle overlay */}
+      {/* SVG circle overlay — draws around the full card */}
       {circling && (
-        <div className="pointer-events-none absolute inset-[-8px] z-20">
-          <svg viewBox="0 0 116 100" fill="none" className="absolute inset-0 w-full h-full overflow-visible">
-            <path
-              d="M 58,7 C 94,3 112,23 112,50 C 112,77 94,95 58,95 C 22,95 4,77 4,50 C 4,23 22,9 58,7"
+        <div className="pointer-events-none absolute z-20" style={{ inset: "-5px" }}>
+          <svg
+            style={{ width: "100%", height: "100%" }}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              x="2" y="2" width="96" height="96"
+              rx="10" ry="10"
               stroke="#f59e0b"
-              strokeWidth="4.5"
+              strokeWidth="3.5"
               strokeLinecap="round"
-              strokeDasharray="320"
+              strokeDasharray="400"
+              vectorEffect="non-scaling-stroke"
               className="animate-draw-circle"
-              style={{ filter: "drop-shadow(0 0 9px #f59e0b)" }}
+              style={{ filter: "drop-shadow(0 0 8px #f59e0b)" }}
             />
           </svg>
         </div>
@@ -672,21 +680,21 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
           {item.tag}
         </span>
       </div>
-      <p className="text-[12px] font-bold leading-tight text-stone-100">{item.name}</p>
+      <p className="text-[12px] font-bold leading-tight text-stone-800">{item.name}</p>
       <div className="mt-2.5 flex items-center justify-between">
-        <span className="text-[15px] font-black text-amber-400">£{item.price.toFixed(2)}</span>
+        <span className="text-[15px] font-black text-amber-500">£{item.price.toFixed(2)}</span>
         {added ? (
-          <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400">
+          <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
             <Check className="h-3 w-3" />Added
           </span>
         ) : (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-stone-800 text-stone-400">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-stone-100 text-stone-500">
             <Plus className="h-3.5 w-3.5" />
           </div>
         )}
       </div>
       {!added && (
-        <p className="mt-1.5 text-[9px] text-stone-600 text-center">Tap to circle &amp; add</p>
+        <p className="mt-1.5 text-[9px] text-stone-400 text-center">Tap to circle &amp; add</p>
       )}
     </div>
   );
@@ -696,8 +704,8 @@ function CatalogueGrid({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
   return (
     <section className="px-4">
       <div className="mb-3">
-        <h2 className="text-[14px] font-bold text-stone-100">Browse &amp; Add to Your List</h2>
-        <p className="text-[11px] text-stone-500">Tap any card — watch the magic circle draw itself</p>
+        <h2 className="text-[14px] font-bold text-stone-900">Browse &amp; Add to Your List</h2>
+        <p className="text-[11px] text-stone-400">Tap any card — watch the magic circle draw itself</p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {CATALOGUE.map((item) => (
@@ -1090,7 +1098,7 @@ function ExplainerPlayer() {
     <div className="mx-4">
       <button
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-3 rounded-2xl border border-stone-800/60 bg-stone-900/60 px-4 py-3.5 text-left hover:border-amber-500/30 transition-colors active:scale-[0.98]"
+        className="flex w-full items-center gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-left hover:border-amber-500/30 transition-colors active:scale-[0.98]"
       >
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
           <Play className="h-5 w-5 translate-x-0.5 text-stone-900" strokeWidth={2.5} fill="currentColor" />
@@ -1106,9 +1114,9 @@ function ExplainerPlayer() {
   const scene = SCENES[sceneIdx]!;
 
   return (
-    <div className="mx-4 overflow-hidden rounded-3xl border border-stone-800/60 bg-stone-900 shadow-xl shadow-black/40">
+    <div className="mx-4 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-xl shadow-stone-200/60">
       {/* Scene label */}
-      <div className="flex items-center justify-between border-b border-stone-800/60 bg-stone-950/60 px-4 py-2">
+      <div className="flex items-center justify-between border-b border-stone-100 bg-stone-50 px-4 py-2">
         <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">
           Scene {sceneIdx + 1}/5 · {scene.title}
         </span>
@@ -1125,7 +1133,7 @@ function ExplainerPlayer() {
 
       {/* Caption */}
       <div className="min-h-[56px] border-t border-stone-800/60 px-4 py-3">
-        <p key={sceneIdx} className="text-[11px] leading-relaxed text-stone-400 animate-fade-up line-clamp-3">
+        <p key={sceneIdx} className="text-[11px] leading-relaxed text-stone-600 animate-fade-up line-clamp-3">
           {scene.caption}
         </p>
       </div>
@@ -1134,7 +1142,7 @@ function ExplainerPlayer() {
       <div className="border-t border-stone-800/60 px-4 pb-4 pt-3 space-y-3">
         {/* Progress */}
         <div
-          className="h-1.5 w-full cursor-pointer rounded-full bg-stone-800"
+          className="h-1.5 w-full cursor-pointer rounded-full bg-stone-200"
           onClick={(e) => {
             const r = e.currentTarget.getBoundingClientRect();
             const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
@@ -1164,7 +1172,7 @@ function ExplainerPlayer() {
           >
             {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </button>
-          <span className="flex-1 text-right font-mono text-[10px] text-stone-600 tabular-nums">
+          <span className="flex-1 text-right font-mono text-[10px] text-stone-400 tabular-nums">
             {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")} / 2:00
           </span>
         </div>
@@ -1174,7 +1182,7 @@ function ExplainerPlayer() {
           {SCENES.map((s, i) => (
             <button key={s.id} onClick={() => jumpTo(i)}
               className={cn("h-1.5 rounded-full transition-all duration-300",
-                i === sceneIdx ? "w-6 bg-amber-400" : "w-1.5 bg-stone-700 hover:bg-stone-500")}
+                i === sceneIdx ? "w-6 bg-amber-400" : "w-1.5 bg-stone-300 hover:bg-stone-400")}
             />
           ))}
         </div>
@@ -1357,7 +1365,7 @@ export default function DemoPage() {
   const surprisePots = pots.filter((p) => p.mode !== "LIVE_FEED");
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 text-stone-900">
       {revealPot && <RevealModal pot={revealPot} onClose={() => setRevealPot(null)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
@@ -1370,7 +1378,7 @@ export default function DemoPage() {
       <main className="space-y-6 pb-32 pt-4">
         {/* ── Live Pots ── */}
         <section className="px-4">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-stone-500">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-stone-400">
             Live Pots · {livePots.length} active
           </p>
           <div className="flex flex-col gap-3">
@@ -1385,7 +1393,7 @@ export default function DemoPage() {
         {/* ── Surprise Pots ── */}
         {surprisePots.length > 0 && (
           <section className="px-4">
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-stone-500">
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-stone-400">
               Surprise Pots · {surprisePots.length} locked
             </p>
             <div className="flex flex-col gap-3">

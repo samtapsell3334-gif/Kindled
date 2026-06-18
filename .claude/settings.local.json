@@ -38,7 +38,12 @@
       "Bash(git push *)",
       "Bash(which gh *)",
       "Bash(ssh -T git@github.com)",
-      "Bash(ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 && ssh -T git@github.com 2>&1)"
+      "Bash(ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 && ssh -T git@github.com 2>&1)",
+      "Bash(sed -i '' 's/border border-stone-800\\\\/60 bg-stone-900\\\\/60 px-4 py-3\\\\.5/border border-stone-200 bg-white px-4 py-3.5/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')",
+      "Bash(sed -i '' 's/border border-stone-800\\\\/60 bg-stone-900 shadow-xl shadow-black\\\\/40/border border-stone-200 bg-white shadow-xl shadow-stone-200\\\\/60/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')",
+      "Bash(sed -i '' 's/border-b border-stone-800\\\\/60 bg-stone-950\\\\/60/border-b border-stone-100 bg-stone-50/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')",
+      "Bash(sed -i '' 's/h-1\\\\.5 w-full cursor-pointer rounded-full bg-stone-800/h-1.5 w-full cursor-pointer rounded-full bg-stone-200/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')",
+      "Bash(sed -i '' 's/w-1\\\\.5 bg-stone-700 hover:bg-stone-500/w-1.5 bg-stone-300 hover:bg-stone-400/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')"
     ]
   }
 }
