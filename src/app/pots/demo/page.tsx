@@ -170,9 +170,9 @@ const CATALOGUE: CatalogItem[] = [
 
 const SCENES: ExplainerScene[] = [
   { id: 1, title: "The Gifting Paradox",
-    caption: "Would you rather your family receive fifteen cheap, duplicate plastic toys forgotten in a landfill... or combine forces to unlock one incredible, life-changing milestone? For kids, that's the dream mountain bike. For adults, it's a cosy log burner, a family sofa, or even a house deposit — completely out of reach for a single buyer's budget." },
-  { id: 2, title: "Mum Knows Best",
-    caption: "We all prefer those meaningful milestones... but directly asking loved ones for cash always feels incredibly awkward. Kindled fixes this — our 'Mum Knows Best' Checklist lets parents list lower-cost items. Relatives click to instantly Claim or Tick Off an item, securing it in real-time across all shared family links. No duplicates. No overspending. Guaranteed to be loved." },
+    caption: "Would you rather your family receive duplicate, forgotten gifts... or combine forces to unlock one incredible, life-changing milestone? For kids, that's the dream mountain bike. For adults, it's a cosy log burner, a family sofa, or even a house deposit — completely out of reach for a single buyer's budget." },
+  { id: 2, title: "Parent Knows Best",
+    caption: "We all prefer those meaningful milestones... but directly asking loved ones for money always feels incredibly awkward. Kindled fixes this — our 'Parent Knows Best' Checklist lets anyone curate the perfect list on behalf of a loved one. Relatives click to instantly Claim or Tick Off an item, securing it in real-time across all shared links. No duplicates. No guessing. Guaranteed to be loved." },
   { id: 3, title: "Continuous Gifting",
     caption: "Unlike temporary registries that expire, Kindled is a continuous ledger built to stack up over time. An incomplete birthday pot seamlessly carries over to Christmas... letting grandparents, aunts, and colleagues keep chipping in. By stacking minor contributions, you unlock massive purchasing power — turning ten minor gifts into a beautiful family sofa or a coding camp." },
   { id: 4, title: "Under Wraps Reveal",
@@ -346,7 +346,7 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
             className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3.5 py-2 text-[12px] font-semibold text-stone-900 shadow-md shadow-amber-200 active:scale-95"
           >
             <Share2 className="h-3.5 w-3.5" />
-            Share
+            Guide Buyers
           </motion.button>
         </div>
 
@@ -373,8 +373,19 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
 
 function LivePotCard({ pot, onRemove }: { pot: DemoPot; onRemove?: (id: string) => void }) {
   const pct = Math.min(100, Math.round((pot.raised / pot.goal) * 100));
-  const statusLabel = pct >= 100 ? "Funded 🎉" : pct >= 50 ? "Halfway there ✨" : "Just getting started";
-  const statusColor = pct >= 100 ? "text-emerald-500" : pct >= 50 ? "text-amber-500" : "text-orange-400";
+  const statusLabel =
+    pct >= 100 ? "Fully Lit 🔥" :
+    pct >= 75  ? "Blazing 🔥" :
+    pct >= 50  ? "Campfire 🏕️" :
+    pct >= 25  ? "Kindling 🪵" :
+    pct > 0    ? "Embers ✨" :
+                 "Spark 🕯️";
+  const statusColor =
+    pct >= 100 ? "text-emerald-500" :
+    pct >= 75  ? "text-orange-500" :
+    pct >= 50  ? "text-amber-500" :
+    pct >= 25  ? "text-amber-400" :
+                 "text-orange-400";
 
   return (
     <motion.article
@@ -491,7 +502,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
             )}
           >
             <Zap className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Trigger Reveal Ceremony
+            Reveal All 🎉
           </button>
         </div>
         <div className="mt-3 flex items-center gap-1.5 text-stone-500">
@@ -530,7 +541,7 @@ function MumChecklist({ onClaim }: { onClaim: (name: string) => void }) {
   return (
     <section className="px-4">
       <div className="mb-3">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Mum Knows Best</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Parent Knows Best</p>
         <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">Cheaper gift ideas 🛍️</p>
         <p className="text-[11px] text-stone-400 mt-0.5">Claim one to prevent duplicates</p>
       </div>
@@ -1021,7 +1032,7 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
     );
   }
 
-  /* ── Scene 2: Mum Knows Best Checklist ── */
+  /* ── Scene 2: Parent Knows Best Checklist ── */
   if (id === 2) {
     const items = [
       { label: "Storybook Collection", price: "£15", who: "👵 Grandma Linda", claimAt: 0.2 },
@@ -1033,7 +1044,7 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
         <div className="mb-1 flex items-center gap-2">
           <span className="text-base">👩</span>
           <div>
-            <p className="text-[10px] font-black text-white">Mum&apos;s Checklist</p>
+            <p className="text-[10px] font-black text-white">Parent&apos;s Checklist</p>
             <p className="text-[8px] text-stone-400">Real-time duplicate protection</p>
           </div>
         </div>
@@ -2106,7 +2117,7 @@ export default function DemoPage() {
           </section>
         )}
 
-        {/* ── Mum Knows Best ── */}
+        {/* ── Parent Knows Best ── */}
         <MumChecklist onClaim={handleClaim} />
 
         {/* ── Kindled Stars entry ── */}
