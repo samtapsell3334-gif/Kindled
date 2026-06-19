@@ -1185,7 +1185,6 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           <Lock className="h-3 w-3" />
           <span className="text-[11px]">Keeping it a secret until the big day</span>
         </div>
-        <FundingBar raised={pot.raised} goal={pot.goal} hideAmounts className="mt-2" />
         {pot.stackNote && (
           <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5">
             <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-violet-300" />
@@ -4522,9 +4521,10 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
             </div>
           </div>
 
-          {/* Heat progress */}
-          <div className="mt-3">
-            <FundingBar raised={pot.raised} goal={pot.goal} hideAmounts />
+          {/* Progress hidden from Billy */}
+          <div className="mt-3 flex items-center gap-1.5">
+            <Lock className="h-3 w-3 text-white/30 shrink-0" />
+            <span className="text-[11px] text-white/30 italic">Progress hidden until reveal day</span>
           </div>
 
           {/* Stack note */}
