@@ -54,6 +54,8 @@ interface DemoPot {
   claimedNote?: string;
   /** Secondary "stack to the next event" line shown beneath covered pots. */
   stackNote?: string;
+  /** True for checklist/"Mum Knows Best" items — hidden from receiver & contributor views. */
+  isChecklist?: boolean;
 }
 
 
@@ -138,7 +140,7 @@ const INITIAL_POTS: DemoPot[] = [
 
 const CHECKLIST_POTS: DemoPot[] = [
   {
-    id: "cl1", title: "LEGO Space Shuttle Explorer",
+    id: "cl1", title: "LEGO Space Shuttle Explorer", isChecklist: true,
     goal: 25, raised: 25, mode: "LIVE_FEED", continuous: false,
     eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
     contributors: 1, boosterEntries: 0,
@@ -149,7 +151,7 @@ const CHECKLIST_POTS: DemoPot[] = [
     claimedNote: "Shipped directly from Amazon · Arrives Dec 23",
   },
   {
-    id: "cl2", title: "Adventure Book Series (x3)",
+    id: "cl2", title: "Adventure Book Series (x3)", isChecklist: true,
     goal: 15, raised: 15, mode: "LIVE_FEED", continuous: false,
     eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
     contributors: 1, boosterEntries: 0,
@@ -160,7 +162,7 @@ const CHECKLIST_POTS: DemoPot[] = [
     claimedNote: "Bringing to the party in person",
   },
   {
-    id: "cl3", title: "Marvel Action Figure Set",
+    id: "cl3", title: "Marvel Action Figure Set", isChecklist: true,
     goal: 18, raised: 0, mode: "LIVE_FEED", continuous: false,
     eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
     contributors: 0, boosterEntries: 0,
@@ -198,7 +200,7 @@ const SCENES: ExplainerScene[] = [
   { id: 2, title: "Parent Knows Best",
     caption: "We all prefer those meaningful milestones... but directly asking loved ones for money always feels incredibly awkward. Kindled fixes this — our 'Parent Knows Best' Checklist lets anyone curate the perfect list on behalf of a loved one. Relatives click to instantly Claim or Tick Off an item, securing it in real-time across all shared links. No duplicates. No guessing. Guaranteed to be loved." },
   { id: 3, title: "Continuous Gifting",
-    caption: "Unlike temporary registries that expire, Kindled is a continuous ledger built to stack up over time. An incomplete birthday pot seamlessly carries over to Christmas... letting grandparents, aunts, and colleagues keep chipping in. By stacking minor contributions, you unlock massive purchasing power — turning ten minor gifts into a beautiful family sofa or a coding camp." },
+    caption: "Unlike temporary registries that expire, Kindled is a continuous ledger built to stack up over time. An incomplete birthday fire seamlessly carries over to Christmas... letting grandparents, aunts, and colleagues keep chipping in. By stacking minor contributions, you unlock massive purchasing power — turning ten minor gifts into a beautiful family sofa or a coding camp." },
   { id: 4, title: "Under Wraps Reveal",
     caption: "And we protect the surprise until the very end. Toggle on 'Under Wraps' mode and progress bars, totals, and greetings are completely hidden from the receiver. Contributions keep flowing in secretly, while the registry looks like a beautiful locked gift box. On the big day, trigger the cinematic Reveal Ceremony — digital fireworks, glitter, and a floating mosaic of notes from the family." },
   { id: 5, title: "Simple for Grandma",
@@ -646,7 +648,7 @@ function ProfileHeader({ potCount, totalGoal, onShare, isContributor }: {
 
         <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
           {[
-            { value: potCount, label: "pots", color: "text-amber-500" },
+            { value: potCount, label: "fires", color: "text-amber-500" },
             { value: `£${totalGoal.toLocaleString()}`, label: "goal", color: "text-orange-500" },
             { value: "4", label: "events", color: "text-rose-500" },
           ].map((stat) => (
@@ -711,12 +713,13 @@ function occasionLabel(occasion: Occasion): string {
 
 const KINDLE_AMOUNTS = [5, 10, 25, 50];
 
-function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected }: {
+function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideStackNote }: {
   pot: DemoPot;
   onRemove?: (id: string) => void;
   onKindle?: (id: string, amount: number) => void;
   onBuy?: (id: string) => void;
   onAmountSelected?: (pot: DemoPot, amount: number) => void;
+  hideStackNote?: boolean;
 }) {
   const [kindleOpen, setKindleOpen] = useState(false);
   const [kindled, setKindled] = useState(false);
@@ -823,7 +826,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected }: {
               <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
               <CountdownTimer targetIso={pot.eventIso} compact />
             </div>
-            {pot.stackNote && (
+            {pot.stackNote && !hideStackNote && (
               <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200/70 px-2.5 py-1.5">
                 <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
                 <p className="text-[10px] leading-snug text-amber-700">{pot.stackNote}</p>
@@ -1314,8 +1317,139 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
   );
 }
 
-function CatalogueGrid({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
+// ─── Creator sign-up modal (shown to contributors who click Catalogue) ────────
+function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setLoading(true);
+    try {
+      await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, name: "Contributor", type: "creator-from-contributor" }),
+      });
+    } catch { /* silent */ }
+    setSent(true);
+    setLoading(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-0">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", stiffness: 340, damping: 36 }}
+        className="relative z-10 w-full max-w-lg overflow-hidden rounded-t-3xl"
+        style={{ background: "linear-gradient(160deg, #1a0e08 0%, #2c1810 50%, #1a0e08 100%)" }}
+      >
+        {/* Accent stripe */}
+        <div className="h-[3px] w-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-500" />
+
+        {/* Ambient particles */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {CONFETTI_P.slice(0, 8).map((c) => (
+            <span key={c.id} className={cn("animate-confetti absolute rounded-sm opacity-40", c.color)}
+              style={{ left: c.left, top: 0, width: c.w, height: c.h,
+                "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
+          ))}
+        </div>
+
+        <div className="relative px-6 pb-10 pt-5">
+          {/* Handle */}
+          <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-white/20" />
+
+          {/* Close */}
+          <button onClick={onClose} className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20">
+            <X className="h-4 w-4" />
+          </button>
+
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500">
+              <Flame className="h-6 w-6 text-stone-900" strokeWidth={2} />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80">For You</p>
+              <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">
+                Start Your Own Kindle Board
+              </h2>
+            </div>
+          </div>
+
+          <p className="mb-5 text-[13px] leading-relaxed text-white/70">
+            Loved how easy it was to chip in for Billy? Create your family&apos;s continuous Spark Goals today.
+            Gather contributions year-round, stop plastic duplicate waste, and easily fund your family&apos;s
+            biggest milestone dreams.
+          </p>
+
+          {sent ? (
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex flex-col items-center gap-3 rounded-2xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 border border-amber-400/30 px-5 py-6"
+            >
+              {/* Golden reservation pass skeuomorph */}
+              <div className="relative flex w-full max-w-xs flex-col items-center overflow-hidden rounded-2xl border-2 border-dashed border-amber-400/60 bg-gradient-to-br from-amber-400 to-orange-500 px-6 py-5 shadow-xl shadow-amber-900/40">
+                <div className="absolute left-0 top-1/2 h-6 w-3 -translate-y-1/2 rounded-r-full bg-stone-900/40" />
+                <div className="absolute right-0 top-1/2 h-6 w-3 -translate-y-1/2 rounded-l-full bg-stone-900/40" />
+                <Sparkles className="h-7 w-7 text-stone-900 mb-1" strokeWidth={2} />
+                <p className="text-[9px] font-bold uppercase tracking-widest text-stone-900/70">Kindled · First Kindler Pass</p>
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-[19px] font-bold text-stone-900 text-center leading-tight mt-1">Reserved</p>
+                <p className="text-[11px] text-stone-900/70 mt-1">Your Kindle Board is being set up</p>
+              </div>
+              <p className="text-[12px] text-amber-300/80 text-center">We&apos;ll send your magic link to {email}</p>
+            </motion.div>
+          ) : (
+            <form onSubmit={(e) => { void handleSubmit(e); }} className="flex flex-col gap-3">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="w-full rounded-2xl border border-amber-400/30 bg-white/10 px-4 py-3.5 text-[14px] text-white placeholder-white/30 outline-none focus:border-amber-400/70 focus:ring-2 focus:ring-amber-400/20 transition-all"
+              />
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.01 }}
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900 shadow-xl shadow-amber-900/40 active:scale-95 disabled:opacity-60"
+              >
+                <Flame className="h-4.5 w-4.5" strokeWidth={2.5} />
+                {loading ? "Lighting the fire…" : "Create My First Fire"}
+              </motion.button>
+            </form>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function CatalogueGrid({ onAdd, isContributor, onContributorClick }: {
+  onAdd: (item: CatalogItem) => void;
+  isContributor?: boolean;
+  onContributorClick?: () => void;
+}) {
   const [active, setActive] = useState(false);
+
+  const handleActivate = () => {
+    if (isContributor) { onContributorClick?.(); return; }
+    setActive(true);
+  };
 
   if (!active) {
     return (
@@ -1324,7 +1458,7 @@ function CatalogueGrid({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
           whileHover={{ scale: 1.01, y: -1 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 400, damping: 28 }}
-          onClick={() => setActive(true)}
+          onClick={handleActivate}
           className="flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left"
           style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
         >
@@ -1333,7 +1467,9 @@ function CatalogueGrid({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
           </div>
           <div>
             <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-800">Catalogue Circling Mode</p>
-            <p className="text-[11px] text-stone-400">Circle any item with a marker pen to add it</p>
+            <p className="text-[11px] text-stone-400">
+              {isContributor ? "Start your own Kindle Board" : "Circle any item with a marker pen to add it"}
+            </p>
           </div>
         </motion.button>
       </section>
@@ -1397,7 +1533,7 @@ function MemoryCardView({ card }: { card: MemoryCard }) {
 }
 
 const REVEAL_ACTIONS = [
-  { icon: ShoppingBag, label: "Merge & Buy", desc: "Combine pots for one milestone", gradient: "from-amber-400 to-orange-500", textCol: "text-stone-900" },
+  { icon: ShoppingBag, label: "Merge & Buy", desc: "Combine fires for one milestone", gradient: "from-amber-400 to-orange-500", textCol: "text-stone-900" },
   { icon: CreditCard, label: "Top Up & Order", desc: "Pay the difference, ship now", gradient: "from-emerald-400 to-teal-500", textCol: "text-stone-900" },
   { icon: RefreshCw, label: "Roll Over", desc: "Carry balance to next event", gradient: "from-violet-500 to-fuchsia-500", textCol: "text-white" },
   { icon: Gift, label: "Redeem Vouchers", desc: "Currys · John Lewis · Amazon", gradient: "from-sky-500 to-blue-500", textCol: "text-white" },
@@ -4108,12 +4244,18 @@ function ReceiverView({ pots, onOpenStars, onShare }: {
   onOpenStars: () => void;
   onShare: () => void;
 }) {
-  // Single unified stream — all pots regardless of mode
-  const allActive = pots.filter((p) => !p.isClaimed);
-  const claimed = pots.filter((p) => p.isClaimed);
-  const occasion = nextMajorOccasion();
-  const occasionName = occasion === "christmas" ? "Christmas" : "10th Birthday";
-  const totalTarget = allActive.reduce((s, p) => s + p.goal, 0);
+  // Exclude checklist pots entirely — receiver must not see "Mum Knows Best" items
+  const sparkGoals = pots.filter((p) => !p.isClaimed && !p.isChecklist);
+  const claimed    = pots.filter((p) => p.isClaimed && !p.isChecklist);
+  const totalTarget = sparkGoals.reduce((s, p) => s + p.goal, 0);
+
+  // Dual countdown: always compute both Christmas AND Birthday
+  const now = new Date();
+  const yr  = now.getFullYear();
+  let xmasDate = new Date(yr, 11, 25); if (xmasDate <= now) xmasDate = new Date(yr + 1, 11, 25);
+  let bdayDate = new Date(yr, 5, 28);  if (bdayDate <= now) bdayDate = new Date(yr + 1, 5, 28);
+  const xmasDays = Math.ceil((xmasDate.getTime() - now.getTime()) / 86_400_000);
+  const bdayDays = Math.ceil((bdayDate.getTime() - now.getTime()) / 86_400_000);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff8f0] to-[#fdf9f5]">
@@ -4125,7 +4267,7 @@ function ReceiverView({ pots, onOpenStars, onShare }: {
               <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500">Your Kindled list</p>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500">Your Kindled Spark Goals</p>
               <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[24px] font-semibold text-stone-900 leading-tight">Hey Billy!</h1>
             </div>
           </div>
@@ -4142,27 +4284,52 @@ function ReceiverView({ pots, onOpenStars, onShare }: {
         </div>
         <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">share your list with the people who love you</p>
 
-        {/* Stats — no cash raised visible */}
-        <div className="mt-4 grid grid-cols-3 gap-2">
+        {/* ── Total Spark Goal Value hero ── */}
+        <div className="mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-stone-900 to-stone-800 px-5 py-4 shadow-xl"
+          style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.06)" }}>
+          <div className="h-[2px] w-full rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 mb-3" />
+          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80">Total Spark Goal Value</p>
+          <p style={{ fontFamily: "var(--font-display)" }} className="text-[36px] font-bold text-white leading-none mt-0.5">
+            £{totalTarget.toLocaleString()}
+          </p>
+          <p className="mt-1.5 text-[11px] leading-snug text-white/50">
+            Across {sparkGoals.length} Kindle Fires — all held under wraps until reveal day
+          </p>
+        </div>
+
+        {/* ── Dual event countdowns ── */}
+        <div className="mt-3 grid grid-cols-2 gap-2">
           {[
-            { value: `${allActive.length}`, label: "gifts", color: "text-amber-500" },
-            { value: `£${totalTarget.toLocaleString()}`, label: "total target", color: "text-orange-500" },
-            { value: occasionName, label: "next occasion", color: "text-violet-500" },
-          ].map((s) => (
-            <div key={s.label} className="rounded-2xl bg-white px-2 py-3 text-center shadow-sm" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04)" }}>
-              <p className={cn("text-[14px] font-bold leading-tight", s.color)} style={{ fontFamily: "var(--font-display)" }}>{s.value}</p>
-              <p className="text-[9px] text-stone-400 leading-tight mt-0.5">{s.label}</p>
+            { Icon: TreePine, label: "Christmas", days: xmasDays, color: "text-red-500", accent: "from-red-500 to-amber-500", bg: "bg-red-50", border: "border-red-200/60" },
+            { Icon: Cake,     label: "10th Birthday", days: bdayDays, color: "text-violet-500", accent: "from-violet-500 to-fuchsia-400", bg: "bg-violet-50", border: "border-violet-200/60" },
+          ].map(({ Icon, label, days, color, accent, bg, border }) => (
+            <div key={label} className={cn("overflow-hidden rounded-2xl border px-3 py-3", bg, border)}>
+              <div className={cn("mb-1.5 h-[2px] w-full rounded-full bg-gradient-to-r", accent)} />
+              <div className="flex items-center gap-1.5 mb-1">
+                <Icon className={cn("h-4 w-4 shrink-0", color)} strokeWidth={1.75} />
+                <p className="text-[10px] font-semibold text-stone-500 truncate">{label}</p>
+              </div>
+              <p style={{ fontFamily: "var(--font-display)" }} className={cn("text-[28px] font-bold leading-none", color)}>{days}</p>
+              <p className="text-[9px] text-stone-400 mt-0.5">days away</p>
             </div>
           ))}
+        </div>
+
+        {/* Continuous-fire note */}
+        <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200/60 bg-amber-50/80 px-3 py-2.5">
+          <Flame className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" strokeWidth={2} />
+          <p className="text-[11px] leading-snug text-amber-800/80">
+            These fires are continuous. A magical Reveal Ceremony will ignite on your next big occasion even if your Kindle Goals are only partially stoked!
+          </p>
         </div>
       </div>
 
       <div className="space-y-6 pb-20 px-4">
-        {/* ── Unified wishlist stream — every pot locked ── */}
+        {/* ── Unified Spark Goals stream — every fire locked under wraps ── */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-3">Your wish list · all under wraps</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-3">Your Spark Goals · all under wraps</p>
           <div className="flex flex-col gap-3">
-            {allActive.map((pot, i) => (
+            {sparkGoals.map((pot, i) => (
               <ReceiverPotCard key={pot.id} pot={pot} index={i} />
             ))}
           </div>
@@ -4240,6 +4407,7 @@ export default function DemoPage() {
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [pendingContribution, setPendingContribution] = useState<{ pot: DemoPot; amount: number } | null>(null);
   const [previewReceiver, setPreviewReceiver] = useState(false);
+  const [showCreatorModal, setShowCreatorModal] = useState(false);
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));
@@ -4310,6 +4478,7 @@ export default function DemoPage() {
       {revealPot && <RevealModal pot={revealPot} onClose={() => setRevealPot(null)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showNewGift && <NewGiftSheet onAdd={handleAddNewGift} onClose={() => setShowNewGift(false)} />}
+      <AnimatePresence>{showCreatorModal && <CreatorSignUpModal onClose={() => setShowCreatorModal(false)} />}</AnimatePresence>
       {pendingContribution && (
         <ContributionPromptModal
           pot={pendingContribution.pot}
@@ -4355,20 +4524,21 @@ export default function DemoPage() {
         <section className="px-4">
           <div className="mb-3">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
-              {isContributor ? "Active Pots" : "Gift List"}
+              {isContributor ? "Active Spark Goals" : "Gift List"}
             </p>
             <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">
-              {activePots.length} {isContributor ? "pots to kindle" : "gifts to kindle or buy"}
+              {activePots.filter((p) => !p.isChecklist).length} {isContributor ? "fires to stoke" : "gifts to kindle or buy"}
             </p>
           </div>
           <div className="flex flex-col gap-3">
-            {activePots.map((pot) => (
+            {(isContributor ? activePots.filter((p) => !p.isChecklist) : activePots).map((pot) => (
               <LivePotCard
                 key={pot.id}
                 pot={pot}
                 onKindle={handleKindle}
                 onBuy={handleBuy}
                 onAmountSelected={(p, amt) => setPendingContribution({ pot: p, amount: amt })}
+                hideStackNote={isContributor}
                 {...(!isContributor && { onRemove: (id: string) => setPots((p) => p.filter((x) => x.id !== id)) })}
               />
             ))}
@@ -4571,7 +4741,11 @@ export default function DemoPage() {
         )}
 
         {/* ── Catalogue — pot-creation tool, owner only ── */}
-        {!isContributor && <CatalogueGrid onAdd={handleAddItem} />}
+        <CatalogueGrid
+          onAdd={handleAddItem}
+          isContributor={isContributor}
+          onContributorClick={() => setShowCreatorModal(true)}
+        />
 
         {/* ── Explainer ── */}
         <ExplainerPlayer />
