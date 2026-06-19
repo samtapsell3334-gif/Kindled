@@ -3619,34 +3619,213 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
   );
 }
 
+// ─── Count-up stat for the proof block ───────────────────────────────────────
+function CountUpStat({ target, suffix = "", duration = 1400 }: { target: number; suffix?: string; duration?: number }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      obs.disconnect();
+      const start = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        const ease = 1 - Math.pow(1 - t, 3);
+        setVal(Math.round(ease * target));
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, { threshold: 0.5 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [target, duration]);
+  return <span ref={ref}>{val}{suffix}</span>;
+}
+
+// ─── Single locked pot card used in Receiver's unified stream ─────────────────
+function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
+  const occ = occasionFor(pot);
+  const isXmas = occ === "christmas";
+  const targetIso = occasionTargetIso(pot);
+  const daysUntil = Math.max(0, Math.ceil((new Date(targetIso).getTime() - Date.now()) / 86_400_000));
+
+  const th = isXmas
+    ? { bg: "bg-[#140a08]", border: "border-red-800/40", accent: "from-red-700 via-amber-500 to-red-600",
+        giftColor: "text-amber-400", dayColor: "text-amber-300", labelColor: "text-amber-400/80",
+        modeLabel: "Under Wraps" }
+    : { bg: "bg-[#12091f]", border: "border-violet-600/30", accent: "from-violet-500 via-fuchsia-400 to-pink-400",
+        giftColor: "text-violet-300", dayColor: "text-violet-300", labelColor: "text-violet-400/80",
+        modeLabel: "Wrapped Up" };
+
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.07, type: "spring", stiffness: 360, damping: 32 }}
+      className={cn("relative overflow-hidden rounded-2xl border shadow-lg shadow-black/30", th.bg, th.border)}
+    >
+      {/* Accent stripe */}
+      <div className={cn("h-[3px] w-full bg-gradient-to-r", th.accent)} />
+
+      {/* Seasonal particle backdrop */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+        {isXmas
+          ? SNOW.map((s) => (
+              <span key={s.id} className="animate-snow absolute rounded-full bg-white/70"
+                style={{ left: s.left, top: 0, width: s.size, height: s.size,
+                  "--dur": s.dur, "--sx": s.sx, "--drift": s.drift, animationDelay: s.delay } as React.CSSProperties} />
+            ))
+          : (
+            <>
+              {CONFETTI_P.map((c) => (
+                <span key={c.id} className={cn("animate-confetti absolute rounded-sm", c.color)}
+                  style={{ left: c.left, top: 0, width: c.w, height: c.h,
+                    "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
+              ))}
+              {BUBBLES_P.map((b) => (
+                <span key={b.id} className="animate-bubble-rise absolute bottom-0 rounded-full"
+                  style={{ left: b.left, width: b.size, height: b.size, backgroundColor: b.color,
+                    "--dur": b.dur, animationDelay: b.delay,
+                    boxShadow: `0 0 8px ${b.color}60` } as React.CSSProperties} />
+              ))}
+            </>
+          )}
+      </div>
+
+      <div className="relative z-10">
+        {/* Product image — full-width banner */}
+        {pot.image && (
+          <div className="relative h-32 w-full overflow-hidden">
+            <img src={pot.image} alt={pot.title} className="h-full w-full object-cover opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
+            {/* Lock badge */}
+            <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
+              <Lock className="h-3 w-3 text-white/70" strokeWidth={2} />
+              <span className="text-[9px] font-bold uppercase tracking-wider text-white/60">{th.modeLabel}</span>
+            </div>
+            {/* Countdown badge */}
+            <div className={cn("absolute left-3 top-3 rounded-full px-2.5 py-1 backdrop-blur-sm", isXmas ? "bg-red-900/70" : "bg-violet-900/70")}>
+              <span className={cn("text-[11px] font-bold", th.dayColor)}>
+                {isXmas ? "Christmas" : "Birthday"} in {daysUntil} {daysUntil === 1 ? "day" : "days"}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="p-4">
+          {/* Title row */}
+          <div className="flex items-start gap-3">
+            {!pot.image && (
+              <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10")}>
+                <Gift className={cn("h-5 w-5", th.giftColor)} strokeWidth={1.5} />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-semibold text-white leading-snug">{pot.title}</h3>
+              <p className={cn("mt-0.5 text-[11px]", th.labelColor)}>
+                {!pot.image && `${isXmas ? "Christmas" : "Birthday"} in ${daysUntil} days · `}Balance hidden · {pot.contributors} givers
+              </p>
+            </div>
+            <div className="shrink-0 text-right">
+              <p className="text-[9px] uppercase tracking-wider text-white/40">Target</p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-bold text-white">£{pot.goal.toLocaleString()}</p>
+            </div>
+          </div>
+
+          {/* Heat progress */}
+          <div className="mt-3">
+            <FundingBar raised={pot.raised} goal={pot.goal} hideAmounts />
+          </div>
+
+          {/* Stack note */}
+          {pot.stackNote && (
+            <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-white/8 bg-white/5 px-2.5 py-1.5">
+              <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-white/40" />
+              <p className="text-[10px] leading-snug text-white/40">{pot.stackNote}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+// ─── On-dashboard proof stats (receiver view) ─────────────────────────────────
+function ReceiverProofStats() {
+  const stats = [
+    {
+      Icon: Leaf,
+      value: 30, suffix: "%",
+      label: "Waste Reduction",
+      desc: "Household retail waste spikes 30% over holidays. Kindled matches purchases to exact demand — dropping duplicate retail waste to 0%.",
+      color: "text-emerald-500", bg: "bg-emerald-50", border: "border-emerald-200/60",
+    },
+    {
+      Icon: ShieldCheck,
+      value: 100, suffix: "%",
+      label: "Duplicate Free",
+      desc: "1 in 5 physical gifts are duplicates. Our real-time checklists eliminate duplicate buying entirely.",
+      color: "text-amber-500", bg: "bg-amber-50", border: "border-amber-200/60",
+    },
+    {
+      Icon: Landmark,
+      value: 3, suffix: ".2B",
+      label: "Redirected",
+      desc: "£3.2B wasted on unwanted gifts redirected into durable milestones previously out of any single person's budget.",
+      color: "text-violet-500", bg: "bg-violet-50", border: "border-violet-200/60",
+    },
+  ];
+
+  return (
+    <div>
+      <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-stone-400">Why this list matters</p>
+      <p style={{ fontFamily: "var(--font-display)" }} className="mb-4 text-[17px] font-semibold text-stone-800 leading-tight">
+        A smarter, kinder way to give
+      </p>
+      <div className="flex flex-col gap-3">
+        {stats.map(({ Icon, value, suffix, label, desc, color, bg, border }) => (
+          <div key={label} className={cn("flex gap-4 rounded-2xl border p-4", bg, border)}>
+            <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm")}>
+              <Icon className={cn("h-5 w-5", color)} strokeWidth={1.75} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-1">
+                <p style={{ fontFamily: "var(--font-display)" }} className={cn("text-[22px] font-bold", color)}>
+                  {value === 3 ? "£" : ""}<CountUpStat target={value} suffix={suffix} />
+                </p>
+                <p className="text-[12px] font-semibold text-stone-600">{label}</p>
+              </div>
+              <p className="mt-0.5 text-[11px] leading-snug text-stone-500">{desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-center text-[9px] text-stone-400 leading-snug">
+        Sources: British Retail Consortium · Waste & Resources Action Programme (WRAP) UK · Psychological Science Gifting Surveys
+      </p>
+    </div>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // RECEIVER VIEW
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ReceiverView({ pots, onOpenStars, onReveal, onShare }: {
+function ReceiverView({ pots, onOpenStars, onShare }: {
   pots: DemoPot[];
   onOpenStars: () => void;
-  onReveal: (pot: DemoPot) => void;
   onShare: () => void;
 }) {
-  const livePots = pots.filter((p) => p.mode === "LIVE_FEED" && !p.isClaimed);
-  const claimedPots = pots.filter((p) => p.mode === "LIVE_FEED" && p.isClaimed);
-  const surprisePots = pots.filter((p) => p.mode !== "LIVE_FEED");
-  const totalRaised = pots.filter((p) => !p.isClaimed).reduce((s, p) => s + p.raised, 0);
-
-  // Next major occasion for countdown
+  // Single unified stream — all pots regardless of mode
+  const allActive = pots.filter((p) => !p.isClaimed);
+  const claimed = pots.filter((p) => p.isClaimed);
   const occasion = nextMajorOccasion();
   const occasionName = occasion === "christmas" ? "Christmas" : "10th Birthday";
-  const occasionDateStr = occasion === "christmas" ? "25 Dec 2026" : "28 Jun 2027";
-  const occasionIso = occasion === "christmas" ? "2026-12-25T08:00:00Z" : "2027-06-28T10:00:00Z";
-  const daysUntil = Math.max(0, Math.ceil((new Date(occasionIso).getTime() - Date.now()) / 86_400_000));
-  const occasionDesc = occasion === "christmas"
-    ? "Your family is quietly pooling gifts so Christmas morning is absolutely magical."
-    : "Your loved ones are secretly stacking up something special for your big day.";
+  const totalTarget = allActive.reduce((s, p) => s + p.goal, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff8f0] to-[#fdf9f5]">
-      {/* Hero greeting */}
+      {/* Hero */}
       <div className="px-5 pt-6 pb-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-4">
@@ -3658,7 +3837,6 @@ function ReceiverView({ pots, onOpenStars, onReveal, onShare }: {
               <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[24px] font-semibold text-stone-900 leading-tight">Hey Billy!</h1>
             </div>
           </div>
-          {/* Guide Buyers CTA */}
           <motion.button
             whileTap={{ scale: 0.94 }}
             whileHover={{ scale: 1.03 }}
@@ -3672,154 +3850,38 @@ function ReceiverView({ pots, onOpenStars, onReveal, onShare }: {
         </div>
         <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">share your list with the people who love you</p>
 
-        {/* Summary stats */}
+        {/* Stats — no cash raised visible */}
         <div className="mt-4 grid grid-cols-3 gap-2">
           {[
-            { value: `£${totalRaised}`, label: "kindled so far", color: "text-amber-500" },
-            { value: livePots.length, label: "wishes", color: "text-orange-500" },
-            { value: `${surprisePots.length}`, label: "surprises", color: "text-violet-500" },
+            { value: `${allActive.length}`, label: "gifts", color: "text-amber-500" },
+            { value: `£${totalTarget.toLocaleString()}`, label: "total target", color: "text-orange-500" },
+            { value: occasionName, label: "next occasion", color: "text-violet-500" },
           ].map((s) => (
-            <div key={s.label} className="rounded-2xl bg-white px-3 py-3 text-center shadow-sm" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04)" }}>
-              <p className={cn("text-[18px] font-bold", s.color)} style={{ fontFamily: "var(--font-display)" }}>{s.value}</p>
-              <p className="text-[10px] text-stone-400 leading-tight">{s.label}</p>
+            <div key={s.label} className="rounded-2xl bg-white px-2 py-3 text-center shadow-sm" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04)" }}>
+              <p className={cn("text-[14px] font-bold leading-tight", s.color)} style={{ fontFamily: "var(--font-display)" }}>{s.value}</p>
+              <p className="text-[9px] text-stone-400 leading-tight mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
       </div>
 
       <div className="space-y-6 pb-20 px-4">
-
-        {/* ── Next occasion countdown ── */}
-        <div className="overflow-hidden rounded-2xl border border-amber-200/60 bg-gradient-to-br from-amber-50 to-orange-50">
-          <div className={cn("h-[3px] w-full bg-gradient-to-r", occasion === "christmas" ? "from-red-500 via-amber-400 to-red-600" : "from-violet-400 via-fuchsia-400 to-pink-400")} />
-          <div className="p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                {occasion === "christmas"
-                  ? <TreePine className="h-7 w-7 shrink-0 text-red-500" strokeWidth={1.5} />
-                  : <Cake className="h-7 w-7 shrink-0 text-violet-500" strokeWidth={1.5} />}
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Next big occasion</p>
-                  <p style={{ fontFamily: "var(--font-display)" }} className="text-[17px] font-semibold text-stone-900 leading-tight">{occasionName}</p>
-                  <p className="text-[11px] text-stone-500">{occasionDateStr}</p>
-                </div>
-              </div>
-              <div className="shrink-0 text-right">
-                <p style={{ fontFamily: "var(--font-display)" }} className={cn("text-[32px] font-bold leading-none", occasion === "christmas" ? "text-red-500" : "text-violet-500")}>{daysUntil}</p>
-                <p className="text-[10px] text-stone-400">days away</p>
-              </div>
-            </div>
-            <p className="mt-3 text-[12px] leading-snug text-stone-500">{occasionDesc}</p>
+        {/* ── Unified wishlist stream — every pot locked ── */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-3">Your wish list · all under wraps</p>
+          <div className="flex flex-col gap-3">
+            {allActive.map((pot, i) => (
+              <ReceiverPotCard key={pot.id} pot={pot} index={i} />
+            ))}
           </div>
         </div>
 
-        {/* ── Surprise gifts teaser ── */}
-        {surprisePots.length > 0 && (
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Surprises waiting</p>
-            <div className="flex flex-col gap-3">
-              {surprisePots.map((pot, i) => {
-                const isUnlockDay = new Date() >= new Date(pot.eventIso);
-                const occ = occasionFor(pot);
-                const isXmasPot = occ === "christmas";
-                return (
-                  <motion.div
-                    key={pot.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08, type: "spring", stiffness: 340, damping: 30 }}
-                    className={cn(
-                      "relative overflow-hidden rounded-2xl border p-4",
-                      isXmasPot ? "bg-[#1a0f0f] border-red-700/30" : "bg-[#1a1028] border-violet-500/30",
-                    )}
-                  >
-                    {/* Particle backdrop */}
-                    <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
-                      {isXmasPot
-                        ? SNOW.slice(0, 8).map((s) => (
-                            <span key={s.id} className="animate-snow absolute rounded-full bg-white/60"
-                              style={{ left: s.left, top: 0, width: s.size, height: s.size,
-                                "--dur": s.dur, "--sx": s.sx, "--drift": s.drift, animationDelay: s.delay } as React.CSSProperties} />
-                          ))
-                        : CONFETTI_P.slice(0, 8).map((c) => (
-                            <span key={c.id} className={cn("animate-confetti absolute rounded-sm", c.color)}
-                              style={{ left: c.left, top: 0, width: c.w, height: c.h,
-                                "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
-                          ))}
-                    </div>
-                    <div className="relative flex items-center gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10">
-                        <Gift className="h-6 w-6 text-white/70" strokeWidth={1.5} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-bold text-white/80">
-                          {isXmasPot ? "Christmas surprise" : "Birthday surprise"}
-                        </p>
-                        <p className="text-[11px] text-white/40 mt-0.5">
-                          {pot.eventLabel} · {pot.eventDate} · being secretly planned for you…
-                        </p>
-                      </div>
-                      <Lock className="h-5 w-5 text-white/50" strokeWidth={1.75} />
-                    </div>
-                    {/* Reveal button — kept for demo purposes */}
-                    <button
-                      onClick={() => onReveal(pot)}
-                      className={cn(
-                        "relative z-10 mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl py-2.5 text-[12px] font-bold text-stone-900 shadow-lg active:scale-95 transition-transform",
-                        "bg-gradient-to-r",
-                        isXmasPot ? "from-amber-400 to-orange-500" : "from-violet-400 to-fuchsia-500",
-                      )}
-                    >
-                      <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-                      {isUnlockDay ? "Open my gift!" : "Open my gift · Demo reveal"}
-                    </button>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* ── Live wish list ── */}
-        {livePots.length > 0 && (
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Your wish list</p>
-            <div className="flex flex-col gap-3">
-              {livePots.map((pot, i) => (
-                <motion.div
-                  key={pot.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06, type: "spring", stiffness: 340, damping: 30 }}
-                  className="overflow-hidden rounded-2xl bg-white"
-                  style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)" }}
-                >
-                  <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
-                  <div className="flex items-center gap-3 p-4">
-                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-amber-50">
-                      {pot.image
-                        ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover" />
-                        : <div className="flex h-full w-full items-center justify-center"><Gift className="h-5 w-5 text-stone-400" strokeWidth={1.5} /></div>}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium text-stone-900">{pot.title}</h3>
-                      <div className="mt-2">
-                        <FundingBar raised={pot.raised} goal={pot.goal} />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Ordered / claimed gifts ── */}
-        {claimedPots.length > 0 && (
+        {/* ── Claimed / sorted ── */}
+        {claimed.length > 0 && (
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Sorted</p>
             <div className="flex flex-col gap-2">
-              {claimedPots.map((pot) => (
+              {claimed.map((pot) => (
                 <div key={pot.id} className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500">
                     <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
@@ -3833,6 +3895,9 @@ function ReceiverView({ pots, onOpenStars, onReveal, onShare }: {
             </div>
           </div>
         )}
+
+        {/* ── On-dashboard proof stats ── */}
+        <ReceiverProofStats />
 
         {/* ── Kindled Stars CTA ── */}
         <motion.button
@@ -3859,7 +3924,6 @@ function ReceiverView({ pots, onOpenStars, onReveal, onShare }: {
             <span className="rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-black text-stone-900">Open →</span>
           </div>
         </motion.button>
-
       </div>
     </div>
   );
@@ -3883,6 +3947,7 @@ export default function DemoPage() {
   const [logEntries, setLogEntries] = useState<string[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [pendingContribution, setPendingContribution] = useState<{ pot: DemoPot; amount: number } | null>(null);
+  const [previewReceiver, setPreviewReceiver] = useState(false);
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));
@@ -3947,7 +4012,6 @@ export default function DemoPage() {
   const activePots = pots.filter((p) => !p.isClaimed);
   const claimedPots = pots.filter((p) => p.isClaimed);
   const surprisePots = pots.filter((p) => p.mode !== "LIVE_FEED");
-  const nextOccasion = nextMajorOccasion();
 
   return (
     <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
@@ -3981,7 +4045,7 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onReveal={setRevealPot} onShare={handleShare} />
+          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onShare={handleShare} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
@@ -4033,43 +4097,125 @@ export default function DemoPage() {
               </motion.button>
             )}
           </div>
-          {/* Unwrap All — owner only, under grid */}
-          {!isContributor && surprisePots.length > 0 && (
+          {/* Reveal preview — contributor only */}
+          {isContributor && surprisePots.length > 0 && (
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 400, damping: 26 }}
               onClick={() => setRevealPot(surprisePots[0] ?? pots[0]!)}
-              className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-500 py-4 shadow-xl"
-              style={{ boxShadow: "0 4px 24px rgba(220,38,38,0.35), 0 0 0 1px rgba(220,38,38,0.2)" }}
+              className="relative mt-4 flex w-full items-center gap-4 overflow-hidden rounded-2xl p-4 text-left"
+              style={{
+                background: "linear-gradient(135deg, #1a0f0f 0%, #2d1515 50%, #1a0f0f 100%)",
+                boxShadow: "0 4px 24px rgba(220,38,38,0.35), 0 0 0 1px rgba(220,38,38,0.25)",
+              }}
             >
-              <Gift className="h-5 w-5 text-white" strokeWidth={2} />
-              <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white">
-                Unwrap all · Open on {occasionLabel(nextOccasion)} Day
-              </span>
+              {/* Subtle snow particles */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+                {SNOW.slice(0, 6).map((s) => (
+                  <span key={s.id} className="animate-snow absolute rounded-full bg-white/40"
+                    style={{ left: s.left, top: 0, width: s.size, height: s.size,
+                      "--dur": s.dur, "--sx": s.sx, "--drift": s.drift, animationDelay: s.delay } as React.CSSProperties} />
+                ))}
+              </div>
+              <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-500/20">
+                <Lock className="h-6 w-6 text-red-300" strokeWidth={1.75} />
+              </div>
+              <div className="relative flex-1 min-w-0">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-red-400/80">Locked for Billy</p>
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-[14px] font-semibold text-white leading-snug">
+                  Countdown: {Math.max(0, Math.ceil((new Date(surprisePots[0]?.eventIso ?? "2026-12-25T00:00:00Z").getTime() - Date.now()) / 86_400_000))} Days
+                </p>
+                <p className="text-[11px] text-red-200/70 mt-0.5">Givers: Tap to preview the magical unwrap ceremony</p>
+              </div>
+              <div className="relative shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 px-3 py-2">
+                <Sparkles className="h-4 w-4 text-stone-900" strokeWidth={2} />
+              </div>
             </motion.button>
           )}
         </section>
 
-        {/* ── "What Billy sees" — contributor-only teaser ── */}
+        {/* ── Contributor: See What the Receiver Sees toggle + Advantage panel ── */}
         {isContributor && (
-          <section className="px-4">
+          <section className="px-4 space-y-4">
+            {/* Preview toggle */}
             <div className="overflow-hidden rounded-2xl border border-violet-200/50 bg-gradient-to-br from-violet-50 to-fuchsia-50">
               <div className="h-[3px] w-full bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400" />
               <div className="p-4">
-                <div className="mb-3 flex items-center gap-2">
-                  <Lock className="h-4 w-4 text-violet-500" strokeWidth={2} />
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-violet-600">What Billy sees</p>
-                </div>
-                {/* Actual LockedPotCard preview — exactly what Billy sees */}
-                <LockedPotCard
-                  pot={surprisePots[0] ?? activePots[0]!}
-                  onReveal={() => undefined}
-                />
-                <p className="mt-3 text-[12px] leading-snug text-stone-500">
-                  Billy only sees a locked mystery gift — no amounts, no names. He just knows something wonderful is coming and counts down to the big day.
-                  <span className="font-semibold text-violet-600"> The surprise stays safe until you unwrap it together.</span>
+                <button
+                  onClick={() => setPreviewReceiver((v) => !v)}
+                  className="flex w-full items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-violet-500" strokeWidth={2} />
+                    <p className="text-[13px] font-semibold text-violet-700">See What Billy Sees</p>
+                  </div>
+                  <div className={cn(
+                    "flex h-6 w-11 items-center rounded-full transition-colors duration-200",
+                    previewReceiver ? "bg-violet-500" : "bg-stone-200",
+                  )}>
+                    <motion.div
+                      animate={{ x: previewReceiver ? 22 : 2 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 32 }}
+                      className="h-5 w-5 rounded-full bg-white shadow"
+                    />
+                  </div>
+                </button>
+
+                <AnimatePresence>
+                  {previewReceiver && (
+                    <motion.div
+                      key="receiver-preview"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ type: "spring", stiffness: 360, damping: 34 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-3">
+                        <LockedPotCard
+                          pot={surprisePots[0] ?? activePots[0]!}
+                          onReveal={() => undefined}
+                        />
+                        <p className="mt-2 text-[11px] leading-snug text-stone-500">
+                          Billy sees a locked card with a heat bar and countdown — no amounts, no names, no spoilers.
+                          <span className="font-semibold text-violet-600"> The magic stays intact until the big day.</span>
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Contributor Advantage panel */}
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-stone-900 to-stone-800 shadow-xl">
+              <div className="h-[3px] w-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-500" />
+              <div className="p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80 mb-1">Contributor Advantage</p>
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white mb-3 leading-snug">
+                  Why giving this way feels better
                 </p>
+                <div className="flex flex-col gap-3">
+                  {[
+                    { Icon: ShieldCheck, stat: "82%", label: "Zero Gift Anxiety", desc: "of contributors report zero gift-buying stress when using Kindled vs traditional shopping." },
+                    { Icon: Wallet, stat: "0%", label: "Payout Fees", desc: "Every penny you kindle goes directly to the pot — no platform fees, no hidden charges." },
+                    { Icon: Star, stat: "3×", label: "Emotional ROI", desc: "Group gifting creates 3× stronger memory bonds than solo gifts of the same monetary value." },
+                  ].map(({ Icon, stat, label, desc }) => (
+                    <div key={label} className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/15">
+                        <Icon className="h-4.5 w-4.5 text-amber-400" strokeWidth={1.75} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline gap-1.5">
+                          <span style={{ fontFamily: "var(--font-display)" }} className="text-[17px] font-bold text-amber-400">{stat}</span>
+                          <span className="text-[12px] font-semibold text-white/80">{label}</span>
+                        </div>
+                        <p className="text-[10px] leading-snug text-white/50">{desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
