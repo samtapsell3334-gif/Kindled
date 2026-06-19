@@ -356,7 +356,210 @@ function useAudio() {
     } catch { /* silent */ }
   }, [get, pluck]);
 
-  return { thump, chime, sparkleBlip };
+  // ── Brazilian samba fanfare ─────────────────────────────────────────────────
+  // Punchy brass stabs + driving samba percussion. Fires on reveal ceremony.
+  // Synthesised entirely in Web Audio: no network requests, no external files.
+  const sambaFanfare = useCallback(() => {
+    try {
+      const c = get();
+      const now = c.currentTime + 0.05;
+      const BPM = 128;
+      const beat = 60 / BPM;        // 0.469 s
+      const bar  = beat * 4;        // 1.875 s
+
+      // Master limiter — prevents clipping when all layers stack.
+      const limiter = c.createDynamicsCompressor();
+      limiter.threshold.value = -3;
+      limiter.knee.value = 6;
+      limiter.ratio.value = 20;
+      limiter.attack.value = 0.001;
+      limiter.release.value = 0.08;
+      limiter.connect(c.destination);
+
+      // ── Brass stab: sawtooth + bandpass, punchy staccato envelope ──────────
+      const brassStab = (t: number, freq: number, gain = 0.38) => {
+        const mg = c.createGain();
+        mg.gain.setValueAtTime(0, t);
+        mg.gain.linearRampToValueAtTime(gain, t + 0.012);
+        mg.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+        mg.connect(limiter);
+
+        const osc = c.createOscillator();
+        osc.type = "sawtooth";
+        osc.frequency.value = freq;
+
+        const bpf = c.createBiquadFilter();
+        bpf.type = "bandpass";
+        bpf.frequency.value = 1100;
+        bpf.Q.value = 1.8;
+
+        // Slight pitch-bend on attack for natural brass articulation
+        osc.frequency.setValueAtTime(freq * 1.03, t);
+        osc.frequency.exponentialRampToValueAtTime(freq, t + 0.04);
+
+        osc.connect(bpf); bpf.connect(mg);
+        osc.start(t); osc.stop(t + 0.28);
+      };
+
+      // ── Chord voicings ──────────────────────────────────────────────────────
+      // Bb major (I): Bb3, Eb4, G4, Bb4
+      const Bb = [233.08, 311.13, 392.0, 466.16];
+      // F dominant (V): F4, A4, C5, Eb5
+      const Fdom = [349.23, 440.0, 523.25, 622.25];
+      // Bb upper (climax): Bb4, Eb5, G5, Bb5
+      const BbHi = [466.16, 622.25, 783.99, 932.33];
+
+      const stab = (t: number, chord: number[], gain = 0.38) =>
+        chord.forEach((f, i) => brassStab(t + i * 0.007, f, gain));
+
+      // ── Surdo bass drum: pitched sine sweep 90→35 Hz ───────────────────────
+      const surdo = (t: number, gain = 0.65) => {
+        const g = c.createGain();
+        g.gain.setValueAtTime(gain, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+        g.connect(limiter);
+        const o = c.createOscillator();
+        o.type = "sine";
+        o.frequency.setValueAtTime(95, t);
+        o.frequency.exponentialRampToValueAtTime(32, t + 0.28);
+        o.connect(g); o.start(t); o.stop(t + 0.4);
+      };
+
+      // ── Tamborim: filtered noise burst, very short (samba snare-rim) ───────
+      const tamborim = (t: number, gain = 0.18) => {
+        const len = Math.ceil(c.sampleRate * 0.055);
+        const buf = c.createBuffer(1, len, c.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+        const src = c.createBufferSource();
+        src.buffer = buf;
+        const bpf = c.createBiquadFilter();
+        bpf.type = "bandpass"; bpf.frequency.value = 3800; bpf.Q.value = 4;
+        const hpf = c.createBiquadFilter();
+        hpf.type = "highpass"; hpf.frequency.value = 2200;
+        const g = c.createGain();
+        g.gain.setValueAtTime(gain, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.065);
+        src.connect(bpf); bpf.connect(hpf); hpf.connect(g); g.connect(limiter);
+        src.start(t);
+      };
+
+      // ── Agogô bell: two-tone metallic cowbell (sine cluster) ───────────────
+      const agogo = (t: number, hi: boolean, gain = 0.14) => {
+        const freqs = hi ? [1250, 1875, 2500] : [940, 1410, 1880];
+        const g = c.createGain();
+        g.gain.setValueAtTime(gain, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+        g.connect(limiter);
+        freqs.forEach((f, i) => {
+          const o = c.createOscillator();
+          const og = c.createGain();
+          o.type = "sine"; o.frequency.value = f;
+          og.gain.value = [0.55, 0.3, 0.15][i]!;
+          o.connect(og); og.connect(g); o.start(t); o.stop(t + 0.5);
+        });
+      };
+
+      // ── Shaker: hi-freq noise sixteenths ───────────────────────────────────
+      const shaker = (t: number, gain = 0.08) => {
+        const len = Math.ceil(c.sampleRate * 0.03);
+        const buf = c.createBuffer(1, len, c.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+        const src = c.createBufferSource();
+        src.buffer = buf;
+        const hpf = c.createBiquadFilter();
+        hpf.type = "highpass"; hpf.frequency.value = 7000;
+        const g = c.createGain();
+        g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+        src.connect(hpf); hpf.connect(g); g.connect(limiter);
+        src.start(t);
+      };
+
+      // ════════════════════════════════════════════════════════════════════════
+      // ARRANGEMENT  (≈ 24 s, 128 BPM)
+      // ════════════════════════════════════════════════════════════════════════
+
+      // ── INTRO (bars 1-2): Brass fanfare hits + light percussion ─────────────
+      stab(now, Bb, 0.35);
+      surdo(now);
+      agogo(now + beat * 0.5, true);
+      agogo(now + beat * 1.5, false);
+      stab(now + beat * 2, Fdom, 0.32);
+      surdo(now + beat * 2);
+      agogo(now + beat * 2.5, true);
+      agogo(now + beat * 3.5, false);
+      // Bar 2 tamborim starts
+      for (let i = 0; i < 8; i++) tamborim(now + bar + i * beat * 0.5, 0.15);
+      stab(now + bar, Bb, 0.36);
+      surdo(now + bar);
+      stab(now + bar + beat * 2, Fdom, 0.33);
+      surdo(now + bar + beat * 2);
+
+      // ── BUILD (bars 3-4): Staccato brass every beat + denser perc ───────────
+      for (let b = 2; b < 4; b++) {
+        for (let q = 0; q < 4; q++) {
+          const t = now + bar * b + beat * q;
+          stab(t, q % 2 === 0 ? Bb : Fdom, 0.34 + q * 0.01);
+          surdo(t);
+          agogo(t + beat * 0.25, q % 2 === 0);
+        }
+        // Full 16th tamborim + shaker
+        for (let i = 0; i < 16; i++) {
+          tamborim(now + bar * b + i * beat * 0.25, 0.17);
+          shaker(now + bar * b + i * beat * 0.25, 0.09);
+        }
+      }
+
+      // ── TENSION RISE (bars 4-5): Fast repeated hits, chromatic ascent ───────
+      const riseChords = [Fdom, Bb, Fdom, BbHi];
+      for (let i = 0; i < 8; i++) {
+        const t = now + bar * 4 + i * beat * 0.5;
+        stab(t, riseChords[Math.floor(i / 2)]!, 0.38 + i * 0.012);
+        surdo(t);
+        tamborim(t + beat * 0.125, 0.2);
+        agogo(t + beat * 0.25, i % 2 === 0, 0.16);
+      }
+
+      // ── CLIMAX EXPLOSION (bars 5-8): Full brass + percussion storm ──────────
+      const climax = now + bar * 5;
+
+      // Giant downbeat chord — both octave layers simultaneously
+      BbHi.forEach((f, i) => brassStab(climax + i * 0.005, f, 0.55));
+      Bb.forEach((f, i)   => brassStab(climax + i * 0.005, f, 0.48));
+      surdo(climax, 0.8);
+
+      // Every beat of the climax: alternating Bb/F brass + surdo pair
+      for (let b = 0; b < 12; b++) {
+        const t = climax + b * beat;
+        const chord = b % 2 === 0 ? BbHi : Fdom;
+        stab(t, chord, 0.45 + Math.min(b, 4) * 0.01);
+        surdo(t, 0.72);
+        surdo(t + beat * 0.5, 0.45);            // off-beat surdo for carnival pulse
+        agogo(t + beat * 0.25, b % 2 === 1, 0.18);
+        agogo(t + beat * 0.75, b % 2 === 0, 0.16);
+      }
+
+      // Continuous 16th tamborim + shaker storm through climax
+      for (let i = 0; i < 48; i++) {
+        tamborim(climax + i * beat * 0.25, 0.2);
+        shaker(climax + i * beat * 0.25, 0.1);
+      }
+
+      // ── FINAL BURST (last downbeat): massive chord + percussion hits ─────────
+      const finale = climax + beat * 12;
+      BbHi.forEach((f, i) => brassStab(finale + i * 0.004, f, 0.62));
+      Bb.forEach((f, i)   => brassStab(finale + i * 0.004, f, 0.56));
+      [0, beat * 0.25, beat * 0.5, beat * 0.75].forEach((d) => {
+        surdo(finale + d, 0.8);
+        tamborim(finale + d + beat * 0.125, 0.24);
+      });
+      agogo(finale, true, 0.22); agogo(finale + beat * 0.5, false, 0.2);
+
+    } catch { /* silent */ }
+  }, [get]);
+
+  return { thump, chime, sparkleBlip, sambaFanfare };
 }
 
 
@@ -1202,7 +1405,7 @@ const REVEAL_ACTIONS = [
 
 function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
   const [phase, setPhase] = useState<RevealPhase>("idle");
-  const { thump, chime, sparkleBlip } = useAudio();
+  const { thump, chime, sparkleBlip, sambaFanfare } = useAudio();
   const rafRef = useRef<number | null>(null);
 
   const startReveal = useCallback(() => {
@@ -1214,6 +1417,7 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
       setTimeout(() => {
         setPhase("fireworks");
         chime();
+        sambaFanfare();
         // Bright sparkle blips layered over each visual firework burst
         FW_BURSTS.forEach((_, bi) => {
           [0, 90, 180].forEach((d) => setTimeout(() => sparkleBlip(0), bi * 120 + d));
@@ -1221,7 +1425,7 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
         setTimeout(() => setPhase("mosaic"), 2400);
       }, 450);
     }, 1050);
-  }, [thump, chime, sparkleBlip]);
+  }, [thump, chime, sparkleBlip, sambaFanfare]);
 
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
