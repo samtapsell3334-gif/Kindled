@@ -2236,6 +2236,94 @@ function ExplainerPlayer() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+// INVESTOR PIN GATE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const INVESTOR_PIN = "1066";
+const SESSION_KEY  = "kindled_investor_unlocked";
+
+function InvestorPinGate({ children }: { children: React.ReactNode }) {
+  const [unlocked, setUnlocked] = useState(false);
+  const [digits, setDigits]     = useState("");
+  const [shake, setShake]       = useState(false);
+  const [showGate, setShowGate] = useState(false);
+
+  // Read session on mount (client-only)
+  useEffect(() => {
+    if (sessionStorage.getItem(SESSION_KEY) === "1") setUnlocked(true);
+    else setShowGate(true);
+  }, []);
+
+  const handleDigit = useCallback((d: string) => {
+    const next = (digits + d).slice(0, 4);
+    setDigits(next);
+    if (next.length === 4) {
+      if (next === INVESTOR_PIN) {
+        sessionStorage.setItem(SESSION_KEY, "1");
+        setUnlocked(true);
+      } else {
+        setShake(true);
+        setTimeout(() => { setShake(false); setDigits(""); }, 650);
+      }
+    }
+  }, [digits]);
+
+  const handleBackspace = useCallback(() => setDigits((d) => d.slice(0, -1)), []);
+
+  if (unlocked) return <>{children}</>;
+  if (!showGate) return null;
+
+  return (
+    <div className="mx-4 mb-6 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-lg"
+      style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05)" }}>
+      {/* Top accent */}
+      <div className="h-[3px] w-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-500" />
+      <div className="p-5 text-center">
+        <div className="mb-3 flex justify-center">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-stone-100">
+            <Lock className="h-5 w-5 text-stone-500" strokeWidth={2} />
+          </div>
+        </div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Investor View</p>
+        <p style={{ fontFamily: "var(--font-display)" }} className="mt-0.5 text-[17px] font-semibold text-stone-800">Enter PIN to unlock</p>
+
+        {/* Dot indicators */}
+        <div className={cn("mt-4 flex justify-center gap-3", shake && "animate-shake")}>
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className={cn(
+              "h-3.5 w-3.5 rounded-full border-2 transition-all duration-150",
+              i < digits.length
+                ? shake ? "border-red-400 bg-red-400" : "border-amber-500 bg-amber-500"
+                : "border-stone-300 bg-transparent",
+            )} />
+          ))}
+        </div>
+
+        {/* Keypad */}
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {["1","2","3","4","5","6","7","8","9"].map((d) => (
+            <button key={d} onClick={() => handleDigit(d)}
+              className="flex h-12 items-center justify-center rounded-xl bg-stone-100 text-[18px] font-semibold text-stone-800 transition-all active:scale-95 active:bg-stone-200 hover:bg-stone-200">
+              {d}
+            </button>
+          ))}
+          <div />
+          <button onClick={() => handleDigit("0")}
+            className="flex h-12 items-center justify-center rounded-xl bg-stone-100 text-[18px] font-semibold text-stone-800 transition-all active:scale-95 active:bg-stone-200 hover:bg-stone-200">
+            0
+          </button>
+          <button onClick={handleBackspace}
+            className="flex h-12 items-center justify-center rounded-xl bg-stone-100 text-stone-500 transition-all active:scale-95 active:bg-stone-200 hover:bg-stone-200">
+            <ChevronDown className="h-5 w-5 rotate-90" strokeWidth={2.5} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // INVESTOR HUD
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -4498,7 +4586,11 @@ export default function DemoPage() {
         <FirstKindlersCTA />
       </main>
 
-      {!isContributor && <InvestorHUD pots={pots} logEntries={logEntries} />}
+      {!isContributor && (
+        <InvestorPinGate>
+          <InvestorHUD pots={pots} logEntries={logEntries} />
+        </InvestorPinGate>
+      )}
       </>}
       </motion.div>
       )}
