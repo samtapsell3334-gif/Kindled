@@ -37,7 +37,6 @@ export interface PotApiResponse {
 export interface VideoTribute {
   id: string;
   contributorName: string;
-  avatarEmoji: string;
   /** Text message — shown as a slide-in card when videoUrl is absent */
   message: string;
   videoUrl?: string;
@@ -47,7 +46,6 @@ export interface VideoTribute {
 export interface PotCardData {
   id: string;
   title: string;
-  emoji: string;
   raised: number;
   goal: number;
   event: { label: string; date: string; isoDate: string };

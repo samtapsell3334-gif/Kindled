@@ -27,10 +27,10 @@ export async function POST(req: Request) {
       await resend.emails.send({
         from: "Kindled Signups <onboarding@resend.dev>",
         to: [recipientEmail],
-        subject: `✨ New First Kindler: ${submitterEmail}`,
+        subject: `New First Kindler: ${submitterEmail}`,
         html: `
           <div style="font-family:sans-serif;max-width:520px;margin:auto;padding:32px">
-            <h2 style="color:#f59e0b;margin-bottom:8px">New First Kindler 🔥</h2>
+            <h2 style="color:#f59e0b;margin-bottom:8px">New First Kindler</h2>
             <p style="color:#374151;font-size:16px">A new creator just reserved their spot:</p>
             <p style="background:#fef3c7;border-radius:8px;padding:16px 20px;font-size:18px;font-weight:600;color:#92400e">
               ${submitterEmail}

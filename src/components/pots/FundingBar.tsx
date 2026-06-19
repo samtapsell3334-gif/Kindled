@@ -6,9 +6,18 @@ interface FundingBarProps {
   raised: number;
   goal: number;
   className?: string;
+  /** Under Wraps mode — hides the exact raised £ and numeric %, showing a heat-themed label instead. */
+  hideAmounts?: boolean;
 }
 
-export function FundingBar({ raised, goal, className }: FundingBarProps) {
+function heatLabel(pct: number) {
+  if (pct >= 95) return "Combustion Level: Blazing Hot!";
+  if (pct >= 70) return "Flame Intensity: Stoking up!";
+  if (pct >= 40) return "Kindle Progress: Catching Sparks";
+  return "Spark Level: Smoldering";
+}
+
+export function FundingBar({ raised, goal, className, hideAmounts }: FundingBarProps) {
   const pct = Math.min(100, Math.round((raised / goal) * 100));
 
   const trackColor =
@@ -24,10 +33,10 @@ export function FundingBar({ raised, goal, className }: FundingBarProps) {
       <div className="relative h-2 w-full overflow-hidden rounded-full bg-stone-700/60">
         <div
           role="progressbar"
-          aria-valuenow={pct}
+          aria-valuenow={hideAmounts ? undefined : pct}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label={`${pct}% funded`}
+          aria-label={hideAmounts ? heatLabel(pct) : `${pct}% funded`}
           style={{ width: `${pct}%` }}
           className={cn(
             "h-full rounded-full transition-all duration-700 ease-out",
@@ -38,16 +47,25 @@ export function FundingBar({ raised, goal, className }: FundingBarProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-baseline justify-between">
-        <p className="text-[13px] font-medium text-stone-200">
-          <span className="text-amber-400">£{raised.toLocaleString()}</span>
-          <span className="text-stone-400"> raised of </span>
-          <span className="text-stone-300">£{goal.toLocaleString()}</span>
-        </p>
-        <span className="text-[12px] font-semibold tabular-nums text-stone-400">
-          {pct}%
-        </span>
-      </div>
+      {hideAmounts ? (
+        <div className="flex items-baseline justify-between">
+          <p className="text-[13px] font-medium text-amber-300">{heatLabel(pct)}</p>
+          <span className="text-[12px] font-semibold text-stone-400">
+            Target: £{goal.toLocaleString()}
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-baseline justify-between">
+          <p className="text-[13px] font-medium text-stone-200">
+            <span className="text-amber-400">£{raised.toLocaleString()}</span>
+            <span className="text-stone-400"> raised of </span>
+            <span className="text-stone-300">£{goal.toLocaleString()}</span>
+          </p>
+          <span className="text-[12px] font-semibold tabular-nums text-stone-400">
+            {pct}%
+          </span>
+        </div>
+      )}
     </div>
   );
 }

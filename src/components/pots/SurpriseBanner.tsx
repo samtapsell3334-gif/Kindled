@@ -16,7 +16,7 @@ export function SurpriseBanner({ recipientName, eventLabel }: SurpriseBannerProp
       <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden />
       <p className="text-[12px] leading-snug text-amber-200">
         <span className="font-semibold">This is a surprise for {recipientName}!</span>{" "}
-        Help bridge the gap before {eventLabel} morning — without them knowing. 🤫
+        Help bridge the gap before {eventLabel} morning — without them knowing.
       </p>
     </div>
   );

@@ -20,7 +20,6 @@ const MOCK_POTS: PotCardData[] = [
   {
     id: "pot_bike",
     title: "Mountain Bike",
-    emoji: "🚵",
     raised: 320,
     goal: 650,
     event: { label: "Ongoing", date: "Anytime", isoDate: "2027-01-01T00:00:00Z" },
@@ -35,7 +34,6 @@ const MOCK_POTS: PotCardData[] = [
   {
     id: "pot_ps5",
     title: "PS5 Game Bundle",
-    emoji: "🎮",
     raised: 95,
     goal: 120,
     event: { label: "Christmas", date: "Dec 25", isoDate: "2026-12-25T08:00:00Z" },
@@ -46,21 +44,20 @@ const MOCK_POTS: PotCardData[] = [
     recipientName: "Sam",
     boosterEntries: 5,
     tributes: [
-      { id: "t1", contributorName: "Mum", avatarEmoji: "👩",
+      { id: "t1", contributorName: "Mum",
         message: "So proud of you — enjoy every second!", recordedAt: "2026-12-20T10:00:00Z" },
-      { id: "t2", contributorName: "Dad", avatarEmoji: "👨",
+      { id: "t2", contributorName: "Dad",
         message: "Happy Christmas, you deserve it.", recordedAt: "2026-12-21T11:00:00Z" },
-      { id: "t3", contributorName: "Sarah", avatarEmoji: "👩‍🦰",
-        message: "Can't believe you're this old already 😂",
+      { id: "t3", contributorName: "Sarah",
+        message: "Can't believe you're this old already!",
         videoUrl: "mock://sarah-tribute.mp4", recordedAt: "2026-12-22T09:00:00Z" },
-      { id: "t4", contributorName: "Jake", avatarEmoji: "🧔",
+      { id: "t4", contributorName: "Jake",
         message: "Get on FIFA tonight!", recordedAt: "2026-12-23T14:00:00Z" },
     ],
   },
   {
     id: "pot_camera",
     title: "Sony A7 IV Camera",
-    emoji: "📷",
     raised: 310,
     goal: 900,
     event: { label: "Christmas", date: "Dec 25", isoDate: "2026-12-25T00:00:00Z" },
@@ -75,7 +72,6 @@ const MOCK_POTS: PotCardData[] = [
   {
     id: "pot_spa",
     title: "Spa Weekend Break",
-    emoji: "🛁",
     raised: 180,
     goal: 350,
     event: { label: "Birthday", date: "Feb 14", isoDate: "2027-02-14T00:00:00Z" },
@@ -86,13 +82,13 @@ const MOCK_POTS: PotCardData[] = [
     recipientName: "Emma",
     boosterEntries: 3,
     tributes: [
-      { id: "s1", contributorName: "Lucy",  avatarEmoji: "👩‍🦳",
+      { id: "s1", contributorName: "Lucy",
         message: "You deserve this so much. Relax!", recordedAt: "2027-02-10T10:00:00Z" },
-      { id: "s2", contributorName: "Tom",   avatarEmoji: "👱",
+      { id: "s2", contributorName: "Tom",
         message: "Happy Birthday! Go enjoy it.",
         videoUrl: "mock://tom-tribute.mp4", recordedAt: "2027-02-11T12:00:00Z" },
-      { id: "s3", contributorName: "Priya", avatarEmoji: "👩‍🦱",
-        message: "Can't wait to hear all about it 🧖",  recordedAt: "2027-02-12T09:00:00Z" },
+      { id: "s3", contributorName: "Priya",
+        message: "Can't wait to hear all about it!", recordedAt: "2027-02-12T09:00:00Z" },
     ],
   },
 ];
@@ -211,7 +207,7 @@ function ModeLegend() {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-8 py-16 text-center">
-      <span className="text-5xl" aria-hidden>🔥</span>
+      <Flame className="h-12 w-12 text-amber-400" strokeWidth={1.5} aria-hidden />
       <p className="text-[15px] font-semibold text-stone-300">No pots yet</p>
       <p className="text-[13px] text-stone-500">Create your first Kindling pot to get started.</p>
     </div>

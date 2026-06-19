@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
-import { Brain, Leaf, RotateCcw, Banknote, TrendingUp } from "lucide-react";
+import { Brain, Leaf, RotateCcw, Banknote, TrendingUp, Armchair } from "lucide-react";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // HOOKS
@@ -35,7 +35,7 @@ function useCountUp(target: number, active: boolean, duration = 1800) {
 
 const MILESTONES = [
   { value: 150,  label: "AirPods Pro" },
-  { value: 350,  label: "Keyboard" },
+  { value: 350,  label: "Snug Two-Seater Sofa" },
   { value: 600,  label: "LEGO Falcon" },
   { value: 900,  label: "Velvet Sofa" },
   { value: 1500, label: "MacBook Air" },
@@ -656,7 +656,7 @@ function MilestoneSimulator() {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
                 <div className="absolute inset-0 flex items-center px-4">
                   <div>
-                    <p className="text-[13px] font-bold text-white">🛋️ Velvet Sofa</p>
+                    <p className="flex items-center gap-1.5 text-[13px] font-bold text-white"><Armchair className="h-3.5 w-3.5 text-amber-300" strokeWidth={2} /> Velvet Sofa</p>
                     <p className="text-[11px] text-amber-400 font-semibold mt-0.5">
                       £{SOFA_GOAL} · £{stillNeeded} still needed
                     </p>
@@ -762,6 +762,9 @@ export function GiftingImpactPanel() {
             </div>
             <p className="mt-3 text-center text-[9px] text-white/20 leading-relaxed px-2">
               * All statistics are approximate figures from third-party consumer research. Sources listed on each card. Kindled&apos;s platform impact will be independently tracked post-launch.
+            </p>
+            <p className="mt-1.5 text-center text-[8.5px] text-white/15 leading-relaxed px-4">
+              Sources: British Retail Consortium · Waste &amp; Resources Action Programme (WRAP) UK Waste Studies · YouGov UK Consumer Surveys · Money &amp; Pensions Service
             </p>
           </div>
 

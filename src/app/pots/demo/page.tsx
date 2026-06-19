@@ -6,7 +6,9 @@ import {
   Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown,
   Play, Pause, SkipForward, Volume2, VolumeX, X, Zap,
   ShoppingBag, RefreshCw, CreditCard, Gift, Flame,
-  Package, Leaf, ShieldCheck,
+  Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
+  Landmark, Radio, Wrench, Trophy, Wallet, Eye,
+  Bike, Plane, Home, Cake, TreePine, GraduationCap, Armchair, PenLine,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { FundingBar } from "@/components/pots/FundingBar";
@@ -23,7 +25,6 @@ import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
 interface MemoryCard {
   id: string;
   name: string;
-  emoji: string;
   message: string;
   rot: number;
   delay: number;
@@ -33,7 +34,6 @@ interface MemoryCard {
 interface DemoPot {
   id: string;
   title: string;
-  emoji: string;
   image?: string;
   goal: number;
   raised: number;
@@ -50,15 +50,15 @@ interface DemoPot {
   tag?: string;
   isClaimed?: boolean;
   claimedBy?: string;
-  claimedEmoji?: string;
   claimedNote?: string;
+  /** Secondary "stack to the next event" line shown beneath covered pots. */
+  stackNote?: string;
 }
 
 
 interface CatalogItem {
   id: string;
   name: string;
-  emoji: string;
   image: string;
   price: number;
   tag: string;
@@ -78,84 +78,88 @@ interface ExplainerScene {
 
 const INITIAL_POTS: DemoPot[] = [
   {
-    id: "p1", title: "Super-Fast Mountain Bike", emoji: "🚵",
+    id: "p1", title: "Super-Fast Mountain Bike",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&q=80",
     goal: 450, raised: 310, mode: "LIVE_FEED", continuous: true,
     eventLabel: "Ongoing", eventDate: "Anytime", eventIso: "2027-01-01T00:00:00Z",
     contributors: 7, boosterEntries: 0,
     accentGradient: "from-emerald-500 via-teal-400 to-cyan-400",
     tributes: [],
+    stackNote: "Next up: Birthday 2027 — stack balance to unlock an even larger milestone",
   },
   {
-    id: "p2", title: "LEGO Star Wars Millennium Falcon", emoji: "🚀",
+    id: "p2", title: "LEGO Star Wars Millennium Falcon",
     image: "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=400&h=400&fit=crop&q=80",
     goal: 730, raised: 730, mode: "UNDER_THE_TREE", continuous: true,
     eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
     contributors: 9, boosterEntries: 8,
     accentGradient: "from-red-700 via-amber-500 to-red-600",
     tributes: [
-      { id: "t1", name: "Grandma Jean", emoji: "👵", rot: -4, delay: 0,
-        message: "Happy Christmas sweetheart! We knew you wanted this forever. Build it with love! 🎄", hasVideo: true },
-      { id: "t2", name: "Uncle Pete", emoji: "🧔", rot: 3, delay: 120,
-        message: "7541 pieces... good luck! 😂 Happy Christmas mate, enjoy every single one!" },
-      { id: "t3", name: "Dad", emoji: "👨", rot: -2, delay: 240,
-        message: "Merry Christmas! Build it before New Year's — I'll time you! 🚀", hasVideo: true },
-      { id: "t4", name: "The School Crew", emoji: "👫", rot: 2, delay: 360,
-        message: "Happy Christmas from all of us! Can't wait to see it finished! 🎁" },
+      { id: "t1", name: "Grandma Jean", rot: -4, delay: 0,
+        message: "Happy Christmas sweetheart! We knew you wanted this forever. Build it with love!", hasVideo: true },
+      { id: "t2", name: "Uncle Pete", rot: 3, delay: 120,
+        message: "7541 pieces... good luck! Happy Christmas mate, enjoy every single one!" },
+      { id: "t3", name: "Dad", rot: -2, delay: 240,
+        message: "Merry Christmas! Build it before New Year's — I'll time you!", hasVideo: true },
+      { id: "t4", name: "The School Crew", rot: 2, delay: 360,
+        message: "Happy Christmas from all of us! Can't wait to see it finished!" },
     ],
+    stackNote: "Next up: 11th Birthday in 2027 — stack balance to unlock an even larger milestone",
   },
   {
-    id: "p3", title: "Retro Arcade Cabinet", emoji: "🕹️",
+    id: "p3", title: "Retro Arcade Cabinet",
     image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop&q=80",
     goal: 250, raised: 80, mode: "LIVE_FEED", continuous: true,
     eventLabel: "Ongoing", eventDate: "Anytime", eventIso: "2027-01-01T00:00:00Z",
     contributors: 3, boosterEntries: 0,
     accentGradient: "from-fuchsia-500 via-purple-400 to-indigo-500",
     tributes: [],
+    stackNote: "Next up: Christmas 2026 — stack balance to unlock an even larger milestone",
   },
   {
-    id: "p4", title: "Cosy Log Burner", emoji: "🔥",
+    id: "p4", title: "Cosy Log Burner",
     image: "https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?w=400&h=400&fit=crop&q=80",
     goal: 800, raised: 425, mode: "WRAPPED_UP", continuous: false,
     eventLabel: "Birthday", eventDate: "Jun 28", eventIso: "2026-06-28T10:00:00Z",
     contributors: 5, boosterEntries: 3,
     accentGradient: "from-violet-500 via-fuchsia-400 to-pink-500",
     tributes: [
-      { id: "b1", name: "The Kids", emoji: "👨‍👩‍👦", rot: -3, delay: 0,
-        message: "Mum, you are always cold — this one's for you! Cosy nights ahead ❤️🔥", hasVideo: true },
-      { id: "b2", name: "Auntie Claire", emoji: "👩‍🦰", rot: 4, delay: 140,
-        message: "You've wanted one of these for years! Enjoy every warm evening 🥰" },
-      { id: "b3", name: "Work Crew", emoji: "👫", rot: -1, delay: 260,
-        message: "From all of us — you deserve every cosy moment! 🔥🎉", hasVideo: true },
+      { id: "b1", name: "The Kids", rot: -3, delay: 0,
+        message: "Mum, you are always cold — this one's for you! Cosy nights ahead.", hasVideo: true },
+      { id: "b2", name: "Auntie Claire", rot: 4, delay: 140,
+        message: "You've wanted one of these for years! Enjoy every warm evening." },
+      { id: "b3", name: "Work Crew", rot: -1, delay: 260,
+        message: "From all of us — you deserve every cosy moment!", hasVideo: true },
     ],
+    stackNote: "Next up: Christmas 2026 — stack balance to unlock an even larger milestone",
   },
 ];
 
 const CHECKLIST_POTS: DemoPot[] = [
   {
-    id: "cl1", title: "LEGO Space Shuttle Explorer", emoji: "🚀",
+    id: "cl1", title: "LEGO Space Shuttle Explorer",
     goal: 25, raised: 25, mode: "LIVE_FEED", continuous: false,
     eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
     contributors: 1, boosterEntries: 0,
     accentGradient: "from-emerald-400 to-teal-500",
     tributes: [],
     tag: "Grandma Linda",
-    isClaimed: true, claimedBy: "Grandma Linda", claimedEmoji: "👵",
+    isClaimed: true, claimedBy: "Grandma Linda",
     claimedNote: "Shipped directly from Amazon · Arrives Dec 23",
   },
   {
-    id: "cl2", title: "Adventure Book Series (x3)", emoji: "📚",
+    id: "cl2", title: "Adventure Book Series (x3)",
     goal: 15, raised: 15, mode: "LIVE_FEED", continuous: false,
     eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
     contributors: 1, boosterEntries: 0,
     accentGradient: "from-sky-400 to-blue-500",
     tributes: [],
     tag: "Uncle Steve",
-    isClaimed: true, claimedBy: "Uncle Steve", claimedEmoji: "👨‍🦲",
+    isClaimed: true, claimedBy: "Uncle Steve",
     claimedNote: "Bringing to the party in person",
   },
   {
-    id: "cl3", title: "Marvel Action Figure Set", emoji: "🦸",
+    id: "cl3", title: "Marvel Action Figure Set",
     goal: 18, raised: 0, mode: "LIVE_FEED", continuous: false,
     eventLabel: "Christmas", eventDate: "Dec 25", eventIso: "2026-12-25T08:00:00Z",
     contributors: 0, boosterEntries: 0,
@@ -167,22 +171,22 @@ const CHECKLIST_POTS: DemoPot[] = [
 ];
 
 const CATALOGUE: CatalogItem[] = [
-  { id: "c1", name: "Nintendo Switch OLED", emoji: "🎮",
+  { id: "c1", name: "Nintendo Switch OLED",
     image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=400&fit=crop&q=80",
     price: 309.99, tag: "Popular", tagColor: "bg-red-100 text-red-600", glowColor: "#ef4444" },
-  { id: "c2", name: "Electric Scooter Pro", emoji: "🛴",
+  { id: "c2", name: "Electric Scooter Pro",
     image: "https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=400&h=400&fit=crop&q=80",
     price: 399.99, tag: "Trending", tagColor: "bg-emerald-100 text-emerald-600", glowColor: "#10b981" },
-  { id: "c3", name: "Meta Quest 3 VR", emoji: "🥽",
+  { id: "c3", name: "Meta Quest 3 VR",
     image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=400&h=400&fit=crop&q=80",
     price: 499.99, tag: "High Intent", tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6" },
-  { id: "c4", name: "LEGO Technic Ferrari", emoji: "🏎️",
+  { id: "c4", name: "LEGO Technic Ferrari",
     image: "https://images.unsplash.com/photo-1560961911-ba7ef651a56c?w=400&h=400&fit=crop&q=80",
     price: 189.99, tag: "Bestseller", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
-  { id: "c5", name: "Air Hockey Table", emoji: "🏒",
+  { id: "c5", name: "Air Hockey Table",
     image: "https://images.unsplash.com/photo-1526888935184-a82d2a4b7e67?w=400&h=400&fit=crop&q=80",
     price: 199.99, tag: "New", tagColor: "bg-pink-100 text-pink-600", glowColor: "#ec4899" },
-  { id: "c6", name: "LEGO Star Wars X-Wing", emoji: "✈️",
+  { id: "c6", name: "LEGO Star Wars X-Wing",
     image: "https://images.unsplash.com/photo-1609372332255-611485350f25?w=400&h=400&fit=crop&q=80",
     price: 99.99, tag: "Fan Fave", tagColor: "bg-sky-100 text-sky-600", glowColor: "#38bdf8" },
 ];
@@ -249,6 +253,25 @@ const SPARKLES = Array.from({ length: 10 }, (_, i) => ({
   size: 4 + (i % 5),
 }));
 
+// Reveal ceremony — slow-rising golden embers (background layer)
+const EMBERS = Array.from({ length: 22 }, (_, i) => ({
+  id: i,
+  left: `${2 + (i * 421) % 96}%`,
+  size: 3 + (i % 4),
+  emberX: `${-20 + (i * 17) % 40}px`,
+  emberY: `${-180 - (i * 23) % 140}px`,
+  dur: `${2.8 + (i * 0.21) % 2.4}s`,
+  delay: `${(i * 0.17) % 2.2}s`,
+  color: ["#fbbf24", "#f59e0b", "#fde68a", "#fb923c"][i % 4]!,
+}));
+
+// Reveal ceremony — organic light-leak streaks
+const LIGHT_LEAKS = [
+  { color: "rgba(251,191,36,0.5)", size: 520, dur: "3.4s", delay: "0s", peak: 0.5 },
+  { color: "rgba(249,115,22,0.4)", size: 420, dur: "4.1s", delay: "0.5s", peak: 0.4 },
+  { color: "rgba(236,72,153,0.3)", size: 360, dur: "3.8s", delay: "1.1s", peak: 0.35 },
+];
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // SOUND UTILITY
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -275,23 +298,56 @@ function useAudio() {
     } catch { /* silent */ }
   }, [get]);
 
+  // One plucked "harp string" — quick attack, long shimmering decay, two
+  // slightly-detuned oscillators for a richer, more organic pluck.
+  const pluck = useCallback((c: AudioContext, freq: number, t: number, gain: number, dur: number) => {
+    const g = c.createGain();
+    g.connect(c.destination);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(gain, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+    [1, 1.0035, 2.005].forEach((mult, i) => {
+      const o = c.createOscillator();
+      const og = c.createGain();
+      o.type = i === 2 ? "sine" : "triangle";
+      o.frequency.value = freq * mult;
+      og.gain.value = i === 2 ? 0.18 : 0.5;
+      o.connect(og); og.connect(g);
+      o.start(t); o.stop(t + dur);
+    });
+  }, []);
+
+  // Ascending harp-like glissando — a fast run up a pentatonic scale across
+  // two octaves, ending in a sustained, shimmering high chord.
   const chime = useCallback(() => {
     try {
       const c = get();
-      [523, 659, 784, 1047].forEach((f, i) => {
-        const o = c.createOscillator();
-        const g = c.createGain();
-        o.connect(g); g.connect(c.destination);
-        o.frequency.value = f; o.type = "sine";
-        const t = c.currentTime + i * 0.13;
-        g.gain.setValueAtTime(0.18, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-        o.start(t); o.stop(t + 0.5);
+      const base = c.currentTime + 0.02;
+      // C major pentatonic across two octaves, run upward.
+      const run = [523.25, 587.33, 659.25, 784.0, 880.0, 1046.5, 1174.7, 1318.5, 1568.0, 1760.0];
+      run.forEach((f, i) => {
+        pluck(c, f, base + i * 0.052, 0.16, 1.1);
+      });
+      // Sustained shimmering chord on top, slightly after the run lands.
+      const chordAt = base + run.length * 0.052 + 0.04;
+      [1046.5, 1318.5, 1568.0, 2093.0].forEach((f, i) => {
+        pluck(c, f, chordAt + i * 0.03, 0.13, 2.2);
       });
     } catch { /* silent */ }
-  }, [get]);
+  }, [get, pluck]);
 
-  return { thump, chime };
+  // A single bright, randomised sparkle blip — for layering over visual
+  // spark bursts so the fireworks feel reactive rather than scripted.
+  const sparkleBlip = useCallback((t = 0) => {
+    try {
+      const c = get();
+      const freq = 1800 + Math.random() * 1400;
+      pluck(c, freq, c.currentTime + t, 0.05, 0.35);
+    } catch { /* silent */ }
+  }, [get, pluck]);
+
+  return { thump, chime, sparkleBlip };
 }
 
 
@@ -320,8 +376,8 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
 // PROFILE HEADER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ProfileHeader({ potCount, totalGoal, onShare }: {
-  potCount: number; totalGoal: number; onShare: () => void;
+function ProfileHeader({ potCount, totalGoal, onShare, isContributor }: {
+  potCount: number; totalGoal: number; onShare: () => void; isContributor?: boolean;
 }) {
   return (
     <header className="sticky top-0 z-30 border-b border-orange-100/80 bg-[#fdf9f5]/95 backdrop-blur-lg">
@@ -353,22 +409,28 @@ function ProfileHeader({ potCount, totalGoal, onShare }: {
                 <span className="text-[11px] font-medium text-stone-400">· Billy&apos;s List</span>
               </div>
               <p className="text-[11px] text-stone-400">
-                Managed by <span className="font-semibold text-amber-500">Mum (Sarah)</span>
+                {isContributor
+                  ? <>Contributing to <span className="font-semibold text-amber-500">Billy&apos;s List</span></>
+                  : <>Managed by <span className="font-semibold text-amber-500">Mum (Sarah)</span></>}
               </p>
             </div>
           </div>
-          <motion.button
-            whileTap={{ scale: 0.94 }}
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            onClick={onShare}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3.5 py-2 text-[12px] font-semibold text-stone-900 shadow-md shadow-amber-200 active:scale-95"
-          >
-            <Share2 className="h-3.5 w-3.5" />
-            Guide Buyers
-          </motion.button>
+          {!isContributor && (
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              onClick={onShare}
+              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3.5 py-2 text-[12px] font-semibold text-stone-900 shadow-md shadow-amber-200 active:scale-95"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              Guide Buyers
+            </motion.button>
+          )}
         </div>
-        <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">by sharing your list with the people who love you</p>
+        {!isContributor && (
+          <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">by sharing your list with the people who love you</p>
+        )}
 
         <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
           {[
@@ -483,7 +545,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
         {/* Claimed state */}
         {pot.isClaimed && pot.claimedBy && (
           <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2">
-            <span className="text-base">{pot.claimedEmoji ?? "✅"}</span>
+            <Check className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2.5} />
             <div className="min-w-0">
               <p className="text-[12px] font-semibold text-emerald-700">{pot.claimedBy} — ordered</p>
               {pot.claimedNote && <p className="text-[11px] text-emerald-600/80 truncate">{pot.claimedNote}</p>}
@@ -491,25 +553,20 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
           </div>
         )}
 
-        {/* Progress */}
+        {/* Progress — Under Wraps: heat-themed, totals hidden */}
         {!pot.isClaimed && (
           <>
-            <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" />
+            <FundingBar raised={pot.raised} goal={pot.goal} hideAmounts className="mt-4" />
             <div className="mt-3 flex items-center justify-between">
               <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
-              <span className="text-[12px] font-semibold text-stone-500">
-                {pct < 15 ? "Just a Spark" :
-                 pct < 30 ? "Starting to Smolder" :
-                 pct < 50 ? "Catching Fire" :
-                 pct < 70 ? "Flames Growing" :
-                 pct < 85 ? "Stoking Up" :
-                 pct < 95 ? "Blazing" :
-                            "Fully Lit"}
-              </span>
+              <CountdownTimer targetIso={pot.eventIso} compact />
             </div>
-            <div className="mt-1 text-right">
-              <span className="text-[10px] text-stone-400">Target: £{pot.goal}</span>
-            </div>
+            {pot.stackNote && (
+              <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200/70 px-2.5 py-1.5">
+                <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
+                <p className="text-[10px] leading-snug text-amber-700">{pot.stackNote}</p>
+              </div>
+            )}
 
             {/* Action buttons */}
             <div className="mt-3 flex gap-2">
@@ -536,7 +593,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
                   onClick={() => onBuy?.(pot.id)}
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 border-stone-200 bg-white py-2.5 text-[13px] font-semibold text-stone-700 transition-colors hover:border-stone-300"
                 >
-                  <span className="text-[13px]">🛒</span>
+                  <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2} />
                   Buy outright · £{pot.goal}
                 </motion.button>
               )}
@@ -589,10 +646,10 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
   const isXmas = pot.mode === "UNDER_THE_TREE";
   const th = isXmas
     ? { bg: "bg-[#1a0f0f]", border: "border-red-700/30", glow: "animate-gift-glow",
-        box: "from-red-800/30 to-amber-700/20", emoji: "🎁", label: "text-amber-400",
+        box: "from-red-800/30 to-amber-700/20", label: "text-amber-400",
         modeLabel: "Under the Tree", btn: "from-amber-400 to-orange-500 shadow-amber-900/40" }
     : { bg: "bg-[#1a1028]", border: "border-violet-500/30", glow: "animate-gift-glow-plum",
-        box: "from-violet-600/25 to-fuchsia-700/20", emoji: "🎀", label: "text-violet-400",
+        box: "from-violet-600/25 to-fuchsia-700/20", label: "text-violet-400",
         modeLabel: "Wrapped Up", btn: "from-violet-500 to-fuchsia-500 shadow-violet-900/40" };
 
   return (
@@ -637,7 +694,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
             <Lock className="h-3 w-3 text-stone-400" />
             <p className="text-[12px] font-semibold text-stone-200">Locked · Unwraps {pot.eventDate}</p>
           </div>
-          <CountdownTimer targetIso={pot.eventIso} />
+          <CountdownTimer targetIso={pot.eventIso} eventLabel={pot.eventLabel} />
           <button
             onClick={() => onReveal(pot)}
             className={cn(
@@ -654,6 +711,13 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           <Users className="h-3 w-3" />
           <span className="text-[11px]">Balance hidden · {pot.contributors} contributors</span>
         </div>
+        <div className="mt-1.5 text-right text-[10px] text-stone-500">Target: £{pot.goal}</div>
+        {pot.stackNote && (
+          <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5">
+            <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-violet-300" />
+            <p className="text-[10px] leading-snug text-stone-400">{pot.stackNote}</p>
+          </div>
+        )}
       </div>
     </article>
   );
@@ -693,13 +757,14 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
         : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
       onClick={handleClick}
     >
-      {/* SVG circle overlay */}
+      {/* Marker-pen overlay — imperfect, hand-drawn felt-tip loop around the card boundary */}
       {circling && (
-        <div className="pointer-events-none absolute z-20" style={{ inset: "-5px" }}>
+        <div className="pointer-events-none absolute z-20" style={{ inset: "-6px" }}>
           <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
-            <rect x="2" y="2" width="96" height="96" rx="10" ry="10"
-              stroke="#f59e0b" strokeWidth="3.5" strokeLinecap="round"
-              strokeDasharray="400" vectorEffect="non-scaling-stroke"
+            <path
+              d="M 6 3 C 30 0, 55 4, 80 1 C 92 0, 99 8, 97 22 C 100 45, 96 60, 99 78 C 100 92, 88 100, 70 98 C 48 101, 28 96, 12 99 C -1 101, -2 88, 1 70 C -3 50, 2 32, -1 18 C -3 6, 1 1, 6 3 Z"
+              stroke="#f59e0b" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
+              strokeDasharray="440" vectorEffect="non-scaling-stroke"
               className="animate-draw-circle"
               style={{ filter: "drop-shadow(0 0 8px #f59e0b)" }}
             />
@@ -759,12 +824,42 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
 }
 
 function CatalogueGrid({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
+  const [active, setActive] = useState(false);
+
+  if (!active) {
+    return (
+      <section className="px-4">
+        <motion.button
+          whileHover={{ scale: 1.01, y: -1 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 400, damping: 28 }}
+          onClick={() => setActive(true)}
+          className="flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left"
+          style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
+            <ShoppingBag className="h-5 w-5 text-stone-900" strokeWidth={2} />
+          </div>
+          <div>
+            <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-800">Catalogue Circling Mode</p>
+            <p className="text-[11px] text-stone-400">Circle any item with a marker pen to add it</p>
+          </div>
+        </motion.button>
+      </section>
+    );
+  }
+
   return (
     <section className="px-4">
-      <div className="mb-3">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Catalogue</p>
-        <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">Browse &amp; add to your list</p>
-        <p className="text-[11px] text-stone-400 mt-0.5">Tap any card — watch the magic circle draw itself</p>
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Catalogue Circling Mode</p>
+          <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">Browse &amp; add to your list</p>
+          <p className="text-[11px] text-stone-400 mt-0.5">Tap any card — watch the marker pen circle it</p>
+        </div>
+        <button onClick={() => setActive(false)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-400 hover:bg-stone-200">
+          <X className="h-3.5 w-3.5" />
+        </button>
       </div>
       <div className="grid grid-cols-2 gap-3">
         {CATALOGUE.map((item) => (
@@ -819,31 +914,35 @@ const REVEAL_ACTIONS = [
 
 function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
   const [phase, setPhase] = useState<RevealPhase>("idle");
-  const { thump, chime } = useAudio();
+  const { thump, chime, sparkleBlip } = useAudio();
   const rafRef = useRef<number | null>(null);
 
   const startReveal = useCallback(() => {
     setPhase("shaking");
-    // Rhythmic thumps during shake
-    [0, 140, 280, 420, 560, 700, 840].forEach((t) => setTimeout(() => thump(0), t));
+    // Rhythmic thumps during shake — speeds up into a crescendo
+    [0, 160, 300, 420, 520, 600, 670, 730, 780].forEach((t) => setTimeout(() => thump(0), t));
     setTimeout(() => {
       setPhase("flashing");
       setTimeout(() => {
         setPhase("fireworks");
         chime();
-        setTimeout(() => setPhase("mosaic"), 2200);
+        // Bright sparkle blips layered over each visual firework burst
+        FW_BURSTS.forEach((_, bi) => {
+          [0, 90, 180].forEach((d) => setTimeout(() => sparkleBlip(0), bi * 120 + d));
+        });
+        setTimeout(() => setPhase("mosaic"), 2400);
       }, 450);
     }, 1050);
-  }, [thump, chime]);
+  }, [thump, chime, sparkleBlip]);
 
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
 
   const isXmas = pot.mode === "UNDER_THE_TREE";
 
   const defaultTributes = [
-    { id: "g1", name: "The Whole Family", emoji: "👨‍👩‍👧‍👦", message: "We all chipped in with so much love. Enjoy every single moment!", rot: -1, delay: 0 },
-    { id: "g2", name: "Gran & Grandad", emoji: "👵", message: "So proud of you. You deserve this and so much more. ✨", rot: 2, delay: 150 },
-    { id: "g3", name: "Your Best Friends", emoji: "🤝", message: "Couldn't be happier for you — enjoy every second! 🎉", rot: -1, delay: 300 },
+    { id: "g1", name: "The Whole Family", message: "We all chipped in with so much love. Enjoy every single moment!", rot: -1, delay: 0 },
+    { id: "g2", name: "Gran & Grandad", message: "So proud of you. You deserve this and so much more.", rot: 2, delay: 150 },
+    { id: "g3", name: "Your Best Friends", message: "Couldn't be happier for you — enjoy every second!", rot: -1, delay: 300 },
   ];
 
   return (
@@ -853,9 +952,36 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
         <div className="pointer-events-none absolute inset-0 bg-white animate-flash z-10" />
       )}
 
-      {/* Fireworks */}
+      {/* Fireworks + light-leak + ember layers */}
       {(phase === "fireworks" || phase === "mosaic" || phase === "actions") && (
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {/* Organic light-leak streaks — soft, hardware-accelerated blurred blobs sweeping across the screen */}
+          {LIGHT_LEAKS.map((l, i) => (
+            <div
+              key={i}
+              className="absolute animate-light-leak rounded-full mix-blend-screen blur-3xl"
+              style={{
+                left: `${20 + i * 25}%`, top: `${10 + i * 18}%`,
+                width: l.size, height: l.size, background: l.color,
+                "--leak-dur": l.dur, "--leak-peak": l.peak, animationDelay: l.delay,
+              } as React.CSSProperties}
+            />
+          ))}
+
+          {/* Slow-rising golden embers */}
+          {EMBERS.map((e) => (
+            <span
+              key={e.id}
+              className="absolute bottom-0 animate-ember-rise rounded-full"
+              style={{
+                left: e.left, width: e.size, height: e.size, backgroundColor: e.color,
+                boxShadow: `0 0 6px ${e.color}`,
+                "--ember-x": e.emberX, "--ember-y": e.emberY,
+                "--ember-dur": e.dur, animationDelay: e.delay,
+              } as React.CSSProperties}
+            />
+          ))}
+
           {FW_BURSTS.map((b, bi) => (
             <div key={bi} className="absolute" style={{ left: b.cx, top: b.cy }}>
               {FW_SPARKS.map((s) => (
@@ -874,6 +1000,9 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
                 <div key={i} className="absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-400/40 animate-sw-ring"
                   style={{ animationDelay: `${d}s` }} />
               ))}
+              {/* Warm chime-pulse wash, syncs roughly with the glissando landing */}
+              <div className="absolute inset-0 h-screen w-screen -translate-x-1/2 -translate-y-1/2 animate-chime-pulse rounded-full"
+                style={{ background: "radial-gradient(circle, rgba(251,191,36,0.5), transparent 70%)", width: "140vmax", height: "140vmax", "--pulse-peak": 0.4 } as React.CSSProperties} />
             </div>
           )}
         </div>
@@ -950,7 +1079,7 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
         {/* ── FIREWORKS ── */}
         {phase === "fireworks" && (
           <div className="flex flex-col items-center gap-4 px-6 py-8">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400">🎉 Fully Funded!</p>
+            <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-400"><Sparkles className="h-3 w-3" /> Fully Funded!</p>
             {/* Product image reveal */}
             {pot.image && (
               <div className="animate-scale-in overflow-hidden rounded-2xl shadow-xl shadow-black/50" style={{ width: 160, height: 120 }}>
@@ -966,8 +1095,8 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
             </div>
             <div className="w-full">
               <FundingBar raised={pot.goal} goal={pot.goal} />
-              <p className="mt-2 text-center text-[11px] text-emerald-400 font-medium">
-                {pot.contributors} people made this happen 🙌
+              <p className="mt-2 flex items-center justify-center gap-1.5 text-center text-[11px] text-emerald-400 font-medium">
+                <Users className="h-3 w-3" /> {pot.contributors} people made this happen
               </p>
             </div>
           </div>
@@ -977,7 +1106,7 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
         {phase === "mosaic" && (
           <div className="flex flex-col gap-4 px-4 py-6 max-h-[72vh] overflow-y-auto">
             <div className="text-center">
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-white">Messages from the family 💌</p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-white">Messages from the family</p>
               <p className="text-[11px] text-stone-500 mt-0.5">From everyone who loves you</p>
             </div>
             <div className="flex flex-col gap-3">
@@ -1038,24 +1167,25 @@ function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
 function SceneVisual({ id, progress }: { id: number; progress: number }) {
   /* ── Scene 1: The Gifting Paradox ── */
   if (id === 1) {
-    const dupes = ["🧸","📦","🧦","🪆","🕯️","📦","🧸","🧦"];
+    const dupes = [Package, Package, Package, Gift, Package, Gift, Package, Package];
     const dreams = [
-      { e: "🚵", label: "Mountain Bike", val: "£450" },
-      { e: "🔥", label: "Cosy Log Burner", val: "£600" },
-      { e: "✈️", label: "Dream Holiday", val: "£1,200" },
-      { e: "🏠", label: "House Deposit", val: "£5,000" },
+      { Icon: Bike, label: "Mountain Bike", val: "£450" },
+      { Icon: Flame, label: "Cosy Log Burner", val: "£600" },
+      { Icon: Plane, label: "Dream Holiday", val: "£1,200" },
+      { Icon: Home, label: "House Deposit", val: "£5,000" },
     ];
     return (
       <div className="relative flex h-full w-full overflow-hidden">
         {/* Left: junk pile */}
         <div className="flex w-[44%] flex-col items-center justify-center gap-2 bg-red-950/40 px-2 py-3 border-r border-stone-700">
           <div className="flex flex-wrap justify-center gap-1">
-            {dupes.map((e, i) => (
-              <span key={i} className="text-base grayscale opacity-60" style={{ animationDelay: `${i*0.1}s` }}>{e}</span>
+            {dupes.map((Icon, i) => (
+              <Icon key={i} className="h-4 w-4 text-stone-400 opacity-60" style={{ animationDelay: `${i*0.1}s` }} />
             ))}
           </div>
-          <div className="mt-1 rounded-full bg-red-500/90 px-2 py-0.5">
-            <p className="text-[9px] font-black text-white tracking-widest">✕ WASTED</p>
+          <div className="mt-1 flex items-center gap-1 rounded-full bg-red-500/90 px-2 py-0.5">
+            <X className="h-2.5 w-2.5 text-white" strokeWidth={3} />
+            <p className="text-[9px] font-black text-white tracking-widest">WASTED</p>
           </div>
           <p className="text-[8px] text-red-400 text-center leading-tight">Forgotten in landfill</p>
         </div>
@@ -1073,14 +1203,14 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
               className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-900/40 to-orange-900/30 px-2.5 py-1.5"
               style={{ opacity: progress > i * 0.18 ? 1 : 0.2, transition: "opacity 0.5s ease", transitionDelay: `${i * 0.1}s` }}
             >
-              <span className="text-base">{d.e}</span>
+              <d.Icon className="h-4 w-4 shrink-0 text-amber-400" strokeWidth={1.75} />
               <div className="min-w-0 flex-1">
                 <p className="text-[9px] font-black text-amber-300 truncate">{d.label}</p>
               </div>
               <span className="text-[9px] font-black text-emerald-400 shrink-0">{d.val}</span>
             </div>
           ))}
-          <p className="mt-0.5 text-[8px] text-amber-400 text-center font-bold">✦ Combine forces to unlock</p>
+          <p className="mt-0.5 flex items-center justify-center gap-1 text-[8px] text-amber-400 text-center font-bold"><Sparkles className="h-2.5 w-2.5" /> Combine forces to unlock</p>
         </div>
         {/* WOULD YOU RATHER stamp */}
         {progress > 0.25 && (
@@ -1097,14 +1227,14 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
   /* ── Scene 2: Parent Knows Best Checklist ── */
   if (id === 2) {
     const items = [
-      { label: "Storybook Collection", price: "£15", who: "👵 Grandma Linda", claimAt: 0.2 },
-      { label: "Lego Space Set", price: "£25", who: "👨‍🦲 Uncle Steve", claimAt: 0.45 },
-      { label: "Marvel Figure Set", price: "£18", who: "👩 Auntie Jo", claimAt: 0.72 },
+      { label: "Storybook Collection", price: "£15", who: "Grandma Linda", claimAt: 0.2 },
+      { label: "Lego Space Set", price: "£25", who: "Uncle Steve", claimAt: 0.45 },
+      { label: "Marvel Figure Set", price: "£18", who: "Auntie Jo", claimAt: 0.72 },
     ];
     return (
       <div className="flex h-full flex-col justify-center gap-1.5 px-4 py-3">
         <div className="mb-1 flex items-center gap-2">
-          <span className="text-base">👩</span>
+          <Users className="h-4 w-4 text-stone-300" strokeWidth={1.75} />
           <div>
             <p className="text-[10px] font-black text-white">Parent&apos;s Checklist</p>
             <p className="text-[8px] text-stone-400">Real-time duplicate protection</p>
@@ -1136,7 +1266,7 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
         })}
         {progress > 0.8 && (
           <div className="mt-1 flex items-center gap-1.5 animate-fade-up">
-            <span className="text-[10px]">🛡️</span>
+            <ShieldCheck className="h-3 w-3 text-emerald-400" strokeWidth={2} />
             <p className="text-[9px] font-bold text-emerald-400">All items secured · Zero duplicates guaranteed</p>
           </div>
         )}
@@ -1152,7 +1282,11 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
       { label: "+£50", from: "Coworkers", at: 0.5 },
       { label: "+£30", from: "Auntie Jo", at: 0.68 },
     ];
-    const milestones = ["🎂 Birthday", "🎄 Christmas", "🎓 Graduation"];
+    const milestones = [
+      { Icon: Cake, label: "Birthday" },
+      { Icon: TreePine, label: "Christmas" },
+      { Icon: GraduationCap, label: "Graduation" },
+    ];
     const totalFilled = Math.min(1, progress * 1.3);
     return (
       <div className="flex h-full flex-col justify-center gap-3 px-4 py-3">
@@ -1161,10 +1295,11 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
           {milestones.map((m, i) => (
             <div key={i} className="flex flex-1 flex-col items-center gap-1">
               <div className={cn(
-                "rounded-lg px-2 py-1 border text-center transition-all duration-500",
+                "flex items-center gap-1 rounded-lg px-2 py-1 border text-center transition-all duration-500",
                 progress > i * 0.3 ? "bg-amber-900/40 border-amber-700/50" : "bg-stone-800/50 border-stone-700/40",
               )}>
-                <p className="text-[8px] font-bold text-stone-300 whitespace-nowrap">{m}</p>
+                <m.Icon className="h-3 w-3 text-amber-300" strokeWidth={1.75} />
+                <p className="text-[8px] font-bold text-stone-300 whitespace-nowrap">{m.label}</p>
               </div>
               {i < 2 && (
                 <div className="absolute" style={{ left: `${(i + 1) * 33}%`, top: "8px" }}>
@@ -1190,7 +1325,7 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
         {/* Pot fill */}
         <div className="rounded-xl border border-emerald-700/40 bg-emerald-900/20 px-3 py-2">
           <div className="flex items-center justify-between mb-1.5">
-            <p className="text-[9px] font-black text-emerald-300">🛋️ Family Sofa Pot</p>
+            <p className="flex items-center gap-1 text-[9px] font-black text-emerald-300"><Armchair className="h-3 w-3" /> Family Sofa Pot</p>
             <p className="text-[9px] font-black text-amber-400">£{Math.round(totalFilled * 650)} / £650</p>
           </div>
           <div className="h-2 w-full rounded-full bg-stone-700 overflow-hidden">
@@ -1209,13 +1344,13 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
     const shaking = progress > 0.25 && progress < 0.55;
     const revealed = progress > 0.65;
     const fireworks = progress > 0.72;
-    const messages = ["🎉 Happy Birthday!", "Love you so much!", "From Gran ❤️", "You deserve it!", "Woop woop! 🎊"];
+    const messages = ["Happy Birthday!", "Love you so much!", "From Gran", "You deserve it!", "Woop woop!"];
     return (
       <div className="relative flex h-full items-center justify-center overflow-hidden bg-stone-950">
         {/* Stars bg */}
         <div className="pointer-events-none absolute inset-0">
           {[{l:"10%",t:"15%"},{l:"80%",t:"10%"},{l:"55%",t:"8%"},{l:"30%",t:"20%"},{l:"90%",t:"35%"},{l:"5%",t:"50%"}].map((p,i)=>(
-            <span key={i} className="absolute text-[8px] text-white/30" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.2}s ${i*0.3}s ease-in-out infinite alternate`}}>✦</span>
+            <Star key={i} className="absolute h-2 w-2 fill-white/30 text-white/30" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.2}s ${i*0.3}s ease-in-out infinite alternate`}} />
           ))}
         </div>
         {!revealed ? (
@@ -1254,7 +1389,7 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
                 }}
               />
             ))}
-            <p className="text-xl font-black text-amber-400">🎊 Reveal!</p>
+            <p className="flex items-center gap-1.5 text-xl font-black text-amber-400"><Sparkles className="h-5 w-5" /> Reveal!</p>
             <div className="flex flex-wrap justify-center gap-1 max-w-[200px]">
               {messages.map((msg, i) => (
                 <div
@@ -1291,12 +1426,12 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
         <div className="flex flex-col items-center gap-2 animate-fade-up">
           {/* Stripe badge */}
           <div className="flex items-center gap-1.5 rounded-xl bg-indigo-900/50 border border-indigo-700/40 px-3 py-1.5">
-            <span className="text-base">🔒</span>
+            <Lock className="h-3 w-3 text-indigo-300" strokeWidth={2} />
             <p className="text-[9px] font-black text-indigo-300">Regulated &amp; Secured by Stripe</p>
           </div>
           {/* Apple Pay button */}
           <div className="flex items-center justify-center gap-2 rounded-2xl bg-stone-100 px-6 py-3 shadow-lg">
-            <span className="text-[16px]"></span>
+            <CreditCard className="h-4 w-4 text-stone-900" strokeWidth={2} />
             <span className="text-[12px] font-black text-stone-900">Pay</span>
           </div>
           <p className="text-[9px] text-stone-400">Two taps · Apple Pay or Google Pay</p>
@@ -1312,10 +1447,10 @@ function SceneVisual({ id, progress }: { id: number; progress: number }) {
           </div>
           {/* Mini family tree / logo sign-off */}
           <div className="flex flex-col items-center gap-1">
-            {[["👵","👴"],["👩","👨","👩‍🦲"],["🧒","👧","🧒"]].map((row, ri) => (
+            {[2, 3, 3].map((count, ri) => (
               <div key={ri} className="flex gap-2">
-                {row.map((e, ei) => (
-                  <span key={ei} className="text-lg animate-bounce" style={{ animationDelay: `${(ri*3+ei)*0.08}s` }}>{e}</span>
+                {Array.from({ length: count }, (_, ei) => (
+                  <Users key={ei} className="h-4 w-4 text-amber-300 animate-bounce" style={{ animationDelay: `${(ri*3+ei)*0.08}s` }} />
                 ))}
               </div>
             ))}
@@ -1525,7 +1660,7 @@ function ExplainerPlayer() {
           <Play className="h-5 w-5 translate-x-0.5 text-stone-900" strokeWidth={2.5} fill="currentColor" />
         </div>
         <div>
-          <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-800">📺 Watch How Kindled Works</p>
+          <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-800">Watch How Kindled Works</p>
           <p className="text-[11px] text-stone-400">5 scenes · multi-seasonal gifting · ambient music</p>
         </div>
       </motion.button>
@@ -1649,10 +1784,10 @@ function InvestorHUD({ pots, logEntries }: { pots: DemoPot[]; logEntries: string
   const total = useCountUp(totalTarget, open, 2000);
 
   const streams = [
-    { icon: "🔗", label: "Affiliate Commission", sub: "4.5% on £" + totalGoal.toLocaleString() + " catalogue value", val: affiliate, color: "text-amber-400" },
-    { icon: null, label: "Gift Card Margin", sub: "4% wholesale via Tillo / Prezzee", val: giftCard, color: "text-emerald-400" },
-    { icon: "🏦", label: "Open Banking Spread", sub: "0.5% minus 5p per A2A transfer", val: ob, color: "text-sky-400" },
-    { icon: "📡", label: "Intent Data Leads", sub: "£4.75 CPM × high-ticket nodes", val: intent, color: "text-violet-400" },
+    { icon: Link2, label: "Affiliate Commission", sub: "4.5% on £" + totalGoal.toLocaleString() + " catalogue value", val: affiliate, color: "text-amber-400" },
+    { icon: Gift, label: "Gift Card Margin", sub: "4% wholesale via Tillo / Prezzee", val: giftCard, color: "text-emerald-400" },
+    { icon: Landmark, label: "Open Banking Spread", sub: "0.5% minus 5p per A2A transfer", val: ob, color: "text-sky-400" },
+    { icon: Radio, label: "Intent Data Leads", sub: "£4.75 CPM × high-ticket nodes", val: intent, color: "text-violet-400" },
   ];
 
   return (
@@ -1663,7 +1798,7 @@ function InvestorHUD({ pots, logEntries }: { pots: DemoPot[]; logEntries: string
           onClick={() => setOpen((o) => !o)}
           className="flex items-center gap-2 rounded-t-xl border border-b-0 border-stone-700/60 bg-stone-900/98 px-5 py-2.5 backdrop-blur-md"
         >
-          <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">🛠️ Investor HUD</span>
+          <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-stone-400"><Wrench className="h-3 w-3" /> Investor HUD</span>
           <span className="rounded-full bg-emerald-500/20 px-2 py-px text-[9px] font-black text-emerald-400">
             £{total.toFixed(2)} earned
           </span>
@@ -1682,7 +1817,7 @@ function InvestorHUD({ pots, logEntries }: { pots: DemoPot[]; logEntries: string
             {streams.map((s) => (
               <div key={s.label} className="rounded-xl border border-stone-800/40 bg-stone-900/60 px-3 py-3">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-base">{s.icon}</span>
+                  <s.icon className={cn("h-3.5 w-3.5", s.color)} strokeWidth={2} />
                   <p className="text-[10px] font-bold text-stone-300 leading-tight">{s.label}</p>
                 </div>
                 <p className={cn("font-mono text-[15px] font-black tabular-nums", s.color)}>
@@ -1703,8 +1838,8 @@ function InvestorHUD({ pots, logEntries }: { pots: DemoPot[]; logEntries: string
 
           {/* Intent log */}
           <div className="rounded-xl border border-stone-800/40 bg-stone-950 p-3">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-violet-400 mb-2">
-              📡 IntentDataNode Ledger — Series A Foundation
+            <p className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-violet-400 mb-2">
+              <Radio className="h-3 w-3" /> IntentDataNode Ledger — Series A Foundation
             </p>
             <div className="space-y-1 font-mono text-[9px] text-stone-500 max-h-28 overflow-y-auto">
               {logEntries.map((entry, i) => (
@@ -1985,8 +2120,8 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
           <span>←</span> Back to Dashboard
         </button>
         <div className="text-center">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-violet-400 mb-1">✨ Kindled Stars</p>
-        <h1 className="text-[22px] font-black text-white leading-tight">Billy&apos;s Star Dashboard 🚀</h1>
+        <p className="flex items-center justify-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-violet-400 mb-1"><Sparkles className="h-3 w-3" /> Kindled Stars</p>
+        <h1 className="text-[22px] font-black text-white leading-tight">Billy&apos;s Star Dashboard</h1>
         <p className="text-[12px] text-violet-300 mt-1">Complete adventures to earn stars!</p>
         </div>
 
@@ -2008,10 +2143,12 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
       {/* Star exchange rate */}
       <div className="relative z-10 mx-4 mb-4 rounded-2xl bg-white/8 border border-white/15 px-4 py-3">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">💰</span>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/20">
+            <Wallet className="h-5 w-5 text-amber-400" strokeWidth={1.5} />
+          </div>
           <div>
             <p className="text-[12px] font-bold text-white">Star Exchange Rate</p>
-            <p className="text-[11px] text-violet-300">1 ⭐ = £{EXCHANGE_RATE.toFixed(2)} funded by Mum &amp; Dad</p>
+            <p className="flex items-center gap-1 text-[11px] text-violet-300">1 <StarIcon size={11} className="text-amber-400" /> = £{EXCHANGE_RATE.toFixed(2)} funded by Mum &amp; Dad</p>
           </div>
           <div className="ml-auto text-right">
             <p className="text-[11px] font-black text-emerald-400">£{(totalStars * EXCHANGE_RATE).toFixed(2)}</p>
@@ -2090,10 +2227,10 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
       {/* 20-step sticker chart */}
       <section className="relative z-10 mx-4 mb-5 rounded-3xl bg-white/8 border border-white/15 p-4">
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-xl">🏆</span>
+          <Trophy className="h-5 w-5 text-amber-400" strokeWidth={1.75} />
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-black text-white">Star Chart</p>
-            <p className="text-[11px] text-violet-300">Fill 20 stars → unlock your reward! 🚀</p>
+            <p className="text-[11px] text-violet-300">Fill 20 stars → unlock your reward!</p>
           </div>
           <div className="text-right">
             <p className="text-[11px] font-black text-amber-400">{filledCells.size}/20</p>
@@ -2132,7 +2269,7 @@ function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void 
                     className="select-none"
                     style={{ animation: filled && !isNew ? `twinkle ${1.2 + (idx % 5) * 0.25}s ${idx * 0.07}s ease-in-out infinite alternate` : undefined }}
                   >
-                    {isMilestone ? "🌟" : "⭐"}
+                    <StarIcon size={isMilestone ? 18 : 14} className={isMilestone ? "text-orange-400" : "text-amber-400"} />
                   </motion.span>
                 ) : (
                   <span className="text-[10px] font-black text-white/25 select-none">{idx + 1}</span>
@@ -2198,7 +2335,6 @@ const DREAM_GIFTS = [
   {
     name: "MacBook Air M3",
     price: 649,
-    emoji: "💻",
     image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop&q=80",
     contributors: 6,
     each: 108,
@@ -2206,7 +2342,6 @@ const DREAM_GIFTS = [
   {
     name: "Nike Air Max 270",
     price: 110,
-    emoji: "👟",
     image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&q=80",
     contributors: 4,
     each: 28,
@@ -2240,7 +2375,10 @@ function WouldYouRather() {
               side === s ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
             )}
           >
-            {s === "random" ? "🎁 15 random gifts" : "✨ The dream gifts"}
+            <span className="inline-flex items-center gap-1.5">
+              {s === "random" ? <Gift className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
+              {s === "random" ? "15 random gifts" : "The dream gifts"}
+            </span>
           </motion.button>
         ))}
       </div>
@@ -2327,13 +2465,13 @@ function WouldYouRather() {
                 <div className="flex items-center gap-2 px-4 py-2.5">
                   <div className="flex -space-x-1.5">
                     {Array.from({ length: g.contributors }).map((_, j) => (
-                      <div key={j} className="h-5 w-5 rounded-full border-2 border-white bg-gradient-to-br from-amber-300 to-orange-400 text-[8px] flex items-center justify-center text-stone-900">
-                        {["👩","👨","👵","👴","🧑","👩‍🦰"][j % 6]}
+                      <div key={j} className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-amber-300 to-orange-400 text-stone-900">
+                        <Users className="h-2.5 w-2.5" />
                       </div>
                     ))}
                   </div>
                   <p className="text-[11px] text-stone-500">{g.contributors} people kindling together</p>
-                  <span className="ml-auto text-[11px] font-semibold text-emerald-500">✓ No duplicates</span>
+                  <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-emerald-500"><Check className="h-3 w-3" /> No duplicates</span>
                 </div>
               </motion.div>
             ))}
@@ -2581,7 +2719,6 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
     return {
       id: `p${Date.now()}`,
       title: title.trim(),
-      emoji: "",
       goal,
       raised: 0,
       mode: potMode,
@@ -2655,7 +2792,10 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   mode === m ? "bg-white shadow text-stone-900" : "text-stone-400",
                 )}
               >
-                {m === "link" ? "🔗  Paste a link" : "✏️  Enter manually"}
+                <span className="inline-flex items-center gap-1.5">
+                  {m === "link" ? <Link2 className="h-3.5 w-3.5" /> : <PenLine className="h-3.5 w-3.5" />}
+                  {m === "link" ? "Paste a link" : "Enter manually"}
+                </span>
               </button>
             ))}
           </div>
@@ -2708,7 +2848,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3"
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[13px]">✅</span>
+                    <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={2.5} />
                     <p className="text-[12px] font-semibold text-emerald-700">Product details found — edit if needed</p>
                   </div>
                   <input
@@ -2823,7 +2963,9 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   isSurprise ? "border-amber-300 bg-amber-50" : "border-stone-200 bg-white",
                 )}
               >
-                <span className="text-2xl">{isSurprise ? "🔒" : "👁️"}</span>
+                {isSurprise
+                  ? <Lock className="h-6 w-6 text-amber-500" strokeWidth={1.75} />
+                  : <Eye className="h-6 w-6 text-stone-400" strokeWidth={1.75} />}
                 <div className="flex-1 min-w-0">
                   <p className="text-[14px] font-semibold text-stone-800">
                     {isSurprise ? "Keep it a surprise" : "Visible to everyone"}
@@ -2860,7 +3002,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 : "bg-stone-100 text-stone-400 cursor-not-allowed",
             )}
           >
-            <span className="text-[18px]">🎁</span>
+            <Gift className="h-[18px] w-[18px]" strokeWidth={2} />
             <span style={{ fontFamily: "var(--font-display)" }}>Add to list</span>
           </motion.button>
         </div>
@@ -2888,7 +3030,7 @@ function RoleSwitcher({ role, onChange }: { role: "parent" | "receiver"; onChang
           {role === "parent" && (
             <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
           )}
-          <span className="text-base">👩‍👧</span>
+          <Users className="h-4 w-4" />
           <span>Contributor</span>
         </motion.button>
         <motion.button
@@ -2902,7 +3044,7 @@ function RoleSwitcher({ role, onChange }: { role: "parent" | "receiver"; onChang
           {role === "receiver" && (
             <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
           )}
-          <span className="text-base">🧒</span>
+          <Sparkles className="h-4 w-4" />
           <span>Billy&apos;s view</span>
         </motion.button>
       </div>
@@ -2928,12 +3070,12 @@ function ReceiverView({ pots, onOpenStars }: {
       {/* Hero greeting */}
       <div className="px-5 pt-6 pb-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-orange-400 text-3xl shadow-lg shadow-amber-200">
-            🧒
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-orange-400 shadow-lg shadow-amber-200">
+            <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
           </div>
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500">Your Kindled list</p>
-            <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[24px] font-semibold text-stone-900 leading-tight">Hey Billy! 👋</h1>
+            <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[24px] font-semibold text-stone-900 leading-tight">Hey Billy!</h1>
           </div>
         </div>
 
@@ -2942,7 +3084,7 @@ function ReceiverView({ pots, onOpenStars }: {
           {[
             { value: `£${totalRaised}`, label: "kindled so far", color: "text-amber-500" },
             { value: livePots.length, label: "wishes", color: "text-orange-500" },
-            { value: `${surpriseCount}`, label: "surprises 🔒", color: "text-violet-500" },
+            { value: `${surpriseCount}`, label: "surprises", color: "text-violet-500" },
           ].map((s) => (
             <div key={s.label} className="rounded-2xl bg-white px-3 py-3 text-center shadow-sm" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04)" }}>
               <p className={cn("text-[18px] font-bold", s.color)} style={{ fontFamily: "var(--font-display)" }}>{s.value}</p>
@@ -2992,7 +3134,7 @@ function ReceiverView({ pots, onOpenStars }: {
                         {pot.eventLabel} · {pot.eventDate} · being secretly planned for you…
                       </p>
                     </div>
-                    <div className="text-xl">🔒</div>
+                    <Lock className="h-5 w-5 text-white/50" strokeWidth={1.75} />
                   </div>
                 </motion.div>
               ))}
@@ -3036,7 +3178,7 @@ function ReceiverView({ pots, onOpenStars }: {
                           </div>
                           <div className="mt-1.5 flex items-center justify-between">
                             <p className="text-[11px] text-stone-400">£{pot.raised} of £{pot.goal}</p>
-                            <p className="text-[11px] font-semibold text-amber-500">{pct}% kindled 🔥</p>
+                            <p className="flex items-center gap-1 text-[11px] font-semibold text-amber-500">{pct}% kindled <Flame className="h-3 w-3" /></p>
                           </div>
                         </div>
                       </div>
@@ -3055,7 +3197,9 @@ function ReceiverView({ pots, onOpenStars }: {
             <div className="flex flex-col gap-2">
               {claimedPots.map((pot) => (
                 <div key={pot.id} className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-                  <span className="text-xl">{pot.claimedEmoji ?? "✅"}</span>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500">
+                    <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-stone-700 truncate">{pot.title}</p>
                     <p className="text-[11px] text-emerald-600">{pot.claimedBy} — on its way!</p>
@@ -3077,11 +3221,13 @@ function ReceiverView({ pots, onOpenStars }: {
         >
           <div className="pointer-events-none absolute inset-0">
             {[{l:"12%",t:"18%"},{l:"78%",t:"12%"},{l:"55%",t:"65%"},{l:"88%",t:"55%"},{l:"30%",t:"75%"}].map((p,i)=>(
-              <span key={i} className="absolute text-[10px]" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.3}s ${i*0.4}s ease-in-out infinite alternate`,opacity:0.7}}>⭐</span>
+              <Star key={i} className="absolute h-2.5 w-2.5 fill-white/70 text-white/70" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.3}s ${i*0.4}s ease-in-out infinite alternate`,opacity:0.7}} />
             ))}
           </div>
           <div className="relative flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-3xl">🌟</div>
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20">
+              <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-widest text-violet-200 mb-0.5">Kindled Stars</p>
               <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[19px] font-semibold text-white leading-tight">Your star chart</h3>
@@ -3102,6 +3248,10 @@ function ReceiverView({ pots, onOpenStars }: {
 
 export default function DemoPage() {
   const [viewMode, setViewMode] = useState<"parent" | "receiver">("parent");
+  const [isContributor, setIsContributor] = useState(false);
+  useEffect(() => {
+    setIsContributor(new URLSearchParams(window.location.search).get("view") === "contributor");
+  }, []);
   const [showStars, setShowStars] = useState(false);
   const [showNewGift, setShowNewGift] = useState(false);
   const [pots, setPots] = useState<DemoPot[]>([...INITIAL_POTS, ...CHECKLIST_POTS]);
@@ -3117,9 +3267,9 @@ export default function DemoPage() {
   const showToast = useCallback((msg: string) => setToast(msg), []);
 
   const handleShare = useCallback(() => {
-    void navigator.clipboard.writeText("https://kindledgift.co.uk/list/billys-dreams").catch(() => null);
-    showToast("📋 Link copied to share with family!");
-    addLog("🔗 Wishlist link shared — referral tracking engaged");
+    void navigator.clipboard.writeText("https://kindledgift.co.uk/list/billys-dreams?view=contributor").catch(() => null);
+    showToast("Link copied to share with family!");
+    addLog("Wishlist link shared — referral tracking engaged");
   }, [showToast, addLog]);
 
   const handleAddItem = useCallback((item: CatalogItem) => {
@@ -3128,7 +3278,6 @@ export default function DemoPage() {
     const newPot: DemoPot = {
       id: `new_${item.id}`,
       title: item.name,
-      emoji: item.emoji,
       goal: item.price,
       raised: 0,
       mode: "LIVE_FEED",
@@ -3142,10 +3291,10 @@ export default function DemoPage() {
       tributes: [],
     };
     setPots((prev) => [newPot, ...prev]);
-    showToast(`🎯 "${item.name}" added to Billy's Dream Board!`);
+    showToast(`"${item.name}" added to Billy's Dream Board!`);
     const intentMsg = item.price >= 200
-      ? `📡 IntentDataNode CREATED: "${item.name}" £${item.price} — High-ticket Day 1 signal`
-      : `📊 Catalogue add: "${item.name}" (£${item.price.toFixed(2)}) — tracking engaged`;
+      ? `IntentDataNode CREATED: "${item.name}" £${item.price} — High-ticket Day 1 signal`
+      : `Catalogue add: "${item.name}" (£${item.price.toFixed(2)}) — tracking engaged`;
     addLog(intentMsg);
   }, [addedIds, showToast, addLog]);
 
@@ -3153,22 +3302,22 @@ export default function DemoPage() {
     setPots((prev) => prev.map((p) =>
       p.id === id ? { ...p, raised: Math.min(p.goal, p.raised + amount), contributors: p.contributors + 1 } : p,
     ));
-    showToast(`🔥 £${amount} kindled!`);
-    addLog(`🔥 Contribution: £${amount} added to pot`);
+    showToast(`£${amount} kindled!`);
+    addLog(`Contribution: £${amount} added to pot`);
   }, [showToast, addLog]);
 
   const handleBuy = useCallback((id: string) => {
     setPots((prev) => prev.map((p) =>
-      p.id === id ? { ...p, raised: p.goal, isClaimed: true, claimedBy: "You", claimedEmoji: "✋", claimedNote: "Bought outright — no duplicate risk!" } : p,
+      p.id === id ? { ...p, raised: p.goal, isClaimed: true, claimedBy: "You", claimedNote: "Bought outright — no duplicate risk!" } : p,
     ));
-    showToast("🛒 Bought outright — duplicate prevented!");
-    addLog("🛒 Outright purchase: item fully claimed");
+    showToast("Bought outright — duplicate prevented!");
+    addLog("Outright purchase: item fully claimed");
   }, [showToast, addLog]);
 
   const handleAddNewGift = useCallback((pot: DemoPot) => {
     setPots((prev) => [pot, ...prev]);
-    showToast(`🎁 "${pot.title}" added to the list!`);
-    addLog(`✨ New gift created: "${pot.title}" £${pot.goal} — ${pot.mode}`);
+    showToast(`"${pot.title}" added to the list!`);
+    addLog(`New gift created: "${pot.title}" £${pot.goal} — ${pot.mode}`);
   }, [showToast, addLog]);
 
   const livePots = pots.filter((p) => p.mode === "LIVE_FEED");
@@ -3204,6 +3353,7 @@ export default function DemoPage() {
         potCount={pots.length}
         totalGoal={pots.reduce((s, p) => s + p.goal, 0)}
         onShare={handleShare}
+        isContributor={isContributor}
       />
 
       <main className="space-y-7 pb-36 pt-4">
@@ -3218,31 +3368,33 @@ export default function DemoPage() {
               <LivePotCard
                 key={pot.id}
                 pot={pot}
-                {...((pot.id.startsWith("new_") || pot.id.startsWith("p")) && { onRemove: (id: string) => setPots((p) => p.filter((x) => x.id !== id)) })}
+                {...(!isContributor && (pot.id.startsWith("new_") || pot.id.startsWith("p")) && { onRemove: (id: string) => setPots((p) => p.filter((x) => x.id !== id)) })}
                 onKindle={handleKindle}
                 onBuy={handleBuy}
               />
             ))}
-            {/* Add new gift card */}
-            <motion.button
-              whileHover={{ scale: 1.01, y: -1 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 400, damping: 28 }}
-              onClick={() => setShowNewGift(true)}
-              className="flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/60 px-4 py-4 text-left transition-colors hover:border-amber-400 hover:bg-amber-50"
-            >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-xl font-bold text-stone-900 shadow">
-                +
-              </div>
-              <div>
-                <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-700">New gift</p>
-                <p className="text-[12px] text-stone-400">Paste a link or enter manually</p>
-              </div>
-            </motion.button>
+            {/* Add new gift card — owner only */}
+            {!isContributor && (
+              <motion.button
+                whileHover={{ scale: 1.01, y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                onClick={() => setShowNewGift(true)}
+                className="flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/60 px-4 py-4 text-left transition-colors hover:border-amber-400 hover:bg-amber-50"
+              >
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-xl font-bold text-stone-900 shadow">
+                  +
+                </div>
+                <div>
+                  <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-700">New gift</p>
+                  <p className="text-[12px] text-stone-400">Paste a link or enter manually</p>
+                </div>
+              </motion.button>
+            )}
           </div>
         </section>
 
-        {/* ── Surprise Pots + Unwrap CTA ── */}
+        {/* ── Surprise Pots + Unwrap CTA (Unwrap trigger is owner-only) ── */}
         {surprisePots.length > 0 && (
           <section className="px-4">
             <div className="mb-3">
@@ -3251,10 +3403,11 @@ export default function DemoPage() {
             </div>
             <div className="flex flex-col gap-3">
               {surprisePots.map((pot) => (
-                <LockedPotCard key={pot.id} pot={pot} onReveal={setRevealPot} />
+                <LockedPotCard key={pot.id} pot={pot} onReveal={isContributor ? () => undefined : setRevealPot} />
               ))}
             </div>
-            {/* ── Unwrap All — sits directly under the pots ── */}
+            {/* ── Unwrap All — sits directly under the pots, owner-only ── */}
+            {!isContributor && (
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.97 }}
@@ -3263,16 +3416,18 @@ export default function DemoPage() {
               className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-500 py-4 shadow-xl"
               style={{ boxShadow: "0 4px 24px rgba(220,38,38,0.35), 0 0 0 1px rgba(220,38,38,0.2)" }}
             >
-              <span className="text-[20px]">🎁</span>
+              <Gift className="h-5 w-5 text-white" strokeWidth={2} />
               <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white">Unwrap all · Open on Christmas Day</span>
             </motion.button>
+            )}
           </section>
         )}
 
         {/* ── Would You Rather ── */}
-        <WouldYouRather />
+        {!isContributor && <WouldYouRather />}
 
-        {/* ── Kindled Stars entry ── */}
+        {/* ── Kindled Stars entry — owner/kid admin only ── */}
+        {!isContributor && (
         <section className="px-4">
           <motion.button
             whileHover={{ scale: 1.01, y: -2 }}
@@ -3284,12 +3439,12 @@ export default function DemoPage() {
             {/* Twinkling dots */}
             <div className="pointer-events-none absolute inset-0">
               {[{l:"12%",t:"18%"},{l:"78%",t:"12%"},{l:"55%",t:"65%"},{l:"88%",t:"55%"},{l:"30%",t:"75%"}].map((p,i)=>(
-                <span key={i} className="absolute text-[10px]" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.3}s ${i*0.4}s ease-in-out infinite alternate`,opacity:0.7}}>⭐</span>
+                <Star key={i} className="absolute h-2.5 w-2.5 fill-white/70 text-white/70" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.3}s ${i*0.4}s ease-in-out infinite alternate`,opacity:0.7}} />
               ))}
             </div>
             <div className="relative flex items-center gap-4">
-              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20 text-3xl">
-                🌟
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20">
+                <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-violet-200 mb-0.5">Kids Rewards</p>
@@ -3298,14 +3453,15 @@ export default function DemoPage() {
               </div>
               <div className="flex flex-col items-end gap-1">
                 <span className="rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-black text-stone-900">Open →</span>
-                <span className="text-[10px] text-violet-300">24 ⭐ earned</span>
+                <span className="flex items-center gap-1 text-[10px] text-violet-300"><Star className="h-2.5 w-2.5 fill-current" />24 earned</span>
               </div>
             </div>
           </motion.button>
         </section>
+        )}
 
-        {/* ── Catalogue ── */}
-        <CatalogueGrid onAdd={handleAddItem} />
+        {/* ── Catalogue — pot-creation tool, owner only ── */}
+        {!isContributor && <CatalogueGrid onAdd={handleAddItem} />}
 
         {/* ── Explainer ── */}
         <ExplainerPlayer />
@@ -3320,7 +3476,7 @@ export default function DemoPage() {
         <FirstKindlersCTA />
       </main>
 
-      <InvestorHUD pots={pots} logEntries={logEntries} />
+      {!isContributor && <InvestorHUD pots={pots} logEntries={logEntries} />}
       </>}
       </motion.div>
       )}

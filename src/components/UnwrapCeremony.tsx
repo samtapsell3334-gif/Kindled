@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Heart, Copy, Check, ChevronRight, SkipForward } from "lucide-react";
+import { Heart, Copy, Check, ChevronRight, SkipForward, Gift, Flame, User, Trophy, Sparkles, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FundingBar } from "@/components/pots/FundingBar";
 import type { GiftingMode, VideoTribute } from "@/types/pots";
@@ -16,7 +16,6 @@ import type { GiftingMode, VideoTribute } from "@/types/pots";
 
 interface UnwrapCeremonyProps {
   potTitle: string;
-  potEmoji: string;
   raised: number;
   goal: number;
   mode: GiftingMode;
@@ -31,7 +30,8 @@ const TRIBUTE_DURATION_MS = 4000;
 
 // Seasonal theme tokens
 interface SeasonTheme {
-  giftEmoji: string;
+  GiftIcon: LucideIcon;
+  giftIconColor: string;
   giftLabel: string;
   glowClass: string;
   boxGradient: string;
@@ -46,7 +46,8 @@ interface SeasonTheme {
 function getTheme(mode: GiftingMode): SeasonTheme {
   if (mode === "WRAPPED_UP") {
     return {
-      giftEmoji: "🎀",
+      GiftIcon: Gift,
+      giftIconColor: "text-violet-300",
       giftLabel: "Birthday gift",
       glowClass: "animate-gift-glow-plum",
       boxGradient: "from-violet-700/30 to-fuchsia-800/20",
@@ -59,7 +60,8 @@ function getTheme(mode: GiftingMode): SeasonTheme {
     };
   }
   return {
-    giftEmoji: "🎁",
+    GiftIcon: Gift,
+    giftIconColor: "text-amber-400",
     giftLabel: "Christmas gift",
     glowClass: "animate-gift-glow",
     boxGradient: "from-red-800/30 to-amber-700/20",
@@ -156,9 +158,10 @@ function IgnitionSlider({ theme, onIgnite }: IgnitionSliderProps) {
         />
 
         {/* Track label */}
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center gap-2">
+          <Flame className="h-3.5 w-3.5 text-white/40" />
           <span className="text-[13px] font-bold tracking-widest text-white/40 select-none">
-            🔥 &nbsp; S L I D E &nbsp; T O &nbsp; I G N I T E
+            S L I D E &nbsp; T O &nbsp; I G N I T E
           </span>
         </div>
 
@@ -228,9 +231,9 @@ function SlotCounter({ raised, onDone }: { raised: number; onDone: () => void })
         {Array.from({ length: 5 }, (_, i) => (
           <div
             key={i}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-800 text-lg blur-[3px]"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-800 blur-[3px]"
           >
-            👤
+            <User className="h-5 w-5 text-stone-500" />
           </div>
         ))}
       </div>
@@ -244,12 +247,11 @@ function SlotCounter({ raised, onDone }: { raised: number; onDone: () => void })
 
 interface MosaicProps {
   tributes: VideoTribute[];
-  potEmoji: string;
   particles: Particle[];
   onDone: () => void;
 }
 
-function MosaicExplosion({ tributes, potEmoji, particles, onDone }: MosaicProps) {
+function MosaicExplosion({ tributes, particles, onDone }: MosaicProps) {
   const [flownIn, setFlownIn] = useState(false);
   const [productVisible, setProductVisible] = useState(false);
   const [shaking, setShaking] = useState(true);
@@ -299,15 +301,16 @@ function MosaicExplosion({ tributes, potEmoji, particles, onDone }: MosaicProps)
 
       {/* Product image (frosted → revealed) */}
       <div className="relative flex h-28 w-28 items-center justify-center rounded-3xl bg-stone-800/60">
-        <span
-          className="text-6xl transition-all duration-1000"
+        <Gift
+          className="h-14 w-14 text-amber-300 transition-all duration-1000"
+          strokeWidth={1.2}
           style={{ filter: productVisible ? "blur(0)" : "blur(12px)", opacity: productVisible ? 1 : 0.3 }}
-        >
-          {potEmoji}
-        </span>
+        />
       </div>
 
-      <p className="text-[16px] font-bold text-stone-100">It&apos;s yours! 🎉</p>
+      <p className="flex items-center gap-1.5 text-[16px] font-bold text-stone-100">
+        <Gift className="h-4 w-4 text-amber-300" /> It&apos;s yours!
+      </p>
 
       {/* Avatar mosaic */}
       <div className="grid grid-cols-4 gap-3">
@@ -322,8 +325,8 @@ function MosaicExplosion({ tributes, potEmoji, particles, onDone }: MosaicProps)
               opacity: flownIn ? 1 : 0,
             }}
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-800 text-2xl shadow-md">
-              {t.avatarEmoji}
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-800 text-[15px] font-bold text-amber-300 shadow-md">
+              {t.contributorName.charAt(0)}
             </div>
             <span className="text-[9px] text-stone-500 text-center leading-tight max-w-[48px] truncate">
               {t.contributorName}
@@ -369,8 +372,8 @@ function TributeShowreel({
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between">
-        <p className="text-[12px] font-semibold uppercase tracking-wider text-stone-500">
-          💌 Messages from your people
+        <p className="flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-stone-500">
+          <Heart className="h-3 w-3" /> Messages from your people
         </p>
         <button
           onClick={advance}
@@ -387,7 +390,7 @@ function TributeShowreel({
       >
         {isVideo ? (
           <div className="relative flex h-52 items-center justify-center bg-stone-800">
-            <span className="text-6xl">{tribute.avatarEmoji}</span>
+            <span className="text-5xl font-bold text-amber-300">{tribute.contributorName.charAt(0)}</span>
             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-400/90 shadow-lg">
                 <div className="ml-1 h-0 w-0 border-y-[8px] border-l-[14px] border-y-transparent border-l-stone-900" />
@@ -404,8 +407,8 @@ function TributeShowreel({
 
         <div className="px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-800 text-lg">
-              {tribute.avatarEmoji}
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-800 text-[12px] font-bold text-amber-300">
+              {tribute.contributorName.charAt(0)}
             </div>
             <div>
               <p className="text-[13px] font-semibold text-stone-200">{tribute.contributorName}</p>
@@ -462,7 +465,7 @@ function SplashScreen({
   const [copied, setCopied] = useState(false);
 
   function handleThankYou() {
-    const msg = `Thank you all so much for my ${potTitle} — I'm genuinely overwhelmed by your generosity! 🎁💛`;
+    const msg = `Thank you all so much for my ${potTitle} — I'm genuinely overwhelmed by your generosity!`;
     void navigator.clipboard.writeText(msg).catch(() => undefined);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -488,7 +491,7 @@ function SplashScreen({
           style={{ animationDelay: "0.12s" }}
         >
           <div className="flex items-start gap-3">
-            <span className="text-2xl">🏆</span>
+            <Trophy className="h-6 w-6 shrink-0 text-amber-400" strokeWidth={1.5} />
             <div>
               <p className="text-[13px] font-bold">
                 <span className="animate-gold-shimmer">
@@ -500,7 +503,7 @@ function SplashScreen({
                 <span className="font-bold text-amber-400">{boosterEntries} entries</span> into
                 the{" "}
                 <span className="font-semibold text-stone-200">£2,500 Summer Goal Booster Draw</span>.
-                Draws happen the first Monday of each month. Good luck! 🎲
+                Draws happen the first Monday of each month. Good luck!
               </p>
             </div>
           </div>
@@ -556,7 +559,6 @@ function SplashScreen({
 
 export function UnwrapCeremony({
   potTitle,
-  potEmoji,
   raised,
   goal,
   mode,
@@ -594,9 +596,7 @@ export function UnwrapCeremony({
                 theme.boxGradient, theme.glowClass,
               )}
             >
-              <span className="text-8xl select-none" role="img" aria-label={theme.giftLabel}>
-                {theme.giftEmoji}
-              </span>
+              <theme.GiftIcon className={cn("h-20 w-20", theme.giftIconColor)} strokeWidth={1.2} aria-label={theme.giftLabel} />
             </div>
 
             <div className="text-center">
@@ -634,10 +634,9 @@ export function UnwrapCeremony({
           <div className="relative flex w-full max-w-sm flex-col items-center gap-6">
             <MosaicExplosion
               tributes={tributes.length > 0 ? tributes : [
-                { id: "anon", contributorName: "Anonymous", avatarEmoji: "🤗",
+                { id: "anon", contributorName: "Anonymous",
                   message: "With love!", recordedAt: new Date().toISOString() },
               ]}
-              potEmoji={potEmoji}
               particles={particles}
               onDone={() => advance(tributes.length > 0 ? "tributes" : "splash")}
             />
@@ -658,7 +657,7 @@ export function UnwrapCeremony({
         {phase === "splash" && (
           <div className="w-full max-w-sm pb-4">
             <div className="animate-fade-up mb-5 text-center">
-              <span className="text-5xl" aria-hidden>🎉</span>
+              <Sparkles className="mx-auto h-12 w-12 text-amber-400" strokeWidth={1.2} aria-hidden />
               <h1 className="mt-2 text-[22px] font-bold text-stone-100">
                 Your {potTitle}!
               </h1>

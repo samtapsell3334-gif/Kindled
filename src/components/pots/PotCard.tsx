@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Users } from "lucide-react";
+import { Users, Gift, Sparkles, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EventChip } from "./EventChip";
 import { FundingBar } from "./FundingBar";
@@ -100,7 +100,8 @@ interface LockedTheme {
   border: string;
   glowClass: string;
   boxGradient: string;
-  boxEmoji: string;
+  BoxIcon: LucideIcon;
+  boxIconColor: string;
   boxEmojiLabel: string;
   accentStripe: string;
   labelColor: string;
@@ -117,11 +118,12 @@ function getLockedTheme(mode: GiftingMode): LockedTheme {
       border: "border-violet-500/30",
       glowClass: "animate-gift-glow-plum",
       boxGradient: "from-violet-600/25 to-fuchsia-700/20",
-      boxEmoji: "🎀",
+      BoxIcon: Gift,
+      boxIconColor: "text-violet-300",
       boxEmojiLabel: "Birthday gift",
       accentStripe: "bg-gradient-to-r from-violet-500 via-fuchsia-400 to-pink-500",
       labelColor: "text-violet-400",
-      modeLabel: "Wrapped Up ✨",
+      modeLabel: "Wrapped Up",
       countdownLabel: "Birthday",
       unlockBtnClass: "from-violet-500 to-fuchsia-500 shadow-violet-900/40",
       Particles: ConfettiOverlay,
@@ -132,11 +134,12 @@ function getLockedTheme(mode: GiftingMode): LockedTheme {
     border: "border-red-700/30",
     glowClass: "animate-gift-glow",
     boxGradient: "from-red-800/30 to-amber-700/20",
-    boxEmoji: "🎁",
+    BoxIcon: Gift,
+    boxIconColor: "text-amber-400",
     boxEmojiLabel: "Christmas gift",
     accentStripe: "bg-gradient-to-r from-red-700 via-amber-500 to-red-600",
     labelColor: "text-amber-400",
-    modeLabel: "Under the Tree 🎄",
+    modeLabel: "Under the Tree",
     countdownLabel: "Reveal",
     unlockBtnClass: "from-amber-400 to-orange-500 shadow-amber-900/40",
     Particles: SnowOverlay,
@@ -157,7 +160,6 @@ function LockedCard({ pot }: { pot: PotCardData }) {
       {showCeremony && (
         <UnwrapCeremony
           potTitle={pot.title}
-          potEmoji={pot.emoji}
           raised={pot.raised}
           goal={pot.goal}
           mode={pot.mode}
@@ -181,8 +183,8 @@ function LockedCard({ pot }: { pot: PotCardData }) {
           {/* Header */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2.5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black/30 text-xl">
-                🎁
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black/30">
+                <Gift className="h-5 w-5 text-stone-300" strokeWidth={1.5} />
               </span>
               <div className="min-w-0">
                 <h3 className="truncate text-[15px] font-semibold tracking-tight text-stone-100">
@@ -205,9 +207,7 @@ function LockedCard({ pot }: { pot: PotCardData }) {
               theme.boxGradient,
             )}
           >
-            <span className="text-5xl select-none" role="img" aria-label={theme.boxEmojiLabel}>
-              {theme.boxEmoji}
-            </span>
+            <theme.BoxIcon className={cn("h-12 w-12", theme.boxIconColor)} strokeWidth={1.2} aria-label={theme.boxEmojiLabel} />
             <p className="px-3 text-center text-[13px] font-semibold text-stone-200">
               Locked — Unwraps {pot.event.date}
             </p>
@@ -222,7 +222,8 @@ function LockedCard({ pot }: { pot: PotCardData }) {
                   theme.unlockBtnClass,
                 )}
               >
-                🎉 Unwrap now!
+                <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+                Unwrap now!
               </button>
             ) : (
               <CountdownTimer targetIso={pot.event.isoDate} />
@@ -250,7 +251,7 @@ function LiveCard({ pot }: { pot: PotCardData }) {
   const isContributorSurpriseView = pot.mode !== "LIVE_FEED" && !pot.isLocked;
 
   const statusLabel =
-    pct >= 100 ? "Funded 🎉" : pct >= 50 ? "Halfway there" : "Just getting started";
+    pct >= 100 ? "Funded" : pct >= 50 ? "Halfway there" : "Just getting started";
   const statusColor =
     pct >= 100 ? "text-emerald-400" : pct >= 50 ? "text-amber-400" : "text-orange-400";
 
@@ -266,8 +267,8 @@ function LiveCard({ pot }: { pot: PotCardData }) {
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-2.5">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-800 text-xl">
-              {pot.emoji}
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-800">
+              <Gift className="h-5 w-5 text-stone-400" strokeWidth={1.5} />
             </span>
             <div className="min-w-0">
               <h3 className="truncate text-[15px] font-semibold tracking-tight text-stone-100">

@@ -359,3 +359,29 @@ body {
   80%  { opacity: 1; }
   100% { transform: translate(var(--tx,0px), var(--ty,-120px)) scale(0.3); opacity: 0; }
 }
+
+/* ── Reveal ceremony: organic light-leak sweep ── */
+@keyframes light-leak-sweep {
+  0%   { transform: translate(-30%, -20%) rotate(0deg) scale(1);   opacity: 0; }
+  15%  { opacity: var(--leak-peak, 0.55); }
+  50%  { transform: translate(10%, 5%) rotate(8deg) scale(1.15);   opacity: var(--leak-peak, 0.55); }
+  85%  { opacity: 0.1; }
+  100% { transform: translate(40%, 25%) rotate(14deg) scale(1.3);  opacity: 0; }
+}
+.animate-light-leak { animation: light-leak-sweep var(--leak-dur, 3.2s) ease-in-out forwards; }
+
+/* ── Reveal ceremony: slow-rising golden embers ── */
+@keyframes ember-rise {
+  0%   { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateY(var(--ember-y,-220px)) translateX(var(--ember-x,12px)) scale(1.1); opacity: 0; }
+}
+.animate-ember-rise { animation: ember-rise var(--ember-dur, 3.4s) ease-out forwards; }
+
+/* ── Reveal ceremony: screen-wide warm pulse on chime hits ── */
+@keyframes chime-pulse {
+  0%   { opacity: 0; }
+  30%  { opacity: var(--pulse-peak, 0.35); }
+  100% { opacity: 0; }
+}
+.animate-chime-pulse { animation: chime-pulse 0.7s ease-out forwards; }

@@ -1,7 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { X, Play, Pause, Volume2, VolumeX } from "lucide-react";
+import {
+  X, Play, Pause, Volume2, VolumeX, Trash2, Sparkles, Zap, Check, Link2, Bike, Lock, Video, Banknote,
+  Wallet, Package, ShoppingBag, Infinity as InfinityIcon, Coins, BatteryCharging, Gift,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Scene config ─────────────────────────────────────────────────────────────
@@ -170,7 +173,7 @@ function Scene1({ p }: { p: number }) {
 
       {/* Wallet + money */}
       <div className={cn("flex items-center gap-3 transition-all duration-700", showWallet ? "opacity-100 scale-100" : "opacity-0 scale-75")}>
-        <span className="text-5xl">👛</span>
+        <Wallet className="h-12 w-12 text-stone-400" strokeWidth={1.5} />
         {showMoney && (
           <div className="flex flex-col gap-0.5">
             {["£50", "£75", "£30"].map((v, i) => (
@@ -195,10 +198,10 @@ function Scene1({ p }: { p: number }) {
       {showJunk && (
         <div className="flex items-end gap-4 animate-fade-up">
           {[
-            { e: "🧦", l: "socks" },
-            { e: "🗿", l: "trinket" },
-            { e: "🛍️", l: "clutter" },
-          ].map(({ e, l }, i) => (
+            { Icon: Package, l: "socks" },
+            { Icon: Package, l: "trinket" },
+            { Icon: ShoppingBag, l: "clutter" },
+          ].map(({ Icon, l }, i) => (
             <div
               key={l}
               className={cn(
@@ -207,7 +210,7 @@ function Scene1({ p }: { p: number }) {
               )}
               style={{ transitionDelay: `${i * 120}ms` }}
             >
-              <span className="text-3xl animate-wobble">{e}</span>
+              <Icon className="h-7 w-7 animate-wobble text-stone-500" strokeWidth={1.5} />
               <span className="text-[8px] text-stone-600">{l}</span>
             </div>
           ))}
@@ -219,7 +222,7 @@ function Scene1({ p }: { p: number }) {
       {/* Trash bin */}
       {showBin && (
         <div className="flex flex-col items-center gap-1 animate-scale-in">
-          <span className="text-5xl">{binFull ? "🗑️" : "🗑️"}</span>
+          <Trash2 className="h-12 w-12 text-stone-500" strokeWidth={1.5} />
           {binFull && (
             <div className="rounded-full bg-rose-500/20 px-2.5 py-0.5 animate-fade-up">
               <span className={cn("text-[9px] font-bold", SCENE_TEXT[0])}>
@@ -253,13 +256,11 @@ function Scene2({ p }: { p: number }) {
       {showCoins && (
         <div className="pointer-events-none absolute top-0 left-0 right-0 flex justify-around">
           {[0, 1, 2, 3].map((i) => (
-            <span
+            <Coins
               key={i}
-              className="animate-coin-drop text-base"
+              className="animate-coin-drop h-4 w-4 text-amber-400"
               style={{ animationDelay: `${i * 0.4}s` }}
-            >
-              🪙
-            </span>
+            />
           ))}
         </div>
       )}
@@ -271,11 +272,13 @@ function Scene2({ p }: { p: number }) {
           showCard ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
         )}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-800 text-xl">🚵</div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-800">
+              <Bike className="h-5 w-5 text-stone-300" strokeWidth={1.5} />
+            </div>
             <div className="min-w-0">
               <p className="truncate text-[13px] font-bold text-stone-100">Mountain Bike</p>
-              <p className={cn("text-[11px] font-medium transition-colors duration-500", fillPct >= 100 ? SCENE_TEXT[1] : "text-amber-400")}>
-                {fillPct >= 100 ? "Fully funded! 🎉" : "Collecting contributions..."}
+              <p className={cn("flex items-center gap-1 text-[11px] font-medium transition-colors duration-500", fillPct >= 100 ? SCENE_TEXT[1] : "text-amber-400")}>
+                {fillPct >= 100 ? <><Sparkles className="h-3 w-3" /> Fully funded!</> : "Collecting contributions..."}
               </p>
             </div>
           </div>
@@ -328,9 +331,10 @@ function Scene2({ p }: { p: number }) {
       )}
 
       {showChip && (
-        <div className={cn("animate-fade-up rounded-full border px-3 py-1.5", "border-emerald-500/30 bg-emerald-500/10")}>
+        <div className={cn("flex animate-fade-up items-center gap-1.5 rounded-full border px-3 py-1.5", "border-emerald-500/30 bg-emerald-500/10")}>
+          <InfinityIcon className={cn("h-3.5 w-3.5", SCENE_TEXT[1])} />
           <span className={cn("text-[11px] font-semibold", SCENE_TEXT[1])}>
-            ♾️ Open year-round — never expires
+            Open year-round — never expires
           </span>
         </div>
       )}
@@ -358,7 +362,7 @@ function Scene3({ p }: { p: number }) {
         {/* Header */}
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🚵</span>
+            <Bike className="h-4 w-4 text-stone-300" strokeWidth={1.75} />
             <span className="text-[13px] font-bold text-stone-100">Mountain Bike</span>
           </div>
           {/* Toggle */}
@@ -393,10 +397,10 @@ function Scene3({ p }: { p: number }) {
           {showGiftBox && (
             <div className="animate-gift-glow-plum rounded-xl border border-violet-500/20 bg-gradient-to-b from-violet-700/25 to-fuchsia-800/15">
               <div className="animate-scale-in flex flex-col items-center gap-2 py-4">
-                <span className="text-4xl">🎀</span>
+                <Gift className="h-9 w-9 text-violet-300" strokeWidth={1.2} />
                 <p className="text-[12px] font-semibold text-stone-200">Locked — Unwraps Jun 28</p>
                 <div className="flex items-center gap-1 rounded-full bg-stone-800/60 px-2.5 py-1">
-                  <span className="text-[10px]">🔒</span>
+                  <Lock className="h-2.5 w-2.5 text-stone-400" />
                   <span className="text-[10px] text-stone-400">Balance hidden from you</span>
                 </div>
               </div>
@@ -417,8 +421,9 @@ function Scene3({ p }: { p: number }) {
         )}
       </div>
 
-      <div className="animate-fade-up rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1">
-        <span className={cn("text-[11px] font-semibold", SCENE_TEXT[2])}>🔮 Suspense fully preserved</span>
+      <div className="flex animate-fade-up items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1">
+        <Lock className="h-3 w-3 text-violet-300" />
+        <span className={cn("text-[11px] font-semibold", SCENE_TEXT[2])}>Suspense fully preserved</span>
       </div>
     </div>
   );
@@ -444,7 +449,9 @@ function Scene4({ p }: { p: number }) {
           showCard ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
         )}>
           <div className="mb-3 flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-800 text-xl">🚵</div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-800">
+              <Bike className="h-5 w-5 text-stone-300" strokeWidth={1.5} />
+            </div>
             <div className="min-w-0">
               <p className="truncate text-[13px] font-bold text-stone-100">Mountain Bike</p>
               <p className={cn("text-[11px] font-medium", SCENE_TEXT[3])}>85% funded — help push it over!</p>
@@ -463,21 +470,23 @@ function Scene4({ p }: { p: number }) {
           {/* CTA / transfer */}
           <div className="mt-3">
             {!showTransfer && (
-              <div className="rounded-xl bg-gradient-to-r from-sky-500 to-teal-400 px-4 py-2.5 text-center">
-                <span className="text-[12px] font-bold text-stone-900">⚡ Chip In £20</span>
+              <div className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-teal-400 px-4 py-2.5 text-center">
+                <Zap className="h-3.5 w-3.5 text-stone-900" strokeWidth={2.5} />
+                <span className="text-[12px] font-bold text-stone-900">Chip In £20</span>
               </div>
             )}
             {showTransfer && !transferDone && (
               <div className="relative overflow-hidden rounded-xl bg-stone-800 px-4 py-2.5 text-center">
                 <span className="text-[12px] text-stone-400">Processing via Open Banking...</span>
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <span className="animate-transfer text-xl">💸</span>
+                  <Banknote className="animate-transfer h-5 w-5 text-emerald-400" />
                 </div>
               </div>
             )}
             {transferDone && (
-              <div className="animate-scale-in rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-center">
-                <span className={cn("text-[12px] font-bold", SCENE_TEXT[1])}>✅ £20 sent instantly!</span>
+              <div className="animate-scale-in flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-center">
+                <Check className={cn("h-3.5 w-3.5", SCENE_TEXT[1])} strokeWidth={2.5} />
+                <span className={cn("text-[12px] font-bold", SCENE_TEXT[1])}>£20 sent instantly!</span>
               </div>
             )}
           </div>
@@ -485,7 +494,7 @@ function Scene4({ p }: { p: number }) {
           {/* Camera prompt */}
           {showCamera && (
             <div className="mt-2.5 animate-fade-up flex items-center gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 p-2.5">
-              <span className="text-xl shrink-0">🎥</span>
+              <Video className="h-5 w-5 shrink-0 text-amber-400" strokeWidth={1.5} />
               <div>
                 <p className="text-[11px] font-semibold text-amber-300">Record a video tribute?</p>
                 <p className="text-[9px] text-stone-500">Leave Leo a personal message</p>
@@ -495,8 +504,9 @@ function Scene4({ p }: { p: number }) {
         </div>
       )}
 
-      <div className="animate-fade-up rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1">
-        <span className={cn("text-[11px] font-semibold", SCENE_TEXT[3])}>🔗 A2A Open Banking · instant settlement</span>
+      <div className="flex animate-fade-up items-center gap-1.5 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1">
+        <Link2 className="h-3 w-3 text-sky-300" />
+        <span className={cn("text-[11px] font-semibold", SCENE_TEXT[3])}>A2A Open Banking · instant settlement</span>
       </div>
     </div>
   );
@@ -529,7 +539,7 @@ function Scene5({ p }: { p: number }) {
       {/* Pre-swipe ignition */}
       {!swiped && (
         <div className="flex flex-col items-center gap-3 animate-fade-up">
-          <span className="text-5xl">🎁</span>
+          <Gift className="h-12 w-12 text-amber-400" strokeWidth={1.2} />
           <div className="flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-5 py-2.5">
             <span className={cn("animate-swipe-bounce text-sm", SCENE_TEXT[4])}>→</span>
             <span className={cn("text-[13px] font-bold", SCENE_TEXT[4])}>Slide to ignite</span>
@@ -548,8 +558,9 @@ function Scene5({ p }: { p: number }) {
             </span>
           </div>
           {counterVal >= 450 && (
-            <div className="animate-scale-in rounded-full bg-emerald-500/20 px-3 py-1">
-              <span className={cn("text-[11px] font-bold", SCENE_TEXT[1])}>✨ 100% FUNDED</span>
+            <div className="animate-scale-in flex items-center gap-1 rounded-full bg-emerald-500/20 px-3 py-1">
+              <Sparkles className={cn("h-3 w-3", SCENE_TEXT[1])} />
+              <span className={cn("text-[11px] font-bold", SCENE_TEXT[1])}>100% FUNDED</span>
             </div>
           )}
         </div>
@@ -579,20 +590,20 @@ function Scene5({ p }: { p: number }) {
       {showTributes && (
         <div className="flex w-full max-w-[240px] flex-col gap-1.5">
           {[
-            { e: "🧔", name: "Jamie", msg: "Get shredding mate! 🤘" },
-            { e: "👩‍🦱", name: "Sarah", msg: "So well deserved! 🚵‍♀️" },
+            { name: "Jamie", msg: "Get shredding mate!" },
+            { name: "Sarah", msg: "So well deserved!" },
           ].map((t, i) => (
             <div
               key={t.name}
               className="animate-fade-up flex items-center gap-2 rounded-xl border border-stone-700/50 bg-stone-800/80 p-2"
               style={{ animationDelay: `${i * 180}ms` }}
             >
-              <span className="shrink-0 text-lg">{t.e}</span>
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-700 text-[10px] font-bold text-stone-300">{t.name.charAt(0)}</span>
               <div className="min-w-0 flex-1">
                 <p className="text-[9px] font-bold text-stone-300">{t.name}</p>
                 <p className="truncate text-[10px] text-stone-400">&ldquo;{t.msg}&rdquo;</p>
               </div>
-              <span className="shrink-0 text-xs">▶️</span>
+              <Play className="h-3 w-3 shrink-0 text-stone-400" fill="currentColor" />
             </div>
           ))}
         </div>
@@ -792,9 +803,8 @@ export function InteractiveExplainer({ isOpen, onClose }: InteractiveExplainerPr
           <div className="flex items-center justify-between bg-stone-900 px-4 py-1.5">
             <span className="text-[9px] font-medium tabular-nums text-stone-600">9:41</span>
             <div className="flex items-center gap-1.5 text-[9px] text-stone-600">
-              <span>▲▲▲</span>
               <span>WiFi</span>
-              <span>🔋</span>
+              <BatteryCharging className="h-3 w-3" />
             </div>
           </div>
           {/* Scene */}

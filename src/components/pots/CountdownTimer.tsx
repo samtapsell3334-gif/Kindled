@@ -38,9 +38,12 @@ function Sep() {
 
 interface CountdownTimerProps {
   targetIso: string;
+  /** Single-line "Christmas in 184 days" style readout for light, inline contexts. */
+  compact?: boolean;
+  eventLabel?: string;
 }
 
-export function CountdownTimer({ targetIso }: CountdownTimerProps) {
+export function CountdownTimer({ targetIso, compact, eventLabel }: CountdownTimerProps) {
   const target = new Date(targetIso);
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(compute(target));
 
@@ -49,6 +52,15 @@ export function CountdownTimer({ targetIso }: CountdownTimerProps) {
     return () => clearInterval(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetIso]);
+
+  if (compact) {
+    return (
+      <span className="text-[11px] font-semibold text-amber-600 tabular-nums">
+        {eventLabel ? `${eventLabel} in ` : "Unwraps in "}
+        {timeLeft.days}d {String(timeLeft.hours).padStart(2, "0")}h
+      </span>
+    );
+  }
 
   return (
     <div className="flex items-end gap-2" role="timer" aria-live="off">

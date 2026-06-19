@@ -43,7 +43,22 @@
       "Bash(sed -i '' 's/border border-stone-800\\\\/60 bg-stone-900 shadow-xl shadow-black\\\\/40/border border-stone-200 bg-white shadow-xl shadow-stone-200\\\\/60/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')",
       "Bash(sed -i '' 's/border-b border-stone-800\\\\/60 bg-stone-950\\\\/60/border-b border-stone-100 bg-stone-50/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')",
       "Bash(sed -i '' 's/h-1\\\\.5 w-full cursor-pointer rounded-full bg-stone-800/h-1.5 w-full cursor-pointer rounded-full bg-stone-200/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')",
-      "Bash(sed -i '' 's/w-1\\\\.5 bg-stone-700 hover:bg-stone-500/w-1.5 bg-stone-300 hover:bg-stone-400/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')"
+      "Bash(sed -i '' 's/w-1\\\\.5 bg-stone-700 hover:bg-stone-500/w-1.5 bg-stone-300 hover:bg-stone-400/g' '/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx')",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget",
+      "Bash(npm run *)",
+      "Bash(unzip -o \"/Users/samueltapsell/Downloads/Logo design request-handoff.zip\" -d kindled_logo)",
+      "Bash(npx tsc *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('\\\\n'.join\\(sorted\\(d.get\\('dependencies',{}\\).keys\\(\\)\\)\\)\\)\")",
+      "Bash(kill 6331 6333)",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3000/pots/demo)",
+      "Bash(grep -n 'showToast\\(`\\\\|showToast\\(\"\\\\|addLog\\(`\\\\|addLog\\(\"' src/app/pots/demo/page.tsx)",
+      "Bash(python3 -)",
+      "Bash(sort -t: -k1 -n)",
+      "Bash(lsof -i :3000 -sTCP:LISTEN -t)",
+      "Bash(kill 12911 12912)",
+      "Bash(disown)"
     ]
   }
 }
