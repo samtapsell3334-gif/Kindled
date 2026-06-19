@@ -778,7 +778,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
 // PROFILE HEADER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ProfileHeader({ potCount, totalGoal, onShare, isContributor, onStartReceiving }: {
+function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, onStartReceiving }: {
   potCount: number; totalGoal: number; onShare: () => void; isContributor?: boolean; onStartReceiving?: () => void;
 }) {
   return (
