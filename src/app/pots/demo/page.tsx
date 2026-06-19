@@ -186,9 +186,9 @@ const CATALOGUE: CatalogItem[] = [
   { id: "c4", name: "LEGO Technic Ferrari",
     image: "https://images.unsplash.com/photo-1560961911-ba7ef651a56c?w=400&h=400&fit=crop&q=80",
     price: 189.99, tag: "Bestseller", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
-  { id: "c5", name: "Air Hockey Table",
-    image: "https://images.unsplash.com/photo-1526888935184-a82d2a4b7e67?w=400&h=400&fit=crop&q=80",
-    price: 199.99, tag: "New", tagColor: "bg-pink-100 text-pink-600", glowColor: "#ec4899" },
+  { id: "c5", name: "Cosy Family Sofa",
+    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=400&fit=crop&q=80",
+    price: 899.99, tag: "Milestone", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
   { id: "c6", name: "LEGO Star Wars X-Wing",
     image: "https://images.unsplash.com/photo-1609372332255-611485350f25?w=400&h=400&fit=crop&q=80",
     price: 99.99, tag: "Fan Fave", tagColor: "bg-sky-100 text-sky-600", glowColor: "#38bdf8" },
@@ -4239,10 +4239,11 @@ function ReceiverProofStats() {
 // RECEIVER VIEW
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ReceiverView({ pots, onOpenStars, onShare }: {
+function ReceiverView({ pots, onOpenStars, onShare, onReveal }: {
   pots: DemoPot[];
   onOpenStars: () => void;
   onShare: () => void;
+  onReveal: (pot: DemoPot) => void;
 }) {
   // Exclude checklist pots entirely — receiver must not see "Mum Knows Best" items
   const sparkGoals = pots.filter((p) => !p.isClaimed && !p.isChecklist);
@@ -4334,6 +4335,46 @@ function ReceiverView({ pots, onOpenStars, onShare }: {
             ))}
           </div>
         </div>
+
+        {/* ── Receiver Samba Reveal Demo ── */}
+        <motion.button
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 380, damping: 28 }}
+          onClick={() => onReveal(sparkGoals[0] ?? pots[0]!)}
+          className="relative w-full overflow-hidden rounded-2xl text-left"
+          style={{
+            background: "linear-gradient(135deg, #1a0e08 0%, #2c1810 50%, #1a0e08 100%)",
+            boxShadow: "0 4px 28px rgba(251,146,60,0.25), 0 0 0 1px rgba(251,146,60,0.2)",
+          }}
+        >
+          {/* Subtle particle backdrop */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+            {CONFETTI_P.slice(0, 6).map((c) => (
+              <span key={c.id} className={cn("animate-confetti absolute rounded-sm opacity-30", c.color)}
+                style={{ left: c.left, top: 0, width: c.w, height: c.h,
+                  "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
+            ))}
+          </div>
+          <div className="relative flex items-center gap-4 p-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-900/40">
+              <Sparkles className="h-7 w-7 text-stone-900" strokeWidth={1.75} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/80 mb-0.5">Experience Your Reveal Day</p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-semibold text-white leading-snug">
+                See the magical Samba celebration
+              </p>
+              <p className="mt-0.5 text-[11px] leading-snug text-white/50">
+                Preview the cinematic ceremony your family will ignite when your fires are fully stoked
+              </p>
+            </div>
+            <div className="shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 px-3 py-2">
+              <Play className="h-4 w-4 text-stone-900" strokeWidth={2.5} />
+            </div>
+          </div>
+          <div className="h-[3px] w-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-500" />
+        </motion.button>
 
         {/* ── Claimed / sorted ── */}
         {claimed.length > 0 && (
@@ -4506,7 +4547,7 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onShare={handleShare} />
+          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onShare={handleShare} onReveal={setRevealPot} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
