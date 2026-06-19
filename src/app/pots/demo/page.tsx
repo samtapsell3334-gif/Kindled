@@ -994,8 +994,8 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           </button>
         </div>
         <div className="mt-3 flex items-center gap-1.5 text-stone-500">
-          <Users className="h-3 w-3" />
-          <span className="text-[11px]">Balance hidden · {pot.contributors} contributors</span>
+          <Lock className="h-3 w-3" />
+          <span className="text-[11px]">Keeping it a secret until the big day</span>
         </div>
         <FundingBar raised={pot.raised} goal={pot.goal} hideAmounts className="mt-2" />
         {pot.stackNote && (
@@ -4011,15 +4011,157 @@ function AboutPage() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// REVEAL DEMO VIEW — standalone tab experience
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function RevealDemoView({ pots, onLaunch }: { pots: DemoPot[]; onLaunch: (pot: DemoPot) => void }) {
+  const occasion = nextMajorOccasion();
+  const isXmas = occasion === "christmas";
+  const now = new Date(); const yr = now.getFullYear();
+  let targetDate = isXmas ? new Date(yr, 11, 25) : new Date(yr, 5, 28);
+  if (targetDate <= now) targetDate = isXmas ? new Date(yr + 1, 11, 25) : new Date(yr + 1, 5, 28);
+  const daysUntil = Math.ceil((targetDate.getTime() - now.getTime()) / 86_400_000);
+  const demoTarget = pots.find((p) => !p.isChecklist && !p.isClaimed) ?? pots[0]!;
+
+  return (
+    <div className="min-h-screen" style={{ background: "linear-gradient(160deg, #0a0604 0%, #1a0e08 50%, #0a0604 100%)" }}>
+      {/* Particle field */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        {isXmas
+          ? SNOW.map((s) => (
+              <span key={s.id} className="animate-snow absolute rounded-full bg-white/60"
+                style={{ left: s.left, top: 0, width: s.size, height: s.size,
+                  "--dur": s.dur, "--sx": s.sx, "--drift": s.drift, animationDelay: s.delay } as React.CSSProperties} />
+            ))
+          : CONFETTI_P.map((c) => (
+              <span key={c.id} className={cn("animate-confetti absolute rounded-sm opacity-60", c.color)}
+                style={{ left: c.left, top: 0, width: c.w, height: c.h,
+                  "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
+            ))}
+      </div>
+
+      <div className="relative z-10 flex flex-col items-center px-5 pt-10 pb-24 text-center">
+        {/* Header */}
+        <div className="mb-2 flex items-center gap-2">
+          <Zap className="h-5 w-5 text-amber-400" strokeWidth={2} />
+          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80">Live Reveal Experience</p>
+        </div>
+        <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold text-white leading-tight mb-2">
+          The Samba Ceremony
+        </h1>
+        <p className="max-w-xs text-[13px] leading-relaxed text-white/50 mb-8">
+          This is what Billy sees when the big day arrives — a cinematic, euphoric unwrap moment built by the people who love him.
+        </p>
+
+        {/* Wrapped present card */}
+        <div className="relative w-full max-w-xs overflow-hidden rounded-3xl border"
+          style={{
+            background: isXmas
+              ? "linear-gradient(145deg, #1a0808 0%, #2d1010 50%, #1a0808 100%)"
+              : "linear-gradient(145deg, #12091f 0%, #20103a 50%, #12091f 100%)",
+            borderColor: isXmas ? "rgba(220,38,38,0.3)" : "rgba(139,92,246,0.3)",
+            boxShadow: isXmas
+              ? "0 0 60px rgba(220,38,38,0.2), 0 0 0 1px rgba(220,38,38,0.15)"
+              : "0 0 60px rgba(139,92,246,0.2), 0 0 0 1px rgba(139,92,246,0.15)",
+          }}>
+          {/* Accent stripe */}
+          <div className={cn("h-[3px] w-full bg-gradient-to-r", isXmas ? "from-red-600 via-amber-400 to-red-700" : "from-violet-500 via-fuchsia-400 to-pink-500")} />
+
+          {/* Present image area */}
+          <div className="relative flex h-52 items-center justify-center">
+            {/* Glow */}
+            <div className={cn("absolute inset-0 opacity-20 blur-3xl", isXmas ? "bg-red-500" : "bg-violet-500")} />
+            <div className={cn("relative flex h-36 w-36 items-center justify-center rounded-3xl border-4",
+              isXmas ? "border-red-500/40 bg-red-900/30" : "border-violet-500/40 bg-violet-900/30")}>
+              <Gift className={cn("h-20 w-20", isXmas ? "text-red-300/80" : "text-violet-300/80")} strokeWidth={1} />
+              {/* Ribbon cross */}
+              <div className={cn("absolute inset-0 flex items-center justify-center")}>
+                <div className={cn("absolute h-full w-1 rounded-full opacity-40", isXmas ? "bg-amber-400" : "bg-pink-400")} />
+                <div className={cn("absolute h-1 w-full rounded-full opacity-40", isXmas ? "bg-amber-400" : "bg-pink-400")} />
+              </div>
+            </div>
+          </div>
+
+          {/* Info */}
+          <div className="px-5 pb-5 pt-1 text-center">
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-1"
+              style={{ color: isXmas ? "rgba(251,191,36,0.7)" : "rgba(216,180,254,0.7)" }}>
+              {isXmas ? "Christmas Surprise" : "Birthday Surprise"}
+            </p>
+            <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-bold text-white leading-tight mb-0.5">
+              {demoTarget.title}
+            </p>
+            <div className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 mt-1",
+              isXmas ? "bg-red-900/40 border border-red-500/30" : "bg-violet-900/40 border border-violet-500/30")}>
+              <Lock className="h-3 w-3 text-white/50" strokeWidth={2} />
+              <span className="text-[10px] text-white/50">Locked for Billy ·</span>
+              <span className={cn("text-[10px] font-bold", isXmas ? "text-amber-400" : "text-violet-300")}>
+                {daysUntil} days
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Phases list */}
+        <div className="mt-8 w-full max-w-xs">
+          {[
+            { Icon: Gift, label: "The Wrapped Present", desc: "Seasons the experience to Christmas or Birthday" },
+            { Icon: Zap, label: "Tactile Shake", desc: "The box vibrates to syncopated samba percussion" },
+            { Icon: Radio, label: "Samba Synth Engine", desc: "Surdo drums, agogô bells, cuíca whistle, pandeiro" },
+            { Icon: Sparkles, label: "Dopamine Climax", desc: "Fireworks, gold sparks, funded amount slot-machine" },
+            { Icon: Star, label: "Memory Cards", desc: "Family video wishes and handwritten notes float in" },
+          ].map(({ Icon, label, desc }, i) => (
+            <div key={label} className="flex items-start gap-3 text-left mb-3">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 mt-0.5">
+                <span className="text-[10px] font-bold text-white/50">{i + 1}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <Icon className="h-3.5 w-3.5 text-amber-400/80" strokeWidth={1.75} />
+                  <p className="text-[12px] font-semibold text-white/80">{label}</p>
+                </div>
+                <p className="text-[11px] text-white/40 mt-0.5">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Launch button */}
+        <motion.button
+          whileHover={{ scale: 1.03, y: -3 }}
+          whileTap={{ scale: 0.96 }}
+          transition={{ type: "spring", stiffness: 400, damping: 26 }}
+          onClick={() => onLaunch(demoTarget)}
+          className="mt-4 flex w-full max-w-xs items-center justify-center gap-3 rounded-2xl py-5 font-bold text-stone-900 shadow-2xl"
+          style={{
+            background: "linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ef4444 100%)",
+            boxShadow: "0 8px 32px rgba(251,146,60,0.5), 0 0 0 1px rgba(251,146,60,0.3)",
+          }}
+        >
+          <Zap className="h-5 w-5" strokeWidth={2.5} />
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-[17px]">Launch Reveal Ceremony</span>
+          <Sparkles className="h-5 w-5" strokeWidth={2} />
+        </motion.button>
+
+        <p className="mt-4 text-[11px] text-white/30">
+          Triggers the full cinematic Samba reveal with audio, fireworks, and memory cards
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-type ViewMode = "parent" | "receiver" | "about";
+type ViewMode = "parent" | "receiver" | "about" | "reveal";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
   const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
     { id: "parent", label: "Contribute", Icon: Users },
     { id: "receiver", label: "Billy's View", Icon: Sparkles },
+    { id: "reveal", label: "Reveal", Icon: Zap },
     { id: "about", label: "About", Icon: Info },
   ];
   return (
@@ -4031,14 +4173,20 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
             whileTap={{ scale: 0.96 }}
             onClick={() => onChange(id)}
             className={cn(
-              "relative flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-[12px] font-semibold transition-all",
-              role === id ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
+              "relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl py-2 text-[10px] font-semibold transition-all",
+              role === id
+                ? id === "reveal"
+                  ? "bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md"
+                  : "bg-white shadow-sm text-stone-900"
+                : id === "reveal"
+                  ? "text-amber-500"
+                  : "text-stone-400",
             )}
           >
-            {role === id && (
+            {role === id && id !== "reveal" && (
               <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
             )}
-            <Icon className="h-3.5 w-3.5" />
+            <Icon className="h-3.5 w-3.5" strokeWidth={role === id ? 2.5 : 1.75} />
             <span>{label}</span>
           </motion.button>
         ))}
@@ -4151,7 +4299,7 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
             <div className="flex-1 min-w-0">
               <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-semibold text-white leading-snug">{pot.title}</h3>
               <p className={cn("mt-0.5 text-[11px]", th.labelColor)}>
-                {!pot.image && `${isXmas ? "Christmas" : "Birthday"} in ${daysUntil} days · `}Balance hidden · {pot.contributors} givers
+                {!pot.image && `${isXmas ? "Christmas" : "Birthday"} in ${daysUntil} days · `}Keeping it a secret until the big day
               </p>
             </div>
             <div className="shrink-0 text-right">
@@ -4544,6 +4692,10 @@ export default function DemoPage() {
       {viewMode === "about" ? (
         <motion.div key="about" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
           <AboutPage />
+        </motion.div>
+      ) : viewMode === "reveal" ? (
+        <motion.div key="reveal" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
+          <RevealDemoView pots={pots} onLaunch={setRevealPot} />
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
