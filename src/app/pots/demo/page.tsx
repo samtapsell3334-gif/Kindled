@@ -221,6 +221,14 @@ const CONFETTI_P = Array.from({ length: 18 }, (_, i) => {
     color: cols[i % cols.length]!, w: 4 + (i % 4), h: 6 + (i % 5) };
 });
 
+// Ascending light-leak bubbles — birthday seasonal backdrop
+const BUBBLES_P = Array.from({ length: 12 }, (_, i) => ({
+  id: i, left: `${4 + (i * 211) % 92}%`,
+  dur: `${2.6 + (i * 0.27) % 2.2}s`, delay: `${(i * 0.31) % 2.6}s`,
+  size: 6 + (i % 5) * 2,
+  color: ["#f0abfc","#a78bfa","#fbbf24","#f9a8d4","#818cf8"][i % 5]!,
+}));
+
 // Firework sparks — 3 burst centres × 24 sparks each
 const FW_BURSTS = [
   { cx: "50%", cy: "38%" },
@@ -450,16 +458,61 @@ function ProfileHeader({ potCount, totalGoal, onShare, isContributor }: {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// SEASONAL OCCASION HELPERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+type Occasion = "christmas" | "birthday";
+
+/** Whichever major occasion lands soonest from today — used for pots without a fixed date. */
+function nextMajorOccasion(): Occasion {
+  const now = new Date();
+  const year = now.getFullYear();
+  let xmas = new Date(year, 11, 25);
+  if (xmas.getTime() < now.getTime()) xmas = new Date(year + 1, 11, 25);
+  let bday = new Date(year, 5, 28);
+  if (bday.getTime() < now.getTime()) bday = new Date(year + 1, 5, 28);
+  return xmas.getTime() <= bday.getTime() ? "christmas" : "birthday";
+}
+
+function occasionFor(pot: DemoPot): Occasion {
+  const label = pot.eventLabel.toLowerCase();
+  if (label.includes("christmas")) return "christmas";
+  if (label.includes("birthday")) return "birthday";
+  return nextMajorOccasion();
+}
+
+/** Real countdown target for pots whose own eventIso is just a placeholder ("Ongoing"). */
+function occasionTargetIso(pot: DemoPot): string {
+  if (pot.eventLabel !== "Ongoing") return pot.eventIso;
+  const occasion = occasionFor(pot);
+  const now = new Date();
+  const year = now.getFullYear();
+  if (occasion === "christmas") {
+    let d = new Date(year, 11, 25);
+    if (d.getTime() < now.getTime()) d = new Date(year + 1, 11, 25);
+    return d.toISOString();
+  }
+  let d = new Date(year, 5, 28);
+  if (d.getTime() < now.getTime()) d = new Date(year + 1, 5, 28);
+  return d.toISOString();
+}
+
+function occasionLabel(occasion: Occasion): string {
+  return occasion === "christmas" ? "Christmas" : "Birthday";
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // LIVE POT CARD
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const KINDLE_AMOUNTS = [5, 10, 25, 50];
 
-function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
+function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected }: {
   pot: DemoPot;
   onRemove?: (id: string) => void;
   onKindle?: (id: string, amount: number) => void;
   onBuy?: (id: string) => void;
+  onAmountSelected?: (pot: DemoPot, amount: number) => void;
 }) {
   const [kindleOpen, setKindleOpen] = useState(false);
   const [kindled, setKindled] = useState(false);
@@ -481,6 +534,11 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
                  "text-orange-400";
 
   function handleKindle(amount: number) {
+    if (onAmountSelected) {
+      setKindleOpen(false);
+      onAmountSelected(pot, amount);
+      return;
+    }
     setKindled(true);
     setKindleOpen(false);
     onKindle?.(pot.id, amount);
@@ -556,7 +614,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
         {/* Progress — Under Wraps: heat-themed, totals hidden */}
         {!pot.isClaimed && (
           <>
-            <FundingBar raised={pot.raised} goal={pot.goal} hideAmounts className="mt-4" />
+            <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" />
             <div className="mt-3 flex items-center justify-between">
               <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
               <CountdownTimer targetIso={pot.eventIso} compact />
@@ -643,7 +701,13 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy }: {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot) => void }) {
-  const isXmas = pot.mode === "UNDER_THE_TREE";
+  const occasion = occasionFor(pot);
+  const isXmas = occasion === "christmas";
+  const targetIso = occasionTargetIso(pot);
+
+  // Days until occasion
+  const daysUntil = Math.max(0, Math.ceil((new Date(targetIso).getTime() - Date.now()) / 86_400_000));
+
   const th = isXmas
     ? { bg: "bg-[#1a0f0f]", border: "border-red-700/30", glow: "animate-gift-glow",
         box: "from-red-800/30 to-amber-700/20", label: "text-amber-400",
@@ -654,6 +718,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
 
   return (
     <article className={cn("relative overflow-hidden rounded-2xl border shadow-lg shadow-black/50", th.bg, th.border)}>
+      {/* Seasonal particle backdrop */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
         {isXmas
           ? SNOW.map((s) => (
@@ -661,11 +726,21 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
                 style={{ left: s.left, top: 0, width: s.size, height: s.size,
                   "--dur": s.dur, "--sx": s.sx, "--drift": s.drift, animationDelay: s.delay } as React.CSSProperties} />
             ))
-          : CONFETTI_P.map((c) => (
-              <span key={c.id} className={cn("animate-confetti absolute rounded-sm", c.color)}
-                style={{ left: c.left, top: 0, width: c.w, height: c.h,
-                  "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
-            ))}
+          : (
+            <>
+              {CONFETTI_P.map((c) => (
+                <span key={c.id} className={cn("animate-confetti absolute rounded-sm", c.color)}
+                  style={{ left: c.left, top: 0, width: c.w, height: c.h,
+                    "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
+              ))}
+              {BUBBLES_P.map((b) => (
+                <span key={b.id} className="animate-bubble-rise absolute bottom-0 rounded-full opacity-70"
+                  style={{ left: b.left, width: b.size, height: b.size, backgroundColor: b.color,
+                    "--dur": b.dur, animationDelay: b.delay,
+                    boxShadow: `0 0 8px ${b.color}80` } as React.CSSProperties} />
+              ))}
+            </>
+          )}
       </div>
       <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
       <div className="relative z-10 p-4">
@@ -689,12 +764,16 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           </div>
         </div>
         <div className={cn(th.glow, "mt-4 flex flex-col items-center gap-3 rounded-2xl py-6 border border-white/5 bg-gradient-to-b", th.box)}>
+          {/* Occasion countdown headline */}
+          <p className={cn("text-[13px] font-bold", isXmas ? "text-amber-300" : "text-violet-300")}>
+            {occasionLabel(occasion)} in {daysUntil} {daysUntil === 1 ? "day" : "days"}
+          </p>
           <Gift className={cn("h-14 w-14", isXmas ? "text-amber-400" : "text-violet-300")} strokeWidth={1.2} />
           <div className="flex items-center gap-1.5">
             <Lock className="h-3 w-3 text-stone-400" />
             <p className="text-[12px] font-semibold text-stone-200">Locked · Unwraps {pot.eventDate}</p>
           </div>
-          <CountdownTimer targetIso={pot.eventIso} eventLabel={pot.eventLabel} />
+          <CountdownTimer targetIso={targetIso} eventLabel={pot.eventLabel} />
           <button
             onClick={() => onReveal(pot)}
             className={cn(
@@ -711,7 +790,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           <Users className="h-3 w-3" />
           <span className="text-[11px]">Balance hidden · {pot.contributors} contributors</span>
         </div>
-        <div className="mt-1.5 text-right text-[10px] text-stone-500">Target: £{pot.goal}</div>
+        <FundingBar raised={pot.raised} goal={pot.goal} hideAmounts className="mt-2" />
         {pot.stackNote && (
           <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5">
             <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-violet-300" />
@@ -723,6 +802,214 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
   );
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTRIBUTION PROMPT MODAL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ContributionPromptModal({
+  pot,
+  amount,
+  onConfirm,
+  onClose,
+}: {
+  pot: DemoPot;
+  amount: number;
+  onConfirm: (id: string, amount: number) => void;
+  onClose: () => void;
+}) {
+  const [tab, setTab] = useState<"card" | "video">("card");
+  const [message, setMessage] = useState("");
+  const [recording, setRecording] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  function finalize() {
+    setSubmitted(true);
+    onConfirm(pot.id, amount);
+    setTimeout(onClose, 1200);
+  }
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        key="contrib-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm"
+        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      >
+        <motion.div
+          key="contrib-sheet"
+          initial={{ y: "100%", opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "100%", opacity: 0 }}
+          transition={{ type: "spring", stiffness: 360, damping: 34 }}
+          className="w-full max-w-lg overflow-hidden rounded-t-3xl"
+          style={{ background: "linear-gradient(160deg, #1c1917 0%, #171310 100%)", border: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          {/* Handle */}
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="h-1 w-10 rounded-full bg-white/20" />
+          </div>
+
+          <div className="px-5 pb-8 pt-2">
+            {/* Header */}
+            <div className="mb-4 text-center">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400 mb-1">
+                Chipping in £{amount} to {pot.title}
+              </p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">
+                Add a personal touch?
+              </p>
+              <p className="mt-1 text-[12px] text-stone-400">
+                Make Billy&apos;s reveal morning even more magical
+              </p>
+            </div>
+
+            {/* Option tabs */}
+            <div className="mb-4 flex gap-2 rounded-2xl bg-white/5 p-1">
+              <button
+                onClick={() => setTab("card")}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
+                  tab === "card"
+                    ? "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900 shadow-md"
+                    : "text-stone-400",
+                )}
+              >
+                <PenLine className="h-4 w-4" />
+                Digital Card
+              </button>
+              <button
+                onClick={() => setTab("video")}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
+                  tab === "video"
+                    ? "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-md"
+                    : "text-stone-400",
+                )}
+              >
+                <Radio className="h-4 w-4" />
+                Video Wish
+              </button>
+            </div>
+
+            {/* Option A — Digital Card */}
+            {tab === "card" && (
+              <motion.div
+                key="card-tab"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col gap-3"
+              >
+                <div
+                  className="relative rounded-2xl border-2 transition-all"
+                  style={{ borderColor: message.length > 0 ? "#f59e0b" : "rgba(255,255,255,0.1)",
+                    boxShadow: message.length > 0 ? "0 0 0 3px rgba(245,158,11,0.15), 0 0 20px rgba(245,158,11,0.12)" : "none" }}
+                >
+                  <div className="absolute left-3 top-2.5 flex items-center gap-1.5 text-amber-400">
+                    <PenLine className="h-3.5 w-3.5" />
+                    <span className="text-[10px] font-semibold uppercase tracking-wider">Your message</span>
+                  </div>
+                  <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Write a beautiful note to float onto Billy's screen on his big reveal morning…"
+                    rows={4}
+                    className="w-full resize-none rounded-2xl bg-transparent px-3 pb-3 pt-8 text-[13px] leading-relaxed text-stone-200 placeholder:text-stone-600 focus:outline-none"
+                  />
+                </div>
+                <p className="text-center text-[11px] text-stone-500">
+                  &ldquo;Stoke the Fire with a Digital Card&rdquo; — your words will float onto Billy&apos;s screen at the moment of reveal.
+                </p>
+              </motion.div>
+            )}
+
+            {/* Option B — Video Wish */}
+            {tab === "video" && (
+              <motion.div
+                key="video-tab"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col items-center gap-4"
+              >
+                {/* Pulsating record button */}
+                <div className="relative flex items-center justify-center py-4">
+                  {[1, 2, 3].map((i) => (
+                    <span
+                      key={i}
+                      className="absolute rounded-full bg-rose-500/20"
+                      style={{ width: 60 + i * 28, height: 60 + i * 28,
+                        animation: `ping ${1 + i * 0.35}s ${i * 0.2}s ease-out infinite` }}
+                    />
+                  ))}
+                  <motion.button
+                    whileTap={{ scale: 0.92 }}
+                    onClick={() => setRecording((r) => !r)}
+                    className={cn(
+                      "relative z-10 flex h-16 w-16 items-center justify-center rounded-full transition-all",
+                      recording
+                        ? "bg-rose-600 shadow-lg shadow-rose-900/60"
+                        : "bg-gradient-to-br from-rose-500 to-pink-600 shadow-xl shadow-rose-900/50",
+                    )}
+                  >
+                    {recording
+                      ? <span className="h-5 w-5 rounded bg-white" />
+                      : <Radio className="h-7 w-7 text-white" strokeWidth={2} />}
+                  </motion.button>
+                </div>
+                <div className="text-center">
+                  <p className="text-[13px] font-semibold text-stone-200">
+                    {recording ? "Recording… tap to stop" : "Press to record"}
+                  </p>
+                  <p className="mt-1 text-[11px] text-stone-500">
+                    &ldquo;Spark a Smile with a Video Wish&rdquo; — a heartfelt 15-second clip woven into Billy&apos;s cinematic unboxing celebration!
+                  </p>
+                </div>
+                <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-stone-700 bg-white/5 py-2.5 text-[12px] font-medium text-stone-400 hover:border-stone-500 transition-colors">
+                  <Plus className="h-3.5 w-3.5" />
+                  Or upload a video instead
+                  <input type="file" accept="video/*" className="sr-only" />
+                </label>
+              </motion.div>
+            )}
+
+            {/* CTAs */}
+            <div className="mt-5 flex flex-col gap-2">
+              {submitted ? (
+                <div className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-4">
+                  <Check className="h-5 w-5 text-white" strokeWidth={2.5} />
+                  <span className="text-[15px] font-semibold text-white">Contribution sent!</span>
+                </div>
+              ) : (
+                <>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={finalize}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-semibold text-stone-900"
+                    style={{ background: "linear-gradient(135deg, #fbbf24, #f97316)", boxShadow: "0 4px 20px rgba(251,146,60,0.4)" }}
+                  >
+                    <Flame className="h-5 w-5" />
+                    Send £{amount} {tab === "card" && message.trim() ? "+ Digital Card" : tab === "video" ? "+ Video Wish" : ""}
+                  </motion.button>
+                  <button
+                    onClick={finalize}
+                    className="text-center text-[12px] text-stone-500 hover:text-stone-300 transition-colors py-1"
+                  >
+                    Skip — just contribute £{amount}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CATALOGUE CARD (SVG circle + 3D tilt)
@@ -3056,14 +3343,15 @@ function RoleSwitcher({ role, onChange }: { role: "parent" | "receiver"; onChang
 // RECEIVER VIEW
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ReceiverView({ pots, onOpenStars }: {
+function ReceiverView({ pots, onOpenStars, onReveal, isContributor }: {
   pots: DemoPot[];
   onOpenStars: () => void;
+  onReveal: (pot: DemoPot) => void;
+  isContributor?: boolean;
 }) {
   const livePots = pots.filter((p) => p.mode === "LIVE_FEED" && !p.isClaimed);
   const claimedPots = pots.filter((p) => p.mode === "LIVE_FEED" && p.isClaimed);
   const surpriseCount = pots.filter((p) => p.mode !== "LIVE_FEED").length;
-  const totalRaised = pots.filter((p) => p.mode === "LIVE_FEED").reduce((s, p) => s + p.raised, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff8f0] to-[#fdf9f5]">
@@ -3082,7 +3370,7 @@ function ReceiverView({ pots, onOpenStars }: {
         {/* Summary stats */}
         <div className="mt-4 grid grid-cols-3 gap-2">
           {[
-            { value: `£${totalRaised}`, label: "kindled so far", color: "text-amber-500" },
+            { value: `${pots.filter((p) => !p.isClaimed).length}`, label: "gifts heating up", color: "text-amber-500" },
             { value: livePots.length, label: "wishes", color: "text-orange-500" },
             { value: `${surpriseCount}`, label: "surprises", color: "text-violet-500" },
           ].map((s) => (
@@ -3101,7 +3389,9 @@ function ReceiverView({ pots, onOpenStars }: {
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Surprises waiting</p>
             <div className="flex flex-col gap-3">
-              {pots.filter((p) => p.mode !== "LIVE_FEED").map((pot, i) => (
+              {pots.filter((p) => p.mode !== "LIVE_FEED").map((pot, i) => {
+                const isUnlockDay = new Date() >= new Date(pot.eventIso);
+                return (
                 <motion.div
                   key={pot.id}
                   initial={{ opacity: 0, y: 12 }}
@@ -3136,8 +3426,23 @@ function ReceiverView({ pots, onOpenStars }: {
                     </div>
                     <Lock className="h-5 w-5 text-white/50" strokeWidth={1.75} />
                   </div>
+                  {/* Receiver-only reveal trigger — never shown to contributors */}
+                  {!isContributor && (
+                    <button
+                      onClick={() => onReveal(pot)}
+                      className={cn(
+                        "relative z-10 mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl py-2.5 text-[12px] font-bold text-stone-900 shadow-lg active:scale-95 transition-transform",
+                        "bg-gradient-to-r",
+                        pot.mode === "UNDER_THE_TREE" ? "from-amber-400 to-orange-500" : "from-violet-400 to-fuchsia-500",
+                      )}
+                    >
+                      <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+                      {isUnlockDay ? "Open my gift!" : "Peek early — open my gift"}
+                    </button>
+                  )}
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -3147,45 +3452,31 @@ function ReceiverView({ pots, onOpenStars }: {
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Your wish list</p>
             <div className="flex flex-col gap-3">
-              {livePots.map((pot, i) => {
-                const pct = Math.min(100, Math.round((pot.raised / pot.goal) * 100));
-                return (
-                  <motion.div
-                    key={pot.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.06, type: "spring", stiffness: 340, damping: 30 }}
-                    className="overflow-hidden rounded-2xl bg-white"
-                    style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)" }}
-                  >
-                    <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
-                    <div className="flex items-center gap-3 p-4">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-amber-50">
-                        {pot.image
-                          ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover" />
-                          : <div className="flex h-full w-full items-center justify-center"><Gift className="h-5 w-5 text-stone-400" strokeWidth={1.5} /></div>}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium text-stone-900">{pot.title}</h3>
-                        <div className="mt-2">
-                          <div className="h-2 w-full overflow-hidden rounded-full bg-stone-100">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${pct}%` }}
-                              transition={{ duration: 1, delay: 0.3 + i * 0.1, ease: "easeOut" }}
-                              className={cn("h-full rounded-full bg-gradient-to-r", pot.accentGradient)}
-                            />
-                          </div>
-                          <div className="mt-1.5 flex items-center justify-between">
-                            <p className="text-[11px] text-stone-400">£{pot.raised} of £{pot.goal}</p>
-                            <p className="flex items-center gap-1 text-[11px] font-semibold text-amber-500">{pct}% kindled <Flame className="h-3 w-3" /></p>
-                          </div>
-                        </div>
+              {livePots.map((pot, i) => (
+                <motion.div
+                  key={pot.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.06, type: "spring", stiffness: 340, damping: 30 }}
+                  className="overflow-hidden rounded-2xl bg-white"
+                  style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)" }}
+                >
+                  <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
+                  <div className="flex items-center gap-3 p-4">
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-amber-50">
+                      {pot.image
+                        ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover" />
+                        : <div className="flex h-full w-full items-center justify-center"><Gift className="h-5 w-5 text-stone-400" strokeWidth={1.5} /></div>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium text-stone-900">{pot.title}</h3>
+                      <div className="mt-2">
+                        <FundingBar raised={pot.raised} goal={pot.goal} hideAmounts />
                       </div>
                     </div>
-                  </motion.div>
-                );
-              })}
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         )}
@@ -3231,7 +3522,7 @@ function ReceiverView({ pots, onOpenStars }: {
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-bold uppercase tracking-widest text-violet-200 mb-0.5">Kindled Stars</p>
               <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[19px] font-semibold text-white leading-tight">Your star chart</h3>
-              <p className="text-[12px] text-violet-200 mt-0.5">24 ⭐ earned · 4 adventures today</p>
+              <p className="flex items-center gap-1 text-[12px] text-violet-200 mt-0.5">24 <Star className="h-3 w-3 fill-current" /> earned · 4 adventures today</p>
             </div>
             <span className="rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-black text-stone-900">Open →</span>
           </div>
@@ -3259,6 +3550,8 @@ export default function DemoPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [logEntries, setLogEntries] = useState<string[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const [pendingContribution, setPendingContribution] = useState<{ pot: DemoPot; amount: number } | null>(null);
+  const [previewReceiver, setPreviewReceiver] = useState(false);
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));
@@ -3320,14 +3613,24 @@ export default function DemoPage() {
     addLog(`New gift created: "${pot.title}" £${pot.goal} — ${pot.mode}`);
   }, [showToast, addLog]);
 
-  const livePots = pots.filter((p) => p.mode === "LIVE_FEED");
+  const activePots = pots.filter((p) => !p.isClaimed);
+  const claimedPots = pots.filter((p) => p.isClaimed);
   const surprisePots = pots.filter((p) => p.mode !== "LIVE_FEED");
+  const nextOccasion = nextMajorOccasion();
 
   return (
     <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
       {revealPot && <RevealModal pot={revealPot} onClose={() => setRevealPot(null)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showNewGift && <NewGiftSheet onAdd={handleAddNewGift} onClose={() => setShowNewGift(false)} />}
+      {pendingContribution && (
+        <ContributionPromptModal
+          pot={pendingContribution.pot}
+          amount={pendingContribution.amount}
+          onConfirm={handleKindle}
+          onClose={() => setPendingContribution(null)}
+        />
+      )}
 
       {/* ── Kids Space (full-screen overlay) ── */}
       {showStars && (
@@ -3343,7 +3646,7 @@ export default function DemoPage() {
       <AnimatePresence mode="wait">
       {viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} />
+          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onReveal={setRevealPot} isContributor={isContributor} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
@@ -3357,22 +3660,63 @@ export default function DemoPage() {
       />
 
       <main className="space-y-7 pb-36 pt-4">
-        {/* ── Live Pots ── */}
+        {/* ── Contributor: Preview Receiver toggle ── */}
+        {isContributor && (
+          <section className="px-4">
+            <button
+              onClick={() => setPreviewReceiver((v) => !v)}
+              className={cn(
+                "flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all",
+                previewReceiver
+                  ? "border-violet-400/40 bg-violet-950/60 text-violet-200"
+                  : "border-stone-200 bg-white text-stone-700",
+              )}
+              style={{ boxShadow: previewReceiver ? "0 0 0 2px rgba(167,139,250,0.2)" : "0 1px 3px rgba(0,0,0,0.05)" }}
+            >
+              <Eye className={cn("h-4 w-4 shrink-0", previewReceiver ? "text-violet-400" : "text-stone-400")} />
+              <div className="flex-1">
+                <p className="text-[13px] font-semibold">{previewReceiver ? "Previewing Billy's view" : "See What the Receiver Sees"}</p>
+                <p className={cn("text-[11px]", previewReceiver ? "text-violet-400" : "text-stone-400")}>
+                  {previewReceiver ? "Tap again to return to contributor mode" : "Toggle to see the locked mystery cards Billy sees"}
+                </p>
+              </div>
+              <span className={cn("h-5 w-9 rounded-full transition-all relative", previewReceiver ? "bg-violet-500" : "bg-stone-200")}>
+                <span className={cn("absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all", previewReceiver ? "left-4" : "left-0.5")} />
+              </span>
+            </button>
+          </section>
+        )}
+
+        {/* ── Unified pots grid ── */}
         <section className="px-4">
-          <div className="mb-3">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Gift List</p>
-            <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">{livePots.length} gifts · kindle or buy</p>
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+                {isContributor && !previewReceiver ? "Active Pots" : "Gift List"}
+              </p>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">
+                {activePots.length} {isContributor && !previewReceiver ? "pots to kindle" : "gifts under wraps"}
+              </p>
+            </div>
           </div>
           <div className="flex flex-col gap-3">
-            {livePots.map((pot) => (
-              <LivePotCard
-                key={pot.id}
-                pot={pot}
-                {...(!isContributor && (pot.id.startsWith("new_") || pot.id.startsWith("p")) && { onRemove: (id: string) => setPots((p) => p.filter((x) => x.id !== id)) })}
-                onKindle={handleKindle}
-                onBuy={handleBuy}
-              />
-            ))}
+            {activePots.map((pot) =>
+              isContributor && !previewReceiver ? (
+                <LivePotCard
+                  key={pot.id}
+                  pot={pot}
+                  onKindle={handleKindle}
+                  onBuy={handleBuy}
+                  onAmountSelected={(p, amt) => setPendingContribution({ pot: p, amount: amt })}
+                />
+              ) : (
+                <LockedPotCard
+                  key={pot.id}
+                  pot={pot}
+                  onReveal={isContributor ? () => undefined : setRevealPot}
+                />
+              )
+            )}
             {/* Add new gift card — owner only */}
             {!isContributor && (
               <motion.button
@@ -3392,22 +3736,8 @@ export default function DemoPage() {
               </motion.button>
             )}
           </div>
-        </section>
-
-        {/* ── Surprise Pots + Unwrap CTA (Unwrap trigger is owner-only) ── */}
-        {surprisePots.length > 0 && (
-          <section className="px-4">
-            <div className="mb-3">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Surprise Pots</p>
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">{surprisePots.length} locked &amp; waiting</p>
-            </div>
-            <div className="flex flex-col gap-3">
-              {surprisePots.map((pot) => (
-                <LockedPotCard key={pot.id} pot={pot} onReveal={isContributor ? () => undefined : setRevealPot} />
-              ))}
-            </div>
-            {/* ── Unwrap All — sits directly under the pots, owner-only ── */}
-            {!isContributor && (
+          {/* ── Unwrap All — sits directly under the pots, owner-only ── */}
+          {!isContributor && surprisePots.length > 0 && (
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.97 }}
@@ -3417,9 +3747,30 @@ export default function DemoPage() {
               style={{ boxShadow: "0 4px 24px rgba(220,38,38,0.35), 0 0 0 1px rgba(220,38,38,0.2)" }}
             >
               <Gift className="h-5 w-5 text-white" strokeWidth={2} />
-              <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white">Unwrap all · Open on Christmas Day</span>
+              <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white">
+                Unwrap all · Open on {occasionLabel(nextOccasion)} Day
+              </span>
             </motion.button>
-            )}
+          )}
+        </section>
+
+        {/* Claimed pots (owner view only) */}
+        {!isContributor && claimedPots.length > 0 && (
+          <section className="px-4">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-stone-400">Ordered & Claimed</p>
+            <div className="flex flex-col gap-2">
+              {claimedPots.map((pot) => (
+                <div key={pot.id} className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500">
+                    <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[13px] font-semibold text-stone-700">{pot.title}</p>
+                    {pot.claimedBy && <p className="text-[11px] text-emerald-600">{pot.claimedBy} — on its way!</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
         )}
 
