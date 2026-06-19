@@ -9,7 +9,7 @@ import {
   Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
   Landmark, Radio, Wrench, Trophy, Wallet, Eye,
   Bike, Plane, Home, Cake, TreePine, GraduationCap, Armchair, PenLine,
-  Trash2, AlertCircle, Copy, TrendingUp, Info,
+  Trash2, AlertCircle, Copy, TrendingUp, Info, CircleEllipsis,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { FundingBar } from "@/components/pots/FundingBar";
@@ -587,11 +587,199 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// RECEIVER SIGN-UP MODAL (contributor → create your own list)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [isParent, setIsParent] = useState(false);
+  const [starChart, setStarChart] = useState(false);
+  const [catalogueCircle, setCatalogueCircle] = useState(false);
+  const [starValue, setStarValue] = useState("5");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !name.trim()) return;
+    setLoading(true);
+    try {
+      await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, type: "receiver-from-contributor", isParent, starChart, catalogueCircle, starValue }),
+      });
+    } catch { /* silent */ }
+    setLoading(false);
+    setSubmitted(true);
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[90] flex items-end justify-center bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
+          transition={{ type: "spring", stiffness: 340, damping: 38 }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-full max-w-md rounded-t-3xl bg-[#0e0b07] border-t border-amber-500/20 px-5 pt-5 pb-10 shadow-2xl"
+        >
+          <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-white/20" />
+
+          {submitted ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center gap-4 py-6 text-center"
+            >
+              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                <Flame className="h-8 w-8 text-white" />
+              </div>
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[22px] font-semibold text-amber-300">Your spot is reserved</p>
+              <p className="text-[13px] text-white/60 leading-relaxed">We&apos;ll send your invitation to <span className="text-amber-400 font-semibold">{email}</span> as soon as your list is ready.</p>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={onClose}
+                className="mt-2 rounded-xl bg-amber-500/20 border border-amber-500/30 px-6 py-2.5 text-[13px] font-semibold text-amber-300"
+              >
+                Done
+              </motion.button>
+            </motion.div>
+          ) : (
+            <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-4">
+              <div>
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">Start receiving kindled gifts</p>
+                <p className="mt-1 text-[12px] text-white/50">Create your own wishlist — for you, your child, or someone you love.</p>
+              </div>
+
+              <input
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-amber-400/60 focus:outline-none"
+              />
+              <input
+                type="email"
+                placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-amber-400/60 focus:outline-none"
+              />
+
+              {/* Parent toggle */}
+              <button
+                type="button"
+                onClick={() => setIsParent((v) => !v)}
+                className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition-colors ${isParent ? "border-amber-500/50 bg-amber-500/10" : "border-white/10 bg-white/5"}`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Users className="h-4 w-4 text-amber-400" />
+                  <span className="text-[13px] font-medium text-white">I am a parent — this is for my child</span>
+                </div>
+                <div className={`h-5 w-9 rounded-full transition-colors ${isParent ? "bg-amber-500" : "bg-white/20"} relative`}>
+                  <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${isParent ? "translate-x-4" : "translate-x-0.5"}`} />
+                </div>
+              </button>
+
+              {/* Child feature sub-panel */}
+              <AnimatePresence>
+                {isParent && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-400/70">Child features</p>
+
+                      {/* Star chart toggle */}
+                      <button
+                        type="button"
+                        onClick={() => setStarChart((v) => !v)}
+                        className="flex w-full items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Star className="h-3.5 w-3.5 text-amber-400" />
+                          <span className="text-[13px] text-white/80">Enable Kids Star Charting Tracker</span>
+                        </div>
+                        <div className={`h-4.5 w-8 rounded-full transition-colors ${starChart ? "bg-amber-500" : "bg-white/20"} relative flex items-center`}>
+                          <div className={`absolute h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${starChart ? "translate-x-4" : "translate-x-0.5"}`} />
+                        </div>
+                      </button>
+
+                      {/* Catalogue circling toggle */}
+                      <button
+                        type="button"
+                        onClick={() => setCatalogueCircle((v) => !v)}
+                        className="flex w-full items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2">
+                          <CircleEllipsis className="h-3.5 w-3.5 text-amber-400" />
+                          <span className="text-[13px] text-white/80">Enable Catalogue Circling Mode</span>
+                        </div>
+                        <div className={`h-4.5 w-8 rounded-full transition-colors ${catalogueCircle ? "bg-amber-500" : "bg-white/20"} relative flex items-center`}>
+                          <div className={`absolute h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${catalogueCircle ? "translate-x-4" : "translate-x-0.5"}`} />
+                        </div>
+                      </button>
+
+                      {/* Star value input */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                          <span className="text-[13px] text-white/80">Star Chart Value per Star</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[12px] text-white/40">£</span>
+                          <input
+                            type="number"
+                            min="1"
+                            max="100"
+                            value={starValue}
+                            onChange={(e) => setStarValue(e.target.value)}
+                            className="w-14 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-center text-[13px] text-white focus:border-amber-400/60 focus:outline-none"
+                          />
+                          <span className="text-[11px] text-white/40">/ star</span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-white/30">Default milestone: 30 stars = £{(parseInt(starValue || "5") * 30).toLocaleString()} total</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <motion.button
+                type="submit"
+                whileTap={{ scale: 0.97 }}
+                disabled={!name.trim() || !email.trim() || loading}
+                className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-amber-500/30 disabled:opacity-40"
+              >
+                {loading ? "Creating your list…" : "Create My First Fire"}
+              </motion.button>
+            </form>
+          )}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 // PROFILE HEADER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ProfileHeader({ potCount, totalGoal, onShare, isContributor }: {
-  potCount: number; totalGoal: number; onShare: () => void; isContributor?: boolean;
+function ProfileHeader({ potCount, totalGoal, onShare, isContributor, onStartReceiving }: {
+  potCount: number; totalGoal: number; onShare: () => void; isContributor?: boolean; onStartReceiving?: () => void;
 }) {
   return (
     <header className="sticky top-0 z-30 border-b border-orange-100/80 bg-[#fdf9f5]/95 backdrop-blur-lg">
@@ -634,16 +822,16 @@ function ProfileHeader({ potCount, totalGoal, onShare, isContributor }: {
               whileTap={{ scale: 0.94 }}
               whileHover={{ scale: 1.03 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              onClick={onShare}
-              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-500 px-3.5 py-2 text-[12px] font-semibold text-white shadow-md shadow-violet-200 active:scale-95"
+              onClick={onStartReceiving}
+              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 px-3.5 py-2 text-[12px] font-semibold text-white shadow-md shadow-amber-200 active:scale-95"
             >
-              <Plus className="h-3.5 w-3.5" />
-              Make a list
+              <Gift className="h-3.5 w-3.5" />
+              Start receiving kindled gifts
             </motion.button>
           )}
         </div>
         {isContributor && (
-          <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">start your own dream board for someone you love</p>
+          <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">create your own wishlist for someone you love</p>
         )}
 
         <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
@@ -3322,23 +3510,38 @@ function WhyKindled() {
 type EventType = "birthday" | "christmas" | "custom" | "ongoing";
 type FetchState = "idle" | "fetching" | "done" | "error";
 
-function parseProductUrl(raw: string): { title: string; price: string } {
+const DOMAIN_IMAGES: Record<string, string> = {
+  "amazon":    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop&q=80",
+  "argos":     "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=400&fit=crop&q=80",
+  "currys":    "https://images.unsplash.com/photo-1585399000684-d2f72660f092?w=400&h=400&fit=crop&q=80",
+  "johnlewis": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=400&fit=crop&q=80",
+  "smyths":    "https://images.unsplash.com/photo-1560961911-ba7ef651a56c?w=400&h=400&fit=crop&q=80",
+  "lego":      "https://images.unsplash.com/photo-1609372332255-611485350f25?w=400&h=400&fit=crop&q=80",
+  "apple":     "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&h=400&fit=crop&q=80",
+};
+
+function parseProductUrl(raw: string): { title: string; price: string; image?: string } {
   try {
     const u = new URL(raw);
+    const host = u.hostname.replace(/^www\./, "").toLowerCase();
+    // Match image by domain keyword
+    const image = Object.entries(DOMAIN_IMAGES).find(([k]) => host.includes(k))?.[1]
+      ?? "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=400&fit=crop&q=80";
+
     const amzMatch = u.pathname.match(/\/([A-Za-z0-9][A-Za-z0-9-]{3,})\/dp\//);
     if (amzMatch) {
       const title = (amzMatch[1] ?? "")
         .split("-")
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
         .join(" ");
-      return { title, price: "" };
+      return { title, price: "", image };
     }
     const segments = u.pathname.split("/").filter(Boolean);
     const last = (segments[segments.length - 1] ?? "").replace(/\.(html?|php|aspx?)$/i, "");
     const title = last
       ? last.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-      : `Product from ${u.hostname.replace(/^www\./, "")}`;
-    return { title, price: "" };
+      : `Product from ${host}`;
+    return { title, price: "", image };
   } catch {
     return { title: "", price: "" };
   }
@@ -3369,6 +3572,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
   const [isSurprise, setIsSurprise] = useState(true);
   const [eventDate, setEventDate] = useState("");
   const [customLabel, setCustomLabel] = useState("");
+  const [scrapedImage, setScrapedImage] = useState<string | undefined>(undefined);
   const fetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleUrlChange = useCallback((val: string) => {
@@ -3376,6 +3580,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
     setFetchState("idle");
     setTitle("");
     setAmount("");
+    setScrapedImage(undefined);
     if (fetchTimer.current) clearTimeout(fetchTimer.current);
     const trimmed = val.trim();
     if (trimmed.startsWith("http") && trimmed.length > 15) {
@@ -3384,6 +3589,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
         const parsed = parseProductUrl(trimmed);
         setTitle(parsed.title);
         setAmount(parsed.price);
+        setScrapedImage(parsed.image);
         setFetchState("done");
       }, 1400);
     }
@@ -3435,6 +3641,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
     return {
       id: `p${Date.now()}`,
       title: title.trim(),
+      ...(scrapedImage ? { image: scrapedImage } : {}),
       goal,
       raised: 0,
       mode: potMode,
@@ -3563,26 +3770,33 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3"
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={2.5} />
-                    <p className="text-[12px] font-semibold text-emerald-700">Product details found — edit if needed</p>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Product name"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none"
-                  />
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-semibold text-stone-400">£</span>
-                    <input
-                      type="number"
-                      placeholder="0.00"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="w-full rounded-lg border border-stone-200 bg-white pl-7 pr-3 py-2 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none"
-                    />
+                  <div className="flex items-start gap-3">
+                    {scrapedImage && (
+                      <img src={scrapedImage} alt="" className="h-16 w-16 rounded-lg object-cover shrink-0 border border-emerald-200" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" strokeWidth={2.5} />
+                        <p className="text-[12px] font-semibold text-emerald-700">Product details found — edit if needed</p>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Product name"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none mb-2"
+                      />
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-semibold text-stone-400">£</span>
+                        <input
+                          type="number"
+                          placeholder="0.00"
+                          value={amount}
+                          onChange={(e) => setAmount(e.target.value)}
+                          className="w-full rounded-lg border border-stone-200 bg-white pl-7 pr-3 py-2 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -4047,7 +4261,7 @@ function RevealDemoView({ pots, onLaunch }: { pots: DemoPot[]; onLaunch: (pot: D
           <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80">Live Reveal Experience</p>
         </div>
         <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold text-white leading-tight mb-2">
-          The Samba Ceremony
+          The Reveal Ceremony
         </h1>
         <p className="max-w-xs text-[13px] leading-relaxed text-white/50 mb-8">
           This is what Billy sees when the big day arrives — a cinematic, euphoric unwrap moment built by the people who love him.
@@ -4107,7 +4321,7 @@ function RevealDemoView({ pots, onLaunch }: { pots: DemoPot[]; onLaunch: (pot: D
           {[
             { Icon: Gift, label: "The Wrapped Present", desc: "Seasons the experience to Christmas or Birthday" },
             { Icon: Zap, label: "Tactile Shake", desc: "The box vibrates to syncopated samba percussion" },
-            { Icon: Radio, label: "Samba Synth Engine", desc: "Surdo drums, agogô bells, cuíca whistle, pandeiro" },
+            { Icon: Radio, label: "Synth Fanfare Engine", desc: "Parade drums, ringing bells, happy whistle accents" },
             { Icon: Sparkles, label: "Dopamine Climax", desc: "Fireworks, gold sparks, funded amount slot-machine" },
             { Icon: Star, label: "Memory Cards", desc: "Family video wishes and handwritten notes float in" },
           ].map(({ Icon, label, desc }, i) => (
@@ -4139,12 +4353,12 @@ function RevealDemoView({ pots, onLaunch }: { pots: DemoPot[]; onLaunch: (pot: D
           }}
         >
           <Zap className="h-5 w-5" strokeWidth={2.5} />
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-[17px]">Launch Reveal Ceremony</span>
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-[17px]">Ignite &amp; Unwrap</span>
           <Sparkles className="h-5 w-5" strokeWidth={2} />
         </motion.button>
 
         <p className="mt-4 text-[11px] text-white/30">
-          Triggers the full cinematic Samba reveal with audio, fireworks, and memory cards
+          Triggers the full cinematic reveal with audio fanfare, fireworks, and memory cards
         </p>
       </div>
     </div>
@@ -4332,8 +4546,8 @@ function ReceiverProofStats() {
     {
       Icon: Leaf,
       value: 30, suffix: "%",
-      label: "Waste Reduction",
-      desc: "Household retail waste spikes 30% over holidays. Kindled matches purchases to exact demand — dropping duplicate retail waste to 0%.",
+      label: "Waste Spike",
+      desc: "Household retail waste rises 30% over the festive season. Kindled helps families chip away at and reduce holiday retail waste by matching physical purchases to exact, parent-approved demand.",
       color: "text-emerald-500", bg: "bg-emerald-50", border: "border-emerald-200/60",
     },
     {
@@ -4346,8 +4560,8 @@ function ReceiverProofStats() {
     {
       Icon: Landmark,
       value: 3, suffix: ".2B",
-      label: "Redirected",
-      desc: "£3.2B wasted on unwanted gifts redirected into durable milestones previously out of any single person's budget.",
+      label: "Wasted Annually",
+      desc: "Over £3.2B is wasted on unwanted gifts each year in the UK and US alone. Kindled is designed to help families redirect their portion of this wasted capital into major milestone assets.",
       color: "text-violet-500", bg: "bg-violet-50", border: "border-violet-200/60",
     },
   ];
@@ -4511,7 +4725,7 @@ function ReceiverView({ pots, onOpenStars, onShare, onReveal }: {
             <div className="flex-1 min-w-0">
               <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/80 mb-0.5">Experience Your Reveal Day</p>
               <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-semibold text-white leading-snug">
-                See the magical Samba celebration
+                See the magical reveal celebration
               </p>
               <p className="mt-0.5 text-[11px] leading-snug text-white/50">
                 Preview the cinematic ceremony your family will ignite when your fires are fully stoked
@@ -4597,6 +4811,7 @@ export default function DemoPage() {
   const [pendingContribution, setPendingContribution] = useState<{ pot: DemoPot; amount: number } | null>(null);
   const [previewReceiver, setPreviewReceiver] = useState(false);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
+  const [showReceiverSignUp, setShowReceiverSignUp] = useState(false);
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));
@@ -4668,6 +4883,7 @@ export default function DemoPage() {
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showNewGift && <NewGiftSheet onAdd={handleAddNewGift} onClose={() => setShowNewGift(false)} />}
       <AnimatePresence>{showCreatorModal && <CreatorSignUpModal onClose={() => setShowCreatorModal(false)} />}</AnimatePresence>
+      <AnimatePresence>{showReceiverSignUp && <ReceiverSignUpModal onClose={() => setShowReceiverSignUp(false)} />}</AnimatePresence>
       {pendingContribution && (
         <ContributionPromptModal
           pot={pendingContribution.pot}
@@ -4710,6 +4926,7 @@ export default function DemoPage() {
         totalGoal={pots.reduce((s, p) => s + p.goal, 0)}
         onShare={handleShare}
         isContributor={isContributor}
+        onStartReceiving={() => setShowReceiverSignUp(true)}
       />
 
       <main className="space-y-7 pb-36 pt-4">
