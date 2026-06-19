@@ -9,6 +9,7 @@ import {
   Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
   Landmark, Radio, Wrench, Trophy, Wallet, Eye,
   Bike, Plane, Home, Cake, TreePine, GraduationCap, Armchair, PenLine,
+  Trash2, AlertCircle, Copy, TrendingUp, Info,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { FundingBar } from "@/components/pots/FundingBar";
@@ -3299,41 +3300,320 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ABOUT PAGE (one-pager)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function AboutPage() {
+  const [email, setEmail] = useState("");
+  const [submitState, setSubmitState] = useState<"idle" | "sending" | "done" | "error">("idle");
+
+  async function handleWaitlist(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setSubmitState("sending");
+    try {
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), name: "Waitlist" }),
+      });
+      setSubmitState(res.ok ? "done" : "error");
+    } catch {
+      setSubmitState("error");
+    }
+  }
+
+  const PROBLEMS = [
+    { Icon: AlertCircle, title: "The Guessing Game", stat: "71%", body: "of us feel real anxiety shopping for someone on our list. The well-meant guesses that follow are how 23 million unwanted gifts end up in UK landfill every Christmas." },
+    { Icon: Copy, title: "The Duplicate Disaster", stat: "£700M", body: "wasted yearly on UK gifts nobody actually wanted. Nobody coordinates — so Grandma and Uncle Dave both buy the same LEGO set." },
+    { Icon: CreditCard, title: "The Money Squeeze", stat: "£514", body: "the average UK Christmas costs per head. 36% of us say the cost of living has already shrunk our gifting budget — yet the big stuff feels out of reach alone." },
+  ];
+
+  const STEPS = [
+    { n: "1", title: "Build your list", desc: "Items or a cash goal — any size, any occasion." },
+    { n: "2", title: "Share one link", desc: "WhatsApp or text — no app download, grandparents included." },
+    { n: "3", title: "It stays a secret", desc: "Contributors see what's covered so nothing's bought twice — the total stays under wraps." },
+    { n: "4", title: "The big reveal", desc: "On the day — birthday, baby shower, Christmas and more — everyone gathers for one big moment." },
+  ];
+
+  const BENEFITS = [
+    { title: "Free. Forever.", desc: "No listing fees, no withdrawal fees — not even on the small stuff." },
+    { title: "Real cashback", desc: "Earn 1–2% back on every contribution, plus a raffle entry every £10." },
+    { title: "No app needed", desc: "Open a link, pay by FaceID in seconds. Works for grandparents too." },
+    { title: "Duplicate-proof", desc: "Contributors see it ticked off instantly, so nobody ever doubles up." },
+    { title: "The Reveal", desc: "A genuinely emotional ceremony with the people who love you — not just a balance update." },
+    { title: "Nothing expires", desc: "An unfinished pot carries to the next birthday or Christmas — never a \"failure.\"" },
+  ];
+
+  const PLANET = [
+    { Icon: Trash2, title: "23 Million Gifts", body: "Unwanted Christmas presents that end up in UK landfill every single year — most never even unwrapped twice." },
+    { Icon: Package, title: "£1.27 Billion", body: "Spent annually on UK gifts nobody wanted — much of it boxed, wrapped, and binned within weeks." },
+    { Icon: TrendingUp, title: "+30% Waste", body: "The rise in household waste over the festive season alone — wrapping, packaging, and gifts nobody asked for." },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#15100C] text-white">
+      {/* Ambient glow blobs */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-1/4 -left-1/4 h-[60vw] w-[60vw] rounded-full bg-amber-500/10 blur-[120px]" />
+        <div className="absolute -bottom-1/4 -right-1/4 h-[50vw] w-[50vw] rounded-full bg-orange-600/8 blur-[100px]" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-2xl space-y-10 px-4 pb-20 pt-8">
+
+        {/* ── Hero ── */}
+        <div>
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-amber-400">Gifting, Reimagined</p>
+          <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[clamp(1.7rem,6vw,2.5rem)] font-bold leading-[1.1] tracking-tight text-white">
+            Gifting, Without the{" "}
+            <span className="bg-gradient-to-r from-amber-300 to-orange-500 bg-clip-text text-transparent">Guesswork.</span>
+          </h1>
+          <p className="mt-4 text-[15px] leading-relaxed text-amber-100/70">
+            Kindled turns &ldquo;what do you actually want?&rdquo; into one shared goal everyone can chip in on — any amount, no app required, completely free. No more duplicates. No more clutter. Just the thing they really wanted, funded by the people who love them.
+          </p>
+        </div>
+
+        {/* ── Problem ── */}
+        <div>
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-1 text-[22px] font-semibold text-white">We&apos;ve All Been There</h2>
+          <p className="mb-5 text-[13px] text-amber-100/50">The same gifting headaches, year after year — and the numbers prove it&apos;s not just you.</p>
+          <div className="flex flex-col gap-3">
+            {PROBLEMS.map(({ Icon, title, stat, body }) => (
+              <motion.div
+                key={title}
+                whileHover={{ y: -3 }}
+                transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                className="rounded-2xl border border-white/8 p-4"
+                style={{ background: "linear-gradient(165deg,#1F140A,#241707)" }}
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <Icon className="h-5 w-5 shrink-0 text-amber-400" strokeWidth={1.75} />
+                  <p className="text-[14px] font-semibold text-amber-200">{title}</p>
+                </div>
+                <p className="text-[13px] leading-relaxed text-amber-100/60">
+                  <span className="font-bold text-amber-300">{stat} </span>{body}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Solution ── */}
+        <div className="rounded-2xl border border-amber-500/25 p-5" style={{ background: "linear-gradient(160deg,rgba(244,140,6,0.14),rgba(232,93,4,0.04))" }}>
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-3 text-[22px] font-semibold text-white">Meet the Pot.</h2>
+          <p className="mb-5 text-[13px] leading-relaxed text-amber-100/70">
+            Kindled replaces the guesswork with one shared goal. Build a list — from new trainers to a house deposit. Share a single link. Everyone who loves you chips in whatever they can, big or small. Nothing gets duplicated, nothing gets wasted — and the big moment stays a surprise until everyone&apos;s together to share it.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {STEPS.map((s) => (
+              <div key={s.n} className="rounded-xl border border-white/8 bg-white/4 p-3 transition-colors hover:bg-amber-500/8">
+                <span className="mb-2 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 to-orange-500 text-[11px] font-black text-stone-900">{s.n}</span>
+                <p className="text-[13px] font-semibold text-white">{s.title}</p>
+                <p className="mt-0.5 text-[11px] leading-snug text-amber-100/50">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Real Life Vignettes ── */}
+        <div>
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-1 text-[22px] font-semibold text-white">Real People. Real Pots.</h2>
+          <p className="mb-5 text-[13px] text-amber-100/50">Two ordinary moments, fixed.</p>
+          <div className="flex flex-col gap-4">
+            {/* Leo's Birthday */}
+            <div className="rounded-2xl border border-white/8 bg-white/4 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <Cake className="h-5 w-5 text-violet-400" strokeWidth={1.75} />
+                <h3 className="text-[14px] font-semibold text-white">Leo&apos;s 6th Birthday</h3>
+              </div>
+              <div className="mb-2 flex gap-2">
+                <span className="mt-0.5 shrink-0 rounded bg-white/8 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-100/40">Before</span>
+                <p className="text-[12px] leading-snug text-amber-100/60">Mum gets 14 &ldquo;what does he want?&rdquo; texts. Grandma and Uncle Dave both buy the LEGO set. £80 of toys get returned or binned.</p>
+              </div>
+              <div className="mb-3 flex gap-2">
+                <span className="mt-0.5 shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-300">Kindled</span>
+                <p className="text-[12px] leading-snug text-amber-100/60">One link, 14 relatives — every gift ticked off behind the scenes so nothing doubles up. Leo has no idea what&apos;s coming.</p>
+              </div>
+              <p className="border-t border-white/8 pt-2.5 text-[12px] font-medium italic text-amber-300">Mum saves £80 — and her sanity.</p>
+            </div>
+            {/* Dad's Log Burner */}
+            <div className="rounded-2xl border border-white/8 bg-white/4 p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <Flame className="h-5 w-5 text-orange-400" strokeWidth={1.75} />
+                <h3 className="text-[14px] font-semibold text-white">Dad&apos;s Log Burner</h3>
+              </div>
+              <div className="mb-2 flex gap-2">
+                <span className="mt-0.5 shrink-0 rounded bg-white/8 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-100/40">Before</span>
+                <p className="text-[12px] leading-snug text-amber-100/60">Everyone gets Dad &ldquo;something&rdquo; for Christmas — ties, socks. The £1,200 log burner he actually wants stays a pipe dream; too much for one person.</p>
+              </div>
+              <div className="mb-3 flex gap-2">
+                <span className="mt-0.5 shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-300">Kindled</span>
+                <p className="text-[12px] leading-snug text-amber-100/60">8 family members quietly chip in throughout the year. Christmas morning, with everyone gathered round, Dad finds out exactly how far they got.</p>
+              </div>
+              <p className="border-t border-white/8 pt-2.5 text-[12px] font-medium italic text-amber-300">Fully funded or not, every pound brings it closer — and an unfinished pot simply rolls on to his birthday, until the log burner&apos;s real.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Reveal Ceremony ── */}
+        <div className="relative overflow-hidden rounded-2xl border border-amber-500/35 p-6 text-center" style={{ background: "linear-gradient(160deg,rgba(244,140,6,0.20),rgba(232,93,4,0.05))" }}>
+          {/* Static confetti dots */}
+          {[["10%","8%","#FFC971",10],["88%","16%","#F4684E",8],["6%","72%","#FFC24B",7],["92%","80%","#F48C06",11],["48%","8%","#E85D04",6]].map(([l,t,c,s],i) => (
+            <div key={i} className="pointer-events-none absolute rounded-full opacity-60" style={{ left: l as string, top: t as string, background: c as string, width: Number(s), height: Number(s) }} />
+          ))}
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="relative z-10 mb-2 text-[22px] font-semibold text-white">The Big Reveal Ceremony</h2>
+          <p className="relative z-10 mx-auto mb-5 max-w-lg text-[13px] leading-relaxed text-amber-100/70">
+            This is the bit other apps skip. When it&apos;s time, everyone gathers — in the room or on a video call — for one big moment. Slide to reveal. Confetti. A wall of photos from everyone who chipped in, plus the odd video message that&apos;ll get someone a little misty-eyed. It&apos;s not a notification — it&apos;s an occasion.
+          </p>
+          <div className="relative z-10 flex flex-wrap justify-center gap-2">
+            {["Slide to reveal","Confetti & photo wall","Video messages","Everyone together"].map((chip) => (
+              <span key={chip} className="rounded-full border border-amber-500/40 bg-white/7 px-3 py-1.5 text-[11px] font-bold text-amber-300">{chip}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Benefits ── */}
+        <div>
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-4 text-[22px] font-semibold text-white">The Bit That Actually Matters</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {BENEFITS.map(({ title, desc }) => (
+              <div key={title} className="flex gap-2.5 rounded-2xl border border-white/8 bg-white/3 p-3 transition-colors hover:bg-amber-500/6">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500/15">
+                  <Check className="h-3.5 w-3.5 text-amber-300" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <p className="text-[12px] font-semibold text-white">{title}</p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-amber-100/50">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Kids ── */}
+        <div className="rounded-2xl border border-amber-200/17 p-5" style={{ background: "linear-gradient(155deg,rgba(255,201,113,0.08),rgba(244,140,6,0.02))" }}>
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-amber-400">For the Little Ones</p>
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-3 text-[18px] font-semibold text-white">The List They&apos;ve Been Building All Year</h2>
+          <p className="mb-2 text-[13px] leading-relaxed text-amber-100/60">
+            We all remember it — the big catalogue landing on the doormat, dog-eared by page two. Circling things in biro. That quietly absorbed, hopeful ritual of building a wish list.
+          </p>
+          <p className="mb-4 text-[13px] leading-relaxed text-amber-100/60">
+            Kindled gives kids their own digital catalogue to browse, tap, and dream over — starring exactly what they&apos;d love, with no idea which ones are already covered. Good behaviour is built in: stars earned for good days move them closer to the gifts they&apos;re working towards.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {["Browse & star items","Surprise stays intact","Any age, any occasion","Good days earn stars"].map((chip) => (
+              <span key={chip} className="rounded-full border border-amber-200/25 bg-amber-200/8 px-3 py-1 text-[11px] font-bold text-amber-300">{chip}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Planet ── */}
+        <div>
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-1 text-[22px] font-semibold text-white">Good For Them. Good For the Planet.</h2>
+          <p className="mb-5 text-[13px] text-amber-100/50">Unwanted gifts don&apos;t just waste money — they waste resources. Funding what&apos;s actually wanted means less ends up in the bin.</p>
+          <div className="flex flex-col gap-3">
+            {PLANET.map(({ Icon, title, body }) => (
+              <div key={title} className="flex gap-3.5 rounded-2xl border border-white/8 p-4" style={{ background: "linear-gradient(165deg,#1F140A,#241707)" }}>
+                <Icon className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" strokeWidth={1.75} />
+                <div>
+                  <p className="text-[13px] font-semibold text-amber-200">{title}</p>
+                  <p className="mt-0.5 text-[12px] leading-snug text-amber-100/60">{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Trust ── */}
+        <div className="flex gap-4 rounded-2xl border border-white/8 bg-[#1F140A] p-5">
+          <ShieldCheck className="mt-0.5 h-8 w-8 shrink-0 text-amber-400" strokeWidth={1.5} />
+          <div>
+            <h3 style={{ fontFamily: "var(--font-display)" }} className="mb-1.5 text-[16px] font-semibold text-white">Every Penny Goes to the Gift.</h3>
+            <p className="text-[13px] leading-relaxed text-amber-100/65">
+              No listing fees. No withdrawal fees. No quiet percentage disappearing along the way. Whether you&apos;re chipping in £5 or running the whole pot, every penny goes toward the gift — not one slice is ever taken, by us or anyone else. Free for the people giving. Free for the people receiving. Always.
+            </p>
+          </div>
+        </div>
+
+        {/* ── Waitlist CTA ── */}
+        <div className="rounded-2xl border border-amber-400 p-6 text-center" style={{ background: "linear-gradient(165deg,rgba(244,140,6,0.22),rgba(232,93,4,0.06))", boxShadow: "0 0 24px rgba(244,140,6,0.28), 0 0 50px rgba(232,93,4,0.14)" }}>
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-2 text-[22px] font-semibold text-white">Be Among the First to Light a Pot</h2>
+          <p className="mx-auto mb-5 max-w-sm text-[13px] leading-relaxed text-amber-100/70">
+            We&apos;re opening Kindled to early users soon. Join the waitlist and we&apos;ll let you know the moment you can build your first list.
+          </p>
+          {submitState === "done" ? (
+            <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 py-3.5">
+              <Check className="h-5 w-5 text-emerald-400" strokeWidth={2.5} />
+              <span className="text-[14px] font-semibold text-emerald-300">You&apos;re on the list — we&apos;ll be in touch!</span>
+            </div>
+          ) : (
+            <form onSubmit={(e) => { void handleWaitlist(e); }} className="flex gap-2">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@email.com"
+                className="flex-1 rounded-xl border border-white/18 bg-white/6 px-3.5 py-3 text-[13px] text-white placeholder:text-amber-100/35 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+              />
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                type="submit"
+                disabled={submitState === "sending"}
+                className="rounded-xl bg-gradient-to-br from-amber-300 to-orange-500 px-4 py-3 text-[13px] font-bold text-stone-900 shadow-lg shadow-amber-900/40 disabled:opacity-60 whitespace-nowrap"
+                style={{ animation: "pulseGlow 2.4s ease-in-out infinite" }}
+              >
+                {submitState === "sending" ? "Sending…" : "Join the Waitlist →"}
+              </motion.button>
+            </form>
+          )}
+          {submitState === "error" && <p className="mt-2 text-[11px] text-red-400">Something went wrong — try again.</p>}
+          <p className="mt-3 text-[11px] text-amber-100/35">Free forever. No spam, ever.</p>
+        </div>
+
+        {/* ── Footer ── */}
+        <div className="flex items-center justify-between border-t border-white/8 pt-4">
+          <span className="text-[12px] text-amber-100/40"><span className="font-bold text-amber-300">Kindled</span> — gifting, the way it should feel.</span>
+          <span className="text-right text-[10px] leading-snug text-amber-100/30">Sources: GiftAFeeling 2025 · GlobalData UK Gifting 2024 · YouGov/MoneySuperMarket 2025</span>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function RoleSwitcher({ role, onChange }: { role: "parent" | "receiver"; onChange: (r: "parent" | "receiver") => void }) {
+type ViewMode = "parent" | "receiver" | "about";
+
+function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
+  const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
+    { id: "parent", label: "Contribute", Icon: Users },
+    { id: "receiver", label: "Billy's View", Icon: Sparkles },
+    { id: "about", label: "About", Icon: Info },
+  ];
   return (
     <div className="sticky top-0 z-30 flex justify-center px-4 pt-3 pb-2 bg-[#fdf9f5]/90 backdrop-blur-md border-b border-stone-100">
       <div className="flex w-full max-w-sm rounded-2xl bg-stone-100 p-1 gap-1 shadow-inner">
-        <motion.button
-          whileTap={{ scale: 0.96 }}
-          onClick={() => onChange("parent")}
-          className={cn(
-            "relative flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
-            role === "parent" ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
-          )}
-        >
-          {role === "parent" && (
-            <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
-          )}
-          <Users className="h-4 w-4" />
-          <span>Contributor</span>
-        </motion.button>
-        <motion.button
-          whileTap={{ scale: 0.96 }}
-          onClick={() => onChange("receiver")}
-          className={cn(
-            "relative flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
-            role === "receiver" ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
-          )}
-        >
-          {role === "receiver" && (
-            <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
-          )}
-          <Sparkles className="h-4 w-4" />
-          <span>Billy&apos;s view</span>
-        </motion.button>
+        {tabs.map(({ id, label, Icon }) => (
+          <motion.button
+            key={id}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => onChange(id)}
+            className={cn(
+              "relative flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-[12px] font-semibold transition-all",
+              role === id ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
+            )}
+          >
+            {role === id && (
+              <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
+            )}
+            <Icon className="h-3.5 w-3.5" />
+            <span>{label}</span>
+          </motion.button>
+        ))}
       </div>
     </div>
   );
@@ -3590,7 +3870,7 @@ function ReceiverView({ pots, onOpenStars, onReveal, onShare }: {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export default function DemoPage() {
-  const [viewMode, setViewMode] = useState<"parent" | "receiver">("parent");
+  const [viewMode, setViewMode] = useState<ViewMode>("parent");
   const [isContributor, setIsContributor] = useState(false);
   useEffect(() => {
     setIsContributor(new URLSearchParams(window.location.search).get("view") === "contributor");
@@ -3693,9 +3973,13 @@ export default function DemoPage() {
       {/* ── Role switcher (always visible) ── */}
       <RoleSwitcher role={viewMode} onChange={setViewMode} />
 
-      {/* ── Receiver view ── */}
+      {/* ── Views ── */}
       <AnimatePresence mode="wait">
-      {viewMode === "receiver" ? (
+      {viewMode === "about" ? (
+        <motion.div key="about" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
+          <AboutPage />
+        </motion.div>
+      ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
           <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onReveal={setRevealPot} onShare={handleShare} />
         </motion.div>
