@@ -4601,11 +4601,12 @@ function ReceiverProofStats() {
 // RECEIVER VIEW
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ReceiverView({ pots, onOpenStars, onShare, onReveal }: {
+function ReceiverView({ pots, onOpenStars, onShare, onReveal, onAddGift }: {
   pots: DemoPot[];
   onOpenStars: () => void;
   onShare: () => void;
   onReveal: (pot: DemoPot) => void;
+  onAddGift: () => void;
 }) {
   // Exclude checklist pots entirely — receiver must not see "Mum Knows Best" items
   const sparkGoals = pots.filter((p) => !p.isClaimed && !p.isChecklist);
@@ -4787,6 +4788,18 @@ function ReceiverView({ pots, onOpenStars, onShare, onReveal }: {
           </div>
         </motion.button>
       </div>
+
+      {/* Add Spark Goal FAB */}
+      <motion.button
+        whileTap={{ scale: 0.94 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        onClick={onAddGift}
+        className="fixed bottom-24 right-5 z-40 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-[13px] font-bold text-white shadow-xl shadow-amber-400/40 active:scale-95"
+      >
+        <Plus className="h-4 w-4" strokeWidth={2.5} />
+        Add a Spark Goal
+      </motion.button>
     </div>
   );
 }
@@ -4915,7 +4928,7 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onShare={handleShare} onReveal={setRevealPot} />
+          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onShare={handleShare} onReveal={setRevealPot} onAddGift={() => setShowNewGift(true)} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
