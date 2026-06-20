@@ -966,7 +966,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
       style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
     >
       <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
-      <div className="flex min-h-[440px] flex-col p-4">
+      <div className="flex flex-col p-3.5">
         {/* Header row */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-3">
@@ -1044,8 +1044,8 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
               </div>
             )}
 
-            {/* Action buttons — pushed to bottom for uniform card height */}
-            <div className="mt-auto pt-3 flex gap-2">
+            {/* Action buttons */}
+            <div className="mt-3 flex gap-2">
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setKindleOpen((v) => !v)}
