@@ -5077,6 +5077,25 @@ export default function DemoPage() {
               </motion.button>
             )}
           </div>
+          {/* ── Claimed / ordered pots — contributor view ── */}
+          {claimedPots.filter((p) => !p.isChecklist).length > 0 && (
+            <div className="mt-2">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2 mt-4">Ordered &amp; on their way</p>
+              <div className="flex flex-col gap-3">
+                {claimedPots.filter((p) => !p.isChecklist).map((pot) => (
+                  <LivePotCard
+                    key={pot.id}
+                    pot={pot}
+                    onKindle={handleKindle}
+                    onBuy={handleBuy}
+                    onAmountSelected={(p, amt) => setPendingContribution({ pot: p, amount: amt })}
+                    hideStackNote
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* ── Sign-up card — below pots list ── */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
