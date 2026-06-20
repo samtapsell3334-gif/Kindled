@@ -848,24 +848,7 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
           )}
         </div>
         {isContributor && (
-          <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">start your own list — takes 2 minutes</p>
-        )}
-
-        {/* Raffle + cashback callout — contributor only, sits right under header */}
-        {isContributor && (
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, type: "spring", stiffness: 340, damping: 30 }}
-            className="mt-3 flex items-start gap-3 rounded-2xl border border-amber-400/30 bg-gradient-to-r from-amber-50 to-orange-50 px-3.5 py-3"
-            style={{ boxShadow: "0 0 0 1px rgba(245,158,11,0.15), 0 2px 12px rgba(245,158,11,0.1)" }}
-          >
-            <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-            <p className="text-[11px] leading-snug text-amber-900/80">
-              <span className="font-bold text-amber-700">Chip in to enter the £2,500 Goal Booster Draw</span> — one entry per £10 contributed.{" "}
-              <span className="font-semibold text-orange-700">Earn 2% back</span> in Spark Balance to stoke your own future fires when you start your own board.
-            </p>
-          </motion.div>
+          <p className="mt-1 text-right text-[10px] text-stone-400 pr-0.5">contributing to Billy&apos;s list</p>
         )}
 
         <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
@@ -5019,57 +5002,67 @@ export default function DemoPage() {
 
       <main className="space-y-7 pb-36 pt-4">
 
-        {/* ── Contributor hero CTA — top of feed ── */}
+        {/* ── Contributor sign-up hero — bright, impossible to miss ── */}
         {isContributor && (
           <section className="px-4">
             <motion.div
-              initial={{ opacity: 0, y: -12 }}
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 340, damping: 32 }}
-              className="relative overflow-hidden rounded-3xl"
-              style={{
-                background: "linear-gradient(135deg, #0f0700 0%, #1f0e00 40%, #2a1200 100%)",
-                boxShadow: "0 8px 40px rgba(245,158,11,0.3), 0 0 0 1px rgba(245,158,11,0.25)",
-              }}
+              className="overflow-hidden rounded-3xl bg-white"
+              style={{ boxShadow: "0 4px 32px rgba(245,158,11,0.22), 0 0 0 2px rgba(245,158,11,0.35)" }}
             >
-              {/* Ember particles */}
-              <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                {EMBERS.slice(0, 12).map((e) => (
-                  <span key={e.id} className="absolute rounded-full bg-amber-400/50"
-                    style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
-                      animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`,
-                      "--sx": e.emberX } as React.CSSProperties} />
-                ))}
+              {/* Bold amber top bar */}
+              <div className="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 px-5 py-3 flex items-center gap-2">
+                <Flame className="h-4 w-4 text-white shrink-0" />
+                <p className="text-[12px] font-black uppercase tracking-widest text-white">Want your own list like this?</p>
               </div>
-              {/* Glow top stripe */}
-              <div className="h-[3px] w-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500" />
-              <div className="relative px-5 py-5">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 border border-amber-500/30 shadow-inner">
-                    <Flame className="h-7 w-7 text-amber-400" strokeWidth={1.5} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-400/70 mb-1">You could have one of these</p>
-                    <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-bold text-white leading-tight">
-                      Start receiving your own kindled gifts
-                    </p>
-                    <p className="mt-1.5 text-[12px] text-white/50 leading-snug">
-                      Build your wishlist in minutes. Share one link. Watch friends and family stoke your Spark Goals — no awkward money talk, no wasted gifts.
-                    </p>
-                  </div>
+
+              <div className="px-5 py-5">
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-[22px] font-bold text-stone-900 leading-tight">
+                  Start receiving kindled gifts yourself
+                </p>
+                <p className="mt-2 text-[13px] text-stone-500 leading-relaxed">
+                  Loved how easy it was to chip in for Billy? You can have your own list — no awkward money conversations, no duplicate gifts, just exactly what you actually want.
+                </p>
+
+                {/* Benefit bullets */}
+                <div className="mt-3 space-y-2">
+                  {[
+                    { Icon: Check, text: "Friends & family chip in — any amount, no app needed" },
+                    { Icon: Lock, text: "Gifts stay a surprise until your reveal day" },
+                    { Icon: Star, text: "Star chart mode for kids · parent controls built in" },
+                  ].map(({ Icon, text }) => (
+                    <div key={text} className="flex items-center gap-2">
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                        <Icon className="h-3 w-3 text-amber-600" strokeWidth={2.5} />
+                      </div>
+                      <p className="text-[12px] text-stone-600">{text}</p>
+                    </div>
+                  ))}
                 </div>
+
+                {/* Raffle + cashback strip */}
+                <div className="mt-4 flex items-start gap-2.5 rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-3">
+                  <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                  <p className="text-[11px] leading-snug text-amber-900">
+                    <span className="font-bold">Every contribution enters you into our £2,500 Goal Booster Draw.</span>{" "}
+                    Plus earn <span className="font-bold text-orange-600">2% back in Spark Balance</span> to ignite your own future fires.
+                  </p>
+                </div>
+
                 <motion.button
-                  whileTap={{ scale: 0.96 }}
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 26 }}
                   onClick={() => setShowReceiverSignUp(true)}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-bold text-stone-900"
-                  style={{ background: "linear-gradient(135deg, #fbbf24, #f97316)", boxShadow: "0 4px 20px rgba(251,146,60,0.5)" }}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[16px] font-bold text-white"
+                  style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)", boxShadow: "0 6px 24px rgba(249,115,22,0.45)" }}
                 >
                   <Flame className="h-5 w-5" />
-                  Create my own fire
+                  Create my own fire — it&apos;s free
                 </motion.button>
-                <p className="mt-2 text-center text-[10px] text-white/30">Free to set up · no app required · takes 2 minutes</p>
+                <p className="mt-2 text-center text-[10px] text-stone-400">No app required · 2 minute setup · cancel anytime</p>
               </div>
             </motion.div>
           </section>
