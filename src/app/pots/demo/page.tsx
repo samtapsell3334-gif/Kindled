@@ -657,7 +657,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
             <div className="space-y-5">
               {/* Header + step dots */}
               <div>
-                <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">Start receiving kindled gifts</p>
+                <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">Create my own fire</p>
                 <p className="mt-1 text-[12px] text-white/50">Step {step} of {totalSteps}</p>
                 <div className="mt-3 flex gap-1.5">
                   {Array.from({ length: totalSteps }).map((_, i) => (
@@ -843,7 +843,7 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
               className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 px-3.5 py-2 text-[12px] font-semibold text-white shadow-md shadow-amber-200 active:scale-95"
             >
               <Gift className="h-3.5 w-3.5" />
-              Start receiving kindled gifts
+              Create my own fire
             </motion.button>
           )}
         </div>
@@ -1388,8 +1388,32 @@ function ContributionPromptModal({
               </motion.div>
             )}
 
+            {/* Giver incentive callout */}
+            <div className="mt-4 rounded-2xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-rose-500/5 p-3.5 space-y-2.5"
+              style={{ boxShadow: "0 0 20px rgba(245,158,11,0.08)" }}>
+              <div className="flex items-start gap-2.5">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/20">
+                  <Trophy className="h-3.5 w-3.5 text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-[12px] font-bold text-amber-300">Stoke &amp; Win</p>
+                  <p className="text-[11px] text-white/55 leading-snug">Chipping in automatically enters you into our active <span className="text-amber-400 font-semibold">£2,500 Summer Goal Booster Draw</span> — one entry per £10 contributed.</p>
+                </div>
+              </div>
+              <div className="h-px bg-white/8" />
+              <div className="flex items-start gap-2.5">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-rose-500/20">
+                  <Flame className="h-3.5 w-3.5 text-rose-400" />
+                </div>
+                <div>
+                  <p className="text-[12px] font-bold text-rose-300">Kindle Back Rewards</p>
+                  <p className="text-[11px] text-white/55 leading-snug">Earn <span className="text-rose-300 font-semibold">2% back</span> in Spark Balance on every contribution — ignite your own future Spark Goals when you start your own board.</p>
+                </div>
+              </div>
+            </div>
+
             {/* CTAs */}
-            <div className="mt-5 flex flex-col gap-2">
+            <div className="mt-4 flex flex-col gap-2">
               {submitted ? (
                 <div className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-4">
                   <Check className="h-5 w-5 text-white" strokeWidth={2.5} />
@@ -4027,7 +4051,7 @@ function AboutPage() {
             <span className="bg-gradient-to-r from-amber-300 to-orange-500 bg-clip-text text-transparent">Guesswork.</span>
           </h1>
           <p className="mt-4 text-[15px] leading-relaxed text-amber-100/70">
-            Kindled turns &ldquo;what do you actually want?&rdquo; into one shared goal everyone can chip in on — any amount, no app required, completely free. No more duplicates. No more clutter. Just the thing they really wanted, funded by the people who love them.
+            Kindled turns &ldquo;what do you actually want?&rdquo; into one shared goal everyone can chip in on — any amount, no app required, completely free. No more duplicates. No more clutter. Just the thing you really wanted, funded by the people who love you.
           </p>
         </div>
 
@@ -5038,7 +5062,7 @@ export default function DemoPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/70 mb-0.5">Want your own list?</p>
-                    <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white leading-tight">Start receiving kindled gifts</p>
+                    <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white leading-tight">Create my own fire</p>
                     <p className="text-[12px] text-white/50 mt-0.5">Create your wishlist in seconds — with parent controls, star charts &amp; more</p>
                   </div>
                   <ChevronUp className="h-5 w-5 rotate-90 text-amber-400 shrink-0" />
