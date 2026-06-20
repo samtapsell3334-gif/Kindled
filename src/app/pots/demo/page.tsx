@@ -591,8 +591,10 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
+  const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [birthday, setBirthday] = useState("");
   const [isParent, setIsParent] = useState(false);
   const [starChart, setStarChart] = useState(false);
   const [catalogueCircle, setCatalogueCircle] = useState(false);
@@ -600,15 +602,18 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() || !name.trim()) return;
+  const totalSteps = isParent ? 4 : 3;
+
+  const handleNext = () => setStep((s) => Math.min(s + 1, totalSteps));
+  const handleBack = () => setStep((s) => Math.max(s - 1, 1));
+
+  const handleSubmit = async () => {
     setLoading(true);
     try {
       await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, type: "receiver-from-contributor", isParent, starChart, catalogueCircle, starValue }),
+        body: JSON.stringify({ name, email, birthday, type: "receiver-from-contributor", isParent, starChart, catalogueCircle, starValue }),
       });
     } catch { /* silent */ }
     setLoading(false);
@@ -635,9 +640,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
           <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-white/20" />
 
           {submitted ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
+            <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center gap-4 py-6 text-center"
             >
               <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
@@ -645,129 +648,143 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
               </div>
               <p style={{ fontFamily: "var(--font-display)" }} className="text-[22px] font-semibold text-amber-300">Your spot is reserved</p>
               <p className="text-[13px] text-white/60 leading-relaxed">We&apos;ll send your invitation to <span className="text-amber-400 font-semibold">{email}</span> as soon as your list is ready.</p>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={onClose}
-                className="mt-2 rounded-xl bg-amber-500/20 border border-amber-500/30 px-6 py-2.5 text-[13px] font-semibold text-amber-300"
-              >
+              <motion.button whileTap={{ scale: 0.95 }} onClick={onClose}
+                className="mt-2 rounded-xl bg-amber-500/20 border border-amber-500/30 px-6 py-2.5 text-[13px] font-semibold text-amber-300">
                 Done
               </motion.button>
             </motion.div>
           ) : (
-            <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-4">
+            <div className="space-y-5">
+              {/* Header + step dots */}
               <div>
                 <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">Start receiving kindled gifts</p>
-                <p className="mt-1 text-[12px] text-white/50">Create your own wishlist — for you, your child, or someone you love.</p>
+                <p className="mt-1 text-[12px] text-white/50">Step {step} of {totalSteps}</p>
+                <div className="mt-3 flex gap-1.5">
+                  {Array.from({ length: totalSteps }).map((_, i) => (
+                    <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i < step ? "bg-amber-500" : "bg-white/15"}`} />
+                  ))}
+                </div>
               </div>
 
-              <input
-                type="text"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-amber-400/60 focus:outline-none"
-              />
-              <input
-                type="email"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-amber-400/60 focus:outline-none"
-              />
-
-              {/* Parent toggle */}
-              <button
-                type="button"
-                onClick={() => setIsParent((v) => !v)}
-                className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition-colors ${isParent ? "border-amber-500/50 bg-amber-500/10" : "border-white/10 bg-white/5"}`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Users className="h-4 w-4 text-amber-400" />
-                  <span className="text-[13px] font-medium text-white">I am a parent — this is for my child</span>
-                </div>
-                <div className={`h-5 w-9 rounded-full transition-colors ${isParent ? "bg-amber-500" : "bg-white/20"} relative`}>
-                  <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${isParent ? "translate-x-4" : "translate-x-0.5"}`} />
-                </div>
-              </button>
-
-              {/* Child feature sub-panel */}
-              <AnimatePresence>
-                {isParent && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-400/70">Child features</p>
-
-                      {/* Star chart toggle */}
-                      <button
-                        type="button"
-                        onClick={() => setStarChart((v) => !v)}
-                        className="flex w-full items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Star className="h-3.5 w-3.5 text-amber-400" />
-                          <span className="text-[13px] text-white/80">Enable Kids Star Charting Tracker</span>
-                        </div>
-                        <div className={`h-4.5 w-8 rounded-full transition-colors ${starChart ? "bg-amber-500" : "bg-white/20"} relative flex items-center`}>
-                          <div className={`absolute h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${starChart ? "translate-x-4" : "translate-x-0.5"}`} />
-                        </div>
-                      </button>
-
-                      {/* Catalogue circling toggle */}
-                      <button
-                        type="button"
-                        onClick={() => setCatalogueCircle((v) => !v)}
-                        className="flex w-full items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <CircleEllipsis className="h-3.5 w-3.5 text-amber-400" />
-                          <span className="text-[13px] text-white/80">Enable Catalogue Circling Mode</span>
-                        </div>
-                        <div className={`h-4.5 w-8 rounded-full transition-colors ${catalogueCircle ? "bg-amber-500" : "bg-white/20"} relative flex items-center`}>
-                          <div className={`absolute h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${catalogueCircle ? "translate-x-4" : "translate-x-0.5"}`} />
-                        </div>
-                      </button>
-
-                      {/* Star value input */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                          <span className="text-[13px] text-white/80">Star Chart Value per Star</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[12px] text-white/40">£</span>
-                          <input
-                            type="number"
-                            min="1"
-                            max="100"
-                            value={starValue}
-                            onChange={(e) => setStarValue(e.target.value)}
-                            className="w-14 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-center text-[13px] text-white focus:border-amber-400/60 focus:outline-none"
-                          />
-                          <span className="text-[11px] text-white/40">/ star</span>
-                        </div>
+              <AnimatePresence mode="wait">
+                {step === 1 && (
+                  <motion.div key="s1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3">
+                    <p className="text-[13px] font-semibold text-white/70">Your details</p>
+                    <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-amber-400/60 focus:outline-none" />
+                    <input type="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-amber-400/60 focus:outline-none" />
+                    <motion.button whileTap={{ scale: 0.97 }} onClick={handleNext}
+                      disabled={!name.trim() || !email.trim()}
+                      className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-amber-500/30 disabled:opacity-40">
+                      Next
+                    </motion.button>
+                  </motion.div>
+                )}
+                {step === 2 && (
+                  <motion.div key="s2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3">
+                    <p className="text-[13px] font-semibold text-white/70">Your milestone date</p>
+                    <p className="text-[12px] text-white/40">We&apos;ll build your reveal countdown around this date.</p>
+                    <div>
+                      <label className="mb-1.5 block text-[11px] font-medium text-white/50">Birthday (or main event date)</label>
+                      <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)}
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white focus:border-amber-400/60 focus:outline-none" />
+                    </div>
+                    <div className="flex gap-2">
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={handleBack}
+                        className="flex-1 rounded-xl border border-white/10 py-3 text-[14px] font-semibold text-white/60">
+                        Back
+                      </motion.button>
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={handleNext}
+                        className="flex-[2] rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
+                        Next
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+                {step === 3 && (
+                  <motion.div key="s3" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3">
+                    <p className="text-[13px] font-semibold text-white/70">Who is this list for?</p>
+                    <button type="button" onClick={() => setIsParent((v) => !v)}
+                      className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition-colors ${isParent ? "border-amber-500/50 bg-amber-500/10" : "border-white/10 bg-white/5"}`}>
+                      <div className="flex items-center gap-2.5">
+                        <Users className="h-4 w-4 text-amber-400" />
+                        <span className="text-[13px] font-medium text-white">I am a parent / guardian — this is for my child</span>
                       </div>
-                      <p className="text-[10px] text-white/30">Default milestone: 30 stars = £{(parseInt(starValue || "5") * 30).toLocaleString()} total</p>
+                      <div className={`h-5 w-9 rounded-full transition-colors ${isParent ? "bg-amber-500" : "bg-white/20"} relative shrink-0`}>
+                        <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${isParent ? "translate-x-4" : "translate-x-0.5"}`} />
+                      </div>
+                    </button>
+                    <div className="flex gap-2">
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={handleBack}
+                        className="flex-1 rounded-xl border border-white/10 py-3 text-[14px] font-semibold text-white/60">
+                        Back
+                      </motion.button>
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={isParent ? handleNext : () => { void handleSubmit(); }}
+                        disabled={loading}
+                        className="flex-[2] rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
+                        {isParent ? "Next" : loading ? "Creating…" : "Create My First Fire"}
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                )}
+                {step === 4 && isParent && (
+                  <motion.div key="s4" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3">
+                    <p className="text-[13px] font-semibold text-white/70">Child features</p>
+                    {/* Star chart toggle */}
+                    <button type="button" onClick={() => setStarChart((v) => !v)}
+                      className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Star className="h-3.5 w-3.5 text-amber-400" />
+                        <span className="text-[13px] text-white/80">Use a star chart?</span>
+                      </div>
+                      <div className={`h-5 w-9 rounded-full transition-colors ${starChart ? "bg-amber-500" : "bg-white/20"} relative shrink-0`}>
+                        <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${starChart ? "translate-x-4" : "translate-x-0.5"}`} />
+                      </div>
+                    </button>
+                    <AnimatePresence>
+                      {starChart && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                          <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[13px] text-white/80">Star value per star</span>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[12px] text-white/40">£</span>
+                                <input type="number" min="0.10" max="50" step="0.10" value={starValue}
+                                  onChange={(e) => setStarValue(e.target.value)}
+                                  className="w-16 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-center text-[13px] text-white focus:border-amber-400/60 focus:outline-none" />
+                              </div>
+                            </div>
+                            <p className="text-[10px] text-white/30">30 stars to earn — milestone value: £{(parseFloat(starValue || "5") * 30).toFixed(0)}</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    {/* Catalogue circling */}
+                    <button type="button" onClick={() => setCatalogueCircle((v) => !v)}
+                      className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <CircleEllipsis className="h-3.5 w-3.5 text-amber-400" />
+                        <span className="text-[13px] text-white/80">Enable Catalogue Circling Mode</span>
+                      </div>
+                      <div className={`h-5 w-9 rounded-full transition-colors ${catalogueCircle ? "bg-amber-500" : "bg-white/20"} relative shrink-0`}>
+                        <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${catalogueCircle ? "translate-x-4" : "translate-x-0.5"}`} />
+                      </div>
+                    </button>
+                    <div className="flex gap-2">
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={handleBack}
+                        className="flex-1 rounded-xl border border-white/10 py-3 text-[14px] font-semibold text-white/60">
+                        Back
+                      </motion.button>
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={() => { void handleSubmit(); }} disabled={loading}
+                        className="flex-[2] rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
+                        {loading ? "Creating…" : "Create My First Fire"}
+                      </motion.button>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              <motion.button
-                type="submit"
-                whileTap={{ scale: 0.97 }}
-                disabled={!name.trim() || !email.trim() || loading}
-                className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-amber-500/30 disabled:opacity-40"
-              >
-                {loading ? "Creating your list…" : "Create My First Fire"}
-              </motion.button>
-            </form>
+            </div>
           )}
         </motion.div>
       </motion.div>
@@ -979,7 +996,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
               </div>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <p className={cn("text-[11px] font-medium", statusColor)}>{statusLabel}</p>
-                {pot.continuous && !pot.isClaimed && (
+                {pot.continuous && !pot.isClaimed && !hideStackNote && (
                   <span className="rounded-full bg-teal-50 border border-teal-200 px-1.5 py-px text-[9px] font-semibold text-teal-600">
                     ∞ continuous
                   </span>
@@ -4368,12 +4385,13 @@ function RevealDemoView({ pots, onLaunch }: { pots: DemoPot[]; onLaunch: (pot: D
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-type ViewMode = "parent" | "receiver" | "about" | "reveal";
+type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
   const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
     { id: "parent", label: "Contribute", Icon: Users },
     { id: "receiver", label: "Billy's View", Icon: Sparkles },
+    { id: "catalogue", label: "Catalogue", Icon: ShoppingBag },
     { id: "reveal", label: "Reveal", Icon: Zap },
     { id: "about", label: "About", Icon: Info },
   ];
@@ -4390,13 +4408,17 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
               role === id
                 ? id === "reveal"
                   ? "bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md"
-                  : "bg-white shadow-sm text-stone-900"
+                  : id === "catalogue"
+                    ? "bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md"
+                    : "bg-white shadow-sm text-stone-900"
                 : id === "reveal"
                   ? "text-amber-500"
-                  : "text-stone-400",
+                  : id === "catalogue"
+                    ? "text-violet-400"
+                    : "text-stone-400",
             )}
           >
-            {role === id && id !== "reveal" && (
+            {role === id && id !== "reveal" && id !== "catalogue" && (
               <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
             )}
             <Icon className="h-3.5 w-3.5" strokeWidth={role === id ? 2.5 : 1.75} />
@@ -4922,6 +4944,18 @@ export default function DemoPage() {
         <motion.div key="about" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
           <AboutPage />
         </motion.div>
+      ) : viewMode === "catalogue" ? (
+        <motion.div key="catalogue" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
+          <div className="px-4 pt-5 pb-32">
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-violet-400">Circle the Catalogue</p>
+            <p style={{ fontFamily: "var(--font-display)" }} className="mb-4 text-[20px] font-semibold text-stone-800 leading-tight">Pick your next Spark Goal</p>
+            <CatalogueGrid
+              onAdd={handleAddItem}
+              isContributor={isContributor}
+              onContributorClick={() => setShowCreatorModal(true)}
+            />
+          </div>
+        </motion.div>
       ) : viewMode === "reveal" ? (
         <motion.div key="reveal" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
           <RevealDemoView pots={pots} onLaunch={setRevealPot} />
@@ -5193,12 +5227,7 @@ export default function DemoPage() {
         </section>
         )}
 
-        {/* ── Catalogue — pot-creation tool, owner only ── */}
-        <CatalogueGrid
-          onAdd={handleAddItem}
-          isContributor={isContributor}
-          onContributorClick={() => setShowCreatorModal(true)}
-        />
+        {/* ── Catalogue moved to dedicated tab ── */}
 
         {/* ── Explainer ── */}
         <ExplainerPlayer />
