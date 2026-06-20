@@ -966,7 +966,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
       style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
     >
       <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
-      <div className="p-4">
+      <div className="flex min-h-[440px] flex-col p-4">
         {/* Header row */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-3">
@@ -1038,8 +1038,8 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
               </div>
             )}
 
-            {/* Action buttons */}
-            <div className="mt-3 flex gap-2">
+            {/* Action buttons — pushed to bottom for uniform card height */}
+            <div className="mt-auto pt-3 flex gap-2">
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setKindleOpen((v) => !v)}
@@ -5001,6 +5001,63 @@ export default function DemoPage() {
       />
 
       <main className="space-y-7 pb-36 pt-4">
+
+        {/* ── Contributor hero CTA — top of feed ── */}
+        {isContributor && (
+          <section className="px-4">
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 340, damping: 32 }}
+              className="relative overflow-hidden rounded-3xl"
+              style={{
+                background: "linear-gradient(135deg, #0f0700 0%, #1f0e00 40%, #2a1200 100%)",
+                boxShadow: "0 8px 40px rgba(245,158,11,0.3), 0 0 0 1px rgba(245,158,11,0.25)",
+              }}
+            >
+              {/* Ember particles */}
+              <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                {EMBERS.slice(0, 12).map((e) => (
+                  <span key={e.id} className="absolute rounded-full bg-amber-400/50"
+                    style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
+                      animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`,
+                      "--sx": e.emberX } as React.CSSProperties} />
+                ))}
+              </div>
+              {/* Glow top stripe */}
+              <div className="h-[3px] w-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500" />
+              <div className="relative px-5 py-5">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 border border-amber-500/30 shadow-inner">
+                    <Flame className="h-7 w-7 text-amber-400" strokeWidth={1.5} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-400/70 mb-1">You could have one of these</p>
+                    <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-bold text-white leading-tight">
+                      Start receiving your own kindled gifts
+                    </p>
+                    <p className="mt-1.5 text-[12px] text-white/50 leading-snug">
+                      Build your wishlist in minutes. Share one link. Watch friends and family stoke your Spark Goals — no awkward money talk, no wasted gifts.
+                    </p>
+                  </div>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                  onClick={() => setShowReceiverSignUp(true)}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-bold text-stone-900"
+                  style={{ background: "linear-gradient(135deg, #fbbf24, #f97316)", boxShadow: "0 4px 20px rgba(251,146,60,0.5)" }}
+                >
+                  <Flame className="h-5 w-5" />
+                  Create my own fire
+                </motion.button>
+                <p className="mt-2 text-center text-[10px] text-white/30">Free to set up · no app required · takes 2 minutes</p>
+              </div>
+            </motion.div>
+          </section>
+        )}
+
         {/* ── All pots grid (always LivePotCard — no hidden amounts) ── */}
         <section className="px-4">
           <div className="mb-3">
