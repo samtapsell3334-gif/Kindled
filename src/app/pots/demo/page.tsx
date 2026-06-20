@@ -5002,9 +5002,8 @@ export default function DemoPage() {
 
       <main className="space-y-7 pb-36 pt-4">
 
-        {/* ── Contributor sign-up hero — bright, impossible to miss ── */}
-        {isContributor && (
-          <section className="px-4">
+        {/* ── Sign-up hero — always visible on Contribute tab ── */}
+        <section className="px-4">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -5066,7 +5065,6 @@ export default function DemoPage() {
               </div>
             </motion.div>
           </section>
-        )}
 
         {/* ── All pots grid (always LivePotCard — no hidden amounts) ── */}
         <section className="px-4">
