@@ -840,15 +840,32 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
               whileHover={{ scale: 1.03 }}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
               onClick={onStartReceiving}
-              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 px-3.5 py-2 text-[12px] font-semibold text-white shadow-md shadow-amber-200 active:scale-95"
+              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3.5 py-2 text-[12px] font-semibold text-stone-900 shadow-md shadow-amber-200 active:scale-95"
             >
-              <Gift className="h-3.5 w-3.5" />
+              <Flame className="h-3.5 w-3.5" />
               Create my own fire
             </motion.button>
           )}
         </div>
         {isContributor && (
-          <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">create your own wishlist for someone you love</p>
+          <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">start your own list — takes 2 minutes</p>
+        )}
+
+        {/* Raffle + cashback callout — contributor only, sits right under header */}
+        {isContributor && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, type: "spring", stiffness: 340, damping: 30 }}
+            className="mt-3 flex items-start gap-3 rounded-2xl border border-amber-400/30 bg-gradient-to-r from-amber-50 to-orange-50 px-3.5 py-3"
+            style={{ boxShadow: "0 0 0 1px rgba(245,158,11,0.15), 0 2px 12px rgba(245,158,11,0.1)" }}
+          >
+            <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+            <p className="text-[11px] leading-snug text-amber-900/80">
+              <span className="font-bold text-amber-700">Chip in to enter the £2,500 Goal Booster Draw</span> — one entry per £10 contributed.{" "}
+              <span className="font-semibold text-orange-700">Earn 2% back</span> in Spark Balance to stoke your own future fires when you start your own board.
+            </p>
+          </motion.div>
         )}
 
         <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
