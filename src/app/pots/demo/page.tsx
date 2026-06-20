@@ -5047,35 +5047,6 @@ export default function DemoPage() {
               </motion.button>
             )}
 
-            {/* Create own list CTA — contributor only */}
-            {isContributor && (
-              <motion.button
-                whileHover={{ scale: 1.01, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 28 }}
-                onClick={() => setShowReceiverSignUp(true)}
-                className="relative w-full overflow-hidden rounded-2xl text-left"
-                style={{ background: "linear-gradient(135deg, #1c0d00 0%, #2d1500 50%, #1c0d00 100%)", boxShadow: "0 4px 24px rgba(245,158,11,0.25), 0 0 0 1px rgba(245,158,11,0.2)" }}
-              >
-                <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                  {EMBERS.slice(0, 8).map((e) => (
-                    <span key={e.id} className="absolute rounded-full bg-amber-400/60"
-                      style={{ left: e.left, bottom: 0, width: e.size, height: e.size, animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`, "--sx": e.emberX } as React.CSSProperties} />
-                  ))}
-                </div>
-                <div className="relative flex items-center gap-4 px-4 py-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 border border-amber-500/30">
-                    <Flame className="h-6 w-6 text-amber-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/70 mb-0.5">Want your own list?</p>
-                    <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-white leading-tight">Create my own fire</p>
-                    <p className="text-[12px] text-white/50 mt-0.5">Create your wishlist in seconds — with parent controls, star charts &amp; more</p>
-                  </div>
-                  <ChevronUp className="h-5 w-5 rotate-90 text-amber-400 shrink-0" />
-                </div>
-              </motion.button>
-            )}
           </div>
           {/* ── Claimed / ordered pots — contributor view ── */}
           {claimedPots.filter((p) => !p.isChecklist).length > 0 && (
