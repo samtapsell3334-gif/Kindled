@@ -5310,8 +5310,8 @@ export default function DemoPage() {
 
         {/* ── Catalogue moved to dedicated tab ── */}
 
-        {/* ── Explainer ── */}
-        <ExplainerPlayer />
+        {/* ── Explainer — owner only (contributors see hero CTA instead) ── */}
+        {!isContributor && <ExplainerPlayer />}
 
         {/* ── Why Kindled stats ── */}
         <WhyKindled />
