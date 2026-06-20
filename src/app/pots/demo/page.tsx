@@ -9,7 +9,7 @@ import {
   Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
   Landmark, Radio, Wrench, Trophy, Wallet, Eye,
   Bike, Plane, Home, Cake, TreePine, GraduationCap, Armchair, PenLine,
-  Trash2, AlertCircle, Copy, TrendingUp, Info, CircleEllipsis,
+  Trash2, AlertCircle, Copy, TrendingUp, Info, CircleEllipsis, CalendarDays,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { FundingBar } from "@/components/pots/FundingBar";
@@ -1031,6 +1031,12 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
               <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
               <CountdownTimer targetIso={pot.eventIso} compact />
             </div>
+            {hideStackNote && pot.eventLabel !== "Ongoing" && (
+              <div className="mt-2 flex items-center gap-1.5">
+                <CalendarDays className="h-3 w-3 shrink-0 text-stone-400" />
+                <p className="text-[10px] text-stone-400">Next event: <span className="font-medium text-stone-500">{pot.eventLabel} · {pot.eventDate}</span></p>
+              </div>
+            )}
             {pot.stackNote && !hideStackNote && (
               <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200/70 px-2.5 py-1.5">
                 <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
@@ -5002,70 +5008,6 @@ export default function DemoPage() {
 
       <main className="space-y-7 pb-36 pt-4">
 
-        {/* ── Sign-up hero — always visible on Contribute tab ── */}
-        <section className="px-4">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 340, damping: 32 }}
-              className="overflow-hidden rounded-3xl bg-white"
-              style={{ boxShadow: "0 4px 32px rgba(245,158,11,0.22), 0 0 0 2px rgba(245,158,11,0.35)" }}
-            >
-              {/* Bold amber top bar */}
-              <div className="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 px-5 py-3 flex items-center gap-2">
-                <Flame className="h-4 w-4 text-white shrink-0" />
-                <p className="text-[12px] font-black uppercase tracking-widest text-white">Want your own list like this?</p>
-              </div>
-
-              <div className="px-5 py-5">
-                <p style={{ fontFamily: "var(--font-display)" }} className="text-[22px] font-bold text-stone-900 leading-tight">
-                  Start receiving kindled gifts yourself
-                </p>
-                <p className="mt-2 text-[13px] text-stone-500 leading-relaxed">
-                  Loved how easy it was to chip in for Billy? You can have your own list — no awkward money conversations, no duplicate gifts, just exactly what you actually want.
-                </p>
-
-                {/* Benefit bullets */}
-                <div className="mt-3 space-y-2">
-                  {[
-                    { Icon: Check, text: "Friends & family chip in — any amount, no app needed" },
-                    { Icon: Lock, text: "Gifts stay a surprise until your reveal day" },
-                    { Icon: Star, text: "Star chart mode for kids · parent controls built in" },
-                  ].map(({ Icon, text }) => (
-                    <div key={text} className="flex items-center gap-2">
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100">
-                        <Icon className="h-3 w-3 text-amber-600" strokeWidth={2.5} />
-                      </div>
-                      <p className="text-[12px] text-stone-600">{text}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Raffle + cashback strip */}
-                <div className="mt-4 flex items-start gap-2.5 rounded-2xl border border-amber-200 bg-amber-50 px-3.5 py-3">
-                  <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                  <p className="text-[11px] leading-snug text-amber-900">
-                    <span className="font-bold">Every contribution enters you into our £2,500 Goal Booster Draw.</span>{" "}
-                    Plus earn <span className="font-bold text-orange-600">2% back in Spark Balance</span> to ignite your own future fires.
-                  </p>
-                </div>
-
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 26 }}
-                  onClick={() => setShowReceiverSignUp(true)}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[16px] font-bold text-white"
-                  style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)", boxShadow: "0 6px 24px rgba(249,115,22,0.45)" }}
-                >
-                  <Flame className="h-5 w-5" />
-                  Create my own fire — it&apos;s free
-                </motion.button>
-                <p className="mt-2 text-center text-[10px] text-stone-400">No app required · 2 minute setup · cancel anytime</p>
-              </div>
-            </motion.div>
-          </section>
-
         {/* ── All pots grid (always LivePotCard — no hidden amounts) ── */}
         <section className="px-4">
           <div className="mb-3">
@@ -5135,6 +5077,61 @@ export default function DemoPage() {
               </motion.button>
             )}
           </div>
+          {/* ── Sign-up card — below pots list ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 340, damping: 32 }}
+            className="mt-2 overflow-hidden rounded-2xl bg-white"
+            style={{ boxShadow: "0 2px 20px rgba(245,158,11,0.18), 0 0 0 2px rgba(245,158,11,0.3)" }}
+          >
+            <div className="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 px-4 py-2.5 flex items-center gap-2">
+              <Flame className="h-3.5 w-3.5 text-white shrink-0" />
+              <p className="text-[11px] font-black uppercase tracking-widest text-white">Want your own list like this?</p>
+            </div>
+            <div className="px-4 py-4">
+              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-bold text-stone-900 leading-tight">
+                Start receiving kindled gifts yourself
+              </p>
+              <p className="mt-1.5 text-[12px] text-stone-500 leading-relaxed">
+                No awkward money conversations, no duplicate gifts — just exactly what you want, chipped in by people who care.
+              </p>
+              <div className="mt-2.5 space-y-1.5">
+                {([
+                  [Check, "Friends & family chip in any amount — no app needed"],
+                  [Lock, "Gifts stay secret until your reveal day"],
+                  [Star, "Star chart mode for kids · parent controls built in"],
+                ] as const).map(([Icon, text]) => (
+                  <div key={text} className="flex items-center gap-2">
+                    <div className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                      <Icon className="h-2.5 w-2.5 text-amber-600" strokeWidth={2.5} />
+                    </div>
+                    <p className="text-[11px] text-stone-600">{text}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+                <Trophy className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+                <p className="text-[10.5px] leading-snug text-amber-900">
+                  <span className="font-bold">Enter our £2,500 Goal Booster Draw</span> with every contribution.{" "}
+                  Plus earn <span className="font-bold text-orange-600">2% Spark Balance back</span> on your own future fires.
+                </p>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02, y: -1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 26 }}
+                onClick={() => setShowReceiverSignUp(true)}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-[14px] font-bold text-white"
+                style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)", boxShadow: "0 4px 16px rgba(249,115,22,0.4)" }}
+              >
+                <Flame className="h-4 w-4" />
+                Create my own fire — it&apos;s free
+              </motion.button>
+              <p className="mt-1.5 text-center text-[10px] text-stone-400">No app required · 2 minute setup</p>
+            </div>
+          </motion.div>
+
           {/* Reveal preview — contributor only */}
           {isContributor && surprisePots.length > 0 && (
             <motion.button
