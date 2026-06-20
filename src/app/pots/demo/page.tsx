@@ -5026,7 +5026,7 @@ export default function DemoPage() {
                 onKindle={handleKindle}
                 onBuy={handleBuy}
                 onAmountSelected={(p, amt) => setPendingContribution({ pot: p, amount: amt })}
-                hideStackNote={isContributor}
+                hideStackNote
                 {...(!isContributor && { onRemove: (id: string) => setPots((p) => p.filter((x) => x.id !== id)) })}
               />
             ))}
