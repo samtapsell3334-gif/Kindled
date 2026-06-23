@@ -1194,7 +1194,7 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
         : "0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)" }}
       onClick={handleClick}
     >
-      {/* Argos blue biro circle — the nostalgia! */}
+      {/* Classic blue biro pen circle */}
       {circling && (
         <div className="pointer-events-none absolute z-20" style={{ inset: "-8px" }}>
           <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
@@ -1410,7 +1410,7 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
   return (
     <div className="pb-32" style={{ background: "#fdf9f5" }}>
 
-      {/* ── Argos-nostalgia header banner ── */}
+      {/* ── Retro catalogue header banner ── */}
       <div className="relative overflow-hidden px-4 py-5"
         style={{ background: "linear-gradient(135deg,#cc0000 0%,#e63946 40%,#cc0000 100%)" }}>
         {/* Halftone dot pattern */}
@@ -1435,7 +1435,7 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
               Circle your dreams · {CATALOGUE.length} products
             </p>
           </div>
-          {/* Argos-style page sticker */}
+          {/* Retro catalogue page sticker */}
           <div className="flex flex-col items-center justify-center rounded-full bg-amber-400 p-3 shadow-xl"
             style={{ width: 64, height: 64, boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
             <p className="text-[7px] font-black uppercase leading-none text-stone-900">Circle</p>
@@ -3102,7 +3102,7 @@ type FetchState = "idle" | "fetching" | "done" | "error";
 
 const DOMAIN_IMAGES: Record<string, string> = {
   "amazon":    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop&q=80",
-  "argos":     "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=400&fit=crop&q=80",
+  "catalogue": "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=400&fit=crop&q=80",
   "currys":    "https://images.unsplash.com/photo-1585399000684-d2f72660f092?w=400&h=400&fit=crop&q=80",
   "johnlewis": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=400&fit=crop&q=80",
   "smyths":    "https://images.unsplash.com/photo-1560961911-ba7ef651a56c?w=400&h=400&fit=crop&q=80",
