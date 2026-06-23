@@ -4837,19 +4837,20 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
     { id: "receiver", label: "Billy's View", Icon: Sparkles },
     { id: "catalogue", label: "Catalogue", Icon: ShoppingBag },
     { id: "reveal", label: "Reveal", Icon: Zap },
-    { id: "reveal2", label: "Reveal V2", Icon: Sparkles },
+    { id: "reveal2", label: "✦ V2", Icon: Sparkles },
     { id: "about", label: "About", Icon: Info },
   ];
   return (
-    <div className="sticky top-0 z-30 flex justify-center px-4 pt-3 pb-2 bg-[#fdf9f5]/90 backdrop-blur-md border-b border-stone-100">
-      <div className="flex w-full max-w-sm rounded-2xl bg-stone-100 p-1 gap-1 shadow-inner">
+    <div className="sticky top-0 z-30 px-4 pt-3 pb-2 bg-[#fdf9f5]/90 backdrop-blur-md border-b border-stone-100">
+      <div className="overflow-x-auto scrollbar-none -mx-1 px-1">
+      <div className="flex min-w-max rounded-2xl bg-stone-100 p-1 gap-1 shadow-inner w-full">
         {tabs.map(({ id, label, Icon }) => (
           <motion.button
             key={id}
             whileTap={{ scale: 0.96 }}
             onClick={() => onChange(id)}
             className={cn(
-              "relative flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl py-2 text-[10px] font-semibold transition-all",
+              "relative flex flex-col items-center justify-center gap-0.5 rounded-xl px-2.5 py-2 text-[10px] font-semibold transition-all min-w-[52px]",
               role === id
                 ? id === "reveal"
                   ? "bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md"
@@ -4874,6 +4875,7 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
             <span>{label}</span>
           </motion.button>
         ))}
+      </div>
       </div>
     </div>
   );
