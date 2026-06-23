@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown,
+  Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown, ChevronRight,
   Play, Pause, SkipForward, Volume2, VolumeX, X, Zap,
   ShoppingBag, RefreshCw, CreditCard, Gift, Flame,
   Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
@@ -4271,6 +4271,420 @@ function AboutPage() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
+// REVEAL V2 — Cinematic viral reveal experience
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const EMBERS_V2 = Array.from({ length: 24 }, (_, i) => ({
+  id: i,
+  left: `${3 + (i * 4.1) % 94}%`,
+  size: `${2 + (i * 0.8) % 4}px`,
+  dur: `${3 + (i * 0.5) % 4.5}s`,
+  delay: `${(i * 0.28) % 3.5}s`,
+  drift: `${-20 + (i * 7) % 40}px`,
+}));
+
+const V2_CONTRIBS = [
+  { name: "Mum & Dad", amount: 150, initials: "MD", grad: "from-amber-400 to-orange-500",
+    msg: "We are so proud of who you are becoming. You deserve every single part of this. We love you to the moon and back, always." },
+  { name: "Grandma Linda", amount: 50, initials: "GL", grad: "from-rose-400 to-pink-500",
+    msg: "I've watched you grow into someone truly special. This is just the beginning of your adventures, my darling. Ride fast and smile wide." },
+  { name: "Uncle Steve", amount: 35, initials: "US", grad: "from-blue-400 to-violet-500",
+    msg: "Every ride is going to be an adventure. I can't wait to hear the stories — go fast, stay safe, have the absolute best time." },
+  { name: "Auntie Claire", amount: 25, initials: "AC", grad: "from-emerald-400 to-teal-500",
+    msg: "Happy birthday to the most brilliant kid I know. This is from everyone who loves watching you shine. Enjoy every second." },
+  { name: "Nana Joyce", amount: 30, initials: "NJ", grad: "from-violet-400 to-fuchsia-500",
+    msg: "I hope every single ride reminds you just how deeply you are loved. You make all of us so incredibly happy and proud." },
+  { name: "School Friends", amount: 20, initials: "SF", grad: "from-teal-400 to-cyan-500",
+    msg: "From all the gang — go absolutely smash it! You are the absolute best. See you at the park very soon." },
+];
+
+type RevealV2Phase = "idle" | "intro" | "name" | "flash" | "gift" | "contributors" | "share";
+
+function useFireworks(canvasRef: React.RefObject<HTMLCanvasElement | null>, active: boolean) {
+  useEffect(() => {
+    if (!active) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    let raf = 0;
+    interface FParticle { x: number; y: number; vx: number; vy: number; alpha: number; color: string; size: number; trail: [number, number][]; }
+    const particles: FParticle[] = [];
+    const COLORS = ["#fbbf24", "#f97316", "#ef4444", "#a855f7", "#3b82f6", "#10b981", "#f43f5e", "#fff"];
+    let t = 0;
+
+    function explode(x: number, y: number) {
+      const color = COLORS[Math.floor(Math.random() * COLORS.length)]!;
+      const n = 55 + Math.floor(Math.random() * 35);
+      for (let i = 0; i < n; i++) {
+        const angle = (Math.PI * 2 * i) / n + (Math.random() - 0.5) * 0.4;
+        const speed = 1.5 + Math.random() * 5;
+        particles.push({ x, y, trail: [], vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed - 1,
+          alpha: 1, color, size: 1.5 + Math.random() * 2 });
+      }
+    }
+
+    function frame() {
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+      t++;
+      if (t % 20 === 0) explode(canvas!.width * (0.1 + Math.random() * 0.8), canvas!.height * (0.08 + Math.random() * 0.5));
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]!;
+        p.trail.push([p.x, p.y]);
+        if (p.trail.length > 7) p.trail.shift();
+        p.x += p.vx; p.y += p.vy; p.vy += 0.13; p.vx *= 0.98; p.alpha -= 0.015;
+        if (p.alpha <= 0) { particles.splice(i, 1); continue; }
+        for (let j = 0; j < p.trail.length - 1; j++) {
+          const ta = (j / p.trail.length) * p.alpha * 0.4;
+          const hex = Math.round(ta * 255).toString(16).padStart(2, "0");
+          ctx!.beginPath();
+          ctx!.strokeStyle = p.color + hex;
+          ctx!.lineWidth = 0.8;
+          ctx!.moveTo(p.trail[j]![0], p.trail[j]![1]);
+          ctx!.lineTo(p.trail[j + 1]![0], p.trail[j + 1]![1]);
+          ctx!.stroke();
+        }
+        ctx!.beginPath();
+        ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx!.fillStyle = p.color + Math.round(p.alpha * 255).toString(16).padStart(2, "0");
+        ctx!.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, [active, canvasRef]);
+}
+
+function TypedMessage({ text, delay = 0 }: { text: string; delay?: number }) {
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    setShown(0);
+    const t0 = setTimeout(() => {
+      const iv = setInterval(() => setShown((v) => { if (v >= text.length) { clearInterval(iv); return v; } return v + 1; }), 24);
+      return () => clearInterval(iv);
+    }, delay);
+    return () => clearTimeout(t0);
+  }, [text, delay]);
+  return <>{text.slice(0, shown)}{shown < text.length && <span className="animate-pulse opacity-70">|</span>}</>;
+}
+
+function RevealV2View() {
+  const [phase, setPhase] = useState<RevealV2Phase>("idle");
+  const [contribIdx, setContribIdx] = useState(0);
+  const [flash, setFlash] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useFireworks(canvasRef, phase === "gift" || phase === "contributors" || phase === "share");
+
+  function launch() {
+    setPhase("intro");
+    setTimeout(() => setPhase("name"), 3000);
+    setTimeout(() => { setFlash(true); setTimeout(() => setFlash(false), 380); setPhase("flash"); }, 5800);
+    setTimeout(() => setPhase("gift"), 6200);
+  }
+
+  function goContributors() { setContribIdx(0); setPhase("contributors"); }
+  function nextContrib() { if (contribIdx < V2_CONTRIBS.length - 1) setContribIdx((i) => i + 1); else setPhase("share"); }
+  function reset() { setPhase("idle"); setContribIdx(0); setFlash(false); }
+
+  const contrib = V2_CONTRIBS[contribIdx]!;
+
+  return (
+    <div className="relative overflow-hidden" style={{ minHeight: "calc(100vh - 120px)", background: "#000" }}>
+      {/* Fireworks canvas */}
+      <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-10 h-full w-full" />
+
+      {/* White flash */}
+      <AnimatePresence>
+        {flash && (
+          <motion.div key="flash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.06 }} className="absolute inset-0 z-50 bg-white" />
+        )}
+      </AnimatePresence>
+
+      {/* ── IDLE ── */}
+      <AnimatePresence>
+        {phase === "idle" && (
+          <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.04 }}
+            transition={{ duration: 0.45 }}
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center"
+            style={{ background: "radial-gradient(ellipse 90% 65% at 50% 65%, #180900, #000)" }}>
+            {EMBERS_V2.map((e) => (
+              <span key={e.id} className="pointer-events-none absolute rounded-full bg-amber-400/55"
+                style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
+                  animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`, "--sx": e.drift } as React.CSSProperties} />
+            ))}
+            <motion.div animate={{ scale: [1, 1.1, 1], opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              className="mb-7 flex h-20 w-20 items-center justify-center rounded-3xl"
+              style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 50px rgba(251,146,60,0.65),0 0 100px rgba(251,146,60,0.3)" }}>
+              <Flame className="h-10 w-10 text-stone-900" strokeWidth={1.5} />
+            </motion.div>
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+              className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-amber-400/60">
+              Kindled Reveal · Version 2
+            </motion.p>
+            <motion.h2 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+              style={{ fontFamily: "var(--font-display)" }}
+              className="mb-3 text-[40px] font-black leading-tight text-white md:text-[52px]">
+              The moment<br />
+              <span style={{ backgroundImage: "linear-gradient(135deg,#fbbf24,#f97316,#f43f5e)" }}
+                className="bg-clip-text text-transparent">they&apos;ve been waiting for</span>
+            </motion.h2>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+              className="mb-10 max-w-xs text-[14px] leading-relaxed text-white/35">
+              A cinematic reveal ceremony for Billy — with a personalised message from every person who made it happen.
+            </motion.p>
+            <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
+              whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.05, y: -2 }} onClick={launch}
+              className="flex items-center gap-3 rounded-2xl px-8 py-4 text-[16px] font-black text-stone-900"
+              style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 40px rgba(251,146,60,0.5),0 8px 32px rgba(0,0,0,0.5)" }}>
+              <Flame className="h-5 w-5" />
+              Ignite Billy&apos;s Reveal
+              <Sparkles className="h-5 w-5" />
+            </motion.button>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+              className="mt-4 text-[10px] uppercase tracking-widest text-white/15">Sound on for full experience</motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── INTRO ── */}
+      <AnimatePresence>
+        {phase === "intro" && (
+          <motion.div key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 z-20 flex items-center justify-center" style={{ background: "#000" }}>
+            <motion.div animate={{ scale: [0.85, 1.3, 0.9, 1.15, 0.85], opacity: [0.2, 0.8, 0.3, 0.7, 0.2] }}
+              transition={{ duration: 3, ease: "easeInOut" }} className="pointer-events-none absolute inset-0"
+              style={{ background: "radial-gradient(ellipse 60% 40% at 50% 50%,rgba(251,146,60,0.3),transparent)" }} />
+            <motion.p initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: [0, 1, 1, 0], scale: [0.7, 1, 1, 1.15] }}
+              transition={{ duration: 3, times: [0, 0.2, 0.75, 1] }}
+              style={{ fontFamily: "var(--font-display)" }}
+              className="text-center text-[32px] font-black text-white md:text-[48px]">
+              Something special<br />is about to happen…
+            </motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── NAME ── */}
+      <AnimatePresence>
+        {phase === "name" && (
+          <motion.div key="name" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.08 }}
+            transition={{ duration: 0.35 }}
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden"
+            style={{ background: "radial-gradient(ellipse 110% 80% at 50% 60%,#220b00,#000)" }}>
+            {EMBERS_V2.map((e) => (
+              <span key={e.id} className="pointer-events-none absolute rounded-full bg-amber-400/70"
+                style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
+                  animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`, "--sx": e.drift } as React.CSSProperties} />
+            ))}
+            <motion.p initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+              className="mb-5 text-[11px] font-black uppercase tracking-[0.35em] text-amber-400/55">This one&apos;s for</motion.p>
+            <div className="mb-7 flex gap-1 md:gap-2">
+              {"BILLY".split("").map((letter, i) => (
+                <motion.span key={i} initial={{ opacity: 0, y: 50, scale: 0.4 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: 0.25 + i * 0.11, type: "spring", stiffness: 520, damping: 22 }}
+                  style={{ fontFamily: "var(--font-display)",
+                    backgroundImage: "linear-gradient(180deg,#fde68a 0%,#fbbf24 35%,#f97316 100%)",
+                    textShadow: "0 0 40px rgba(251,146,60,0.9),0 0 80px rgba(251,146,60,0.45)" }}
+                  className="bg-clip-text text-[80px] font-black leading-none text-transparent md:text-[110px]">
+                  {letter}
+                </motion.span>
+              ))}
+            </div>
+            <div className="flex flex-wrap justify-center gap-2 px-8">
+              {V2_CONTRIBS.map((c, i) => (
+                <motion.div key={c.name} initial={{ opacity: 0, scale: 0, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 1.1 + i * 0.14, type: "spring", stiffness: 480, damping: 24 }}
+                  className={`flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br ${c.grad} text-[11px] font-black text-white shadow-lg`}>
+                  {c.initials}
+                </motion.div>
+              ))}
+            </div>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 }}
+              className="mt-4 text-[13px] text-white/35">{V2_CONTRIBS.length} people made this happen</motion.p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── GIFT REVEAL ── */}
+      <AnimatePresence>
+        {(phase === "gift") && (
+          <motion.div key="gift" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center px-5 overflow-hidden"
+            style={{ background: "radial-gradient(ellipse 110% 80% at 50% 35%,#1c0900,#060100)" }}>
+            <div className="pointer-events-none absolute inset-0"
+              style={{ background: "radial-gradient(ellipse 70% 50% at 50% 40%,rgba(251,146,60,0.18),transparent)" }} />
+            <motion.p initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-amber-400/55">Billy&apos;s Christmas gift — revealed</motion.p>
+            <motion.div initial={{ y: -180, scale: 1.25, opacity: 0, rotateX: -25 }}
+              animate={{ y: 0, scale: 1, opacity: 1, rotateX: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 20 }}
+              className="relative mb-6 w-full max-w-[290px] overflow-hidden rounded-3xl"
+              style={{ background: "linear-gradient(145deg,#1c0900,#090200)",
+                boxShadow: "0 0 0 1px rgba(251,146,60,0.22),0 36px 80px rgba(251,146,60,0.35),0 8px 32px rgba(0,0,0,0.9)" }}>
+              <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500" />
+              <div className="p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-400/12 border border-amber-400/18">
+                    <Flame className="h-5.5 w-5.5 text-amber-400" strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-400/45">Fully Kindled</p>
+                    <p className="text-[15px] font-bold text-white">Super-Fast Mountain Bike</p>
+                  </div>
+                </div>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
+                  style={{ fontFamily: "var(--font-display)" }} className="text-[52px] font-black text-white leading-none mb-1">£310</motion.p>
+                <p className="mb-4 text-[11px] text-amber-400/55">raised by {V2_CONTRIBS.length} people who love you</p>
+                <div className="h-2.5 overflow-hidden rounded-full bg-white/8">
+                  <motion.div initial={{ width: "0%" }} animate={{ width: "100%" }}
+                    transition={{ delay: 0.25, duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" />
+                </div>
+                <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}
+                  className="mt-4 flex -space-x-2">
+                  {V2_CONTRIBS.map((c, i) => (
+                    <div key={i} className={`flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#090200] bg-gradient-to-br ${c.grad} text-[9px] font-black text-white`}>
+                      {c.initials}
+                    </div>
+                  ))}
+                </motion.div>
+              </div>
+            </motion.div>
+            <motion.button initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.9 }}
+              whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.04, y: -2 }} onClick={goContributors}
+              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-[14px] font-bold text-stone-900"
+              style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.45)" }}>
+              <Users className="h-4 w-4" />
+              Meet everyone who made this happen
+              <ChevronRight className="h-4 w-4" />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── CONTRIBUTORS ── */}
+      <AnimatePresence mode="wait">
+        {phase === "contributors" && (
+          <motion.div key={`c-${contribIdx}`}
+            initial={{ opacity: 0, y: 55, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -55, scale: 1.04 }}
+            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
+            style={{ background: `radial-gradient(ellipse 80% 60% at 50% 50%,#0d0015,#000)` }}>
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              {EMBERS_V2.slice(0, 10).map((e) => (
+                <span key={e.id} className="absolute rounded-full bg-amber-400/30"
+                  style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
+                    animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`, "--sx": e.drift } as React.CSSProperties} />
+              ))}
+            </div>
+            <p className="mb-5 text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
+              {contribIdx + 1} of {V2_CONTRIBS.length}
+            </p>
+            <motion.div initial={{ scale: 0, rotate: -160 }} animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 480, damping: 22 }}
+              className={`mb-5 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br ${contrib.grad} text-[28px] font-black text-white shadow-2xl`}
+              style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.7),0 0 40px rgba(251,146,60,0.15)" }}>
+              {contrib.initials}
+            </motion.div>
+            <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              style={{ fontFamily: "var(--font-display)" }} className="text-[30px] font-black text-white mb-1">
+              {contrib.name}
+            </motion.p>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }}
+              className="text-[24px] font-black text-amber-400 mb-6">£{contrib.amount}</motion.p>
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}
+              className="mb-7 w-full max-w-sm rounded-2xl border border-white/8 bg-white/[0.04] px-5 py-4 backdrop-blur-sm text-left">
+              <div className="mb-2.5 flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3 text-violet-400" />
+                <p className="text-[9px] font-black uppercase tracking-widest text-violet-400/65">Personal message</p>
+              </div>
+              <p className="min-h-[72px] text-[13px] leading-relaxed text-white/75 italic">
+                &ldquo;<TypedMessage text={contrib.msg} delay={550} />&rdquo;
+              </p>
+            </motion.div>
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85 }}
+              whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.04 }} onClick={nextContrib}
+              className={`flex items-center gap-2 rounded-2xl bg-gradient-to-r ${contrib.grad} px-7 py-3.5 text-[14px] font-bold text-white shadow-xl`}>
+              {contribIdx < V2_CONTRIBS.length - 1
+                ? <><span>Next: {V2_CONTRIBS[contribIdx + 1]!.name}</span><ChevronRight className="h-4 w-4" /></>
+                : <><Sparkles className="h-4 w-4" /><span>See the celebration</span></>}
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── SHARE / CELEBRATION ── */}
+      <AnimatePresence>
+        {phase === "share" && (
+          <motion.div key="share" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
+            style={{ background: "radial-gradient(ellipse 100% 70% at 50% 40%,#1c0800,#000)" }}>
+            {EMBERS_V2.map((e) => (
+              <span key={e.id} className="pointer-events-none absolute rounded-full bg-amber-400/45"
+                style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
+                  animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`, "--sx": e.drift } as React.CSSProperties} />
+            ))}
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 14, -10, 6, 0] }}
+              transition={{ type: "spring", stiffness: 400, damping: 18, delay: 0.1 }}
+              className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl"
+              style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 50px rgba(251,146,60,0.6)" }}>
+              <Sparkles className="h-10 w-10 text-stone-900" />
+            </motion.div>
+            <motion.h2 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+              style={{ fontFamily: "var(--font-display)" }}
+              className="mb-2 text-[44px] font-black leading-tight text-white">
+              That&apos;s a wrap,{" "}
+              <span style={{ backgroundImage: "linear-gradient(135deg,#fbbf24,#f97316)" }} className="bg-clip-text text-transparent">Billy!</span>
+            </motion.h2>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+              className="mb-7 max-w-xs text-[14px] leading-relaxed text-white/40">
+              {V2_CONTRIBS.length} people came together and raised £310 for this moment. That&apos;s the power of Kindled.
+            </motion.p>
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.52 }}
+              className="mb-7 flex gap-3">
+              {[["7", "contributors"], ["£310", "raised"], ["47", "days"]].map(([v, l]) => (
+                <div key={l} className="flex flex-col items-center rounded-2xl border border-white/8 bg-white/[0.05] px-4 py-3">
+                  <span style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-black text-amber-400">{v}</span>
+                  <span className="text-[9px] uppercase tracking-wider text-white/30">{l}</span>
+                </div>
+              ))}
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.68 }}
+              className="flex w-full max-w-xs flex-col gap-3">
+              <button onClick={() => { void navigator.clipboard.writeText("https://kindledgift.co.uk").catch(() => null); }}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900"
+                style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.4)" }}>
+                <Share2 className="h-4 w-4" />
+                Share this moment
+              </button>
+              <a href="/pots/demo"
+                className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 py-4 text-[15px] font-semibold text-white/65 hover:border-white/20 hover:text-white/90 transition-colors">
+                <Flame className="h-4 w-4 text-amber-400" />
+                Start my own fire — free
+              </a>
+              <button onClick={reset} className="py-2 text-[12px] text-white/20 transition-colors hover:text-white/45">
+                Watch again
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // REVEAL DEMO VIEW — standalone tab experience
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -4415,7 +4829,7 @@ function RevealDemoView({ pots, onLaunch }: { pots: DemoPot[]; onLaunch: (pot: D
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about";
+type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "reveal2" | "about";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
   const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
@@ -4423,6 +4837,7 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
     { id: "receiver", label: "Billy's View", Icon: Sparkles },
     { id: "catalogue", label: "Catalogue", Icon: ShoppingBag },
     { id: "reveal", label: "Reveal", Icon: Zap },
+    { id: "reveal2", label: "Reveal V2", Icon: Sparkles },
     { id: "about", label: "About", Icon: Info },
   ];
   return (
@@ -4438,17 +4853,21 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
               role === id
                 ? id === "reveal"
                   ? "bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md"
-                  : id === "catalogue"
-                    ? "bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md"
-                    : "bg-white shadow-sm text-stone-900"
+                  : id === "reveal2"
+                    ? "bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white shadow-md"
+                    : id === "catalogue"
+                      ? "bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md"
+                      : "bg-white shadow-sm text-stone-900"
                 : id === "reveal"
                   ? "text-amber-500"
-                  : id === "catalogue"
+                  : id === "reveal2"
                     ? "text-violet-400"
-                    : "text-stone-400",
+                    : id === "catalogue"
+                      ? "text-violet-400"
+                      : "text-stone-400",
             )}
           >
-            {role === id && id !== "reveal" && id !== "catalogue" && (
+            {role === id && id !== "reveal" && id !== "reveal2" && id !== "catalogue" && (
               <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
             )}
             <Icon className="h-3.5 w-3.5" strokeWidth={role === id ? 2.5 : 1.75} />
@@ -4989,6 +5408,10 @@ export default function DemoPage() {
       ) : viewMode === "reveal" ? (
         <motion.div key="reveal" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
           <RevealDemoView pots={pots} onLaunch={setRevealPot} />
+        </motion.div>
+      ) : viewMode === "reveal2" ? (
+        <motion.div key="reveal2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+          <RevealV2View />
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
