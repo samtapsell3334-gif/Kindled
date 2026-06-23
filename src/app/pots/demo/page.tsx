@@ -67,6 +67,9 @@ interface CatalogItem {
   tag: string;
   tagColor: string;
   glowColor: string;
+  category: string;
+  hearts: number;
+  brand?: string;
 }
 
 interface ExplainerScene {
@@ -174,24 +177,46 @@ const CHECKLIST_POTS: DemoPot[] = [
 ];
 
 const CATALOGUE: CatalogItem[] = [
-  { id: "c1", name: "Nintendo Switch OLED",
-    image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=400&fit=crop&q=80",
-    price: 309.99, tag: "Popular", tagColor: "bg-red-100 text-red-600", glowColor: "#ef4444" },
-  { id: "c2", name: "Electric Scooter Pro",
-    image: "https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=400&h=400&fit=crop&q=80",
-    price: 399.99, tag: "Trending", tagColor: "bg-emerald-100 text-emerald-600", glowColor: "#10b981" },
-  { id: "c3", name: "Meta Quest 3 VR",
-    image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=400&h=400&fit=crop&q=80",
-    price: 499.99, tag: "High Intent", tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6" },
-  { id: "c4", name: "LEGO Technic Ferrari",
-    image: "https://images.unsplash.com/photo-1560961911-ba7ef651a56c?w=400&h=400&fit=crop&q=80",
-    price: 189.99, tag: "Bestseller", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
-  { id: "c5", name: "Cosy Family Sofa",
-    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=400&fit=crop&q=80",
-    price: 899.99, tag: "Milestone", tagColor: "bg-amber-100 text-amber-600", glowColor: "#f59e0b" },
-  { id: "c6", name: "LEGO Star Wars X-Wing",
-    image: "https://images.unsplash.com/photo-1609372332255-611485350f25?w=400&h=400&fit=crop&q=80",
-    price: 99.99, tag: "Fan Fave", tagColor: "bg-sky-100 text-sky-600", glowColor: "#38bdf8" },
+  // ── Tech ──
+  { id: "c1",  brand: "Nintendo",  name: "Switch OLED Console",             category: "Tech",        hearts: 847, price: 319,    tag: "Most Circled",  tagColor: "bg-red-100 text-red-600",       glowColor: "#ef4444", image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=500&h=500&fit=crop&q=85" },
+  { id: "c2",  brand: "Apple",     name: "iPhone 16 Pro 128GB",             category: "Tech",        hearts: 1204,price: 1199,   tag: "Dream Gift",    tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6", image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&h=500&fit=crop&q=85" },
+  { id: "c3",  brand: "Apple",     name: "AirPods Pro (3rd Gen)",           category: "Tech",        hearts: 932, price: 249,    tag: "Trending",      tagColor: "bg-emerald-100 text-emerald-600",glowColor: "#10b981", image: "https://images.unsplash.com/photo-1588423771073-b8903fead714?w=500&h=500&fit=crop&q=85" },
+  { id: "c4",  brand: "Apple",     name: "iPad 11th Gen 256GB",             category: "Tech",        hearts: 761, price: 399,    tag: "Bestseller",    tagColor: "bg-amber-100 text-amber-600",   glowColor: "#f59e0b", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&h=500&fit=crop&q=85" },
+  { id: "c5",  brand: "Meta",      name: "Quest 3S VR Headset",             category: "Tech",        hearts: 589, price: 299,    tag: "High Intent",   tagColor: "bg-fuchsia-100 text-fuchsia-600",glowColor: "#d946ef", image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=500&h=500&fit=crop&q=85" },
+  { id: "c6",  brand: "Sony",      name: "WH-1000XM6 Headphones",          category: "Tech",        hearts: 674, price: 379,    tag: "Fan Fave",      tagColor: "bg-sky-100 text-sky-600",       glowColor: "#0ea5e9", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop&q=85" },
+  { id: "c7",  brand: "Amazon",    name: "Kindle Paperwhite 16GB",          category: "Tech",        hearts: 412, price: 149,    tag: "For Readers",   tagColor: "bg-teal-100 text-teal-600",     glowColor: "#14b8a6", image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500&h=500&fit=crop&q=85" },
+  { id: "c8",  brand: "GoPro",     name: "HERO13 Black Action Camera",      category: "Tech",        hearts: 508, price: 399,    tag: "New",           tagColor: "bg-rose-100 text-rose-600",     glowColor: "#f43f5e", image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&h=500&fit=crop&q=85" },
+  // ── Gaming ──
+  { id: "c9",  brand: "Sony",      name: "PlayStation 5 Slim",              category: "Gaming",      hearts: 1538,price: 449,    tag: "Must Have",     tagColor: "bg-blue-100 text-blue-600",     glowColor: "#3b82f6", image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=500&h=500&fit=crop&q=85" },
+  { id: "c10", brand: "Microsoft", name: "Xbox Series X",                   category: "Gaming",      hearts: 1021,price: 449,    tag: "Trending",      tagColor: "bg-green-100 text-green-600",   glowColor: "#22c55e", image: "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?w=500&h=500&fit=crop&q=85" },
+  { id: "c11", brand: "Valve",     name: "Steam Deck OLED 1TB",             category: "Gaming",      hearts: 724, price: 599,    tag: "For Gamers",    tagColor: "bg-indigo-100 text-indigo-600", glowColor: "#6366f1", image: "https://images.unsplash.com/photo-1640955014216-75201056c829?w=500&h=500&fit=crop&q=85" },
+  { id: "c12", brand: "Razer",     name: "BlackShark V2 Pro Headset",       category: "Gaming",      hearts: 387, price: 119,    tag: "Pro Pick",      tagColor: "bg-lime-100 text-lime-600",     glowColor: "#84cc16", image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop&q=85" },
+  { id: "c13", brand: "Nintendo",  name: "Mario Kart Live Circuit",         category: "Gaming",      hearts: 469, price: 99,     tag: "Family Fave",   tagColor: "bg-yellow-100 text-yellow-600", glowColor: "#eab308", image: "https://images.unsplash.com/photo-1516110833967-0b5716ca1387?w=500&h=500&fit=crop&q=85" },
+  // ── Toys ──
+  { id: "c14", brand: "LEGO",      name: "Star Wars Millennium Falcon",     category: "Toys",        hearts: 2113,price: 649,    tag: "Icon",          tagColor: "bg-amber-100 text-amber-600",   glowColor: "#f59e0b", image: "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=500&h=500&fit=crop&q=85" },
+  { id: "c15", brand: "LEGO",      name: "Technic Lamborghini Urus ST-X",  category: "Toys",        hearts: 1087,price: 349,    tag: "Build It",      tagColor: "bg-orange-100 text-orange-600", glowColor: "#f97316", image: "https://images.unsplash.com/photo-1560961911-ba7ef651a56c?w=500&h=500&fit=crop&q=85" },
+  { id: "c16", brand: "LEGO",      name: "Harry Potter Hogwarts Castle",    category: "Toys",        hearts: 1456,price: 549,    tag: "Magical",       tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=500&h=500&fit=crop&q=85" },
+  { id: "c17", brand: "LEGO",      name: "Ideas Tree House 3-in-1",         category: "Toys",        hearts: 876, price: 229,    tag: "Fan Fave",      tagColor: "bg-emerald-100 text-emerald-600",glowColor: "#10b981", image: "https://images.unsplash.com/photo-1585298723682-7115561c51b7?w=500&h=500&fit=crop&q=85" },
+  { id: "c18", brand: "Hot Wheels",name: "Ultimate Garage Playset",         category: "Toys",        hearts: 643, price: 89,     tag: "Bestseller",    tagColor: "bg-red-100 text-red-600",       glowColor: "#ef4444", image: "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=500&h=500&fit=crop&q=85" },
+  { id: "c19", brand: "Scalextric", name: "Track Day Championship Set",     category: "Toys",        hearts: 512, price: 129,    tag: "Nostalgic",     tagColor: "bg-sky-100 text-sky-600",       glowColor: "#0ea5e9", image: "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=500&h=500&fit=crop&q=85" },
+  // ── Sport ──
+  { id: "c20", brand: "Trek",       name: "Marlin 5 Mountain Bike",         category: "Sport",       hearts: 934, price: 699,    tag: "Milestone",     tagColor: "bg-teal-100 text-teal-600",     glowColor: "#14b8a6", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=500&fit=crop&q=85" },
+  { id: "c21", brand: "Segway",     name: "Ninebot MAX Electric Scooter",   category: "Sport",       hearts: 827, price: 549,    tag: "Trending",      tagColor: "bg-emerald-100 text-emerald-600",glowColor: "#10b981", image: "https://images.unsplash.com/photo-1591123120675-6f7f1aae0e38?w=500&h=500&fit=crop&q=85" },
+  { id: "c22", brand: "Nike",       name: "Mercurial Vapor 16 Elite",       category: "Sport",       hearts: 711, price: 219,    tag: "Pro Pick",      tagColor: "bg-orange-100 text-orange-600", glowColor: "#f97316", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop&q=85" },
+  { id: "c23", brand: "Surftech",   name: "Learn to Surf Foam Board",       category: "Sport",       hearts: 389, price: 299,    tag: "Adventure",     tagColor: "bg-blue-100 text-blue-600",     glowColor: "#3b82f6", image: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=500&h=500&fit=crop&q=85" },
+  { id: "c24", brand: "Bowflex",    name: "SelectTech 552 Dumbbells",       category: "Sport",       hearts: 476, price: 349,    tag: "Home Gym",      tagColor: "bg-rose-100 text-rose-600",     glowColor: "#f43f5e", image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&h=500&fit=crop&q=85" },
+  // ── Home ──
+  { id: "c25", brand: "Charnwood",  name: "Cosy Log Burner — Beacon S4",    category: "Home",        hearts: 1232,price: 799,    tag: "Milestone",     tagColor: "bg-amber-100 text-amber-600",   glowColor: "#f59e0b", image: "https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?w=500&h=500&fit=crop&q=85" },
+  { id: "c26", brand: "Dyson",      name: "V15 Detect Cordless Hoover",     category: "Home",        hearts: 884, price: 599,    tag: "Bestseller",    tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6", image: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=500&h=500&fit=crop&q=85" },
+  { id: "c27", brand: "KitchenAid", name: "Artisan Stand Mixer 4.8L",       category: "Home",        hearts: 1063,price: 499,    tag: "Dream Kitchen", tagColor: "bg-rose-100 text-rose-600",     glowColor: "#f43f5e", image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=500&fit=crop&q=85" },
+  { id: "c28", brand: "DFS",        name: "Corner Sofa — Slate Grey",       category: "Home",        hearts: 1578,price: 1299,   tag: "Family Win",    tagColor: "bg-stone-200 text-stone-700",   glowColor: "#78716c", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&h=500&fit=crop&q=85" },
+  { id: "c29", brand: "Nespresso",  name: "Vertuo Next Coffee Machine",     category: "Home",        hearts: 743, price: 149,    tag: "For Coffee Fans",tagColor: "bg-amber-100 text-amber-600",  glowColor: "#f59e0b", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&h=500&fit=crop&q=85" },
+  // ── Experiences ──
+  { id: "c30", brand: "Merlin",     name: "Alton Towers 2-Day Short Break", category: "Experiences", hearts: 1847,price: 249,    tag: "Memory Maker",  tagColor: "bg-fuchsia-100 text-fuchsia-600",glowColor: "#d946ef", image: "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=500&h=500&fit=crop&q=85" },
+  { id: "c31", brand: "EDF",        name: "London Eye Family (4 tickets)",  category: "Experiences", hearts: 965, price: 89,     tag: "London Icon",   tagColor: "bg-sky-100 text-sky-600",       glowColor: "#0ea5e9", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=500&h=500&fit=crop&q=85" },
+  { id: "c32", brand: "Virgin Exp", name: "Supercar Driving Experience",    category: "Experiences", hearts: 1234,price: 189,    tag: "Bucket List",   tagColor: "bg-red-100 text-red-600",       glowColor: "#ef4444", image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=500&h=500&fit=crop&q=85" },
+  { id: "c33", brand: "Hotel",      name: "Spa Day for Two — 5-Star",       category: "Experiences", hearts: 876, price: 169,    tag: "Ultimate Treat",tagColor: "bg-pink-100 text-pink-600",     glowColor: "#ec4899", image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&h=500&fit=crop&q=85" },
+  { id: "c34", brand: "Waitrose",   name: "Hamper — Luxury Christmas",      category: "Experiences", hearts: 623, price: 125,    tag: "Crowd Pleaser", tagColor: "bg-emerald-100 text-emerald-600",glowColor: "#10b981", image: "https://images.unsplash.com/photo-1543258103-a62bdc069871?w=500&h=500&fit=crop&q=85" },
 ];
 
 const SCENES: ExplainerScene[] = [
@@ -1139,45 +1164,46 @@ function ContributionPromptModal({
 // CATALOGUE CARD (SVG circle + 3D tilt)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: CatalogItem) => void }) {
+function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onAdd: (item: CatalogItem) => void; featured?: boolean }) {
   const [circling, setCircling] = useState(false);
   const [sparkling, setSparkling] = useState(false);
   const [added, setAdded] = useState(false);
+  const [heartPop, setHeartPop] = useState(false);
+
   const handleClick = useCallback(() => {
     if (circling || added) return;
     setCircling(true);
     setTimeout(() => {
       setSparkling(true);
-      setTimeout(() => {
-        setSparkling(false);
-        setAdded(true);
-        onAdd(item);
-      }, 700);
+      setHeartPop(true);
+      setTimeout(() => { setSparkling(false); setHeartPop(false); setAdded(true); onAdd(item); }, 700);
       setTimeout(() => setCircling(false), 200);
     }, 950);
   }, [circling, added, item, onAdd]);
 
+  const h = featured ? 180 : 140;
+
   return (
     <motion.div
-      whileHover={!added ? { y: -3 } : {}}
+      whileHover={!added ? { y: -4, scale: 1.01 } : {}}
       whileTap={!added ? { scale: 0.97 } : {}}
       transition={{ type: "spring", stiffness: 420, damping: 28 }}
-      className={cn("relative overflow-visible rounded-2xl cursor-pointer bg-white")}
+      className="relative overflow-visible rounded-2xl cursor-pointer bg-white"
       style={{ boxShadow: added
-        ? `0 0 0 2px #34d399, 0 4px 20px ${item.glowColor}20`
-        : "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
+        ? `0 0 0 2.5px #34d399, 0 8px 32px ${item.glowColor}30`
+        : "0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)" }}
       onClick={handleClick}
     >
-      {/* Marker-pen overlay — imperfect, hand-drawn felt-tip loop around the card boundary */}
+      {/* Argos blue biro circle — the nostalgia! */}
       {circling && (
-        <div className="pointer-events-none absolute z-20" style={{ inset: "-6px" }}>
+        <div className="pointer-events-none absolute z-20" style={{ inset: "-8px" }}>
           <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
             <path
-              d="M 6 3 C 30 0, 55 4, 80 1 C 92 0, 99 8, 97 22 C 100 45, 96 60, 99 78 C 100 92, 88 100, 70 98 C 48 101, 28 96, 12 99 C -1 101, -2 88, 1 70 C -3 50, 2 32, -1 18 C -3 6, 1 1, 6 3 Z"
-              stroke="#f59e0b" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
-              strokeDasharray="440" vectorEffect="non-scaling-stroke"
+              d="M 7 4 C 28 -1, 58 3, 82 0 C 94 -1, 101 9, 99 24 C 102 48, 97 65, 100 82 C 102 95, 90 102, 72 100 C 50 103, 26 98, 10 101 C -2 103, -3 90, 0 73 C -4 52, 3 34, -2 17 C -4 5, 2 1, 7 4 Z"
+              stroke="#1d4ed8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+              strokeDasharray="460" vectorEffect="non-scaling-stroke"
               className="animate-draw-circle"
-              style={{ filter: "drop-shadow(0 0 8px #f59e0b)" }}
+              style={{ filter: "drop-shadow(0 0 6px #3b82f680)", opacity: 0.85 }}
             />
           </svg>
         </div>
@@ -1188,45 +1214,54 @@ function CatalogCard({ item, onAdd }: { item: CatalogItem; onAdd: (item: Catalog
             <span key={s.id} className="absolute rounded-full animate-sparkle"
               style={{ width: s.size, height: s.size, backgroundColor: s.color,
                 "--spx": s.spx, "--spy": s.spy, animationDelay: s.delay,
-                boxShadow: `0 0 4px ${s.color}` } as React.CSSProperties}
+                boxShadow: `0 0 6px ${s.color}` } as React.CSSProperties}
             />
           ))}
         </div>
       )}
 
-      {/* Product image tile */}
-      <div className="relative overflow-hidden rounded-t-2xl" style={{ height: 120 }}>
-        <img
-          src={item.image}
-          alt={item.name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+      {/* Image */}
+      <div className="relative overflow-hidden rounded-t-2xl" style={{ height: h }}>
+        <img src={item.image} alt={item.name}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
         />
-        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${item.glowColor}28 0%, transparent 60%)` }} />
-        <span className={cn("absolute top-2 right-2 rounded-lg px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider shadow-sm", item.tagColor)}>
+        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${item.glowColor}44 0%, transparent 55%)` }} />
+        {/* Top-left: brand */}
+        {item.brand && (
+          <div className="absolute left-2 top-2 rounded-lg bg-white/90 px-2 py-0.5 backdrop-blur-sm">
+            <p className="text-[8px] font-black uppercase tracking-wider text-stone-600">{item.brand}</p>
+          </div>
+        )}
+        {/* Top-right: tag */}
+        <span className={cn("absolute right-2 top-2 rounded-lg px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider shadow-sm", item.tagColor)}>
           {item.tag}
         </span>
-        {/* Category badge bottom-left */}
-        <div className="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 shadow-md backdrop-blur-sm">
-          <Gift className="h-4 w-4 text-stone-500" strokeWidth={1.5} />
+        {/* Bottom: hearts */}
+        <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur-sm">
+          <motion.span animate={heartPop ? { scale: [1, 2, 0.8, 1.2, 1] } : {}} transition={{ duration: 0.5 }}
+            className="text-[10px]">❤</motion.span>
+          <span className="text-[9px] font-bold text-white">{heartPop ? item.hearts + 1 : item.hearts}</span>
         </div>
       </div>
 
       {/* Info */}
-      <div className="px-3 pb-3 pt-2">
-        <p style={{ fontFamily: "var(--font-display)" }} className="text-[13px] font-medium leading-tight text-stone-800 mb-2">{item.name}</p>
+      <div className="px-3 pb-3 pt-2.5">
+        <p className="mb-0.5 text-[9px] font-semibold uppercase tracking-widest text-stone-400">{item.category}</p>
+        <p style={{ fontFamily: "var(--font-display)" }} className="mb-2 text-[13px] font-semibold leading-snug text-stone-800">{item.name}</p>
         <div className="flex items-center justify-between">
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-semibold text-amber-500">£{item.price.toFixed(0)}</span>
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-bold text-stone-900">£{item.price.toLocaleString()}</span>
           {added ? (
-            <span className="flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 20 }}
+              className="flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
               <Check className="h-3 w-3" /> Added
-            </span>
+            </motion.span>
           ) : (
-            <div className="flex h-7 w-7 items-center justify-center rounded-full text-white"
-              style={{ background: `linear-gradient(135deg, ${item.glowColor}ee, ${item.glowColor}99)`,
-                boxShadow: `0 2px 8px ${item.glowColor}40` }}>
-              <Plus className="h-3.5 w-3.5" />
-            </div>
+            <motion.div whileTap={{ scale: 0.9 }}
+              className="flex h-8 w-8 items-center justify-center rounded-full text-white shadow-md"
+              style={{ background: `linear-gradient(135deg, ${item.glowColor}, ${item.glowColor}bb)` }}>
+              <Plus className="h-4 w-4" />
+            </motion.div>
           )}
         </div>
       </div>
@@ -1356,61 +1391,174 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function CatalogueGrid({ onAdd, isContributor, onContributorClick }: {
-  onAdd: (item: CatalogItem) => void;
-  isContributor?: boolean;
-  onContributorClick?: () => void;
-}) {
-  const [active, setActive] = useState(false);
+const CAT_TABS = ["All", "Tech", "Gaming", "Toys", "Sport", "Home", "Experiences"] as const;
+type CatTab = typeof CAT_TABS[number];
 
-  const handleActivate = () => {
-    if (isContributor) { onContributorClick?.(); return; }
-    setActive(true);
-  };
+function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
+  const [activeTab, setActiveTab] = useState<CatTab>("All");
+  const [tickerIdx, setTickerIdx] = useState(0);
 
-  if (!active) {
-    return (
-      <section className="px-4">
-        <motion.button
-          whileHover={{ scale: 1.01, y: -1 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: "spring", stiffness: 400, damping: 28 }}
-          onClick={handleActivate}
-          className="flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left"
-          style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
-        >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
-            <ShoppingBag className="h-5 w-5 text-stone-900" strokeWidth={2} />
-          </div>
-          <div>
-            <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-800">Catalogue Circling Mode</p>
-            <p className="text-[11px] text-stone-400">
-              {isContributor ? "Start your own Kindle Board" : "Circle any item with a marker pen to add it"}
-            </p>
-          </div>
-        </motion.button>
-      </section>
-    );
-  }
+  const tickerItems = CATALOGUE.filter((c) => c.hearts > 800).slice(0, 6);
+  useEffect(() => {
+    const iv = setInterval(() => setTickerIdx((i) => (i + 1) % tickerItems.length), 2800);
+    return () => clearInterval(iv);
+  }, [tickerItems.length]);
+
+  const filtered = activeTab === "All" ? CATALOGUE : CATALOGUE.filter((c) => c.category === activeTab);
+  const featured = CATALOGUE.filter((c) => c.hearts > 1000).slice(0, 3);
 
   return (
-    <section className="px-4">
-      <div className="mb-3 flex items-center justify-between">
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">Catalogue Circling Mode</p>
-          <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">Browse &amp; add to your list</p>
-          <p className="text-[11px] text-stone-400 mt-0.5">Tap any card — watch the marker pen circle it</p>
+    <div className="pb-32" style={{ background: "#fdf9f5" }}>
+
+      {/* ── Argos-nostalgia header banner ── */}
+      <div className="relative overflow-hidden px-4 py-5"
+        style={{ background: "linear-gradient(135deg,#cc0000 0%,#e63946 40%,#cc0000 100%)" }}>
+        {/* Halftone dot pattern */}
+        <div className="pointer-events-none absolute inset-0 opacity-10"
+          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "14px 14px" }} />
+        <div className="relative flex items-start justify-between">
+          <div>
+            <div className="mb-1 flex items-center gap-2">
+              <div className="rounded bg-white px-2 py-0.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-red-600">Kindled</p>
+              </div>
+              <div className="rounded bg-amber-400 px-2 py-0.5">
+                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-900">2025 · 26</p>
+              </div>
+            </div>
+            <p style={{ fontFamily: "var(--font-display)" }}
+              className="text-[28px] font-black uppercase leading-none tracking-tight text-white">
+              THE<br />
+              <span className="text-amber-300">CATALOGUE</span>
+            </p>
+            <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
+              Circle your dreams · {CATALOGUE.length} products
+            </p>
+          </div>
+          {/* Argos-style page sticker */}
+          <div className="flex flex-col items-center justify-center rounded-full bg-amber-400 p-3 shadow-xl"
+            style={{ width: 64, height: 64, boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
+            <p className="text-[7px] font-black uppercase leading-none text-stone-900">Circle</p>
+            <p className="text-[18px] font-black leading-none text-stone-900">&amp;</p>
+            <p className="text-[7px] font-black uppercase leading-none text-stone-900">Add</p>
+          </div>
         </div>
-        <button onClick={() => setActive(false)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-400 hover:bg-stone-200">
-          <X className="h-3.5 w-3.5" />
-        </button>
+
+        {/* Live ticker */}
+        <div className="mt-3 flex items-center gap-2 overflow-hidden">
+          <div className="flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1">
+            <TrendingUp className="h-3 w-3 text-amber-300" />
+            <p className="text-[9px] font-bold uppercase tracking-wider text-white/80">Trending now</p>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.p key={tickerIdx}
+                initial={{ y: 14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -14, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="text-[11px] font-semibold text-white truncate">
+                {tickerItems[tickerIdx]?.name} — {tickerItems[tickerIdx]?.hearts.toLocaleString()} people circled this
+              </motion.p>
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {CATALOGUE.map((item) => (
-          <CatalogCard key={item.id} item={item} onAdd={onAdd} />
-        ))}
+
+      {/* ── Tip strip ── */}
+      <div className="flex items-center gap-2 bg-amber-50 px-4 py-2.5 border-b border-amber-100">
+        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600">
+          <PenLine className="h-3 w-3 text-white" />
+        </div>
+        <p className="text-[10px] font-semibold text-stone-600">
+          Tap any product — the <span className="font-black text-blue-600">blue biro</span> circles it, then it lands on your fire list.
+        </p>
       </div>
-    </section>
+
+      {/* ── Category tabs ── */}
+      <div className="sticky top-[57px] z-20 bg-white/95 backdrop-blur-sm border-b border-stone-100 shadow-sm">
+        <div className="overflow-x-auto scrollbar-none px-3 py-2.5">
+          <div className="flex gap-1.5 min-w-max">
+            {CAT_TABS.map((tab) => {
+              const count = tab === "All" ? CATALOGUE.length : CATALOGUE.filter((c) => c.category === tab).length;
+              const isActive = activeTab === tab;
+              return (
+                <motion.button key={tab} onClick={() => setActiveTab(tab)}
+                  whileTap={{ scale: 0.95 }}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-[11px] font-bold transition-all",
+                    isActive
+                      ? "bg-stone-900 text-white shadow-md"
+                      : "bg-stone-100 text-stone-500 hover:bg-stone-200"
+                  )}>
+                  {tab}
+                  <span className={cn(
+                    "rounded-full px-1.5 py-0.5 text-[9px] font-black",
+                    isActive ? "bg-white/20 text-white" : "bg-stone-200 text-stone-500"
+                  )}>{count}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Featured strip (only on All tab) ── */}
+      <AnimatePresence mode="wait">
+        {activeTab === "All" && (
+          <motion.div key="featured" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="px-4 pt-4">
+            <div className="mb-2.5 flex items-center gap-2">
+              <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">Most Circled This Month</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {featured.map((item, i) => (
+                <motion.div key={item.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.07 }}>
+                  <CatalogCard item={item} onAdd={onAdd} featured />
+                </motion.div>
+              ))}
+            </div>
+            <div className="my-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-stone-200" />
+              <p className="text-[9px] font-bold uppercase tracking-widest text-stone-400">All Products</p>
+              <div className="h-px flex-1 bg-stone-200" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Main grid ── */}
+      <AnimatePresence mode="wait">
+        <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+          className="grid grid-cols-2 gap-3 px-4">
+          {filtered.map((item, i) => (
+            <motion.div key={item.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04, type: "spring", stiffness: 400, damping: 30 }}>
+              <CatalogCard item={item} onAdd={onAdd} />
+            </motion.div>
+          ))}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* ── Bottom CTA ── */}
+      <div className="mx-4 mt-6 overflow-hidden rounded-2xl"
+        style={{ background: "linear-gradient(135deg,#cc0000,#e63946)", boxShadow: "0 8px 32px rgba(204,0,0,0.3)" }}>
+        <div className="pointer-events-none absolute inset-0 opacity-10"
+          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "12px 12px" }} />
+        <div className="relative px-4 py-4 flex items-center gap-4">
+          <div className="flex-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-0.5">Create your own catalogue</p>
+            <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-bold text-white leading-tight">
+              Let family circle the things you&apos;d actually love
+            </p>
+          </div>
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400">
+            <Flame className="h-5 w-5 text-stone-900" />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -4644,16 +4792,8 @@ export default function DemoPage() {
           <AboutPage />
         </motion.div>
       ) : viewMode === "catalogue" ? (
-        <motion.div key="catalogue" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <div className="px-4 pt-5 pb-32">
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-violet-400">Circle the Catalogue</p>
-            <p style={{ fontFamily: "var(--font-display)" }} className="mb-4 text-[20px] font-semibold text-stone-800 leading-tight">Pick your next Spark Goal</p>
-            <CatalogueGrid
-              onAdd={handleAddItem}
-              isContributor={isContributor}
-              onContributorClick={() => setShowCreatorModal(true)}
-            />
-          </div>
+        <motion.div key="catalogue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+          <CatalogueView onAdd={handleAddItem} />
         </motion.div>
       ) : viewMode === "reveal" ? (
         <motion.div key="reveal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
