@@ -217,6 +217,47 @@ const CATALOGUE: CatalogItem[] = [
   { id: "c32", brand: "Virgin Exp", name: "Supercar Driving Experience",    category: "Experiences", hearts: 1234,price: 189,    tag: "Bucket List",   tagColor: "bg-red-100 text-red-600",       glowColor: "#ef4444", image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=500&h=500&fit=crop&q=85" },
   { id: "c33", brand: "Hotel",      name: "Spa Day for Two — 5-Star",       category: "Experiences", hearts: 876, price: 169,    tag: "Ultimate Treat",tagColor: "bg-pink-100 text-pink-600",     glowColor: "#ec4899", image: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=500&h=500&fit=crop&q=85" },
   { id: "c34", brand: "Waitrose",   name: "Hamper — Luxury Christmas",      category: "Experiences", hearts: 623, price: 125,    tag: "Crowd Pleaser", tagColor: "bg-emerald-100 text-emerald-600",glowColor: "#10b981", image: "https://images.unsplash.com/photo-1543258103-a62bdc069871?w=500&h=500&fit=crop&q=85" },
+  { id: "c60", brand: "Merlin",     name: "Hot Air Balloon Flight",         category: "Experiences", hearts: 1432,price: 199,    tag: "Bucket List",   tagColor: "bg-fuchsia-100 text-fuchsia-600",glowColor: "#d946ef", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&q=85" },
+  { id: "c61", brand: "Restaurant", name: "Michelin Star Dinner for Two",   category: "Experiences", hearts: 987, price: 249,    tag: "Unforgettable", tagColor: "bg-rose-100 text-rose-600",     glowColor: "#f43f5e", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=500&h=500&fit=crop&q=85" },
+  { id: "c62", brand: "Skydive",    name: "Tandem Skydive Experience",      category: "Experiences", hearts: 1134,price: 299,    tag: "Adrenaline",    tagColor: "bg-orange-100 text-orange-600", glowColor: "#f97316", image: "https://images.unsplash.com/photo-1517646287270-a5a9ca602e5c?w=500&h=500&fit=crop&q=85" },
+  { id: "c63", brand: "F1",         name: "Formula 1 Grand Prix Ticket",    category: "Experiences", hearts: 2341,price: 599,    tag: "Once in Life",  tagColor: "bg-red-100 text-red-600",       glowColor: "#ef4444", image: "https://images.unsplash.com/photo-1541773367-e27d9e58f9b6?w=500&h=500&fit=crop&q=85" },
+  // ── Tech extras ──
+  { id: "c35", brand: "DJI",        name: "Mini 4 Pro Drone Fly More",      category: "Tech",        hearts: 743, price: 759,    tag: "Sky High",      tagColor: "bg-sky-100 text-sky-600",       glowColor: "#0ea5e9", image: "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?w=500&h=500&fit=crop&q=85" },
+  { id: "c36", brand: "Samsung",    name: "Galaxy S25 Ultra 256GB",         category: "Tech",        hearts: 891, price: 1249,   tag: "Flagship",      tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6", image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&h=500&fit=crop&q=85" },
+  { id: "c37", brand: "Apple",      name: "Watch Series 10 45mm",           category: "Tech",        hearts: 634, price: 429,    tag: "Wearable",      tagColor: "bg-stone-200 text-stone-700",   glowColor: "#78716c", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop&q=85" },
+  { id: "c38", brand: "Polaroid",   name: "Now+ Instant Camera Gen 2",      category: "Tech",        hearts: 512, price: 119,    tag: "Film Fun",      tagColor: "bg-pink-100 text-pink-600",     glowColor: "#ec4899", image: "https://images.unsplash.com/photo-1520390138845-fd2d229dd553?w=500&h=500&fit=crop&q=85" },
+  { id: "c39", brand: "Marshall",   name: "Stanmore III Bluetooth Speaker", category: "Tech",        hearts: 461, price: 399,    tag: "Sound",         tagColor: "bg-stone-200 text-stone-700",   glowColor: "#78716c", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500&h=500&fit=crop&q=85" },
+  { id: "c40", brand: "Sonos",      name: "Era 300 Spatial Audio Speaker",  category: "Tech",        hearts: 387, price: 449,    tag: "Premium Sound", tagColor: "bg-amber-100 text-amber-600",   glowColor: "#f59e0b", image: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=500&h=500&fit=crop&q=85" },
+  // ── Gaming extras ──
+  { id: "c41", brand: "Custom",     name: "RTX 4070 Gaming PC Build",       category: "Gaming",      hearts: 1842,price: 1499,   tag: "Ultimate Rig",  tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6", image: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=500&h=500&fit=crop&q=85" },
+  { id: "c42", brand: "Herman Miller",name:"Aeron Gaming Chair",            category: "Gaming",      hearts: 934, price: 1195,   tag: "Pro Setup",     tagColor: "bg-emerald-100 text-emerald-600",glowColor: "#10b981", image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=500&h=500&fit=crop&q=85" },
+  { id: "c43", brand: "Pokémon",    name: "TCG Scarlet & Violet Elite Box", category: "Gaming",      hearts: 876, price: 54,     tag: "Collector",     tagColor: "bg-yellow-100 text-yellow-600", glowColor: "#eab308", image: "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?w=500&h=500&fit=crop&q=85" },
+  { id: "c44", brand: "Samsung",    name: "Odyssey OLED G8 34\" Monitor",   category: "Gaming",      hearts: 612, price: 799,    tag: "4K OLED",       tagColor: "bg-blue-100 text-blue-600",     glowColor: "#3b82f6", image: "https://images.unsplash.com/photo-1616763355548-1b606f439f86?w=500&h=500&fit=crop&q=85" },
+  // ── Toys extras ──
+  { id: "c45", brand: "Barbie",     name: "DreamHouse 2024 Edition",        category: "Toys",        hearts: 1241,price: 199,    tag: "Best Seller",   tagColor: "bg-pink-100 text-pink-600",     glowColor: "#ec4899", image: "https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=500&h=500&fit=crop&q=85" },
+  { id: "c46", brand: "LEGO",       name: "City Police Station 2024",       category: "Toys",        hearts: 743, price: 179,    tag: "City Life",     tagColor: "bg-blue-100 text-blue-600",     glowColor: "#3b82f6", image: "https://images.unsplash.com/photo-1498084393753-b411b2d26b34?w=500&h=500&fit=crop&q=85" },
+  { id: "c47", brand: "Nerf",       name: "Hyper Rush 50 Blaster",          category: "Toys",        hearts: 567, price: 59,     tag: "Battle Ready",  tagColor: "bg-orange-100 text-orange-600", glowColor: "#f97316", image: "https://images.unsplash.com/photo-1558618047-f6fa2a2affe5?w=500&h=500&fit=crop&q=85" },
+  { id: "c48", brand: "Ravensburger",name:"3D Puzzle — Eiffel Tower 216pc", category: "Toys",        hearts: 423, price: 49,     tag: "Brain Boost",   tagColor: "bg-teal-100 text-teal-600",     glowColor: "#14b8a6", image: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=500&h=500&fit=crop&q=85" },
+  { id: "c49", brand: "LEGO",       name: "Icons Botanical — Wild Flowers", category: "Toys",        hearts: 654, price: 199,    tag: "Display Piece", tagColor: "bg-emerald-100 text-emerald-600",glowColor: "#10b981", image: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=500&h=500&fit=crop&q=85" },
+  // ── Sport extras ──
+  { id: "c50", brand: "Red Paddle", name: "Inflatable SUP Paddleboard 10'8",category: "Sport",       hearts: 512, price: 599,    tag: "Summer Vibes",  tagColor: "bg-cyan-100 text-cyan-600",     glowColor: "#06b6d4", image: "https://images.unsplash.com/photo-1530870110042-98b2cb110834?w=500&h=500&fit=crop&q=85" },
+  { id: "c51", brand: "Wilson",     name: "Blade 100L v9 Tennis Racket",    category: "Sport",       hearts: 487, price: 229,    tag: "Game Changer",  tagColor: "bg-lime-100 text-lime-600",     glowColor: "#84cc16", image: "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=500&h=500&fit=crop&q=85" },
+  { id: "c52", brand: "Peloton",    name: "Bike+ Smart Indoor Cycle",       category: "Sport",       hearts: 1567,price: 1799,   tag: "Milestone",     tagColor: "bg-red-100 text-red-600",       glowColor: "#ef4444", image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=500&h=500&fit=crop&q=85" },
+  { id: "c53", brand: "Coleman",    name: "Camping Starter Bundle",         category: "Sport",       hearts: 423, price: 299,    tag: "Great Outdoors",tagColor: "bg-green-100 text-green-600",   glowColor: "#22c55e", image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=500&h=500&fit=crop&q=85" },
+  // ── Home extras ──
+  { id: "c55", brand: "Ninja",      name: "Double Stack XL Air Fryer",      category: "Home",        hearts: 1234,price: 199,    tag: "Kitchen Must",  tagColor: "bg-stone-200 text-stone-700",   glowColor: "#78716c", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=500&h=500&fit=crop&q=85" },
+  { id: "c56", brand: "Weber",      name: "Master-Touch 57cm Charcoal BBQ", category: "Home",        hearts: 723, price: 399,    tag: "Summer Essential",tagColor: "bg-orange-100 text-orange-600",glowColor: "#f97316", image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&h=500&fit=crop&q=85" },
+  { id: "c57", brand: "Philips Hue",name: "Colour Ambiance Starter Kit",   category: "Home",        hearts: 543, price: 179,    tag: "Smart Home",    tagColor: "bg-violet-100 text-violet-600", glowColor: "#8b5cf6", image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&h=500&fit=crop&q=85" },
+  { id: "c58", brand: "Sage",       name: "Barista Express Bean-to-Cup",    category: "Home",        hearts: 1087,price: 649,    tag: "Coffee Lover",  tagColor: "bg-amber-100 text-amber-600",   glowColor: "#f59e0b", image: "https://images.unsplash.com/photo-1610889556528-9a770e32642f?w=500&h=500&fit=crop&q=85" },
+  { id: "c59", brand: "Smeg",       name: "50s Retro Pastel Toaster + Kettle",category: "Home",     hearts: 876, price: 249,    tag: "Retro Style",   tagColor: "bg-pink-100 text-pink-600",     glowColor: "#ec4899", image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=500&h=500&fit=crop&q=85" },
+  // ── Fashion & Beauty ──
+  { id: "c65", brand: "Nike",       name: "Air Jordan 1 High OG Retro",     category: "Fashion",     hearts: 1543,price: 169,    tag: "Streetwear",    tagColor: "bg-red-100 text-red-600",       glowColor: "#ef4444", image: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=500&h=500&fit=crop&q=85" },
+  { id: "c66", brand: "Ray-Ban",    name: "Aviator Classic Gold",           category: "Fashion",     hearts: 876, price: 169,    tag: "Timeless",      tagColor: "bg-amber-100 text-amber-600",   glowColor: "#f59e0b", image: "https://images.unsplash.com/photo-1473496169904-658ba7574b0d?w=500&h=500&fit=crop&q=85" },
+  { id: "c67", brand: "Levi's",     name: "Oversized Sherpa Trucker Jacket",category: "Fashion",     hearts: 654, price: 199,    tag: "Cosy Fit",      tagColor: "bg-stone-200 text-stone-700",   glowColor: "#78716c", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop&q=85" },
+  { id: "c68", brand: "Michael Kors",name:"Jet Set Travel Tote",            category: "Fashion",     hearts: 712, price: 279,    tag: "Designer",      tagColor: "bg-rose-100 text-rose-600",     glowColor: "#f43f5e", image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500&h=500&fit=crop&q=85" },
+  { id: "c69", brand: "Jo Malone",  name: "London Cologne Discovery Set",   category: "Fashion",     hearts: 543, price: 209,    tag: "Luxury Scent",  tagColor: "bg-stone-200 text-stone-700",   glowColor: "#78716c", image: "https://images.unsplash.com/photo-1541643600914-78b084683702?w=500&h=500&fit=crop&q=85" },
+  { id: "c70", brand: "Dyson",      name: "Airwrap Complete Long Edition",  category: "Fashion",     hearts: 2134,price: 479,    tag: "Must Have",     tagColor: "bg-fuchsia-100 text-fuchsia-600",glowColor: "#d946ef", image: "https://images.unsplash.com/photo-1522338140262-f46f5913618a?w=500&h=500&fit=crop&q=85" },
+  { id: "c71", brand: "Charlotte T",name: "Pillow Talk Beauty Bundle",      category: "Fashion",     hearts: 987, price: 159,    tag: "Glow Up",       tagColor: "bg-pink-100 text-pink-600",     glowColor: "#ec4899", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&q=85" },
 ];
 
 const SCENES: ExplainerScene[] = [
@@ -1174,37 +1215,34 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
     if (circling || added) return;
     setCircling(true);
     setTimeout(() => {
-      setSparkling(true);
-      setHeartPop(true);
+      setSparkling(true); setHeartPop(true);
       setTimeout(() => { setSparkling(false); setHeartPop(false); setAdded(true); onAdd(item); }, 700);
       setTimeout(() => setCircling(false), 200);
     }, 950);
   }, [circling, added, item, onAdd]);
 
-  const h = featured ? 180 : 140;
+  const imgH = featured ? 190 : 152;
 
   return (
     <motion.div
-      whileHover={!added ? { y: -4, scale: 1.01 } : {}}
+      whileHover={!added ? { y: -5 } : {}}
       whileTap={!added ? { scale: 0.97 } : {}}
-      transition={{ type: "spring", stiffness: 420, damping: 28 }}
+      transition={{ type: "spring", stiffness: 420, damping: 26 }}
       className="relative overflow-visible rounded-2xl cursor-pointer bg-white"
       style={{ boxShadow: added
-        ? `0 0 0 2.5px #34d399, 0 8px 32px ${item.glowColor}30`
-        : "0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)" }}
+        ? `0 0 0 2.5px #34d399, 0 12px 40px ${item.glowColor}35`
+        : "0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04)" }}
       onClick={handleClick}
     >
       {/* Classic blue biro pen circle */}
       {circling && (
-        <div className="pointer-events-none absolute z-20" style={{ inset: "-8px" }}>
+        <div className="pointer-events-none absolute z-20" style={{ inset: "-9px" }}>
           <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
-            <path
-              d="M 7 4 C 28 -1, 58 3, 82 0 C 94 -1, 101 9, 99 24 C 102 48, 97 65, 100 82 C 102 95, 90 102, 72 100 C 50 103, 26 98, 10 101 C -2 103, -3 90, 0 73 C -4 52, 3 34, -2 17 C -4 5, 2 1, 7 4 Z"
-              stroke="#1d4ed8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+            <path d="M 7 4 C 28 -1, 58 3, 82 0 C 94 -1, 101 9, 99 24 C 102 48, 97 65, 100 82 C 102 95, 90 102, 72 100 C 50 103, 26 98, 10 101 C -2 103, -3 90, 0 73 C -4 52, 3 34, -2 17 C -4 5, 2 1, 7 4 Z"
+              stroke="#1d4ed8" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"
               strokeDasharray="460" vectorEffect="non-scaling-stroke"
               className="animate-draw-circle"
-              style={{ filter: "drop-shadow(0 0 6px #3b82f680)", opacity: 0.85 }}
-            />
+              style={{ filter: "drop-shadow(0 0 8px #3b82f6aa)", opacity: 0.9 }} />
           </svg>
         </div>
       )}
@@ -1214,52 +1252,60 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
             <span key={s.id} className="absolute rounded-full animate-sparkle"
               style={{ width: s.size, height: s.size, backgroundColor: s.color,
                 "--spx": s.spx, "--spy": s.spy, animationDelay: s.delay,
-                boxShadow: `0 0 6px ${s.color}` } as React.CSSProperties}
-            />
+                boxShadow: `0 0 8px ${s.color}` } as React.CSSProperties} />
           ))}
         </div>
       )}
 
       {/* Image */}
-      <div className="relative overflow-hidden rounded-t-2xl" style={{ height: h }}>
+      <div className="relative overflow-hidden rounded-t-2xl" style={{ height: imgH }}>
         <img src={item.image} alt={item.name}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-          onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0"; }}
+          className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+          onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0.2"; }}
         />
-        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${item.glowColor}44 0%, transparent 55%)` }} />
-        {/* Top-left: brand */}
+        {/* Rich bottom gradient */}
+        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 45%, transparent 70%)` }} />
+        {/* Colour tint at very bottom */}
+        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${item.glowColor}55 0%, transparent 40%)` }} />
+
+        {/* Brand pill top-left */}
         {item.brand && (
-          <div className="absolute left-2 top-2 rounded-lg bg-white/90 px-2 py-0.5 backdrop-blur-sm">
-            <p className="text-[8px] font-black uppercase tracking-wider text-stone-600">{item.brand}</p>
+          <div className="absolute left-2.5 top-2.5 rounded-lg bg-white/92 px-2 py-0.5 shadow-sm backdrop-blur-md">
+            <p className="text-[8px] font-black uppercase tracking-wider text-stone-700">{item.brand}</p>
           </div>
         )}
-        {/* Top-right: tag */}
-        <span className={cn("absolute right-2 top-2 rounded-lg px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider shadow-sm", item.tagColor)}>
+        {/* Tag top-right */}
+        <span className={cn("absolute right-2.5 top-2.5 rounded-lg px-2 py-0.5 text-[8px] font-black uppercase tracking-wider shadow-sm backdrop-blur-sm", item.tagColor)}>
           {item.tag}
         </span>
-        {/* Bottom: hearts */}
-        <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur-sm">
-          <motion.span animate={heartPop ? { scale: [1, 2, 0.8, 1.2, 1] } : {}} transition={{ duration: 0.5 }}
-            className="text-[10px]">❤</motion.span>
-          <span className="text-[9px] font-bold text-white">{heartPop ? item.hearts + 1 : item.hearts}</span>
+        {/* Price overlaid on image bottom-left */}
+        <div className="absolute bottom-2.5 left-2.5">
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-[22px] font-black leading-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+            £{item.price.toLocaleString()}
+          </span>
+        </div>
+        {/* Hearts bottom-right */}
+        <div className="absolute bottom-3 right-2.5 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
+          <motion.span animate={heartPop ? { scale: [1, 1.8, 0.9, 1.2, 1] } : {}} transition={{ duration: 0.45 }}
+            className="text-[9px] leading-none">❤</motion.span>
+          <span className="text-[9px] font-bold text-white">{(heartPop ? item.hearts + 1 : item.hearts).toLocaleString()}</span>
         </div>
       </div>
 
-      {/* Info */}
+      {/* Info below image */}
       <div className="px-3 pb-3 pt-2.5">
-        <p className="mb-0.5 text-[9px] font-semibold uppercase tracking-widest text-stone-400">{item.category}</p>
-        <p style={{ fontFamily: "var(--font-display)" }} className="mb-2 text-[13px] font-semibold leading-snug text-stone-800">{item.name}</p>
+        <p style={{ fontFamily: "var(--font-display)" }} className="mb-2.5 text-[13px] font-semibold leading-snug text-stone-800">{item.name}</p>
         <div className="flex items-center justify-between">
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-bold text-stone-900">£{item.price.toLocaleString()}</span>
+          <p className="text-[10px] font-semibold text-stone-400">{item.hearts.toLocaleString()} on wishlists</p>
           {added ? (
-            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 20 }}
-              className="flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold text-emerald-600">
+            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 18 }}
+              className="flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-black text-emerald-600">
               <Check className="h-3 w-3" /> Added
             </motion.span>
           ) : (
-            <motion.div whileTap={{ scale: 0.9 }}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-white shadow-md"
-              style={{ background: `linear-gradient(135deg, ${item.glowColor}, ${item.glowColor}bb)` }}>
+            <motion.div whileTap={{ scale: 0.88 }} className="flex h-8 w-8 items-center justify-center rounded-full text-white shadow-lg"
+              style={{ background: `linear-gradient(135deg, ${item.glowColor}, ${item.glowColor}aa)`,
+                boxShadow: `0 4px 12px ${item.glowColor}55` }}>
               <Plus className="h-4 w-4" />
             </motion.div>
           )}
@@ -1391,8 +1437,11 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-const CAT_TABS = ["All", "Tech", "Gaming", "Toys", "Sport", "Home", "Experiences"] as const;
+const CAT_TABS = ["All", "Tech", "Gaming", "Toys", "Sport", "Home", "Fashion", "Experiences"] as const;
 type CatTab = typeof CAT_TABS[number];
+const CAT_ICONS: Record<string, string> = {
+  All: "✦", Tech: "⚡", Gaming: "🎮", Toys: "🧸", Sport: "🏃", Home: "🏡", Fashion: "✨", Experiences: "🎟",
+};
 
 function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
   const [activeTab, setActiveTab] = useState<CatTab>("All");
@@ -1482,13 +1531,12 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
               const isActive = activeTab === tab;
               return (
                 <motion.button key={tab} onClick={() => setActiveTab(tab)}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.95 }} whileHover={{ y: -1 }}
                   className={cn(
-                    "flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-[11px] font-bold transition-all",
-                    isActive
-                      ? "bg-stone-900 text-white shadow-md"
-                      : "bg-stone-100 text-stone-500 hover:bg-stone-200"
+                    "flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold transition-all whitespace-nowrap",
+                    isActive ? "bg-stone-900 text-white shadow-md" : "bg-stone-100 text-stone-500"
                   )}>
+                  <span className="text-[11px] leading-none">{CAT_ICONS[tab]}</span>
                   {tab}
                   <span className={cn(
                     "rounded-full px-1.5 py-0.5 text-[9px] font-black",
@@ -1505,22 +1553,27 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
       <AnimatePresence mode="wait">
         {activeTab === "All" && (
           <motion.div key="featured" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="px-4 pt-4">
-            <div className="mb-2.5 flex items-center gap-2">
-              <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">Most Circled This Month</p>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {featured.map((item, i) => (
-                <motion.div key={item.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.07 }}>
-                  <CatalogCard item={item} onAdd={onAdd} featured />
-                </motion.div>
-              ))}
-            </div>
-            <div className="my-4 flex items-center gap-3">
+            className="pt-4">
+            <div className="mb-3 flex items-center gap-2 px-4">
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">Most Circled Right Now</p>
               <div className="h-px flex-1 bg-stone-200" />
-              <p className="text-[9px] font-bold uppercase tracking-widest text-stone-400">All Products</p>
+              <p className="text-[9px] text-stone-400">scroll →</p>
+            </div>
+            <div className="overflow-x-auto scrollbar-none pl-4 pr-2">
+              <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
+                {featured.map((item, i) => (
+                  <motion.div key={item.id} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.08, type: "spring", stiffness: 380, damping: 28 }}
+                    style={{ width: 180 }}>
+                    <CatalogCard item={item} onAdd={onAdd} featured />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+            <div className="mx-4 my-4 flex items-center gap-3">
+              <div className="h-px flex-1 bg-stone-200" />
+              <p className="text-[9px] font-bold uppercase tracking-widest text-stone-400">All {CATALOGUE.length} Products</p>
               <div className="h-px flex-1 bg-stone-200" />
             </div>
           </motion.div>
