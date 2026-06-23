@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown, ChevronRight,
-  Play, Pause, SkipForward, Volume2, VolumeX, X, Zap,
+  Play, Pause, Volume2, VolumeX, X, Zap,
   ShoppingBag, RefreshCw, CreditCard, Gift, Flame,
   Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
   Landmark, Radio, Wrench, Trophy, Wallet, Eye,
@@ -232,338 +232,21 @@ const BUBBLES_P = Array.from({ length: 12 }, (_, i) => ({
   color: ["#f0abfc","#a78bfa","#fbbf24","#f9a8d4","#818cf8"][i % 5]!,
 }));
 
-// Firework sparks — 3 burst centres × 24 sparks each
-const FW_BURSTS = [
-  { cx: "50%", cy: "38%" },
-  { cx: "18%", cy: "28%" },
-  { cx: "82%", cy: "32%" },
-  { cx: "35%", cy: "55%" },
-  { cx: "68%", cy: "52%" },
-];
+
+
 const FW_SPARKS = Array.from({ length: 24 }, (_, i) => {
   const ang = (i / 24) * Math.PI * 2;
   const dist = 70 + (i * 41) % 70;
-  return {
-    id: i,
-    x: Math.round(Math.cos(ang) * dist),
-    y: Math.round(Math.sin(ang) * dist),
+  return { id: i, x: Math.round(Math.cos(ang) * dist), y: Math.round(Math.sin(ang) * dist),
     color: ["#f59e0b","#ef4444","#8b5cf6","#10b981","#3b82f6","#f97316","#ec4899","#fbbf24"][i % 8]!,
-    dur: `${0.55 + (i * 0.03) % 0.45}s`,
-    delay: `${(i * 0.018) % 0.22}s`,
-    size: 5 + (i % 6),
-  };
+    dur: `${0.55 + (i * 0.03) % 0.45}s`, delay: `${(i * 0.018) % 0.22}s`, size: 5 + (i % 6) };
 });
 
-// Post-circle sparkles
 const SPARKLES = Array.from({ length: 10 }, (_, i) => ({
-  id: i,
-  spx: `${-35 + (i * 37) % 70}px`,
-  spy: `${-30 + (i * 29) % 60}px`,
+  id: i, spx: `${-35 + (i * 37) % 70}px`, spy: `${-30 + (i * 29) % 60}px`,
   color: ["#f59e0b","#fbbf24","#f97316","#fb923c","#fff"][i % 5]!,
-  delay: `${i * 0.06}s`,
-  size: 4 + (i % 5),
+  delay: `${i * 0.06}s`, size: 4 + (i % 5),
 }));
-
-// Reveal ceremony — slow-rising golden embers (background layer)
-const EMBERS = Array.from({ length: 22 }, (_, i) => ({
-  id: i,
-  left: `${2 + (i * 421) % 96}%`,
-  size: 3 + (i % 4),
-  emberX: `${-20 + (i * 17) % 40}px`,
-  emberY: `${-180 - (i * 23) % 140}px`,
-  dur: `${2.8 + (i * 0.21) % 2.4}s`,
-  delay: `${(i * 0.17) % 2.2}s`,
-  color: ["#fbbf24", "#f59e0b", "#fde68a", "#fb923c"][i % 4]!,
-}));
-
-// Reveal ceremony — organic light-leak streaks
-const LIGHT_LEAKS = [
-  { color: "rgba(251,191,36,0.5)", size: 520, dur: "3.4s", delay: "0s", peak: 0.5 },
-  { color: "rgba(249,115,22,0.4)", size: 420, dur: "4.1s", delay: "0.5s", peak: 0.4 },
-  { color: "rgba(236,72,153,0.3)", size: 360, dur: "3.8s", delay: "1.1s", peak: 0.35 },
-];
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// SOUND UTILITY
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function useAudio() {
-  const ctx = useRef<AudioContext | null>(null);
-  const get = useCallback(() => {
-    ctx.current ??= new AudioContext();
-    return ctx.current;
-  }, []);
-
-  const thump = useCallback((t = 0) => {
-    try {
-      const c = get();
-      const o = c.createOscillator();
-      const g = c.createGain();
-      o.connect(g); g.connect(c.destination);
-      o.frequency.value = 70 + Math.random() * 30;
-      o.type = "sine";
-      g.gain.setValueAtTime(0.55, c.currentTime + t);
-      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + 0.18);
-      o.start(c.currentTime + t);
-      o.stop(c.currentTime + t + 0.18);
-    } catch { /* silent */ }
-  }, [get]);
-
-  // One plucked "harp string" — quick attack, long shimmering decay, two
-  // slightly-detuned oscillators for a richer, more organic pluck.
-  const pluck = useCallback((c: AudioContext, freq: number, t: number, gain: number, dur: number) => {
-    const g = c.createGain();
-    g.connect(c.destination);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(gain, t + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-
-    [1, 1.0035, 2.005].forEach((mult, i) => {
-      const o = c.createOscillator();
-      const og = c.createGain();
-      o.type = i === 2 ? "sine" : "triangle";
-      o.frequency.value = freq * mult;
-      og.gain.value = i === 2 ? 0.18 : 0.5;
-      o.connect(og); og.connect(g);
-      o.start(t); o.stop(t + dur);
-    });
-  }, []);
-
-  // Ascending harp-like glissando — a fast run up a pentatonic scale across
-  // two octaves, ending in a sustained, shimmering high chord.
-  const chime = useCallback(() => {
-    try {
-      const c = get();
-      const base = c.currentTime + 0.02;
-      // C major pentatonic across two octaves, run upward.
-      const run = [523.25, 587.33, 659.25, 784.0, 880.0, 1046.5, 1174.7, 1318.5, 1568.0, 1760.0];
-      run.forEach((f, i) => {
-        pluck(c, f, base + i * 0.052, 0.16, 1.1);
-      });
-      // Sustained shimmering chord on top, slightly after the run lands.
-      const chordAt = base + run.length * 0.052 + 0.04;
-      [1046.5, 1318.5, 1568.0, 2093.0].forEach((f, i) => {
-        pluck(c, f, chordAt + i * 0.03, 0.13, 2.2);
-      });
-    } catch { /* silent */ }
-  }, [get, pluck]);
-
-  // A single bright, randomised sparkle blip — for layering over visual
-  // spark bursts so the fireworks feel reactive rather than scripted.
-  const sparkleBlip = useCallback((t = 0) => {
-    try {
-      const c = get();
-      const freq = 1800 + Math.random() * 1400;
-      pluck(c, freq, c.currentTime + t, 0.05, 0.35);
-    } catch { /* silent */ }
-  }, [get, pluck]);
-
-  // ── Brazilian samba fanfare ─────────────────────────────────────────────────
-  // Punchy brass stabs + driving samba percussion. Fires on reveal ceremony.
-  // Synthesised entirely in Web Audio: no network requests, no external files.
-  const sambaFanfare = useCallback(() => {
-    try {
-      const c = get();
-      const now = c.currentTime + 0.05;
-      const BPM = 128;
-      const beat = 60 / BPM;        // 0.469 s
-      const bar  = beat * 4;        // 1.875 s
-
-      // Master limiter — prevents clipping when all layers stack.
-      const limiter = c.createDynamicsCompressor();
-      limiter.threshold.value = -3;
-      limiter.knee.value = 6;
-      limiter.ratio.value = 20;
-      limiter.attack.value = 0.001;
-      limiter.release.value = 0.08;
-      limiter.connect(c.destination);
-
-      // ── Brass stab: sawtooth + bandpass, punchy staccato envelope ──────────
-      const brassStab = (t: number, freq: number, gain = 0.38) => {
-        const mg = c.createGain();
-        mg.gain.setValueAtTime(0, t);
-        mg.gain.linearRampToValueAtTime(gain, t + 0.012);
-        mg.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
-        mg.connect(limiter);
-
-        const osc = c.createOscillator();
-        osc.type = "sawtooth";
-        osc.frequency.value = freq;
-
-        const bpf = c.createBiquadFilter();
-        bpf.type = "bandpass";
-        bpf.frequency.value = 1100;
-        bpf.Q.value = 1.8;
-
-        // Slight pitch-bend on attack for natural brass articulation
-        osc.frequency.setValueAtTime(freq * 1.03, t);
-        osc.frequency.exponentialRampToValueAtTime(freq, t + 0.04);
-
-        osc.connect(bpf); bpf.connect(mg);
-        osc.start(t); osc.stop(t + 0.28);
-      };
-
-      // ── Chord voicings ──────────────────────────────────────────────────────
-      // Bb major (I): Bb3, Eb4, G4, Bb4
-      const Bb = [233.08, 311.13, 392.0, 466.16];
-      // F dominant (V): F4, A4, C5, Eb5
-      const Fdom = [349.23, 440.0, 523.25, 622.25];
-      // Bb upper (climax): Bb4, Eb5, G5, Bb5
-      const BbHi = [466.16, 622.25, 783.99, 932.33];
-
-      const stab = (t: number, chord: number[], gain = 0.38) =>
-        chord.forEach((f, i) => brassStab(t + i * 0.007, f, gain));
-
-      // ── Surdo bass drum: pitched sine sweep 90→35 Hz ───────────────────────
-      const surdo = (t: number, gain = 0.65) => {
-        const g = c.createGain();
-        g.gain.setValueAtTime(gain, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
-        g.connect(limiter);
-        const o = c.createOscillator();
-        o.type = "sine";
-        o.frequency.setValueAtTime(95, t);
-        o.frequency.exponentialRampToValueAtTime(32, t + 0.28);
-        o.connect(g); o.start(t); o.stop(t + 0.4);
-      };
-
-      // ── Tamborim: filtered noise burst, very short (samba snare-rim) ───────
-      const tamborim = (t: number, gain = 0.18) => {
-        const len = Math.ceil(c.sampleRate * 0.055);
-        const buf = c.createBuffer(1, len, c.sampleRate);
-        const d = buf.getChannelData(0);
-        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-        const src = c.createBufferSource();
-        src.buffer = buf;
-        const bpf = c.createBiquadFilter();
-        bpf.type = "bandpass"; bpf.frequency.value = 3800; bpf.Q.value = 4;
-        const hpf = c.createBiquadFilter();
-        hpf.type = "highpass"; hpf.frequency.value = 2200;
-        const g = c.createGain();
-        g.gain.setValueAtTime(gain, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.065);
-        src.connect(bpf); bpf.connect(hpf); hpf.connect(g); g.connect(limiter);
-        src.start(t);
-      };
-
-      // ── Agogô bell: two-tone metallic cowbell (sine cluster) ───────────────
-      const agogo = (t: number, hi: boolean, gain = 0.14) => {
-        const freqs = hi ? [1250, 1875, 2500] : [940, 1410, 1880];
-        const g = c.createGain();
-        g.gain.setValueAtTime(gain, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
-        g.connect(limiter);
-        freqs.forEach((f, i) => {
-          const o = c.createOscillator();
-          const og = c.createGain();
-          o.type = "sine"; o.frequency.value = f;
-          og.gain.value = [0.55, 0.3, 0.15][i]!;
-          o.connect(og); og.connect(g); o.start(t); o.stop(t + 0.5);
-        });
-      };
-
-      // ── Shaker: hi-freq noise sixteenths ───────────────────────────────────
-      const shaker = (t: number, gain = 0.08) => {
-        const len = Math.ceil(c.sampleRate * 0.03);
-        const buf = c.createBuffer(1, len, c.sampleRate);
-        const d = buf.getChannelData(0);
-        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-        const src = c.createBufferSource();
-        src.buffer = buf;
-        const hpf = c.createBiquadFilter();
-        hpf.type = "highpass"; hpf.frequency.value = 7000;
-        const g = c.createGain();
-        g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-        src.connect(hpf); hpf.connect(g); g.connect(limiter);
-        src.start(t);
-      };
-
-      // ════════════════════════════════════════════════════════════════════════
-      // ARRANGEMENT  (≈ 24 s, 128 BPM)
-      // ════════════════════════════════════════════════════════════════════════
-
-      // ── INTRO (bars 1-2): Brass fanfare hits + light percussion ─────────────
-      stab(now, Bb, 0.35);
-      surdo(now);
-      agogo(now + beat * 0.5, true);
-      agogo(now + beat * 1.5, false);
-      stab(now + beat * 2, Fdom, 0.32);
-      surdo(now + beat * 2);
-      agogo(now + beat * 2.5, true);
-      agogo(now + beat * 3.5, false);
-      // Bar 2 tamborim starts
-      for (let i = 0; i < 8; i++) tamborim(now + bar + i * beat * 0.5, 0.15);
-      stab(now + bar, Bb, 0.36);
-      surdo(now + bar);
-      stab(now + bar + beat * 2, Fdom, 0.33);
-      surdo(now + bar + beat * 2);
-
-      // ── BUILD (bars 3-4): Staccato brass every beat + denser perc ───────────
-      for (let b = 2; b < 4; b++) {
-        for (let q = 0; q < 4; q++) {
-          const t = now + bar * b + beat * q;
-          stab(t, q % 2 === 0 ? Bb : Fdom, 0.34 + q * 0.01);
-          surdo(t);
-          agogo(t + beat * 0.25, q % 2 === 0);
-        }
-        // Full 16th tamborim + shaker
-        for (let i = 0; i < 16; i++) {
-          tamborim(now + bar * b + i * beat * 0.25, 0.17);
-          shaker(now + bar * b + i * beat * 0.25, 0.09);
-        }
-      }
-
-      // ── TENSION RISE (bars 4-5): Fast repeated hits, chromatic ascent ───────
-      const riseChords = [Fdom, Bb, Fdom, BbHi];
-      for (let i = 0; i < 8; i++) {
-        const t = now + bar * 4 + i * beat * 0.5;
-        stab(t, riseChords[Math.floor(i / 2)]!, 0.38 + i * 0.012);
-        surdo(t);
-        tamborim(t + beat * 0.125, 0.2);
-        agogo(t + beat * 0.25, i % 2 === 0, 0.16);
-      }
-
-      // ── CLIMAX EXPLOSION (bars 5-8): Full brass + percussion storm ──────────
-      const climax = now + bar * 5;
-
-      // Giant downbeat chord — both octave layers simultaneously
-      BbHi.forEach((f, i) => brassStab(climax + i * 0.005, f, 0.55));
-      Bb.forEach((f, i)   => brassStab(climax + i * 0.005, f, 0.48));
-      surdo(climax, 0.8);
-
-      // Every beat of the climax: alternating Bb/F brass + surdo pair
-      for (let b = 0; b < 12; b++) {
-        const t = climax + b * beat;
-        const chord = b % 2 === 0 ? BbHi : Fdom;
-        stab(t, chord, 0.45 + Math.min(b, 4) * 0.01);
-        surdo(t, 0.72);
-        surdo(t + beat * 0.5, 0.45);            // off-beat surdo for carnival pulse
-        agogo(t + beat * 0.25, b % 2 === 1, 0.18);
-        agogo(t + beat * 0.75, b % 2 === 0, 0.16);
-      }
-
-      // Continuous 16th tamborim + shaker storm through climax
-      for (let i = 0; i < 48; i++) {
-        tamborim(climax + i * beat * 0.25, 0.2);
-        shaker(climax + i * beat * 0.25, 0.1);
-      }
-
-      // ── FINAL BURST (last downbeat): massive chord + percussion hits ─────────
-      const finale = climax + beat * 12;
-      BbHi.forEach((f, i) => brassStab(finale + i * 0.004, f, 0.62));
-      Bb.forEach((f, i)   => brassStab(finale + i * 0.004, f, 0.56));
-      [0, beat * 0.25, beat * 0.5, beat * 0.75].forEach((d) => {
-        surdo(finale + d, 0.8);
-        tamborim(finale + d + beat * 0.125, 0.24);
-      });
-      agogo(finale, true, 0.22); agogo(finale + beat * 0.5, false, 0.2);
-
-    } catch { /* silent */ }
-  }, [get]);
-
-  return { thump, chime, sparkleBlip, sambaFanfare };
-}
-
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 3D TILT HOOK
@@ -1734,293 +1417,6 @@ function CatalogueGrid({ onAdd, isContributor, onContributorClick }: {
 // ═══════════════════════════════════════════════════════════════════════════════
 // REVEAL CEREMONY MODAL
 // ═══════════════════════════════════════════════════════════════════════════════
-
-type RevealPhase = "idle" | "shaking" | "flashing" | "fireworks" | "mosaic" | "actions";
-
-function MemoryCardView({ card }: { card: MemoryCard }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24, rotate: card.rot }}
-      animate={{ opacity: 1, y: 0, rotate: card.rot }}
-      transition={{ type: "spring", stiffness: 320, damping: 28, delay: card.delay / 1000 }}
-      className="overflow-hidden rounded-2xl border border-white/8"
-      style={{ background: "linear-gradient(145deg, #2a2520, #1e1a17)" }}
-    >
-      {/* Postcard header */}
-      <div className="flex items-center gap-2.5 border-b border-white/6 bg-white/5 px-4 py-2.5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-[11px] font-bold text-amber-300">
-          {card.name.charAt(0)}
-        </div>
-        <div>
-          <p style={{ fontFamily: "var(--font-display)" }} className="text-[13px] font-medium text-stone-200">{card.name}</p>
-          {card.hasVideo && (
-            <span className="rounded-sm bg-rose-500/20 px-1 py-px text-[9px] font-bold uppercase tracking-wider text-rose-400">VIDEO</span>
-          )}
-        </div>
-      </div>
-      {/* Message body */}
-      <div className="px-4 py-3">
-        <p className="text-[12px] italic leading-relaxed text-stone-300">&ldquo;{card.message}&rdquo;</p>
-      </div>
-    </motion.div>
-  );
-}
-
-const REVEAL_ACTIONS = [
-  { icon: ShoppingBag, label: "Merge & Buy", desc: "Combine fires for one milestone", gradient: "from-amber-400 to-orange-500", textCol: "text-stone-900" },
-  { icon: CreditCard, label: "Top Up & Order", desc: "Pay the difference, ship now", gradient: "from-emerald-400 to-teal-500", textCol: "text-stone-900" },
-  { icon: RefreshCw, label: "Roll Over", desc: "Carry balance to next event", gradient: "from-violet-500 to-fuchsia-500", textCol: "text-white" },
-  { icon: Gift, label: "Redeem Vouchers", desc: "Currys · John Lewis · Amazon", gradient: "from-sky-500 to-blue-500", textCol: "text-white" },
-];
-
-function RevealModal({ pot, onClose }: { pot: DemoPot; onClose: () => void }) {
-  const [phase, setPhase] = useState<RevealPhase>("idle");
-  const { thump, chime, sparkleBlip, sambaFanfare } = useAudio();
-  const rafRef = useRef<number | null>(null);
-
-  const startReveal = useCallback(() => {
-    setPhase("shaking");
-    // Rhythmic thumps during shake — speeds up into a crescendo
-    [0, 160, 300, 420, 520, 600, 670, 730, 780].forEach((t) => setTimeout(() => thump(0), t));
-    setTimeout(() => {
-      setPhase("flashing");
-      setTimeout(() => {
-        setPhase("fireworks");
-        chime();
-        sambaFanfare();
-        // Bright sparkle blips layered over each visual firework burst
-        FW_BURSTS.forEach((_, bi) => {
-          [0, 90, 180].forEach((d) => setTimeout(() => sparkleBlip(0), bi * 120 + d));
-        });
-        setTimeout(() => setPhase("mosaic"), 2400);
-      }, 450);
-    }, 1050);
-  }, [thump, chime, sparkleBlip, sambaFanfare]);
-
-  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
-
-  const isXmas = pot.mode === "UNDER_THE_TREE";
-
-  const defaultTributes = [
-    { id: "g1", name: "The Whole Family", message: "We all chipped in with so much love. Enjoy every single moment!", rot: -1, delay: 0 },
-    { id: "g2", name: "Gran & Grandad", message: "So proud of you. You deserve this and so much more.", rot: 2, delay: 150 },
-    { id: "g3", name: "Your Best Friends", message: "Couldn't be happier for you — enjoy every second!", rot: -1, delay: 300 },
-  ];
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/92 backdrop-blur-xl p-4">
-      {/* Flash overlay */}
-      {phase === "flashing" && (
-        <div className="pointer-events-none absolute inset-0 bg-white animate-flash z-10" />
-      )}
-
-      {/* Fireworks + light-leak + ember layers */}
-      {(phase === "fireworks" || phase === "mosaic" || phase === "actions") && (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          {/* Organic light-leak streaks — soft, hardware-accelerated blurred blobs sweeping across the screen */}
-          {LIGHT_LEAKS.map((l, i) => (
-            <div
-              key={i}
-              className="absolute animate-light-leak rounded-full mix-blend-screen blur-3xl"
-              style={{
-                left: `${20 + i * 25}%`, top: `${10 + i * 18}%`,
-                width: l.size, height: l.size, background: l.color,
-                "--leak-dur": l.dur, "--leak-peak": l.peak, animationDelay: l.delay,
-              } as React.CSSProperties}
-            />
-          ))}
-
-          {/* Slow-rising golden embers */}
-          {EMBERS.map((e) => (
-            <span
-              key={e.id}
-              className="absolute bottom-0 animate-ember-rise rounded-full"
-              style={{
-                left: e.left, width: e.size, height: e.size, backgroundColor: e.color,
-                boxShadow: `0 0 6px ${e.color}`,
-                "--ember-x": e.emberX, "--ember-y": e.emberY,
-                "--ember-dur": e.dur, animationDelay: e.delay,
-              } as React.CSSProperties}
-            />
-          ))}
-
-          {FW_BURSTS.map((b, bi) => (
-            <div key={bi} className="absolute" style={{ left: b.cx, top: b.cy }}>
-              {FW_SPARKS.map((s) => (
-                <span key={s.id} className="absolute rounded-full animate-fw-spark"
-                  style={{ width: s.size, height: s.size, backgroundColor: s.color,
-                    "--fwx": `${s.x}px`, "--fwy": `${s.y}px`, "--fw-dur": s.dur,
-                    animationDelay: `${parseFloat(s.delay) + bi * 0.12}s`,
-                    boxShadow: `0 0 6px ${s.color}` } as React.CSSProperties}
-                />
-              ))}
-            </div>
-          ))}
-          {phase === "fireworks" && (
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              {[0, 0.6, 1.2].map((d, i) => (
-                <div key={i} className="absolute h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-amber-400/40 animate-sw-ring"
-                  style={{ animationDelay: `${d}s` }} />
-              ))}
-              {/* Warm chime-pulse wash, syncs roughly with the glissando landing */}
-              <div className="absolute inset-0 h-screen w-screen -translate-x-1/2 -translate-y-1/2 animate-chime-pulse rounded-full"
-                style={{ background: "radial-gradient(circle, rgba(251,191,36,0.5), transparent 70%)", width: "140vmax", height: "140vmax", "--pulse-peak": 0.4 } as React.CSSProperties} />
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="relative z-20 w-full max-w-sm overflow-hidden rounded-3xl border border-white/10 shadow-2xl shadow-black/80"
-        style={{ background: "linear-gradient(145deg, #1c1917, #171310)" }}>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={onClose}
-          className="absolute right-3 top-3 z-30 flex h-8 w-8 items-center justify-center rounded-full bg-white/8 text-stone-400 hover:text-stone-100 transition-colors"
-        >
-          <X className="h-4 w-4" />
-        </motion.button>
-
-        {/* ── IDLE ── */}
-        {phase === "idle" && (
-          <div className="flex flex-col items-center gap-5 px-6 py-9">
-            <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-400 mb-1.5">A gift awaits</p>
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-white leading-tight">{pot.title}</p>
-            </div>
-            {/* Gift box with pulsing rings */}
-            <div className="relative flex items-center justify-center py-2">
-              {[80, 110, 140].map((size, i) => (
-                <div key={i} className="absolute rounded-full border border-amber-400/15 animate-sw-ring"
-                  style={{ width: size, height: size, animationDelay: `${i * 0.55}s` }} />
-              ))}
-              <div className={cn("relative z-10 rounded-3xl p-7 border",
-                isXmas ? "bg-gradient-to-br from-red-950 to-red-900/80 border-red-700/40 animate-gift-glow"
-                        : "bg-gradient-to-br from-violet-950 to-indigo-900/80 border-violet-500/40 animate-gift-glow-plum")}>
-                <Gift className={cn("h-16 w-16", isXmas ? "text-amber-400" : "text-violet-300")} strokeWidth={1.2} />
-              </div>
-            </div>
-            {/* Contributors */}
-            <div className="flex items-center gap-2">
-              <div className="flex -space-x-1.5">
-                {["#f59e0b","#a78bfa","#6ee7b7","#fb923c"].slice(0, Math.min(4, pot.contributors)).map((color, i) => (
-                  <div key={i} className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-stone-900 text-[11px] font-bold text-stone-900" style={{ background: color }}>{["M","F","G","S"][i]}</div>
-                ))}
-              </div>
-              <p className="text-[11px] text-stone-400">{pot.contributors} people chipped in with love</p>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.02, y: -1 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 400, damping: 26 }}
-              onClick={startReveal}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl py-4"
-              style={{ background: "linear-gradient(135deg, #fbbf24, #f97316)", boxShadow: "0 4px 20px rgba(251,146,60,0.45)" }}
-            >
-              <Zap className="h-5 w-5 text-stone-900" strokeWidth={2.5} />
-              <span style={{ fontFamily: "var(--font-display)" }} className="text-[17px] font-semibold text-stone-900">Unwrap Now!</span>
-            </motion.button>
-          </div>
-        )}
-
-        {/* ── SHAKING ── */}
-        {(phase === "shaking" || phase === "flashing") && (
-          <div className="flex flex-col items-center gap-5 px-6 py-10 overflow-hidden">
-            <div className={cn("animate-box-shake rounded-3xl p-7 border",
-              isXmas ? "bg-gradient-to-br from-red-950 to-red-900/80 border-red-700/40"
-                      : "bg-gradient-to-br from-violet-950 to-indigo-900/80 border-violet-500/40")}>
-              <Gift className={cn("h-16 w-16", isXmas ? "text-amber-400" : "text-violet-300")} strokeWidth={1.2} />
-            </div>
-            <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-medium text-amber-400 animate-pulse">Something incredible is inside…</p>
-            {/* Intensity bar */}
-            <div className="w-full h-1.5 rounded-full bg-stone-800 overflow-hidden">
-              <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 animate-tribute-bar" style={{ "--tribute-dur": "1s" } as React.CSSProperties} />
-            </div>
-          </div>
-        )}
-
-        {/* ── FIREWORKS ── */}
-        {phase === "fireworks" && (
-          <div className="flex flex-col items-center gap-4 px-6 py-8">
-            <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-amber-400"><Sparkles className="h-3 w-3" /> Fully Funded!</p>
-            {/* Product image reveal */}
-            {pot.image && (
-              <div className="animate-scale-in overflow-hidden rounded-2xl shadow-xl shadow-black/50" style={{ width: 160, height: 120 }}>
-                <img src={pot.image} alt={pot.title} className="h-full w-full object-cover" />
-              </div>
-            )}
-            <div className="text-center animate-fade-up">
-              <p style={{ fontFamily: "var(--font-display)", textShadow: "0 0 40px #f59e0b60" }}
-                className="text-[52px] font-semibold text-amber-400 leading-none tabular-nums">
-                £{pot.goal.toLocaleString()}
-              </p>
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-300 mt-1">{pot.title}</p>
-            </div>
-            <div className="w-full">
-              <FundingBar raised={pot.goal} goal={pot.goal} />
-              <p className="mt-2 flex items-center justify-center gap-1.5 text-center text-[11px] text-emerald-400 font-medium">
-                <Users className="h-3 w-3" /> {pot.contributors} people made this happen
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* ── MOSAIC ── */}
-        {phase === "mosaic" && (
-          <div className="flex flex-col gap-4 px-4 py-6 max-h-[72vh] overflow-y-auto">
-            <div className="text-center">
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-white">Messages from the family</p>
-              <p className="text-[11px] text-stone-500 mt-0.5">From everyone who loves you</p>
-            </div>
-            <div className="flex flex-col gap-3">
-              {(pot.tributes.length > 0 ? pot.tributes : defaultTributes).map((card) => (
-                <MemoryCardView key={card.id} card={card} />
-              ))}
-            </div>
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              whileHover={{ scale: 1.01 }}
-              transition={{ type: "spring", stiffness: 400, damping: 28 }}
-              onClick={() => setPhase("actions")}
-              className="mt-1 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5"
-              style={{ background: "linear-gradient(135deg, #fbbf24, #f97316)", boxShadow: "0 4px 16px rgba(251,146,60,0.35)" }}
-            >
-              <span style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-900">What happens next?</span>
-              <SkipForward className="h-4 w-4 text-stone-900" />
-            </motion.button>
-          </div>
-        )}
-
-        {/* ── ACTIONS ── */}
-        {phase === "actions" && (
-          <div className="flex flex-col gap-4 px-4 py-6">
-            <div className="text-center">
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-white">What would you like to do?</p>
-              <p className="text-[11px] text-stone-500 mt-0.5">Your £{pot.goal.toLocaleString()} is ready</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2.5">
-              {REVEAL_ACTIONS.map(({ icon: Icon, label, desc, gradient, textCol }) => (
-                <motion.button
-                  key={label}
-                  whileHover={{ scale: 1.04, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 450, damping: 28 }}
-                  className={cn("flex flex-col items-start gap-1.5 rounded-2xl p-3.5 text-left", `bg-gradient-to-br ${gradient}`)}
-                >
-                  <Icon className={cn("h-5 w-5", textCol)} strokeWidth={2} />
-                  <p style={{ fontFamily: "var(--font-display)" }} className={cn("text-[13px] font-medium leading-tight", textCol)}>{label}</p>
-                  <p className={cn("text-[10px] leading-tight opacity-75", textCol)}>{desc}</p>
-                </motion.button>
-              ))}
-            </div>
-            <button onClick={onClose} className="mt-1 text-[11px] text-stone-500 hover:text-stone-300 transition-colors text-center">
-              Close ceremony
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // EXPLAINER PLAYER
@@ -4685,159 +4081,17 @@ function RevealV2View() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// REVEAL DEMO VIEW — standalone tab experience
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function RevealDemoView({ pots, onLaunch }: { pots: DemoPot[]; onLaunch: (pot: DemoPot) => void }) {
-  const occasion = nextMajorOccasion();
-  const isXmas = occasion === "christmas";
-  const now = new Date(); const yr = now.getFullYear();
-  let targetDate = isXmas ? new Date(yr, 11, 25) : new Date(yr, 5, 28);
-  if (targetDate <= now) targetDate = isXmas ? new Date(yr + 1, 11, 25) : new Date(yr + 1, 5, 28);
-  const daysUntil = Math.ceil((targetDate.getTime() - now.getTime()) / 86_400_000);
-  const demoTarget = pots.find((p) => !p.isChecklist && !p.isClaimed) ?? pots[0]!;
-
-  return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(160deg, #0a0604 0%, #1a0e08 50%, #0a0604 100%)" }}>
-      {/* Particle field */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        {isXmas
-          ? SNOW.map((s) => (
-              <span key={s.id} className="animate-snow absolute rounded-full bg-white/60"
-                style={{ left: s.left, top: 0, width: s.size, height: s.size,
-                  "--dur": s.dur, "--sx": s.sx, "--drift": s.drift, animationDelay: s.delay } as React.CSSProperties} />
-            ))
-          : CONFETTI_P.map((c) => (
-              <span key={c.id} className={cn("animate-confetti absolute rounded-sm opacity-60", c.color)}
-                style={{ left: c.left, top: 0, width: c.w, height: c.h,
-                  "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
-            ))}
-      </div>
-
-      <div className="relative z-10 flex flex-col items-center px-5 pt-10 pb-24 text-center">
-        {/* Header */}
-        <div className="mb-2 flex items-center gap-2">
-          <Zap className="h-5 w-5 text-amber-400" strokeWidth={2} />
-          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80">Live Reveal Experience</p>
-        </div>
-        <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold text-white leading-tight mb-2">
-          The Reveal Ceremony
-        </h1>
-        <p className="max-w-xs text-[13px] leading-relaxed text-white/50 mb-8">
-          This is what Billy sees when the big day arrives — a cinematic, euphoric unwrap moment built by the people who love him.
-        </p>
-
-        {/* Wrapped present card */}
-        <div className="relative w-full max-w-xs overflow-hidden rounded-3xl border"
-          style={{
-            background: isXmas
-              ? "linear-gradient(145deg, #1a0808 0%, #2d1010 50%, #1a0808 100%)"
-              : "linear-gradient(145deg, #12091f 0%, #20103a 50%, #12091f 100%)",
-            borderColor: isXmas ? "rgba(220,38,38,0.3)" : "rgba(139,92,246,0.3)",
-            boxShadow: isXmas
-              ? "0 0 60px rgba(220,38,38,0.2), 0 0 0 1px rgba(220,38,38,0.15)"
-              : "0 0 60px rgba(139,92,246,0.2), 0 0 0 1px rgba(139,92,246,0.15)",
-          }}>
-          {/* Accent stripe */}
-          <div className={cn("h-[3px] w-full bg-gradient-to-r", isXmas ? "from-red-600 via-amber-400 to-red-700" : "from-violet-500 via-fuchsia-400 to-pink-500")} />
-
-          {/* Present image area */}
-          <div className="relative flex h-52 items-center justify-center">
-            {/* Glow */}
-            <div className={cn("absolute inset-0 opacity-20 blur-3xl", isXmas ? "bg-red-500" : "bg-violet-500")} />
-            <div className={cn("relative flex h-36 w-36 items-center justify-center rounded-3xl border-4",
-              isXmas ? "border-red-500/40 bg-red-900/30" : "border-violet-500/40 bg-violet-900/30")}>
-              <Gift className={cn("h-20 w-20", isXmas ? "text-red-300/80" : "text-violet-300/80")} strokeWidth={1} />
-              {/* Ribbon cross */}
-              <div className={cn("absolute inset-0 flex items-center justify-center")}>
-                <div className={cn("absolute h-full w-1 rounded-full opacity-40", isXmas ? "bg-amber-400" : "bg-pink-400")} />
-                <div className={cn("absolute h-1 w-full rounded-full opacity-40", isXmas ? "bg-amber-400" : "bg-pink-400")} />
-              </div>
-            </div>
-          </div>
-
-          {/* Info */}
-          <div className="px-5 pb-5 pt-1 text-center">
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-1"
-              style={{ color: isXmas ? "rgba(251,191,36,0.7)" : "rgba(216,180,254,0.7)" }}>
-              {isXmas ? "Christmas Surprise" : "Birthday Surprise"}
-            </p>
-            <p style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-bold text-white leading-tight mb-0.5">
-              {demoTarget.title}
-            </p>
-            <div className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 mt-1",
-              isXmas ? "bg-red-900/40 border border-red-500/30" : "bg-violet-900/40 border border-violet-500/30")}>
-              <Lock className="h-3 w-3 text-white/50" strokeWidth={2} />
-              <span className="text-[10px] text-white/50">Locked for Billy ·</span>
-              <span className={cn("text-[10px] font-bold", isXmas ? "text-amber-400" : "text-violet-300")}>
-                {daysUntil} days
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Phases list */}
-        <div className="mt-8 w-full max-w-xs">
-          {[
-            { Icon: Gift, label: "The Wrapped Present", desc: "Seasons the experience to Christmas or Birthday" },
-            { Icon: Zap, label: "Tactile Shake", desc: "The box vibrates to syncopated samba percussion" },
-            { Icon: Radio, label: "Synth Fanfare Engine", desc: "Parade drums, ringing bells, happy whistle accents" },
-            { Icon: Sparkles, label: "Dopamine Climax", desc: "Fireworks, gold sparks, funded amount slot-machine" },
-            { Icon: Star, label: "Memory Cards", desc: "Family video wishes and handwritten notes float in" },
-          ].map(({ Icon, label, desc }, i) => (
-            <div key={label} className="flex items-start gap-3 text-left mb-3">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 mt-0.5">
-                <span className="text-[10px] font-bold text-white/50">{i + 1}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <Icon className="h-3.5 w-3.5 text-amber-400/80" strokeWidth={1.75} />
-                  <p className="text-[12px] font-semibold text-white/80">{label}</p>
-                </div>
-                <p className="text-[11px] text-white/40 mt-0.5">{desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Launch button */}
-        <motion.button
-          whileHover={{ scale: 1.03, y: -3 }}
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: "spring", stiffness: 400, damping: 26 }}
-          onClick={() => onLaunch(demoTarget)}
-          className="mt-4 flex w-full max-w-xs items-center justify-center gap-3 rounded-2xl py-5 font-bold text-stone-900 shadow-2xl"
-          style={{
-            background: "linear-gradient(135deg, #fbbf24 0%, #f97316 50%, #ef4444 100%)",
-            boxShadow: "0 8px 32px rgba(251,146,60,0.5), 0 0 0 1px rgba(251,146,60,0.3)",
-          }}
-        >
-          <Zap className="h-5 w-5" strokeWidth={2.5} />
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-[17px]">Ignite &amp; Unwrap</span>
-          <Sparkles className="h-5 w-5" strokeWidth={2} />
-        </motion.button>
-
-        <p className="mt-4 text-[11px] text-white/30">
-          Triggers the full cinematic reveal with audio fanfare, fireworks, and memory cards
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "reveal2" | "about";
+type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
   const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
     { id: "parent", label: "Contribute", Icon: Users },
     { id: "receiver", label: "Billy's View", Icon: Sparkles },
     { id: "catalogue", label: "Catalogue", Icon: ShoppingBag },
-    { id: "reveal", label: "Reveal", Icon: Zap },
-    { id: "reveal2", label: "✦ V2", Icon: Sparkles },
+    { id: "reveal", label: "Reveal", Icon: Sparkles },
     { id: "about", label: "About", Icon: Info },
   ];
   return (
@@ -4854,21 +4108,17 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
               role === id
                 ? id === "reveal"
                   ? "bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md"
-                  : id === "reveal2"
-                    ? "bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white shadow-md"
-                    : id === "catalogue"
-                      ? "bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md"
-                      : "bg-white shadow-sm text-stone-900"
+                  : id === "catalogue"
+                    ? "bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md"
+                    : "bg-white shadow-sm text-stone-900"
                 : id === "reveal"
                   ? "text-amber-500"
-                  : id === "reveal2"
+                  : id === "catalogue"
                     ? "text-violet-400"
-                    : id === "catalogue"
-                      ? "text-violet-400"
-                      : "text-stone-400",
+                    : "text-stone-400",
             )}
           >
-            {role === id && id !== "reveal" && id !== "reveal2" && id !== "catalogue" && (
+            {role === id && id !== "reveal" && id !== "catalogue" && (
               <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
             )}
             <Icon className="h-3.5 w-3.5" strokeWidth={role === id ? 2.5 : 1.75} />
@@ -5078,7 +4328,7 @@ function ReceiverView({ pots, onOpenStars, onShare, onReveal, onAddGift }: {
   pots: DemoPot[];
   onOpenStars: () => void;
   onShare: () => void;
-  onReveal: (pot: DemoPot) => void;
+  onReveal: () => void;
   onAddGift: () => void;
 }) {
   // Exclude checklist pots entirely — receiver must not see "Mum Knows Best" items
@@ -5177,7 +4427,7 @@ function ReceiverView({ pots, onOpenStars, onShare, onReveal, onAddGift }: {
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 380, damping: 28 }}
-          onClick={() => onReveal(sparkGoals[0] ?? pots[0]!)}
+          onClick={() => onReveal()}
           className="relative w-full overflow-hidden rounded-2xl text-left"
           style={{
             background: "linear-gradient(135deg, #1a0e08 0%, #2c1810 50%, #1a0e08 100%)",
@@ -5290,7 +4540,6 @@ export default function DemoPage() {
   const [showStars, setShowStars] = useState(false);
   const [showNewGift, setShowNewGift] = useState(false);
   const [pots, setPots] = useState<DemoPot[]>([...INITIAL_POTS, ...CHECKLIST_POTS]);
-  const [revealPot, setRevealPot] = useState<DemoPot | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [logEntries, setLogEntries] = useState<string[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
@@ -5365,7 +4614,6 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
-      {revealPot && <RevealModal pot={revealPot} onClose={() => setRevealPot(null)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showNewGift && <NewGiftSheet onAdd={handleAddNewGift} onClose={() => setShowNewGift(false)} />}
       <AnimatePresence>{showCreatorModal && <CreatorSignUpModal onClose={() => setShowCreatorModal(false)} />}</AnimatePresence>
@@ -5408,16 +4656,12 @@ export default function DemoPage() {
           </div>
         </motion.div>
       ) : viewMode === "reveal" ? (
-        <motion.div key="reveal" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <RevealDemoView pots={pots} onLaunch={setRevealPot} />
-        </motion.div>
-      ) : viewMode === "reveal2" ? (
-        <motion.div key="reveal2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+        <motion.div key="reveal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
           <RevealV2View />
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onShare={handleShare} onReveal={setRevealPot} onAddGift={() => setShowNewGift(true)} />
+          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onShare={handleShare} onReveal={() => setViewMode("reveal")} onAddGift={() => setShowNewGift(true)} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
@@ -5553,7 +4797,7 @@ export default function DemoPage() {
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 400, damping: 26 }}
-              onClick={() => setRevealPot(surprisePots[0] ?? pots[0]!)}
+              onClick={() => setViewMode("reveal")}
               className="relative mt-4 flex w-full items-center gap-4 overflow-hidden rounded-2xl p-4 text-left"
               style={{
                 background: "linear-gradient(135deg, #1a0f0f 0%, #2d1515 50%, #1a0f0f 100%)",
