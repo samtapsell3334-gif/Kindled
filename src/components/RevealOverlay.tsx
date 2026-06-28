@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, AlertTriangle } from "lucide-react";
+import { X, Loader2, AlertTriangle, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -41,9 +41,12 @@ function useRevealStatus(taskId: string | null, initialVideoUrl?: string | null)
   const [resolvedUrl, setResolvedUrl] = useState<string | null>(initialVideoUrl ?? null);
   const attemptsRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Guards against setState / timer scheduling after the overlay unmounts
+  // (e.g. user skips while a poll request is mid-flight).
+  const mountedRef = useRef(true);
 
   const poll = useCallback(async () => {
-    if (!taskId) return;
+    if (!taskId || !mountedRef.current) return;
     if (attemptsRef.current >= POLL_MAX_ATTEMPTS) {
       setPhase("error");
       return;
@@ -53,11 +56,13 @@ function useRevealStatus(taskId: string | null, initialVideoUrl?: string | null)
 
     try {
       const res = await fetch(`/api/reveal/status/${taskId}`, { cache: "no-store" });
+      if (!mountedRef.current) return;
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const json = (await res.json()) as {
         data?: { status: string; videoUrl: string | null; error: string | null };
       };
+      if (!mountedRef.current) return;
       const { status, videoUrl } = json.data ?? {};
 
       if (status === "COMPLETED" && videoUrl) {
@@ -71,14 +76,17 @@ function useRevealStatus(taskId: string | null, initialVideoUrl?: string | null)
       }
     } catch {
       // Network blip — retry rather than hard-fail
+      if (!mountedRef.current) return;
       timerRef.current = setTimeout(() => void poll(), POLL_INTERVAL_MS);
     }
   }, [taskId]);
 
   useEffect(() => {
+    mountedRef.current = true;
     if (initialVideoUrl || !taskId) return;
     void poll();
     return () => {
+      mountedRef.current = false;
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [poll, taskId, initialVideoUrl]);
@@ -123,7 +131,7 @@ function LoadingScreen({
         <h2 className="mt-2 text-[22px] font-black leading-tight text-white">{potTitle}</h2>
         <p className="mt-1 text-[13px] text-stone-400">
           £{amountRaised.toFixed(0)} raised — your moment is being crafted
-          {"...".slice(0, dot + 1)}
+          {".".repeat(dot)}
         </p>
       </div>
 
@@ -182,17 +190,33 @@ export function RevealOverlay({
 }: RevealOverlayProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { phase, setPhase, resolvedUrl } = useRevealStatus(taskId, initialVideoUrl);
+  // When the browser blocks unmuted autoplay (the common case, since the
+  // original click gesture goes stale during the 5–60s poll), we surface a
+  // tap-to-play prompt so the reveal never sits frozen on a black frame.
+  const [needsTap, setNeedsTap] = useState(false);
 
   // Auto-play as soon as we transition to "ready"
   useEffect(() => {
     if (phase === "ready" && resolvedUrl && videoRef.current) {
       setPhase("playing");
-      videoRef.current.play().catch(() => {
-        // Autoplay blocked — show play button fallback is handled by controls
-        setPhase("playing"); // still show the player
+      void videoRef.current.play().catch(() => {
+        // Unmuted autoplay rejected — prompt the user to tap (a fresh gesture
+        // re-enables playback with sound).
+        setNeedsTap(true);
       });
     }
   }, [phase, resolvedUrl, setPhase]);
+
+  const handleTapPlay = useCallback(() => {
+    setNeedsTap(false);
+    const el = videoRef.current;
+    if (!el) return;
+    void el.play().catch(() => {
+      // Last resort: play muted so the visual still runs even if sound is blocked.
+      el.muted = true;
+      void el.play();
+    });
+  }, []);
 
   const handleSkip = useCallback(() => {
     setPhase("fadeout");
@@ -256,6 +280,21 @@ export function RevealOverlay({
               className="h-full w-full object-cover"
               style={{ display: "block" }}
             />
+          )}
+
+          {/* Tap-to-play fallback when the browser blocked unmuted autoplay */}
+          {needsTap && (phase === "ready" || phase === "playing") && (
+            <button
+              onClick={handleTapPlay}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-stone-950/40 backdrop-blur-[2px]"
+            >
+              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-white/90 shadow-2xl">
+                <Play className="ml-1 h-9 w-9 text-stone-900" fill="currentColor" />
+              </span>
+              <span className="text-[13px] font-semibold text-white drop-shadow-lg">
+                Tap to play your reveal
+              </span>
+            </button>
           )}
         </motion.div>
       )}
