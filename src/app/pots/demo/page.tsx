@@ -2509,6 +2509,268 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// WOULD YOU RATHER — 2-YEAR VISION PANEL
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const DREAM_UNLOCKS = [
+  {
+    id: "hottub",
+    label: "Hot tub",
+    desc: "Lay-Z-Spa inflatable",
+    price: 700,
+    grad: "from-cyan-500 to-teal-600",
+    glow: "rgba(20,184,166,0.45)",
+    icon: "♨️",
+    pkg: ["Lay-Z-Spa Miami", "Cover + pump", "LED light kit", "Chemical starter kit"],
+  },
+  {
+    id: "disney",
+    label: "Disneyland Paris",
+    desc: "Family of 4, 2 nights",
+    price: 1200,
+    grad: "from-violet-500 to-indigo-600",
+    glow: "rgba(139,92,246,0.45)",
+    icon: "🏰",
+    pkg: ["2-night Disney hotel", "2-day park tickets", "Character dining", "Disney gift card"],
+  },
+  {
+    id: "ebike",
+    label: "Electric bike",
+    desc: "Foldable commuter",
+    price: 900,
+    grad: "from-emerald-500 to-green-600",
+    glow: "rgba(16,185,129,0.45)",
+    icon: "⚡",
+    pkg: ["Engwe folding e-bike", "Helmet + lock", "Rear pannier bag", "Service plan 1yr"],
+  },
+  {
+    id: "spa",
+    label: "Luxury spa break",
+    desc: "2 nights for two",
+    price: 650,
+    grad: "from-rose-500 to-pink-600",
+    glow: "rgba(244,63,94,0.45)",
+    icon: "🧖",
+    pkg: ["2-night hotel stay", "Full-day spa access", "Couples massage", "Dinner for 2"],
+  },
+];
+
+const RANDOM_GIFT_SET = [
+  { label: "Lynx gift set",     price: 12  },
+  { label: "Socks (3-pack)",    price: 8   },
+  { label: "Scented candle",    price: 15  },
+  { label: "Novelty mug",       price: 10  },
+  { label: "Wine (house red)",  price: 9   },
+  { label: "Yankee Candle",     price: 18  },
+  { label: "Book voucher",      price: 10  },
+  { label: "Chocolates",        price: 11  },
+  { label: "Picture frame",     price: 14  },
+  { label: "Moisturiser set",   price: 16  },
+];
+
+function WouldYouRatherPanel({ people, each }: { people: number; each: number }) {
+  const [activeDream, setActiveDream] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e!.isIntersecting) setInView(true); }, { threshold: 0.15 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const perEvent = people * each;
+  const events = [
+    { label: "Birthday 1",  short: "B1", color: "#f59e0b", amount: perEvent },
+    { label: "Christmas 1", short: "C1", color: "#ef4444", amount: perEvent },
+    { label: "Birthday 2",  short: "B2", color: "#f59e0b", amount: perEvent },
+    { label: "Christmas 2", short: "C2", color: "#ef4444", amount: perEvent },
+  ];
+  const stackedTotal = perEvent * 4;
+
+  const dream = DREAM_UNLOCKS[activeDream]!;
+  const pct = Math.min(100, Math.round((stackedTotal / dream.price) * 100));
+  const canAfford = stackedTotal >= dream.price;
+
+  // Pick random gifts for the "without" side
+  const randomGifts = useMemo(() => {
+    const n = Math.min(people * 4, RANDOM_GIFT_SET.length);
+    return RANDOM_GIFT_SET.slice(0, n);
+  }, [people]);
+
+  return (
+    <div ref={ref} className="mt-6">
+      {/* Header */}
+      <div className="mb-4 text-center">
+        <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-stone-400">2-year picture</p>
+        <h3 style={{ fontFamily: "var(--font-display)" }}
+          className="text-[22px] font-semibold leading-tight text-stone-900">
+          Would you rather…
+        </h3>
+        <p className="mt-1 text-[12px] text-stone-400">Same circle · Same occasions · Completely different outcome</p>
+      </div>
+
+      {/* VS layout */}
+      <div className="grid grid-cols-2 gap-3">
+
+        {/* Left — random gifts pile */}
+        <div className="overflow-hidden rounded-3xl border border-red-100 bg-red-50/80">
+          <div className="bg-red-100/80 px-3 py-2 text-center">
+            <p className="text-[9px] font-black uppercase tracking-widest text-red-400">Without Kindled</p>
+            <p className="text-[11px] font-semibold text-red-700">2 years of guesswork</p>
+          </div>
+          <div className="space-y-1.5 p-3">
+            {randomGifts.map((g, i) => (
+              <motion.div key={i}
+                initial={{ opacity: 0, x: -10 }}
+                animate={inView ? { opacity: 1, x: 0 } : {}}
+                transition={{ delay: i * 0.04, type: "spring", stiffness: 400, damping: 28 }}
+                className="flex items-center gap-2 rounded-xl bg-white/70 px-2.5 py-1.5 shadow-sm">
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-lg bg-red-100">
+                  <Gift className="h-2.5 w-2.5 text-red-400" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[10px] font-semibold text-stone-600">{g.label}</p>
+                </div>
+                <span className="shrink-0 text-[9px] text-stone-400">£{g.price}</span>
+              </motion.div>
+            ))}
+            <div className="mt-2 rounded-xl border border-red-200 bg-red-100/60 px-3 py-2 text-center">
+              <p className="text-[9px] text-red-400">Forgotten by February</p>
+              <p className="text-[13px] font-black text-red-500">£{randomGifts.reduce((s,g)=>s+g.price,0)}</p>
+              <p className="text-[9px] text-red-400">in stuff you didn&apos;t want</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right — stacked dream */}
+        <div className="overflow-hidden rounded-3xl border border-amber-200/60 bg-gradient-to-b from-amber-50 to-orange-50">
+          <div className="bg-amber-400/20 px-3 py-2 text-center">
+            <p className="text-[9px] font-black uppercase tracking-widest text-amber-600">With Kindled</p>
+            <p className="text-[11px] font-semibold text-amber-800">4 events · 1 dream</p>
+          </div>
+          <div className="p-3 space-y-1.5">
+            {/* Stacking events */}
+            {events.map((ev, i) => (
+              <motion.div key={ev.label}
+                initial={{ opacity: 0, x: 10 }}
+                animate={inView ? { opacity: 1, x: 0 } : {}}
+                transition={{ delay: i * 0.07, type: "spring", stiffness: 400, damping: 28 }}
+                className="flex items-center gap-2 rounded-xl bg-white/80 px-2.5 py-1.5 shadow-sm">
+                <div className="h-2 w-2 rounded-full shrink-0" style={{ background: ev.color }} />
+                <p className="flex-1 text-[10px] font-semibold text-stone-600 truncate">{ev.label}</p>
+                <span className="text-[10px] font-black" style={{ color: ev.color }}>+£{ev.amount}</span>
+              </motion.div>
+            ))}
+            {/* Total pot */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={inView ? { opacity: 1, scale: 1 } : {}}
+              transition={{ delay: 0.35, type: "spring", stiffness: 320, damping: 24 }}
+              className={`rounded-xl bg-gradient-to-r ${dream.grad} p-2.5 text-center`}
+              style={{ boxShadow: `0 4px 16px ${dream.glow}` }}>
+              <p className="text-[9px] font-black uppercase tracking-wider text-white/70">pot total</p>
+              <p className="text-[22px] font-black text-white leading-none" style={{ fontFamily: "var(--font-display)" }}>
+                £{stackedTotal}
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Dream picker */}
+      <div className="mt-4">
+        <p className="mb-2.5 text-center text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+          What £{stackedTotal} could unlock
+        </p>
+        <div className="grid grid-cols-4 gap-1.5">
+          {DREAM_UNLOCKS.map((d, i) => (
+            <button key={d.id} onClick={() => setActiveDream(i)}
+              className={cn(
+                "rounded-2xl py-2.5 text-center transition-all",
+                activeDream === i
+                  ? `bg-gradient-to-b ${d.grad} text-white shadow-md`
+                  : "bg-stone-100 text-stone-500",
+              )}>
+              <span className="block text-[18px]">{d.icon}</span>
+              <span className="block text-[9px] font-bold leading-tight mt-0.5 px-0.5">{d.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Dream unlock card */}
+      <AnimatePresence mode="wait">
+        <motion.div key={dream.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ type: "spring", stiffness: 400, damping: 28 }}
+          className={`mt-3 overflow-hidden rounded-3xl border border-stone-100 bg-white shadow-sm`}>
+
+          {/* Header */}
+          <div className={`bg-gradient-to-r ${dream.grad} px-5 py-4`}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <span className="text-[28px]">{dream.icon}</span>
+                <p className="mt-1 text-[17px] font-black text-white leading-tight">{dream.label}</p>
+                <p className="text-[11px] text-white/70">{dream.desc}</p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-[9px] font-black uppercase tracking-wider text-white/60">worth</p>
+                <p className="text-[26px] font-black text-white leading-none" style={{ fontFamily: "var(--font-display)" }}>
+                  £{dream.price}
+                </p>
+                {canAfford
+                  ? <span className="inline-block mt-1 rounded-full bg-white/25 px-2 py-0.5 text-[9px] font-black text-white">Unlocked</span>
+                  : <span className="inline-block mt-1 rounded-full bg-black/20 px-2 py-0.5 text-[9px] font-black text-white/70">£{dream.price - stackedTotal} to go</span>
+                }
+              </div>
+            </div>
+            {/* Progress bar */}
+            <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-black/20">
+              <motion.div
+                className="h-full rounded-full bg-white"
+                initial={{ width: "0%" }}
+                animate={{ width: `${pct}%` }}
+                transition={{ duration: 0.7, delay: 0.1 }}
+                style={{ boxShadow: "0 0 8px rgba(255,255,255,0.6)" }}
+              />
+            </div>
+            <p className="mt-1 text-[9px] text-white/55">{pct}% funded after 2 years · {4} occasions pooled</p>
+          </div>
+
+          {/* What's in the package */}
+          <div className="px-5 py-4">
+            <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-stone-400">What&apos;s included</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {dream.pkg.map((item, i) => (
+                <div key={i} className="flex items-center gap-2 rounded-xl bg-stone-50 px-2.5 py-2">
+                  <div className={`h-1.5 w-1.5 rounded-full shrink-0 bg-gradient-to-r ${dream.grad}`} />
+                  <p className="text-[10px] font-semibold text-stone-600 leading-tight">{item}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex items-center gap-3 rounded-2xl border border-stone-100 bg-stone-50/80 px-4 py-3">
+              <div className="h-8 w-8 shrink-0 flex items-center justify-center rounded-xl bg-red-100">
+                <X className="h-4 w-4 text-red-400" />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-stone-700">vs. the alternative</p>
+                <p className="text-[10px] text-stone-400">
+                  {people * 4} separate presents &middot; none of them {dream.label.toLowerCase()}
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // WOULD YOU RATHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -2741,6 +3003,9 @@ function WouldYouRather() {
           <p className="mt-2 text-center text-[10px] text-stone-400">Free forever · No credit card · Works on any device</p>
         </div>
       </div>
+
+      {/* ── Would You Rather — 2-year vision ── */}
+      <WouldYouRatherPanel people={people} each={each} />
 
       {/* ── Social proof chips ── */}
       <div className="-mx-4 mt-3 overflow-x-auto px-4">
