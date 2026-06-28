@@ -4858,7 +4858,8 @@ export default function DemoPage() {
   const [showAiReveal, setShowAiReveal] = useState(false);
   // Demo: use a static preview video so the overlay works without a real API key.
   // In production replace with a real taskId from POST /api/reveal/request.
-  const DEMO_REVEAL_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4";
+  // W3C-hosted cinematic clip — the old Google sample bucket now returns 403.
+  const DEMO_REVEAL_VIDEO = "https://media.w3.org/2010/05/sintel/trailer.mp4";
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));

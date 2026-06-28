@@ -228,6 +228,13 @@ export function RevealOverlay({
     setTimeout(onComplete, 700);
   }, [setPhase, onComplete]);
 
+  // If the source can't load or decode (dead URL, unsupported codec), fall back
+  // to the graceful error screen instead of a frozen black frame.
+  const handleVideoError = useCallback(() => {
+    setNeedsTap(false);
+    setPhase("error");
+  }, [setPhase]);
+
   return (
     <AnimatePresence>
       {phase !== "fadeout" && (
@@ -275,6 +282,7 @@ export function RevealOverlay({
               ref={videoRef}
               src={resolvedUrl}
               onEnded={handleVideoEnded}
+              onError={handleVideoError}
               playsInline
               muted={false}
               className="h-full w-full object-cover"
