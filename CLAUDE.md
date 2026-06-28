@@ -124,3 +124,5 @@ KLING_API_KEY=""
 REVEAL_PROVIDER="kling"   # or "runway"
 RUNWAY_API_KEY=""
 ```
+
+<!-- deploy-trigger: 2026-06-28 -->
