@@ -8,7 +8,7 @@ import {
   ShoppingBag, RefreshCw, CreditCard, Gift, Flame,
   Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
   Landmark, Radio, Wrench, Trophy, Wallet, Eye,
-  Bike, Cake, TreePine, PenLine,
+  Bike, Cake, TreePine, PenLine, Waves, Castle,
   AlertCircle, Copy, TrendingUp, Info, CircleEllipsis, CalendarDays, Gamepad2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -2513,7 +2513,18 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
 // WOULD YOU RATHER — 2-YEAR VISION PANEL
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const DREAM_UNLOCKS = [
+interface DreamUnlock {
+  id: string;
+  label: string;
+  desc: string;
+  price: number;
+  grad: string;
+  glow: string;
+  icon: LucideIcon;
+  pkg: string[];
+}
+
+const DREAM_UNLOCKS: DreamUnlock[] = [
   {
     id: "hottub",
     label: "Hot tub",
@@ -2521,7 +2532,7 @@ const DREAM_UNLOCKS = [
     price: 700,
     grad: "from-cyan-500 to-teal-600",
     glow: "rgba(20,184,166,0.45)",
-    icon: "♨️",
+    icon: Waves,
     pkg: ["Lay-Z-Spa Miami", "Cover + pump", "LED light kit", "Chemical starter kit"],
   },
   {
@@ -2531,7 +2542,7 @@ const DREAM_UNLOCKS = [
     price: 1200,
     grad: "from-violet-500 to-indigo-600",
     glow: "rgba(139,92,246,0.45)",
-    icon: "🏰",
+    icon: Castle,
     pkg: ["2-night Disney hotel", "2-day park tickets", "Character dining", "Disney gift card"],
   },
   {
@@ -2541,7 +2552,7 @@ const DREAM_UNLOCKS = [
     price: 900,
     grad: "from-emerald-500 to-green-600",
     glow: "rgba(16,185,129,0.45)",
-    icon: "⚡",
+    icon: Bike,
     pkg: ["Engwe folding e-bike", "Helmet + lock", "Rear pannier bag", "Service plan 1yr"],
   },
   {
@@ -2551,7 +2562,7 @@ const DREAM_UNLOCKS = [
     price: 650,
     grad: "from-rose-500 to-pink-600",
     glow: "rgba(244,63,94,0.45)",
-    icon: "🧖",
+    icon: Sparkles,
     pkg: ["2-night hotel stay", "Full-day spa access", "Couples massage", "Dinner for 2"],
   },
 ];
@@ -2694,7 +2705,7 @@ function WouldYouRatherPanel({ people, each }: { people: number; each: number })
                   ? `bg-gradient-to-b ${d.grad} text-white shadow-md`
                   : "bg-stone-100 text-stone-500",
               )}>
-              <span className="block text-[18px]">{d.icon}</span>
+              <d.icon className="mx-auto h-[18px] w-[18px]" strokeWidth={2} />
               <span className="block text-[9px] font-bold leading-tight mt-0.5 px-0.5">{d.label}</span>
             </button>
           ))}
@@ -2714,7 +2725,7 @@ function WouldYouRatherPanel({ people, each }: { people: number; each: number })
           <div className={`bg-gradient-to-r ${dream.grad} px-5 py-4`}>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="text-[28px]">{dream.icon}</span>
+                <dream.icon className="h-7 w-7 text-white" strokeWidth={2} />
                 <p className="mt-1 text-[17px] font-black text-white leading-tight">{dream.label}</p>
                 <p className="text-[11px] text-white/70">{dream.desc}</p>
               </div>
