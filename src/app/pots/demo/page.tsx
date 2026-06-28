@@ -19,6 +19,7 @@ import type { GiftingMode } from "@/types/pots";
 import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
 import { GeneratedReveal } from "@/components/GeneratedReveal";
+import { InvestorWarRoom } from "@/components/InvestorWarRoom";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -4435,7 +4436,7 @@ function RevealV2View() {
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about" | "stars";
+type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about" | "stars" | "investor";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
   const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
@@ -4445,6 +4446,7 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
     { id: "catalogue", label: "Catalogue", Icon: ShoppingBag },
     { id: "reveal", label: "Reveal", Icon: Sparkles },
     { id: "about", label: "About", Icon: Info },
+    { id: "investor", label: "Investor", Icon: Lock },
   ];
   return (
     <div className="sticky top-0 z-30 px-4 pt-3 pb-2 bg-[#fdf9f5]/90 backdrop-blur-md border-b border-stone-100">
@@ -4464,17 +4466,21 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
                     ? "bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md"
                     : id === "stars"
                       ? "bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md"
-                      : "bg-white shadow-sm text-stone-900"
+                      : id === "investor"
+                        ? "bg-gradient-to-br from-slate-800 to-blue-900 text-white shadow-md"
+                        : "bg-white shadow-sm text-stone-900"
                 : id === "reveal"
                   ? "text-amber-500"
                   : id === "catalogue"
                     ? "text-violet-400"
                     : id === "stars"
                       ? "text-violet-500"
-                      : "text-stone-400",
+                      : id === "investor"
+                        ? "text-blue-600"
+                        : "text-stone-400",
             )}
           >
-            {role === id && id !== "reveal" && id !== "catalogue" && id !== "stars" && (
+            {role === id && id !== "reveal" && id !== "catalogue" && id !== "stars" && id !== "investor" && (
               <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
             )}
             <Icon className="h-3.5 w-3.5" strokeWidth={role === id ? 2.5 : 1.75} />
@@ -4993,6 +4999,14 @@ export default function DemoPage() {
         <motion.div key="about" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
           <AboutPage />
         </motion.div>
+      ) : viewMode === "investor" ? (
+        <motion.div key="investor" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
+          <div className="px-3 py-4">
+            <InvestorPinGate>
+              <InvestorWarRoom embedded />
+            </InvestorPinGate>
+          </div>
+        </motion.div>
       ) : viewMode === "catalogue" ? (
         <motion.div key="catalogue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
           <CatalogueView onAdd={handleAddItem} />
@@ -5022,7 +5036,7 @@ export default function DemoPage() {
               <Play className="h-5 w-5" strokeWidth={3} />
               Play AI Reveal
             </motion.button>
-            <p className="text-[10px] text-stone-500">Tap to experience the full-screen reveal · Demo uses a sample video</p>
+            <p className="text-[10px] text-stone-500">Tap to experience the full-screen reveal · Generated live from this fire</p>
             {/* Classic reveal underneath */}
             <div className="mt-4 w-full border-t border-white/10 pt-6">
               <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-stone-500">Or — classic reveal</p>
