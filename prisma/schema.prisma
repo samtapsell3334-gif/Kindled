@@ -70,6 +70,10 @@ model User {
   /// Whether the user has completed onboarding (phone verified, profile set)
   isRegistered          Boolean  @default(false)
   cashbackWalletBalance Decimal  @default(0) @db.Decimal(10, 2)
+  /// Stripe Connect Express account ID — populated after host completes onboarding.
+  stripeAccountId       String?  @unique
+  /// Stripe Customer ID — populated when a giver saves a card for future payments.
+  stripeCustomerId      String?  @unique
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
@@ -195,6 +199,8 @@ model Contribution {
   amount          Decimal            @db.Decimal(10, 2)
   paymentMethod   PaymentMethod
   status          ContributionStatus @default(PENDING)
+  /// Stripe PaymentIntent ID — set once the intent is created, used for webhook reconciliation.
+  stripeIntentId  String?            @unique
   /// Optional text tribute shown in the reveal ceremony message cards
   message         String?
   /// Optional video tribute URL shown in the reveal ceremony showreel

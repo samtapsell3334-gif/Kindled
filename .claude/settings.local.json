@@ -87,7 +87,12 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
       "Bash(mkdir -p \"/Users/samueltapsell/untitled folder/src/app/api/reveal/status/[taskId]\")",
       "Bash(grep -n \"showCreatorModal\\\\|showReceiverSignUp\\\\|</div>$\" \"/Users/samueltapsell/untitled folder/src/app/pots/demo/page.tsx\")",
-      "Bash(grep -n 'db\\\\.revealTask\\\\|db\\\\.pot\\\\.update\\\\|db\\\\.$transaction' '/Users/samueltapsell/untitled folder/src/lib/ai-reveal.ts')"
+      "Bash(grep -n 'db\\\\.revealTask\\\\|db\\\\.pot\\\\.update\\\\|db\\\\.$transaction' '/Users/samueltapsell/untitled folder/src/lib/ai-reveal.ts')",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\({**d.get\\('dependencies',{}\\), **d.get\\('devDependencies',{}\\)}, indent=2\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d.get\\('compilerOptions',{}\\).get\\('strictNullChecks'\\), d.get\\('compilerOptions',{}\\).get\\('exactOptionalPropertyTypes'\\)\\)\")",
+      "Bash(node -e \"require\\('/Users/samueltapsell/untitled folder/node_modules/stripe'\\)\")",
+      "Bash(node -e \"const s = require\\('/Users/samueltapsell/untitled folder/node_modules/stripe'\\); console.log\\(Object.keys\\(s.LATEST_API_VERSION || {}\\).length > 0 ? s.LATEST_API_VERSION : require\\('/Users/samueltapsell/untitled folder/node_modules/stripe/esm/apiVersion.js'\\)\\)\")",
+      "Bash(node -e \"const pkg=require\\('/Users/samueltapsell/untitled folder/node_modules/stripe/package.json'\\); console.log\\(pkg.version\\)\")"
     ]
   }
 }
