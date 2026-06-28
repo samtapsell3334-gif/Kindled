@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import type { GiftingMode } from "@/types/pots";
 import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
+import { RevealOverlay } from "@/components/RevealOverlay";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -4853,6 +4854,11 @@ export default function DemoPage() {
   const [previewReceiver, setPreviewReceiver] = useState(false);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
   const [showReceiverSignUp, setShowReceiverSignUp] = useState(false);
+  // AI reveal overlay — shown when user clicks into the Reveal tab
+  const [showAiReveal, setShowAiReveal] = useState(false);
+  // Demo: use a static preview video so the overlay works without a real API key.
+  // In production replace with a real taskId from POST /api/reveal/request.
+  const DEMO_REVEAL_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4";
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));
@@ -4985,7 +4991,36 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "reveal" ? (
         <motion.div key="reveal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-          <RevealV2View />
+          {/* AI Reveal trigger card — shown before the overlay fires */}
+          <div className="flex flex-col items-center gap-6 px-6 py-10 text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-xl shadow-amber-900/30">
+              <Sparkles className="h-10 w-10 text-stone-900" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Immersive AI Reveal</p>
+              <h2 className="mt-2 text-[24px] font-black leading-tight text-white">
+                Billy&apos;s reveal is ready
+              </h2>
+              <p className="mt-2 text-[13px] leading-relaxed text-stone-400">
+                A personalised cinematic video has been generated just for this moment.
+                Full-screen. No spoilers. One shot.
+              </p>
+            </div>
+            <motion.button
+              whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
+              onClick={() => setShowAiReveal(true)}
+              className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 py-4 text-[16px] font-black text-stone-900 shadow-xl shadow-amber-900/40"
+            >
+              <Play className="h-5 w-5" strokeWidth={3} />
+              Play AI Reveal
+            </motion.button>
+            <p className="text-[10px] text-stone-500">Tap to experience the full-screen reveal · Demo uses a sample video</p>
+            {/* Classic reveal underneath */}
+            <div className="mt-4 w-full border-t border-white/10 pt-6">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-stone-500">Or — classic reveal</p>
+              <RevealV2View />
+            </div>
+          </div>
         </motion.div>
       ) : viewMode === "stars" ? (
         <motion.div key="stars" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
@@ -5291,6 +5326,17 @@ export default function DemoPage() {
       </motion.div>
       )}
       </AnimatePresence>
+
+      {/* AI Reveal Overlay — fixed, covers full viewport on reveal */}
+      {showAiReveal && (
+        <RevealOverlay
+          taskId={null}
+          videoUrl={DEMO_REVEAL_VIDEO}
+          potTitle="Billy's Christmas Wish"
+          amountRaised={486}
+          onComplete={() => setShowAiReveal(false)}
+        />
+      )}
     </div>
   );
 }

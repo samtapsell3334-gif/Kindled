@@ -106,6 +106,9 @@ model Pot {
   /// The next milestone reveal date (e.g. Christmas morning or a birthday).
   /// Null for LIVE_FEED pots with no fixed deadline.
   eventDate      DateTime?
+  /// CDN URL of the AI-generated reveal video, populated once generation succeeds.
+  /// Null until a RevealTask for this pot reaches status COMPLETED.
+  revealVideoUrl String?
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
@@ -113,6 +116,7 @@ model Pot {
   items         PotItem[]
   contributions Contribution[]
   intentNodes   IntentDataNode[]
+  revealTasks   RevealTask[]
 
   @@index([creatorId])
   @@index([status])
@@ -121,6 +125,40 @@ model Pot {
   // AdTech: segment programmatic bids by gifting mode and status
   @@index([mode, status])
   @@map("pots")
+}
+
+enum RevealTaskStatus {
+  PENDING    // Submitted to provider, awaiting processing
+  PROCESSING // Provider has started rendering
+  COMPLETED  // Video ready at videoUrl
+  FAILED     // Generation failed — surface fallback ceremony
+}
+
+/// Tracks an AI video generation job for a pot's reveal ceremony.
+/// One pot may have multiple tasks if the first fails and is retried.
+/// Only the most recent COMPLETED task's videoUrl is shown.
+model RevealTask {
+  id         String           @id @default(cuid())
+  potId      String
+  /// Opaque task identifier returned by the video provider (Kling / Runway).
+  providerTaskId String       @unique
+  /// Which provider was used — allows swapping without losing history.
+  provider   String           @default("kling")
+  /// The prompt submitted to the provider, stored for debugging / replay.
+  prompt     String           @db.Text
+  status     RevealTaskStatus @default(PENDING)
+  /// Final CDN URL from the provider once status = COMPLETED.
+  videoUrl   String?
+  /// Raw error payload from the provider if status = FAILED.
+  errorPayload String?        @db.Text
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  pot        Pot              @relation(fields: [potId], references: [id], onDelete: Cascade)
+
+  @@index([potId, status])
+  @@index([status, createdAt])
+  @@map("reveal_tasks")
 }
 
 model PotItem {
