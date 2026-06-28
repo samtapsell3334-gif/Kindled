@@ -1,0 +1,317 @@
+{
+  "meta": {
+    "company": "Kindled",
+    "tagline": "The gifting platform that turns a family's love into something worth keeping.",
+    "confidential": "Private & Confidential — Not for Distribution"
+  },
+
+  "why": {
+    "headline": "The Problem Is Universal. The Solution Has Never Existed.",
+    "subheadline": "Every year, billions are spent on gifts nobody wanted, by people who felt obliged to guess.",
+    "problem": {
+      "label": "The Broken Status Quo",
+      "stats": [
+        {
+          "figure": "£3.2B",
+          "caption": "spent on unwanted gifts in the UK every year",
+          "source": "Halifax / OnePoll, 2023"
+        },
+        {
+          "figure": "78%",
+          "caption": "of UK adults feel stressed buying gifts",
+          "source": "YouGov UK, 2023"
+        },
+        {
+          "figure": "1 in 5",
+          "caption": "gifts are duplicated or returned",
+          "source": "YouGov UK, 2023"
+        },
+        {
+          "figure": "30%",
+          "caption": "more household waste in December alone",
+          "source": "WRAP UK, 2022"
+        }
+      ],
+      "copy": "The gifting market is broken in a way that feels personal to everyone. The giver feels pressure, anxiety, and the fear of getting it wrong. The receiver gets a pile of things they didn't choose. Everyone involved has quietly wished there was a better way — but no product has made it simple enough to actually change behaviour."
+    },
+    "solution": {
+      "label": "Why Kindled Wins",
+      "headline": "One coordinated pot. Real things people actually want.",
+      "copy": "Kindled replaces the chaos of uncoordinated gift-buying with a single, beautiful 'Fire' — a shared pot where everyone chips in. The receiver chooses what they want. Contributors give confidently. The moment of reveal becomes a shared occasion rather than an awkward exchange.",
+      "points": [
+        {
+          "title": "The 1-in-6 Viral Rule",
+          "body": "Every time one person creates a Fire, they invite an average of 6 contributors. Each of those contributors experiences the platform — and the majority go on to create their own Fire. This is not paid acquisition. It is organic, peer-led growth built into the core product loop."
+        },
+        {
+          "title": "Removes the Awkwardness",
+          "body": "Asking for money as a gift is socially uncomfortable. Kindled reframes it entirely — you are not asking for cash, you are curating a meaningful experience that your loved ones can contribute to with pride. The platform provides the social cover that makes participation feel natural."
+        },
+        {
+          "title": "The Right Moment in Culture",
+          "body": "Post-pandemic consumers have fundamentally shifted. Personalisation is now an expectation, not a premium. Generic vouchers feel lazy. Experiences beat objects. Kindled is the product this cultural shift has been waiting for."
+        }
+      ]
+    },
+    "howItWorks": {
+      "label": "How It Works",
+      "headline": "Three steps. Millions of moments.",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Host Creates a Fire",
+          "body": "In under two minutes, the receiver (or someone acting on their behalf) builds a wishlist — a single goal, or a collection of dreams. They set a target, choose a reveal date, and share a link. No app download required for contributors."
+        },
+        {
+          "number": "02",
+          "title": "Givers Contribute",
+          "body": "Family, friends, and colleagues chip in whatever feels right — £10, £50, £200. Open Banking makes the payment frictionless and fee-light. Each contribution is confirmed in seconds. Contributors can optionally leave a message or a short video that becomes part of the reveal."
+        },
+        {
+          "number": "03",
+          "title": "The Reveal Moment",
+          "body": "On the chosen date — a birthday morning, Christmas Day, an anniversary — the receiver opens their Fire. A personalised AI-generated cinematic video plays. The messages and faces of everyone who contributed appear. It is not a notification. It is an occasion."
+        }
+      ]
+    },
+    "whyNow": {
+      "label": "Why Now",
+      "headline": "Three tailwinds converging at once.",
+      "points": [
+        {
+          "title": "Open Banking Is Mature",
+          "body": "UK Open Banking adoption crossed 10 million users in 2023. Account-to-account payments are now fast, trusted, and dramatically cheaper than card rails. Kindled is built on this infrastructure from day one — giving us a structural cost advantage over any competitor still routing through Visa and Mastercard."
+        },
+        {
+          "title": "AI Has Unlocked a New Category of Emotion",
+          "body": "The AI-generated reveal video is not a gimmick — it is the product's emotional centrepiece. Two years ago this was impossible at consumer scale. Today it costs pennies per video and creates a moment that people genuinely share. That shareability is the distribution engine."
+        },
+        {
+          "title": "The Market Is Fragmented and Waiting",
+          "body": "There is no dominant, consumer-facing group-gifting product in the UK. Existing solutions are either clunky (PayPal pools), B2B only (corporate gifting platforms), or solve a narrow slice (GoFundMe is charity-focused). Kindled is the first product designed for the everyday gifting moment — built beautifully and end-to-end."
+        }
+      ]
+    }
+  },
+
+  "engine": {
+    "headline": "Two Phases. One Compounding Machine.",
+    "subheadline": "Phase 1 builds the flywheel. Phase 2 monetises the data it generates.",
+    "phase1": {
+      "label": "Phase 1 — Foundation",
+      "period": "Months 1–12",
+      "tagline": "Build the viral loop. Capture the intent signal.",
+      "summary": "The primary objective of Phase 1 is user acquisition through product virality, not paid marketing. Every Fire created is a distribution event. Every contributor is a future host. The platform compounds without ad spend.",
+      "pillars": [
+        {
+          "title": "The Viral Loop",
+          "body": "Host creates Fire → invites 6 contributors → contributors experience the product → 1 in 6 creates their own Fire. At scale, this produces organic growth curves that paid acquisition cannot replicate economically."
+        },
+        {
+          "title": "Intent Data Capture",
+          "body": "When a user adds a wishlist item, they are declaring exactly what they want to buy — category, price point, brand affinity — before the transaction occurs. This is the most valuable signal in commerce. Kindled captures it at the moment of highest intent and at zero marginal cost."
+        },
+        {
+          "title": "Open Banking Revenue",
+          "body": "A 0.5% platform fee on contributions processed via Open Banking. Structurally lower than card processing fees. Passed through to contributors as a better experience, retained by the platform as margin."
+        },
+        {
+          "title": "Cashback Flywheel",
+          "body": "Sponsored retailers pay to have their products featured on the platform's wishlist catalogue. Contributors who purchase via Kindled earn cashback, which they can use on future contributions. This creates a closed-loop economy that increases contribution frequency and average order value."
+        }
+      ],
+      "metrics": [
+        { "label": "Target Fires created (Y1)", "value": "50,000" },
+        { "label": "Average contributors per Fire", "value": "6" },
+        { "label": "Projected contribution volume (Y1)", "value": "£12M" },
+        { "label": "Platform fee revenue (Y1)", "value": "£60K" }
+      ]
+    },
+    "phase2": {
+      "label": "Phase 2 — Scale",
+      "period": "Months 12–36",
+      "tagline": "Sell the signal. Power the prediction engine.",
+      "summary": "Phase 2 activates the B2B revenue layer that Phase 1 quietly built. The intent data accumulated during Phase 1 is now a licensed asset — sold to retailers, brands, and programmatic advertisers who pay significant premiums for verified purchase intent at category level.",
+      "pillars": [
+        {
+          "title": "Predictive B2B Licensing",
+          "body": "Aggregated, anonymised intent data is packaged as a real-time signal feed. A furniture retailer can buy a segment of users who declared sofa intent in the last 30 days, in the £400–£900 range, before those users have spent anywhere. This is a category that currently doesn't exist at consumer scale."
+        },
+        {
+          "title": "Temporal Advantage Windows",
+          "body": "Between the date a pot is funded and the reveal date (typically 10–20 days), Kindled runs a reverse-auction among relevant retailers. The winning brand gets placement at the reveal moment and a verified buyer signal. CPM rates in this window are 3–5x standard display advertising."
+        },
+        {
+          "title": "Stripe Connect Payouts",
+          "body": "As contribution volume scales, the platform transitions to full Stripe Connect (Express) — enabling instant host payouts, simplified compliance, and the infrastructure for a future financial services layer (BNPL, savings products, gift registries)."
+        },
+        {
+          "title": "Enterprise Gifting API",
+          "body": "Corporate HR and rewards teams pay to white-label Kindled Fires for employee milestones — work anniversaries, retirement, new baby. B2B contracts at £1,000–£10,000 per month with zero CAC (pure outbound sales)."
+        }
+      ],
+      "metrics": [
+        { "label": "Intent data segments exportable", "value": "40+" },
+        { "label": "Target B2B clients (Y2)", "value": "25" },
+        { "label": "Projected B2B revenue (Y2)", "value": "£1.2M" },
+        { "label": "Blended platform revenue (Y3)", "value": "£8M+" }
+      ]
+    }
+  },
+
+  "journey": {
+    "headline": "Four Moments. One Memory.",
+    "subheadline": "This is what Kindled feels like from the inside.",
+    "stages": [
+      {
+        "id": "host",
+        "persona": "The Host",
+        "moment": "Starting a Fire",
+        "emotion": "Relief and Excitement",
+        "narrative": "Sarah is turning 40. She knows exactly what she wants — a weekend spa break she'd never buy herself. She opens Kindled, names her Fire, sets the target, adds the experience. It takes ninety seconds. She shares the link in the family WhatsApp. She feels none of the awkwardness of asking. She feels the quiet joy of being understood.",
+        "insight": "The insight: people don't want to be modest about what they want. They just need social permission to be specific. Kindled provides that permission.",
+        "steps": [
+          "Creates Fire in 90 seconds",
+          "Sets target amount and reveal date",
+          "Shares a single link — no app required for contributors",
+          "Receives real-time notifications as the pot fills"
+        ]
+      },
+      {
+        "id": "giver",
+        "persona": "The Giver",
+        "moment": "Contributing with Ease",
+        "emotion": "Confidence and Pride",
+        "narrative": "Sarah's brother James gets the link. He clicks it. He can see exactly what the spa break costs, how much has already been raised, and what a meaningful contribution looks like. He chips in £50 via Open Banking — no card details, confirmed in four seconds. He leaves a short voice message. He feels good about this gift in a way he rarely has before.",
+        "insight": "The insight: givers want to feel their contribution matters. A coordinated pot with a visible target makes every amount feel significant, not arbitrary.",
+        "steps": [
+          "Opens link on any device — no account required",
+          "Sees the goal, the progress, and suggested contribution amounts",
+          "Pays via Open Banking in four seconds",
+          "Optionally leaves a message or short video"
+        ]
+      },
+      {
+        "id": "reveal",
+        "persona": "The Reveal",
+        "moment": "The AI Cinematic Moment",
+        "emotion": "Surprise and Belonging",
+        "narrative": "On Sarah's birthday morning, she opens her Fire. A full-screen, AI-generated video plays — her name, the spa, the faces and voices of everyone who contributed. Her sister's video message plays automatically. It is cinematic, personal, and completely unexpected. She cries. She shares it. Eight people who see it immediately think: I want this for someone I love.",
+        "insight": "The insight: the reveal is the distribution engine. A shareable emotional moment is worth more than any ad campaign. This is how Kindled grows.",
+        "steps": [
+          "Receives notification: 'Your Fire is fully kindled'",
+          "Opens full-screen AI-generated reveal video",
+          "Watches messages and tributes from every contributor",
+          "Shares the moment — generating organic top-of-funnel awareness"
+        ]
+      },
+      {
+        "id": "loop",
+        "persona": "The Loop",
+        "moment": "Why They Come Back",
+        "emotion": "Habit and Community",
+        "narrative": "Three of the twelve people who watched Sarah's reveal video go on to create their own Fire within the following month. James — who gifted £50 — realises this is how he wants to do gifts from now on. He creates a Fire for his son's birthday. The loop closes. The platform grows without an acquisition budget.",
+        "insight": "The insight: the product's best feature is the feeling it creates. Feelings become habits. Habits become retention. This is a gifting platform with social network dynamics.",
+        "steps": [
+          "Contributors become hosts — the 1-in-6 conversion",
+          "Repeat contribution behaviour builds cashback balance",
+          "Social proof drives referral without explicit referral mechanics",
+          "Each Fire is a new distribution event for the platform"
+        ]
+      }
+    ]
+  },
+
+  "roadmap": {
+    "headline": "Execution in Phases. Compounding by Design.",
+    "subheadline": "Each phase unlocks the next. Nothing is speculative — every milestone has a clear strategic purpose.",
+    "phases": [
+      {
+        "phase": "Phase 1",
+        "period": "Q3 2026 — Q2 2027",
+        "label": "Foundation",
+        "status": "in_progress",
+        "milestones": [
+          {
+            "title": "Core Product Launch",
+            "quarter": "Q3 2026",
+            "why": "The MVP establishes the product loop: Host creates Fire → Givers contribute → Reveal moment. Without this working end-to-end, nothing else matters. Speed to market is the priority — the viral loop cannot start until the first Fire is created.",
+            "deliverables": ["Fire creation flow", "Open Banking contributions", "Basic reveal ceremony", "Shareable link infrastructure"]
+          },
+          {
+            "title": "Viral Loop Instrumentation",
+            "quarter": "Q3 2026",
+            "why": "We need to know whether the 1-in-6 conversion is happening in practice. This milestone instruments the full contributor-to-host funnel, enabling us to optimise the moments where contributors are most likely to create their own Fire.",
+            "deliverables": ["Referral attribution tracking", "Contributor-to-host conversion funnel", "In-product 'Create your own Fire' prompts", "Cohort analysis dashboard"]
+          },
+          {
+            "title": "Intent Data Architecture",
+            "quarter": "Q4 2026",
+            "why": "The intent data layer is the foundation of Phase 2 revenue. Every wishlist item added is a signal. We build the capture, categorisation, and anonymisation infrastructure now — so that by the time we go to B2B market in Phase 2, we have 12 months of clean, exportable data.",
+            "deliverables": ["IntentDataNode schema and capture pipeline", "Category taxonomy and enrichment", "Anonymisation and GDPR compliance layer", "Internal analytics dashboard"]
+          },
+          {
+            "title": "Open Banking & Fee Engine",
+            "quarter": "Q4 2026",
+            "why": "Open Banking is our structural cost advantage. A2A payments cost ~80% less than card processing. This milestone locks in the payment infrastructure and the 0.5% platform fee — the first revenue stream — before scaling contribution volume.",
+            "deliverables": ["Open Banking provider integration", "Fee calculation engine (tested to financial standard)", "Stripe Connect onboarding for hosts", "Contribution reconciliation and ledger"]
+          },
+          {
+            "title": "AI Reveal — General Availability",
+            "quarter": "Q1 2027",
+            "why": "The AI reveal video is the product's emotional centrepiece and primary distribution mechanism. Once it is live and shareable, every funded Fire becomes a piece of branded content that reaches new audiences organically. This milestone is the ignition point for top-of-funnel growth.",
+            "deliverables": ["Kling / Runway integration", "Per-pot cinematic prompt engine", "Video CDN and delivery pipeline", "Social sharing optimisation"]
+          },
+          {
+            "title": "Cashback Catalogue & Retailer Integration",
+            "quarter": "Q2 2027",
+            "why": "The cashback catalogue creates the closed-loop economy: contributors earn cashback, which they spend on future contributions, which generates more data, which attracts more retailers. This is the flywheel that makes Phase 2 possible.",
+            "deliverables": ["Curated product catalogue (72 initial SKUs)", "Sponsored slot auction infrastructure", "Cashback wallet and redemption flow", "First 10 retail partnerships"]
+          }
+        ]
+      },
+      {
+        "phase": "Phase 2",
+        "period": "Q3 2027 — Q2 2028",
+        "label": "Scale",
+        "status": "planned",
+        "milestones": [
+          {
+            "title": "B2B Intent Data Licensing",
+            "quarter": "Q3 2027",
+            "why": "By this point we have 12+ months of anonymised intent data at category level. We package it as a licensed signal feed for retailers, brands, and programmatic buyers. This is a high-margin, recurring revenue stream with no marginal cost per sale.",
+            "deliverables": ["Data export API", "Segment builder (category, price, recency)", "First 10 paying B2B clients", "Revenue target: £300K ARR"]
+          },
+          {
+            "title": "Temporal Advantage Windows",
+            "quarter": "Q3 2027",
+            "why": "The 10–20 day window between pot funding and reveal is a uniquely valuable advertising moment. The audience has verified purchase intent for a specific item in a specific price range. We run a reverse-auction in this window. CPM rates are 3–5x standard display.",
+            "deliverables": ["Reveal-window ad auction engine", "Brand placement in reveal ceremony", "Pricing model: CPM + revenue share", "Target 50 active brand partners (Y2)"]
+          },
+          {
+            "title": "Enterprise Gifting API",
+            "quarter": "Q4 2027",
+            "why": "Corporate HR teams spend significant budget on employee gifting — work anniversaries, retirements, new babies. Kindled is a natural fit. White-labelled Fires with company branding, managed by HR, at enterprise contract values of £1,000–£10,000/month.",
+            "deliverables": ["White-label Fire API", "HR platform integrations (Workday, BambooHR)", "Enterprise SSO and admin dashboard", "First 5 enterprise contracts"]
+          },
+          {
+            "title": "Financial Services Expansion",
+            "quarter": "Q1 2028",
+            "why": "A platform that handles family finances around milestone moments is naturally positioned for adjacent financial products: gift savings plans, buy-now-pay-later contributions, and eventually a Kindled debit card that earns cashback on all spending. This is the long-term moat.",
+            "deliverables": ["Savings plan product (recurring contributions)", "BNPL contribution option", "Partnership with a licensed e-money institution", "FCA sandbox application"]
+          }
+        ]
+      }
+    ]
+  },
+
+  "traction": {
+    "headline": "Early Signals",
+    "items": [
+      { "figure": "£3.2B", "label": "UK addressable market (annual unwanted gifts)", "source": "Halifax/OnePoll 2023" },
+      { "figure": "10M+", "label": "UK Open Banking users — infrastructure is mature", "source": "Open Banking Ltd, 2023" },
+      { "figure": "78%", "label": "of UK adults report gift-buying anxiety", "source": "YouGov UK, 2023" },
+      { "figure": "6x", "label": "average contributor multiplier per Fire (target)", "source": "Internal model" }
+    ]
+  }
+}
