@@ -69,27 +69,26 @@ function buildPrompt(input: PotRevealInput): string {
   const amount = `£${input.amountRaised.toFixed(0)}`;
   const people = input.contributorCount;
 
-  // Category-tuned opening imagery
-  const categoryOpener: Record<string, string> = {
-    ELECTRONICS: "A sleek box illuminated by a warm spotlight sits on a dark surface.",
-    TRAVEL: "A vintage suitcase wrapped in a golden ribbon rests on a sun-drenched cobblestone street.",
-    EXPERIENCES: "Confetti rains down in slow-motion over a beautifully wrapped cylindrical box.",
-    HOME_GARDEN: "A luxuriously wrapped gift sits on a rustic wooden table surrounded by soft candlelight.",
-    SPORTS_OUTDOORS: "An oversized gift box bursts open in an outdoor setting with natural light streaming in.",
-    FASHION: "A stylish gift box tied with a satin ribbon sits in a boutique window display.",
-    TOYS_GAMES: "A tower of colourfully wrapped gifts sits under twinkling fairy lights.",
+  // Category-tuned hero object — what literally explodes out of the box.
+  const categoryHero: Record<string, string> = {
+    ELECTRONICS: "a glowing tech gadget",
+    TRAVEL: "a sun-soaked dream destination with palm trees and a plane ticket",
+    EXPERIENCES: "tickets and fireworks for an unforgettable experience",
+    HOME_GARDEN: "a cosy dream-home upgrade",
+    SPORTS_OUTDOORS: "sports gear bursting into an epic outdoor adventure",
+    FASHION: "a head-turning fashion statement",
+    TOYS_GAMES: "an avalanche of toys and games",
   };
+  const hero = categoryHero[input.category ?? ""] ?? "the dream gift";
 
-  const opener =
-    categoryOpener[input.category ?? ""] ??
-    "A beautifully wrapped gift box sits in a warm, cinematic spotlight.";
-
+  // Viral, creator-style social reveal: punchy hook, explosive payoff, feel-good
+  // ending built to be screenshotted and shared. Vertical 9:16, energetic.
   return [
-    opener,
-    `The ribbon is pulled and the lid slowly rises, releasing a cascade of golden light and glittering particles.`,
-    `The words "${item}" and "${amount} raised by ${people} people who love you" materialise in elegant floating typography,`,
-    `then fade to a joyful burst of confetti and lens flares.`,
-    `Cinematic colour grading, slow motion, warm amber and gold tones, 4K, high-emotion gift reveal.`,
+    `Vertical 9:16 social-media reveal video, energetic content-creator style, designed to go viral.`,
+    `Opens on a teasing close-up of a wrapped gift box that suddenly bursts open in an explosion of confetti, sparks and golden light, revealing ${hero} representing "${item}".`,
+    `Bold kinetic typography slams onto the screen: "${amount} RAISED" then "by ${people} people who love you", with playful pop-style captions and emoji-free motion graphics.`,
+    `Quick punchy cuts, screen shakes on the beat, rising celebratory energy, hearts and stars flying, a wholesome feel-good payoff that makes you smile.`,
+    `Bright, saturated, joyful colour grade, warm amber and pink and gold tones, lens flares, high frame rate, polished and shareable.`,
   ].join(" ");
 }
 

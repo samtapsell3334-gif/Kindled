@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import type { GiftingMode } from "@/types/pots";
 import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
-import { RevealOverlay } from "@/components/RevealOverlay";
+import { GeneratedReveal } from "@/components/GeneratedReveal";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -4867,10 +4867,6 @@ export default function DemoPage() {
   const [showReceiverSignUp, setShowReceiverSignUp] = useState(false);
   // AI reveal overlay — shown when user clicks into the Reveal tab
   const [showAiReveal, setShowAiReveal] = useState(false);
-  // Demo: use a static preview video so the overlay works without a real API key.
-  // In production replace with a real taskId from POST /api/reveal/request.
-  // W3C-hosted cinematic clip — the old Google sample bucket now returns 403.
-  const DEMO_REVEAL_VIDEO = "https://media.w3.org/2010/05/sintel/trailer.mp4";
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));
@@ -5339,13 +5335,14 @@ export default function DemoPage() {
       )}
       </AnimatePresence>
 
-      {/* AI Reveal Overlay — fixed, covers full viewport on reveal */}
+      {/* Personalised generated reveal — built live from this fire's own data */}
       {showAiReveal && (
-        <RevealOverlay
-          taskId={null}
-          videoUrl={DEMO_REVEAL_VIDEO}
-          potTitle="Billy's Christmas Wish"
-          amountRaised={486}
+        <GeneratedReveal
+          recipientName="Billy"
+          occasion="Birthday"
+          totalRaised={V2_TOTAL}
+          gifts={V2_POTS.map((p) => ({ name: p.name, sub: p.sub, Icon: p.Icon, grad: p.grad, glow: p.glow }))}
+          contributors={V2_CONTRIBS.map((c) => ({ name: c.name, initials: c.initials, grad: c.grad }))}
           onComplete={() => setShowAiReveal(false)}
         />
       )}
