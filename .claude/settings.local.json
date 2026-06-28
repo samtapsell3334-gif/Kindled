@@ -58,7 +58,31 @@
       "Bash(sort -t: -k1 -n)",
       "Bash(lsof -i :3000 -sTCP:LISTEN -t)",
       "Bash(kill 12911 12912)",
-      "Bash(disown)"
+      "Bash(disown)",
+      "Bash(lsof -i :3000 -sTCP:LISTEN)",
+      "Bash(xargs -r kill)",
+      "Bash(npx next *)",
+      "Bash(awk 'NR>=4604 && NR<=4800')",
+      "Bash(awk -F: '$2 < 1012')",
+      "Bash(awk -F: '$2 <= 4583')",
+      "Bash(awk -F: 'NR==1{prev=$0; next} {if \\($2>4461 && prev ~ /[0-9]/\\) {print prev; exit} prev=$0}')",
+      "Bash(npx vercel *)",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(grep -v \"^$\\\\|npm warn\\\\|telemetry\\\\|Visit\\\\|^>\")",
+      "Bash(curl -sI https://kindledgift.co.uk)",
+      "Bash(curl -s https://www.kindledgift.co.uk)",
+      "Bash(curl -s https://www.kindledgift.co.uk/pots/demo)",
+      "Bash(npx --prefix \"/Users/samueltapsell/untitled folder\" vercel domains inspect kindledgift.co.uk)",
+      "Bash(awk 'NR>=2051 && /^function [A-Z]/ && NR>2051 {print NR; exit}' src/app/pots/demo/page.tsx)",
+      "Bash(awk 'NR>=1939 && /^function [A-Za-z]/ && NR>1939 {print NR; exit}' src/app/pots/demo/page.tsx)",
+      "Bash(awk 'NR>=2017 && /^function [A-Za-z]/ && NR>2017 {print NR; exit}' src/app/pots/demo/page.tsx)",
+      "Bash(awk 'NR<=1616 && /^function [A-Za-z]/ {last=$0; lastNR=NR} END{print lastNR, last}' src/app/pots/demo/page.tsx)",
+      "Bash(awk 'NR>=1908 && /^function [A-Z]/ && NR>1908 {print NR; exit}' src/app/pots/demo/page.tsx)",
+      "Bash(awk 'NR < 238 || NR > 589' src/components/GiftingImpactPanel.tsx)",
+      "Bash(mv /tmp/gip_trimmed.tsx src/components/GiftingImpactPanel.tsx)",
+      "Bash(awk 'NR < 41 || NR > 234' src/components/GiftingImpactPanel.tsx)",
+      "Bash(mv /tmp/gip2.tsx src/components/GiftingImpactPanel.tsx)"
     ]
   }
 }

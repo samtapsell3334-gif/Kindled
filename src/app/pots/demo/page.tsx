@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown, ChevronRight,
-  Play, Pause, Volume2, VolumeX, X, Zap,
+  Play, X, Zap,
   ShoppingBag, RefreshCw, CreditCard, Gift, Flame,
   Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
   Landmark, Radio, Wrench, Trophy, Wallet, Eye,
-  Bike, Plane, Home, Cake, TreePine, GraduationCap, Armchair, PenLine,
-  Trash2, AlertCircle, Copy, TrendingUp, Info, CircleEllipsis, CalendarDays,
+  Bike, Cake, TreePine, PenLine,
+  AlertCircle, Copy, TrendingUp, Info, CircleEllipsis, CalendarDays, Gamepad2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { FundingBar } from "@/components/pots/FundingBar";
@@ -70,12 +70,6 @@ interface CatalogItem {
   category: string;
   hearts: number;
   brand?: string;
-}
-
-interface ExplainerScene {
-  id: number;
-  title: string;
-  caption: string;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -260,19 +254,6 @@ const CATALOGUE: CatalogItem[] = [
   { id: "c71", brand: "Charlotte T",name: "Pillow Talk Beauty Bundle",      category: "Fashion",     hearts: 987, price: 159,    tag: "Glow Up",       tagColor: "bg-pink-100 text-pink-600",     glowColor: "#ec4899", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&h=500&fit=crop&q=85" },
 ];
 
-const SCENES: ExplainerScene[] = [
-  { id: 1, title: "The Gifting Paradox",
-    caption: "Would you rather your family receive duplicate, forgotten gifts... or combine forces to unlock one incredible, life-changing milestone? For kids, that's the dream mountain bike. For adults, it's a cosy log burner, a family sofa, or even a house deposit — completely out of reach for a single buyer's budget." },
-  { id: 2, title: "Parent Knows Best",
-    caption: "We all prefer those meaningful milestones... but directly asking loved ones for money always feels incredibly awkward. Kindled fixes this — our 'Parent Knows Best' Checklist lets anyone curate the perfect list on behalf of a loved one. Relatives click to instantly Claim or Tick Off an item, securing it in real-time across all shared links. No duplicates. No guessing. Guaranteed to be loved." },
-  { id: 3, title: "Continuous Gifting",
-    caption: "Unlike temporary registries that expire, Kindled is a continuous ledger built to stack up over time. An incomplete birthday fire seamlessly carries over to Christmas... letting grandparents, aunts, and colleagues keep chipping in. By stacking minor contributions, you unlock massive purchasing power — turning ten minor gifts into a beautiful family sofa or a coding camp." },
-  { id: 4, title: "Under Wraps Reveal",
-    caption: "And we protect the surprise until the very end. Toggle on 'Under Wraps' mode and progress bars, totals, and greetings are completely hidden from the receiver. Contributions keep flowing in secretly, while the registry looks like a beautiful locked gift box. On the big day, trigger the cinematic Reveal Ceremony — digital fireworks, glitter, and a floating mosaic of notes from the family." },
-  { id: 5, title: "Simple for Grandma",
-    caption: "Sharing is beautifully effortless. One simple link on WhatsApp lets family chip in securely in just two taps using Apple Pay or Google Pay. No app downloads, no account setup, and absolutely zero hassle for Grandma. Secured globally by Stripe. Kindled doesn't force a new behaviour — it simply makes collaborative family gifting sustainable, emotional, and powerful." },
-];
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // PRE-COMPUTED PARTICLES (avoid hydration mismatch)
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -300,13 +281,6 @@ const BUBBLES_P = Array.from({ length: 12 }, (_, i) => ({
 
 
 
-const FW_SPARKS = Array.from({ length: 24 }, (_, i) => {
-  const ang = (i / 24) * Math.PI * 2;
-  const dist = 70 + (i * 41) % 70;
-  return { id: i, x: Math.round(Math.cos(ang) * dist), y: Math.round(Math.sin(ang) * dist),
-    color: ["#f59e0b","#ef4444","#8b5cf6","#10b981","#3b82f6","#f97316","#ec4899","#fbbf24"][i % 8]!,
-    dur: `${0.55 + (i * 0.03) % 0.45}s`, delay: `${(i * 0.018) % 0.22}s`, size: 5 + (i % 6) };
-});
 
 const SPARKLES = Array.from({ length: 10 }, (_, i) => ({
   id: i, spx: `${-35 + (i * 37) % 70}px`, spy: `${-30 + (i * 29) % 60}px`,
@@ -812,19 +786,9 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                   : <Flame className="h-4 w-4" />}
                 {kindled ? "Kindled!" : "Kindle"}
               </motion.button>
-              {pot.goal <= 60 && (
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => onBuy?.(pot.id)}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 border-stone-200 bg-white py-2.5 text-[13px] font-semibold text-stone-700 transition-colors hover:border-stone-300"
-                >
-                  <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2} />
-                  Buy outright · £{pot.goal}
-                </motion.button>
-              )}
             </div>
 
-            {/* Inline Kindle amount picker */}
+            {/* Kindle contribution panel */}
             <AnimatePresence>
               {kindleOpen && (
                 <motion.div
@@ -834,25 +798,80 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                   transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   className="overflow-hidden"
                 >
-                  <div className="mt-3 grid grid-cols-4 gap-2">
-                    {KINDLE_AMOUNTS.map((amt) => (
+                  <div className="mt-3 space-y-2.5">
+                    {/* Chip in — pick an amount */}
+                    <div>
+                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400">Chip in</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        {KINDLE_AMOUNTS.map((amt) => (
+                          <motion.button
+                            key={amt}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleKindle(amt)}
+                            disabled={amt > pot.goal - pot.raised}
+                            className={cn(
+                              "rounded-xl py-2.5 text-[13px] font-bold transition-all",
+                              amt > pot.goal - pot.raised
+                                ? "bg-stone-100 text-stone-300 cursor-not-allowed"
+                                : "bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100",
+                            )}
+                          >
+                            £{amt}
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="flex items-center gap-2">
+                      <div className="h-px flex-1 bg-stone-100" />
+                      <span className="text-[10px] text-stone-300">or</span>
+                      <div className="h-px flex-1 bg-stone-100" />
+                    </div>
+
+                    {/* Light this fire — fund the remaining balance */}
+                    {pot.goal - pot.raised > 0 && (
                       <motion.button
-                        key={amt}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handleKindle(amt)}
-                        disabled={amt > pot.goal - pot.raised}
-                        className={cn(
-                          "rounded-xl py-2.5 text-[13px] font-bold transition-all",
-                          amt > pot.goal - pot.raised
-                            ? "bg-stone-100 text-stone-300 cursor-not-allowed"
-                            : "bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100",
-                        )}
+                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1.01 }}
+                        onClick={() => handleKindle(pot.goal - pot.raised)}
+                        className="flex w-full items-center justify-between gap-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-left shadow-md shadow-amber-200"
                       >
-                        £{amt}
+                        <div className="flex items-center gap-2.5">
+                          <Flame className="h-4 w-4 shrink-0 text-stone-900" strokeWidth={2} />
+                          <div>
+                            <p className="text-[13px] font-bold text-stone-900 leading-tight">Light this fire fully</p>
+                            <p className="text-[10px] text-stone-900/65 leading-tight">Cover the remaining balance — make it happen today</p>
+                          </div>
+                        </div>
+                        <span className="shrink-0 rounded-lg bg-stone-900/15 px-2.5 py-1 text-[13px] font-black text-stone-900">
+                          £{pot.goal - pot.raised}
+                        </span>
                       </motion.button>
-                    ))}
+                    )}
+
+                    {/* Buy outright */}
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => onBuy?.(pot.id)}
+                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-left hover:border-stone-300 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <ShoppingBag className="h-4 w-4 shrink-0 text-stone-500" strokeWidth={2} />
+                        <div>
+                          <p className="text-[13px] font-semibold text-stone-800 leading-tight">Buy it outright</p>
+                          <p className="text-[10px] text-stone-400 leading-tight">Skip the pot — purchase it directly as your gift</p>
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-lg bg-stone-100 px-2.5 py-1 text-[13px] font-bold text-stone-600">
+                        £{pot.goal}
+                      </span>
+                    </motion.button>
+
+                    <p className="text-center text-[10px] text-stone-400">
+                      £{pot.goal - pot.raised} left to fully fund this gift
+                    </p>
                   </div>
-                  <p className="mt-2 text-center text-[10px] text-stone-400">£{pot.goal - pot.raised} still needed</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1620,589 +1639,6 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// EXPLAINER PLAYER
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function SceneVisual({ id, progress }: { id: number; progress: number }) {
-  /* ── Scene 1: The Gifting Paradox ── */
-  if (id === 1) {
-    const dupes = [Package, Package, Package, Gift, Package, Gift, Package, Package];
-    const dreams = [
-      { Icon: Bike, label: "Mountain Bike", val: "£450" },
-      { Icon: Flame, label: "Cosy Log Burner", val: "£600" },
-      { Icon: Plane, label: "Dream Holiday", val: "£1,200" },
-      { Icon: Home, label: "House Deposit", val: "£5,000" },
-    ];
-    return (
-      <div className="relative flex h-full w-full overflow-hidden">
-        {/* Left: junk pile */}
-        <div className="flex w-[44%] flex-col items-center justify-center gap-2 bg-red-950/40 px-2 py-3 border-r border-stone-700">
-          <div className="flex flex-wrap justify-center gap-1">
-            {dupes.map((Icon, i) => (
-              <Icon key={i} className="h-4 w-4 text-stone-400 opacity-60" style={{ animationDelay: `${i*0.1}s` }} />
-            ))}
-          </div>
-          <div className="mt-1 flex items-center gap-1 rounded-full bg-red-500/90 px-2 py-0.5">
-            <X className="h-2.5 w-2.5 text-white" strokeWidth={3} />
-            <p className="text-[9px] font-black text-white tracking-widest">WASTED</p>
-          </div>
-          <p className="text-[8px] text-red-400 text-center leading-tight">Forgotten in landfill</p>
-        </div>
-        {/* Centre VS badge */}
-        <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-stone-900 border-2 border-amber-400 shadow-lg shadow-amber-900/50">
-            <span className="text-[9px] font-black text-amber-400">OR</span>
-          </div>
-        </div>
-        {/* Right: dream cards */}
-        <div className="flex w-[56%] flex-col justify-center gap-1.5 px-2.5 py-3">
-          {dreams.map((d, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-900/40 to-orange-900/30 px-2.5 py-1.5"
-              style={{ opacity: progress > i * 0.18 ? 1 : 0.2, transition: "opacity 0.5s ease", transitionDelay: `${i * 0.1}s` }}
-            >
-              <d.Icon className="h-4 w-4 shrink-0 text-amber-400" strokeWidth={1.75} />
-              <div className="min-w-0 flex-1">
-                <p className="text-[9px] font-black text-amber-300 truncate">{d.label}</p>
-              </div>
-              <span className="text-[9px] font-black text-emerald-400 shrink-0">{d.val}</span>
-            </div>
-          ))}
-          <p className="mt-0.5 flex items-center justify-center gap-1 text-[8px] text-amber-400 text-center font-bold"><Sparkles className="h-2.5 w-2.5" /> Combine forces to unlock</p>
-        </div>
-        {/* WOULD YOU RATHER stamp */}
-        {progress > 0.25 && (
-          <div className="pointer-events-none absolute inset-x-0 top-2 flex justify-center">
-            <div className="rounded-full bg-amber-400 px-3 py-0.5 shadow-lg shadow-amber-900/40 animate-bounce-in-up">
-              <p className="text-[9px] font-black text-stone-900 tracking-widest">WOULD YOU RATHER?</p>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  /* ── Scene 2: Parent Knows Best Checklist ── */
-  if (id === 2) {
-    const items = [
-      { label: "Storybook Collection", price: "£15", who: "Grandma Linda", claimAt: 0.2 },
-      { label: "Lego Space Set", price: "£25", who: "Uncle Steve", claimAt: 0.45 },
-      { label: "Marvel Figure Set", price: "£18", who: "Auntie Jo", claimAt: 0.72 },
-    ];
-    return (
-      <div className="flex h-full flex-col justify-center gap-1.5 px-4 py-3">
-        <div className="mb-1 flex items-center gap-2">
-          <Users className="h-4 w-4 text-stone-300" strokeWidth={1.75} />
-          <div>
-            <p className="text-[10px] font-black text-white">Parent&apos;s Checklist</p>
-            <p className="text-[8px] text-stone-400">Real-time duplicate protection</p>
-          </div>
-        </div>
-        {items.map((item, i) => {
-          const claimed = progress > item.claimAt;
-          return (
-            <div
-              key={i}
-              className={cn(
-                "flex items-center gap-2 rounded-xl px-3 py-2 border transition-all duration-500",
-                claimed ? "bg-emerald-900/30 border-emerald-700/50" : "bg-stone-800/70 border-stone-700/50",
-              )}
-            >
-              <div className={cn(
-                "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 text-[10px]",
-                claimed ? "border-emerald-400 bg-emerald-400 text-stone-900" : "border-stone-600 text-stone-600",
-              )}>
-                {claimed ? "✓" : "○"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={cn("text-[10px] font-semibold transition-all", claimed ? "line-through text-stone-500" : "text-stone-200")}>{item.label}</p>
-                {claimed && <p className="text-[8px] text-emerald-400 font-bold">{item.who} · Secured!</p>}
-              </div>
-              <span className="text-[10px] font-black text-amber-400 shrink-0">{item.price}</span>
-            </div>
-          );
-        })}
-        {progress > 0.8 && (
-          <div className="mt-1 flex items-center gap-1.5 animate-fade-up">
-            <ShieldCheck className="h-3 w-3 text-emerald-400" strokeWidth={2} />
-            <p className="text-[9px] font-bold text-emerald-400">All items secured · Zero duplicates guaranteed</p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  /* ── Scene 3: Continuous Gifting Timeline ── */
-  if (id === 3) {
-    const contributions = [
-      { label: "+£20", from: "Grandma", at: 0.15 },
-      { label: "+£15", from: "Uncle Steve", at: 0.32 },
-      { label: "+£50", from: "Coworkers", at: 0.5 },
-      { label: "+£30", from: "Auntie Jo", at: 0.68 },
-    ];
-    const milestones = [
-      { Icon: Cake, label: "Birthday" },
-      { Icon: TreePine, label: "Christmas" },
-      { Icon: GraduationCap, label: "Graduation" },
-    ];
-    const totalFilled = Math.min(1, progress * 1.3);
-    return (
-      <div className="flex h-full flex-col justify-center gap-3 px-4 py-3">
-        {/* Timeline */}
-        <div className="relative flex items-center gap-0">
-          {milestones.map((m, i) => (
-            <div key={i} className="flex flex-1 flex-col items-center gap-1">
-              <div className={cn(
-                "flex items-center gap-1 rounded-lg px-2 py-1 border text-center transition-all duration-500",
-                progress > i * 0.3 ? "bg-amber-900/40 border-amber-700/50" : "bg-stone-800/50 border-stone-700/40",
-              )}>
-                <m.Icon className="h-3 w-3 text-amber-300" strokeWidth={1.75} />
-                <p className="text-[8px] font-bold text-stone-300 whitespace-nowrap">{m.label}</p>
-              </div>
-              {i < 2 && (
-                <div className="absolute" style={{ left: `${(i + 1) * 33}%`, top: "8px" }}>
-                  <span className="text-amber-600 text-[10px]">→</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        {/* Contribution chips flying in */}
-        <div className="flex flex-wrap gap-1.5 justify-center">
-          {contributions.map((c, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-900/30 px-2 py-0.5 transition-all duration-500"
-              style={{ opacity: progress > c.at ? 1 : 0, transform: progress > c.at ? "scale(1)" : "scale(0.5)" }}
-            >
-              <span className="text-[9px] font-black text-amber-400">{c.label}</span>
-              <span className="text-[8px] text-stone-400">from {c.from}</span>
-            </div>
-          ))}
-        </div>
-        {/* Pot fill */}
-        <div className="rounded-xl border border-emerald-700/40 bg-emerald-900/20 px-3 py-2">
-          <div className="flex items-center justify-between mb-1.5">
-            <p className="flex items-center gap-1 text-[9px] font-black text-emerald-300"><Armchair className="h-3 w-3" /> Family Sofa Pot</p>
-            <p className="text-[9px] font-black text-amber-400">£{Math.round(totalFilled * 650)} / £650</p>
-          </div>
-          <div className="h-2 w-full rounded-full bg-stone-700 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700"
-              style={{ width: `${totalFilled * 100}%` }}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── Scene 4: Under Wraps Reveal ── */
-  if (id === 4) {
-    const shaking = progress > 0.25 && progress < 0.55;
-    const revealed = progress > 0.65;
-    const fireworks = progress > 0.72;
-    const messages = ["Happy Birthday!", "Love you so much!", "From Gran", "You deserve it!", "Woop woop!"];
-    return (
-      <div className="relative flex h-full items-center justify-center overflow-hidden bg-stone-950">
-        {/* Stars bg */}
-        <div className="pointer-events-none absolute inset-0">
-          {[{l:"10%",t:"15%"},{l:"80%",t:"10%"},{l:"55%",t:"8%"},{l:"30%",t:"20%"},{l:"90%",t:"35%"},{l:"5%",t:"50%"}].map((p,i)=>(
-            <Star key={i} className="absolute h-2 w-2 fill-white/30 text-white/30" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.2}s ${i*0.3}s ease-in-out infinite alternate`}} />
-          ))}
-        </div>
-        {!revealed ? (
-          <div
-            className={cn("flex flex-col items-center gap-2 transition-all", shaking && "animate-box-shake")}
-          >
-            <div className="relative flex h-24 w-20 flex-col">
-              {/* Box lid */}
-              <div className="absolute -top-3 left-0 right-0 flex h-6 items-center justify-center rounded-t-lg bg-gradient-to-r from-rose-500 to-pink-600 shadow-lg">
-                <div className="h-2 w-2 rounded-full bg-amber-300" />
-              </div>
-              {/* Box body */}
-              <div className="mt-3 flex-1 rounded-b-lg bg-gradient-to-br from-rose-600 to-pink-700 shadow-xl shadow-rose-900/50 flex items-center justify-center">
-                <Gift className="h-8 w-8 text-white/80" strokeWidth={1.5} />
-              </div>
-              {/* Bow accent */}
-              <div className="absolute -top-5 left-1/2 -translate-x-1/2 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400/80" />
-            </div>
-            <p className="text-[9px] font-bold text-stone-400">Under Wraps · progress hidden</p>
-            {shaking && <p className="text-[9px] font-black text-amber-400 animate-pulse">Igniting reveal…</p>}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2 animate-scale-in">
-            {/* Firework sparks */}
-            {fireworks && FW_SPARKS.slice(0, 12).map((s) => (
-              <div
-                key={s.id}
-                className="pointer-events-none absolute h-2 w-2 rounded-full animate-fw-spark"
-                style={{
-                  left: "50%", top: "40%",
-                  backgroundColor: s.color,
-                  ["--fwx" as string]: `${s.x * 0.6}px`,
-                  ["--fwy" as string]: `${s.y * 0.5}px`,
-                  ["--fw-dur" as string]: s.dur,
-                  animationDelay: s.delay,
-                }}
-              />
-            ))}
-            <p className="flex items-center gap-1.5 text-xl font-black text-amber-400"><Sparkles className="h-5 w-5" /> Reveal!</p>
-            <div className="flex flex-wrap justify-center gap-1 max-w-[200px]">
-              {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl bg-gradient-to-br from-stone-800 to-stone-900 border border-stone-700 px-2 py-1 animate-drift-in"
-                  style={{ animationDelay: `${i * 0.1}s`, ["--card-rot" as string]: `${(i % 3 - 1) * 3}deg` }}
-                >
-                  <p className="text-[9px] font-bold text-stone-200">{msg}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  /* ── Scene 5: Simple for Grandma ── */
-  const phase = progress < 0.33 ? 0 : progress < 0.65 ? 1 : 2;
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 px-4 py-3">
-      {phase === 0 && (
-        <div className="flex flex-col items-center gap-2 animate-fade-up">
-          {/* Mock WhatsApp bubble */}
-          <div className="rounded-2xl rounded-tl-sm bg-emerald-800/60 border border-emerald-700/40 px-4 py-2.5 max-w-[200px]">
-            <p className="text-[10px] font-bold text-emerald-300 mb-0.5">WhatsApp · Mum</p>
-            <p className="text-[11px] text-stone-200">Billy&apos;s wishlist</p>
-            <p className="text-[9px] text-stone-400 mt-0.5 underline">kindledgift.co.uk/billy</p>
-          </div>
-          <p className="text-[9px] font-bold text-stone-400">One link · no account needed</p>
-        </div>
-      )}
-      {phase === 1 && (
-        <div className="flex flex-col items-center gap-2 animate-fade-up">
-          {/* Stripe badge */}
-          <div className="flex items-center gap-1.5 rounded-xl bg-indigo-900/50 border border-indigo-700/40 px-3 py-1.5">
-            <Lock className="h-3 w-3 text-indigo-300" strokeWidth={2} />
-            <p className="text-[9px] font-black text-indigo-300">Regulated &amp; Secured by Stripe</p>
-          </div>
-          {/* Apple Pay button */}
-          <div className="flex items-center justify-center gap-2 rounded-2xl bg-stone-100 px-6 py-3 shadow-lg">
-            <CreditCard className="h-4 w-4 text-stone-900" strokeWidth={2} />
-            <span className="text-[12px] font-black text-stone-900">Pay</span>
-          </div>
-          <p className="text-[9px] text-stone-400">Two taps · Apple Pay or Google Pay</p>
-        </div>
-      )}
-      {phase === 2 && (
-        <div className="flex flex-col items-center gap-3 animate-scale-in">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 shadow-lg shadow-emerald-900/40">
-              <Check className="h-5 w-5 text-white" strokeWidth={3} />
-            </div>
-            <p className="text-[12px] font-black text-emerald-400">Payment successful!</p>
-          </div>
-          {/* Mini family tree / logo sign-off */}
-          <div className="flex flex-col items-center gap-1">
-            {[2, 3, 3].map((count, ri) => (
-              <div key={ri} className="flex gap-2">
-                {Array.from({ length: count }, (_, ei) => (
-                  <Users key={ei} className="h-4 w-4 text-amber-300 animate-bounce" style={{ animationDelay: `${(ri*3+ei)*0.08}s` }} />
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center gap-1.5">
-            <svg viewBox="0 0 100 100" width="18" height="18">
-              <defs><linearGradient id="sc5-tile" x1="0" y1="0" x2="60" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0%" stopColor="#FFB845"/><stop offset="100%" stopColor="#F26B2C"/></linearGradient></defs>
-              <rect width="100" height="100" rx="22" fill="url(#sc5-tile)"/>
-              <g fill="#FFF4E6">
-                <rect x="28" y="27" width="12" height="46" rx="6"/>
-                <rect x="34" y="33" width="34" height="12" rx="6" transform="rotate(-37 51 39)"/>
-                <rect x="34" y="56" width="34" height="12" rx="6" transform="rotate(37 51 62)"/>
-              </g>
-              <path d="M48 22 C41 14 32 17 35.5 25 C38 30 44 29 48 25.5 Z" fill="#FFF4E6"/>
-              <path d="M48 22 C55 14 64 17 60.5 25 C58 30 52 29 48 25.5 Z" fill="#FFF4E6"/>
-              <circle cx="48" cy="23.5" r="5.5" fill="#FFD27A"/>
-            </svg>
-            <span className="text-[13px] font-black text-amber-400">Kindled</span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Gentle ambient music via Web Audio API
-function useAmbientMusic() {
-  const ctxRef = useRef<AudioContext | null>(null);
-  const nodesRef = useRef<AudioNode[]>([]);
-
-  const start = useCallback(() => {
-    try {
-      ctxRef.current ??= new AudioContext();
-      const ctx = ctxRef.current;
-      if (ctx.state === "suspended") void ctx.resume();
-
-      // Pentatonic notes: C4, E4, G4, A4, C5
-      const notes = [261.63, 329.63, 392.0, 440.0, 523.25];
-      const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(0, ctx.currentTime);
-      masterGain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 1.5);
-      masterGain.connect(ctx.destination);
-      nodesRef.current.push(masterGain);
-
-      // Soft pad — slow sine waves on pentatonic notes
-      notes.forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const g = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.value = freq;
-        g.gain.value = 0.015 + (i % 2) * 0.008;
-        osc.connect(g);
-        g.connect(masterGain);
-        osc.start();
-        nodesRef.current.push(osc, g);
-      });
-
-      // Gentle arpeggiated melody
-      let t = ctx.currentTime + 0.5;
-      const melody = [0, 2, 4, 3, 1, 4, 2, 0];
-      const loop = () => {
-        melody.forEach((ni, i) => {
-          const freq = notes[ni]! * (i > 4 ? 2 : 1);
-          const osc = ctx.createOscillator();
-          const env = ctx.createGain();
-          osc.type = "triangle";
-          osc.frequency.value = freq;
-          env.gain.setValueAtTime(0, t);
-          env.gain.linearRampToValueAtTime(0.06, t + 0.05);
-          env.gain.exponentialRampToValueAtTime(0.001, t + 0.9);
-          osc.connect(env);
-          env.connect(masterGain);
-          osc.start(t);
-          osc.stop(t + 0.9);
-          t += 0.75;
-        });
-        // Repeat every ~6s
-        setTimeout(() => { if (nodesRef.current.length > 0) loop(); }, (t - ctx.currentTime) * 1000 - 200);
-      };
-      loop();
-    } catch { /* silent */ }
-  }, []);
-
-  const stop = useCallback(() => {
-    try {
-      const ctx = ctxRef.current;
-      if (!ctx) return;
-      // Fade out master gain
-      nodesRef.current.forEach((n) => {
-        if (n instanceof GainNode) {
-          n.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8);
-        }
-      });
-      setTimeout(() => {
-        nodesRef.current.forEach((n) => { try { (n as OscillatorNode).stop?.(); } catch { /* ok */ } });
-        nodesRef.current = [];
-      }, 900);
-    } catch { /* silent */ }
-  }, []);
-
-  return { start, stop };
-}
-
-// Animated caption — reveals words one by one, no overlap
-function AnimatedCaption({ text, playing }: { text: string; playing: boolean }) {
-  const words = text.split(" ");
-  const [visibleCount, setVisibleCount] = useState(0);
-
-  useEffect(() => {
-    setVisibleCount(0);
-    if (!playing) { setVisibleCount(words.length); return; }
-    let i = 0;
-    const interval = setInterval(() => {
-      i++;
-      setVisibleCount(i);
-      if (i >= words.length) clearInterval(interval);
-    }, 110);
-    return () => clearInterval(interval);
-  }, [text, playing]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  return (
-    <p className="text-[12px] leading-relaxed text-stone-700 font-medium">
-      {words.map((word, i) => (
-        <span
-          key={i}
-          className="inline-block mr-1 transition-all duration-200"
-          style={{
-            opacity: i < visibleCount ? 1 : 0,
-            transform: i < visibleCount ? "translateY(0)" : "translateY(6px)",
-          }}
-        >
-          {word}
-        </span>
-      ))}
-    </p>
-  );
-}
-
-function ExplainerPlayer() {
-  const [open, setOpen] = useState(false);
-  const [sceneIdx, setSceneIdx] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
-  const [muted, setMuted] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const { start: startMusic, stop: stopMusic } = useAmbientMusic();
-  const SCENE_DUR = 24;
-  const TOTAL = SCENES.length * SCENE_DUR;
-
-  useEffect(() => {
-    if (!playing) return;
-    if (!muted) startMusic();
-    intervalRef.current = setInterval(() => {
-      setElapsed((e) => {
-        if (e >= TOTAL - 1) { setPlaying(false); return TOTAL; }
-        return e + 0.25;
-      });
-    }, 250);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      stopMusic();
-    };
-  }, [playing, muted, startMusic, stopMusic, TOTAL]);
-
-  const currentScene = Math.min(SCENES.length - 1, Math.floor(elapsed / SCENE_DUR));
-  const sceneProgress = (elapsed % SCENE_DUR) / SCENE_DUR;
-
-  useEffect(() => {
-    if (currentScene !== sceneIdx) setSceneIdx(currentScene);
-  }, [currentScene, sceneIdx]);
-
-  const jumpTo = (idx: number) => setElapsed(idx * SCENE_DUR);
-
-  const togglePlay = useCallback(() => {
-    setPlaying((p) => {
-      if (p) stopMusic();
-      else if (!muted) startMusic();
-      return !p;
-    });
-  }, [muted, startMusic, stopMusic]);
-
-  const toggleMute = useCallback(() => {
-    setMuted((m) => {
-      if (!m) stopMusic();
-      else if (playing) startMusic();
-      return !m;
-    });
-  }, [playing, startMusic, stopMusic]);
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
-    setPlaying(false);
-    stopMusic();
-  }, [stopMusic]);
-
-  if (!open) return (
-    <div className="mx-4">
-      <motion.button
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 400, damping: 28 }}
-        onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3.5 text-left"
-        style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
-      >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
-          <Play className="h-5 w-5 translate-x-0.5 text-stone-900" strokeWidth={2.5} fill="currentColor" />
-        </div>
-        <div>
-          <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-800">Watch How Kindled Works</p>
-          <p className="text-[11px] text-stone-400">5 scenes · multi-seasonal gifting · ambient music</p>
-        </div>
-      </motion.button>
-    </div>
-  );
-
-  const scene = SCENES[sceneIdx]!;
-
-  return (
-    <div className="mx-4 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-xl shadow-stone-200/60">
-      {/* Scene label */}
-      <div className="flex items-center justify-between border-b border-stone-100 bg-stone-50 px-4 py-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500">
-          Scene {sceneIdx + 1}/5 · {scene.title}
-        </span>
-        <button onClick={handleClose} className="text-stone-400 hover:text-stone-600 transition-colors">
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-
-      {/* Viewport */}
-      <div className="h-52 bg-stone-950">
-        <SceneVisual id={sceneIdx + 1} progress={sceneProgress} />
-      </div>
-
-      {/* Caption — fixed height, no clamp, words animate in */}
-      <div className="min-h-[72px] border-t border-stone-100 bg-amber-50/40 px-5 py-3.5 flex items-center">
-        <AnimatedCaption key={sceneIdx} text={scene.caption} playing={playing} />
-      </div>
-
-      {/* Controls */}
-      <div className="border-t border-stone-100 px-4 pb-4 pt-3 space-y-3">
-        {/* Progress bar */}
-        <div
-          className="h-1.5 w-full cursor-pointer rounded-full bg-stone-200"
-          onClick={(e) => {
-            const r = e.currentTarget.getBoundingClientRect();
-            const ratio = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-            setElapsed(Math.round(ratio * TOTAL));
-          }}
-        >
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-100"
-            style={{ width: `${(elapsed / TOTAL) * 100}%` }}
-          />
-        </div>
-
-        {/* Buttons + time */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={togglePlay}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md shadow-amber-200 active:scale-90 transition-transform"
-          >
-            {playing
-              ? <Pause className="h-4 w-4" strokeWidth={2.5} fill="currentColor" />
-              : <Play className="h-4 w-4 translate-x-0.5" strokeWidth={2.5} fill="currentColor" />}
-          </button>
-          <button
-            onClick={toggleMute}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 text-stone-500 hover:bg-stone-200 active:scale-90 transition-all"
-          >
-            {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-          </button>
-          <span className="flex-1 text-right font-mono text-[10px] text-stone-400 tabular-nums">
-            {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")} / 2:00
-          </span>
-        </div>
-
-        {/* Scene dots */}
-        <div className="flex justify-center gap-2">
-          {SCENES.map((s, i) => (
-            <button key={s.id} onClick={() => jumpTo(i)}
-              className={cn("h-1.5 rounded-full transition-all duration-300",
-                i === sceneIdx ? "w-6 bg-amber-400" : "w-1.5 bg-stone-300 hover:bg-stone-400")}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════════════════
 // INVESTOR PIN GATE
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -2419,12 +1855,6 @@ const TWINKLE_STARS = Array.from({ length: 28 }, (_, i) => ({
   dur: `${1.4 + (i * 0.19) % 1.2}s`,
 }));
 
-const CHORES = [
-  { id: "c1", Icon: Zap,         title: "Toothbrush Hero",    desc: "Brush teeth morning & night",   stars: 1, color: "from-sky-400 to-blue-500",       shadow: "shadow-sky-200" },
-  { id: "c2", Icon: Package,     title: "Toy Castle Tidyer",  desc: "Put toys back in the box",       stars: 2, color: "from-violet-400 to-purple-500",  shadow: "shadow-violet-200" },
-  { id: "c3", Icon: Leaf,        title: "Veggie Victory",     desc: "Eat all your greens at dinner",  stars: 1, color: "from-emerald-400 to-green-500",  shadow: "shadow-emerald-200" },
-  { id: "c4", Icon: ShieldCheck, title: "Storytime Sleepyhead", desc: "Bed on time without a fuss",  stars: 2, color: "from-amber-400 to-orange-500",   shadow: "shadow-amber-200" },
-];
 
 // Flying star particle type
 interface FlyingStar {
@@ -2514,527 +1944,819 @@ function StarBurst({ x, y }: { x: number; y: number }) {
   );
 }
 
-function KindledStars({ pots, onClose }: { pots: DemoPot[]; onClose: () => void }) {
-  const [totalStars, setTotalStars] = useState(6);
-  const [filledCells, setFilledCells] = useState<Set<number>>(() => new Set(Array.from({ length: 6 }, (_, i) => i)));
-  const [newCell, setNewCell] = useState<number | null>(null);
-  const [burst, setBurst] = useState<{ x: number; y: number; key: number } | null>(null);
+function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
+  // ── star constants ──
+  const CONSTELLATION_POS = [
+    // Galaxy arm — left cluster rising to top-right
+    {cx:12,cy:84},{cx:19,cy:76},{cx:10,cy:68},{cx:24,cy:60},{cx:20,cy:51},
+    // Sweeping arc
+    {cx:30,cy:44},{cx:40,cy:37},{cx:36,cy:27},{cx:48,cy:24},{cx:57,cy:33},
+    // Upper plateau
+    {cx:63,cy:22},{cx:70,cy:16},{cx:76,cy:24},{cx:80,cy:33},{cx:85,cy:24},
+    // Top-right destination
+    {cx:73,cy:42},{cx:82,cy:48},{cx:88,cy:37},{cx:86,cy:56},{cx:92,cy:44},
+  ] as {cx:number; cy:number}[];
+
+  const LEVELS = [
+    {min:0,  max:14,  label:"Spark Scout",       grad:"from-sky-400 to-blue-500",      badge:"bg-sky-500"   },
+    {min:15, max:34,  label:"Star Explorer",      grad:"from-violet-400 to-purple-600", badge:"bg-violet-600"},
+    {min:35, max:59,  label:"Cosmic Adventurer",  grad:"from-amber-400 to-orange-500",  badge:"bg-orange-500"},
+    {min:60, max:999, label:"Galaxy Hero",         grad:"from-rose-400 to-pink-500",     badge:"bg-rose-500"  },
+  ];
+
+  const UNLOCK_MILESTONES = [
+    {stars:25,  label:"Amazon Gift Card",  sub:"£5 · 0% fees",        color:"#f59e0b", unlocked:true },
+    {stars:50,  label:"Smyths Toys £10",   sub:"Toys & games",         color:"#a78bfa", unlocked:false},
+    {stars:75,  label:"LEGO Store £15",    sub:"Official LEGO shop",   color:"#38bdf8", unlocked:false},
+    {stars:100, label:"??? MEGA PRIZE ???",sub:"Top secret reward",    color:"#f43f5e", unlocked:false},
+  ];
+
+  const DAILY_MISSIONS = [
+    {id:"m1",Icon:Zap,         title:"Toothbrush Hero",     desc:"Brush teeth twice today",       stars:1, bonus:false, color:"from-sky-500 to-blue-600",      glow:"shadow-sky-400/40"  },
+    {id:"m2",Icon:Package,     title:"Tidy Commander",      desc:"Pack toys away neatly",          stars:2, bonus:false, color:"from-violet-500 to-purple-600",  glow:"shadow-violet-400/40"},
+    {id:"m3",Icon:Leaf,        title:"Veggie Victory",      desc:"Eat all your greens",            stars:1, bonus:true,  color:"from-emerald-500 to-green-600",  glow:"shadow-emerald-400/40"},
+    {id:"m4",Icon:ShieldCheck, title:"Bedtime Champion",    desc:"Lights out without a fuss",      stars:2, bonus:false, color:"from-amber-400 to-orange-500",   glow:"shadow-amber-400/40" },
+  ];
+
+  // ── state ──
+  const STARTING_STARS = 24;
+  const [totalStars, setTotalStars] = useState(STARTING_STARS);
+  const [filledCells, setFilledCells] = useState<Set<number>>(() => new Set(Array.from({length:STARTING_STARS},(_,i)=>i)));
+  const [newCell, setNewCell] = useState<number|null>(null);
+  const [burst, setBurst] = useState<{x:number;y:number;key:number}|null>(null);
   const [flyingStars, setFlyingStars] = useState<FlyingStar[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
   const [bouncing, setBouncing] = useState(false);
+  const [impactPot, setImpactPot] = useState<string|null>(null);
+  const [claimedBonus, setClaimedBonus] = useState(false);
   const [showRedeem, setShowRedeem] = useState(false);
-  const [impactPot, setImpactPot] = useState<string | null>(null);
-  const potRef = useRef<HTMLDivElement>(null);
-  const chime = useMagicChime();
-  const starIdRef = useRef(0);
-  const EXCHANGE_RATE = 0.50;
-  const targetPot = pots.find((p) => p.mode === "LIVE_FEED") ?? pots[0];
+  const [missionFlipped, setMissionFlipped] = useState<Set<string>>(new Set());
 
-  const handleCellTap = useCallback((idx: number, e: React.MouseEvent<HTMLButtonElement>) => {
+  const potRef = useRef<HTMLDivElement>(null);
+  const jarRef = useRef<HTMLDivElement>(null);
+  const starIdRef = useRef(0);
+  const chime = useMagicChime();
+
+  const targetPot = pots.find(p=>p.mode==="LIVE_FEED")??pots[0];
+  const levelIdx = Math.max(0, LEVELS.findIndex(l=>totalStars<=l.max));
+  const level = LEVELS[levelIdx]!;
+  const prevMax = levelIdx===0 ? 0 : LEVELS[levelIdx-1]!.max;
+  const xpPct = Math.min(100, Math.round(((totalStars-prevMax)/(level.max-prevMax))*100));
+  const streakDay = 3;
+  const EXCHANGE_RATE = 0.50;
+
+  // ── handlers ──
+  const handleCellTap = useCallback((idx:number, e:React.MouseEvent<HTMLButtonElement>) => {
     if (filledCells.has(idx)) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
     chime();
-    setBurst({ x, y, key: Date.now() });
+    setBurst({x:rect.left+rect.width/2, y:rect.top+rect.height/2, key:Date.now()});
     setTimeout(() => {
-      setFilledCells((prev) => new Set([...prev, idx]));
+      setFilledCells(p=>new Set([...p,idx]));
       setNewCell(idx);
-      setTotalStars((s) => s + 1);
+      setTotalStars(s=>s+1);
       setBouncing(true);
-      setTimeout(() => { setBouncing(false); setNewCell(null); }, 800);
-    }, 420);
-    setTimeout(() => setBurst(null), 750);
-  }, [filledCells, chime]);
+      setTimeout(()=>{setBouncing(false);setNewCell(null);},900);
+    },400);
+    setTimeout(()=>setBurst(null),750);
+  },[filledCells,chime]);
 
-  const handleChore = useCallback((chore: typeof CHORES[0], cardEl: HTMLElement) => {
-    if (completedToday.has(chore.id)) return;
+  const handleMission = useCallback((m:typeof DAILY_MISSIONS[0], cardEl:HTMLElement) => {
+    if (completedToday.has(m.id)) return;
     chime();
-    setCompletedToday((s) => new Set([...s, chore.id]));
-
+    setCompletedToday(s=>new Set([...s,m.id]));
+    setMissionFlipped(s=>new Set([...s,m.id]));
+    const bonusStars = m.bonus && Math.random()>0.5 ? 1 : 0;
+    const earned = m.stars + bonusStars;
     const cardRect = cardEl.getBoundingClientRect();
     const potEl = potRef.current;
-    const potRect = potEl ? potEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: 200, width: 40, height: 40 };
-
-    // Spawn flying stars
-    const newStars: FlyingStar[] = Array.from({ length: chore.stars * 3 }, (_) => ({
-      id: starIdRef.current++,
-      x: cardRect.left + cardRect.width / 2 + (Math.random() - 0.5) * 40,
-      y: cardRect.top + cardRect.height / 2 + (Math.random() - 0.5) * 20,
-      tx: potRect.left + potRect.width / 2,
-      ty: potRect.top + potRect.height / 2,
+    const potRect = potEl?.getBoundingClientRect()??{left:window.innerWidth/2,top:200,width:40,height:40};
+    const newStars:FlyingStar[] = Array.from({length:earned*4},()=>({
+      id:starIdRef.current++,
+      x:cardRect.left+cardRect.width/2+(Math.random()-0.5)*50,
+      y:cardRect.top+cardRect.height/2+(Math.random()-0.5)*30,
+      tx:potRect.left+potRect.width/2,
+      ty:potRect.top+potRect.height/2,
     }));
-    setFlyingStars((prev) => [...prev, ...newStars]);
-
-    setTimeout(() => {
-      setTotalStars((s) => s + chore.stars);
+    setFlyingStars(p=>[...p,...newStars]);
+    setTimeout(()=>{
+      setTotalStars(s=>s+earned);
+      const newIdx = totalStars + earned;
+      if (newIdx < 40) {
+        setFilledCells(p=>{const n=new Set(p);for(let i=p.size;i<Math.min(40,p.size+earned);i++)n.add(i);return n;});
+      }
       setBouncing(true);
-      setImpactPot(targetPot?.id ?? null);
-      setTimeout(() => { setBouncing(false); setImpactPot(null); }, 700);
-      setFlyingStars((prev) => prev.filter((s) => !newStars.find((n) => n.id === s.id)));
-    }, 900);
-  }, [completedToday, chime, targetPot]);
+      setImpactPot(targetPot?.id??null);
+      setTimeout(()=>{setBouncing(false);setImpactPot(null);},800);
+      setFlyingStars(p=>p.filter(s=>!newStars.find(n=>n.id===s.id)));
+    },950);
+  },[completedToday,chime,targetPot,totalStars]);
+
+  const claimVisitBonus = useCallback((e:React.MouseEvent<HTMLButtonElement>) => {
+    if (claimedBonus) return;
+    setClaimedBonus(true);
+    chime();
+    setBurst({x:e.clientX,y:e.clientY,key:Date.now()});
+    setTimeout(()=>{
+      setTotalStars(s=>s+1);
+      setFilledCells(p=>{const n=new Set(p);n.add(p.size);return n;});
+      setBouncing(true);
+      setTimeout(()=>setBouncing(false),700);
+    },350);
+    setTimeout(()=>setBurst(null),750);
+  },[claimedBonus,chime]);
 
   if (showRedeem) return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-950 via-violet-950 to-indigo-950 px-4 pt-6 pb-32">
-      <button onClick={() => setShowRedeem(false)} className="mb-4 flex items-center gap-2 text-violet-300 text-[13px] font-bold">
+      <button onClick={()=>setShowRedeem(false)} className="mb-4 flex items-center gap-2 text-violet-300 text-[13px] font-bold">
         <span>←</span> Back to Stars
       </button>
-      <div className="rounded-3xl bg-white/10 border border-white/20 p-5 text-center">
-        <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/20 mx-auto">
-          <Gift className="h-7 w-7 text-amber-400" strokeWidth={1.5} />
-        </div>
-        <h2 className="text-[18px] font-black text-white mb-1">Redeem Stars</h2>
-        <p className="text-[12px] text-violet-300 mb-5">Ask Mum or Dad to approve your gift card!</p>
+      <div className="text-center mb-6">
+        <p className="text-[11px] font-black uppercase tracking-widest text-violet-400 mb-1">Star Shop</p>
+        <h2 style={{fontFamily:"var(--font-display)"}} className="text-[24px] font-black text-white">Redeem your stars</h2>
+        <p className="text-[12px] text-violet-300 mt-1">Ask Mum or Dad to approve!</p>
+      </div>
+      <div className="space-y-3 mb-6">
         {[
-          { brand: "Amazon", color: "#f59e0b", val: 10, stars: 20 },
-          { brand: "Smyths Toys", color: "#a78bfa", val: 5, stars: 10 },
-          { brand: "LEGO Store", color: "#38bdf8", val: 15, stars: 30 },
-        ].map((gc) => (
-          <div key={gc.brand} className="mb-3 flex items-center justify-between rounded-2xl bg-white/10 border border-white/15 px-4 py-3">
+          {brand:"Amazon",       val:5,  stars:10, color:"#f59e0b"},
+          {brand:"Smyths Toys",  val:10, stars:20, color:"#a78bfa"},
+          {brand:"LEGO Store",   val:15, stars:30, color:"#38bdf8"},
+          {brand:"Roblox",       val:10, stars:25, color:"#10b981"},
+        ].map(gc=>(
+          <div key={gc.brand} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/8 px-4 py-3.5">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: gc.color + "30" }}>
-                <ShoppingBag className="h-4 w-4" style={{ color: gc.color }} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{background:gc.color+"25"}}>
+                <ShoppingBag className="h-5 w-5" style={{color:gc.color}} />
               </div>
-              <div className="text-left">
+              <div>
                 <p className="text-[13px] font-bold text-white">{gc.brand} Gift Card</p>
-                <p className="text-[11px] text-violet-300">£{gc.val} · 0% fees</p>
+                <p className="text-[11px] text-violet-300">£{gc.val} · 0% fees · instant</p>
               </div>
             </div>
             <div className="text-right">
               <p className="text-[11px] font-black text-amber-400">{gc.stars} stars</p>
-              <button className={cn(
-                "mt-1 rounded-xl px-3 py-1 text-[11px] font-bold",
-                totalStars >= gc.stars
-                  ? "bg-amber-400 text-stone-900"
-                  : "bg-white/10 text-white/40 cursor-not-allowed",
-              )}>
-                {totalStars >= gc.stars ? "Redeem" : "Need more ⭐"}
+              <button className={cn("mt-1 rounded-xl px-3 py-1.5 text-[11px] font-bold",
+                totalStars>=gc.stars?"bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900":"bg-white/10 text-white/30 cursor-not-allowed")}>
+                {totalStars>=gc.stars?"Redeem!":"Need more"}
               </button>
             </div>
           </div>
         ))}
-        <p className="mt-4 text-[10px] text-violet-400">Parent approval required · Powered by Kindled × Tillo</p>
       </div>
+      <p className="text-center text-[10px] text-violet-500">Parent approval required · Powered by Kindled × Tillo · Instant delivery</p>
     </div>
   );
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-indigo-950 via-violet-950 to-indigo-900 overflow-hidden pb-32">
-      {/* Star burst overlay */}
-      <AnimatePresence>
-        {burst && <StarBurst key={burst.key} x={burst.x} y={burst.y} />}
-      </AnimatePresence>
-      {/* Flying stars overlay */}
-      {flyingStars.map((s) => (
-        <div
-          key={s.id}
-          className="pointer-events-none fixed z-50 text-amber-400"
-          style={{
-            left: s.x, top: s.y,
-            animation: `fly-to-pot 0.9s cubic-bezier(0.25,0.46,0.45,0.94) forwards`,
-            ["--tx" as string]: `${s.tx - s.x}px`,
-            ["--ty" as string]: `${s.ty - s.y}px`,
-          }}
-        >
-          <StarIcon size={18} />
+      {/* Overlays */}
+      <AnimatePresence>{burst&&<StarBurst key={burst.key} x={burst.x} y={burst.y}/>}</AnimatePresence>
+      {flyingStars.map(s=>(
+        <div key={s.id} className="pointer-events-none fixed z-50 text-amber-400"
+          style={{left:s.x,top:s.y,animation:"fly-to-pot 0.9s cubic-bezier(0.25,0.46,0.45,0.94) forwards",
+            ["--tx" as string]:`${s.tx-s.x}px`,["--ty" as string]:`${s.ty-s.y}px`}}>
+          <StarIcon size={16}/>
         </div>
       ))}
 
-      {/* Twinkling star background */}
-      <div className="pointer-events-none absolute inset-0">
-        <svg className="w-full h-40" viewBox="0 0 100 40" preserveAspectRatio="xMidYMid slice">
-          {TWINKLE_STARS.map((s) => (
+      {/* Starfield bg */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <svg className="w-full h-52" viewBox="0 0 100 52" preserveAspectRatio="xMidYMid slice">
+          {TWINKLE_STARS.map(s=>(
             <circle key={s.id} cx={s.cx} cy={s.cy} r={s.r} fill="white"
-              style={{ animation: `twinkle ${s.dur} ${s.delay} ease-in-out infinite alternate`, opacity: 0.6 }} />
+              style={{animation:`twinkle ${s.dur} ${s.delay} ease-in-out infinite alternate`,opacity:0.55}}/>
           ))}
         </svg>
-        {/* Clouds */}
-        {[{ x: "5%", y: 48 }, { x: "55%", y: 28 }, { x: "75%", y: 60 }].map((c, i) => (
-          <div key={i} className="absolute" style={{ left: c.x, top: c.y }}>
-            <div className="flex">
-              {[28, 38, 28].map((w, j) => (
-                <div key={j} className="rounded-full bg-white/8" style={{ width: w, height: w * 0.6, marginLeft: j > 0 ? -8 : 0 }} />
-              ))}
-            </div>
-          </div>
-        ))}
+        {/* Nebula glows */}
+        <div className="absolute -top-20 left-1/4 h-60 w-60 rounded-full bg-violet-600/12 blur-3xl"/>
+        <div className="absolute top-20 right-0 h-44 w-44 rounded-full bg-indigo-500/12 blur-3xl"/>
+        <div className="absolute top-1/3 left-0 h-36 w-36 rounded-full bg-fuchsia-600/10 blur-3xl"/>
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 px-4 pt-5 pb-4">
-        <button onClick={onClose} className="mb-3 flex items-center gap-1.5 text-[13px] font-bold text-violet-300 active:opacity-70">
-          <span>←</span> Back to Dashboard
-        </button>
-        <div className="text-center">
-        <p className="flex items-center justify-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-violet-400 mb-1"><Sparkles className="h-3 w-3" /> Kindled Stars</p>
-        <h1 className="text-[22px] font-black text-white leading-tight">Billy&apos;s Star Dashboard</h1>
-        <p className="text-[12px] text-violet-300 mt-1">Complete adventures to earn stars!</p>
+      {/* ── HERO HEADER ── */}
+      <header className="relative z-10 px-4 pt-6 pb-4">
+        {/* Level badge */}
+        <div className="mb-4 flex items-center justify-between">
+          <div className={cn("flex items-center gap-2 rounded-2xl px-3 py-1.5 bg-gradient-to-r",level.grad)}>
+            <Sparkles className="h-3.5 w-3.5 text-white" strokeWidth={2}/>
+            <span className="text-[11px] font-black text-white uppercase tracking-wide">{level.label}</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/8 px-3 py-1.5">
+            <Flame className="h-3.5 w-3.5 text-orange-400"/>
+            <span className="text-[11px] font-bold text-white">Day {streakDay} streak!</span>
+          </div>
         </div>
 
-        {/* Giant star counter */}
-        <div className={cn(
-          "mt-4 inline-flex flex-col items-center gap-1 rounded-3xl bg-white/10 border border-white/20 px-8 py-4 transition-transform",
-          bouncing && "animate-bounce",
-        )}>
-          <div className="flex items-center gap-2">
-            <StarIcon size={32} className={cn("text-amber-400 drop-shadow-lg", bouncing && "animate-spin")} />
-            <span className="text-[48px] font-black text-amber-400 leading-none tabular-nums">{totalStars}</span>
-            <StarIcon size={32} className={cn("text-amber-400 drop-shadow-lg", bouncing && "animate-spin")} />
+        {/* Star counter */}
+        <motion.div className="text-center"
+          animate={bouncing?{scale:[1,1.12,0.96,1.05,1]}:{scale:1}}
+          transition={bouncing?{duration:0.55,times:[0,0.3,0.6,0.8,1]}:{duration:0.2}}>
+          <div className="inline-flex flex-col items-center">
+            <div className="flex items-center gap-3">
+              <motion.div animate={bouncing?{rotate:[0,30,-20,10,0]}:{rotate:0}} transition={{duration:0.5}}>
+                <StarIcon size={36} className="text-amber-400 drop-shadow-[0_0_12px_rgba(251,191,36,0.8)]"/>
+              </motion.div>
+              <span style={{fontFamily:"var(--font-display)"}}
+                className="text-[64px] font-black leading-none text-amber-400 tabular-nums drop-shadow-[0_0_20px_rgba(251,191,36,0.5)]">
+                {totalStars}
+              </span>
+              <motion.div animate={bouncing?{rotate:[0,-30,20,-10,0]}:{rotate:0}} transition={{duration:0.5}}>
+                <StarIcon size={36} className="text-amber-400 drop-shadow-[0_0_12px_rgba(251,191,36,0.8)]"/>
+              </motion.div>
+            </div>
+            <p className="text-[14px] font-black text-amber-300 mt-1">Billy&apos;s Stars</p>
+            <p className="text-[11px] text-violet-400 mt-0.5">= £{(totalStars*EXCHANGE_RATE).toFixed(2)} unlocked by family</p>
           </div>
-          <p className="text-[12px] font-bold text-amber-300">Stars Earned</p>
-          <p className="text-[10px] text-violet-400">= £{(totalStars * EXCHANGE_RATE).toFixed(2)} towards your dream!</p>
+        </motion.div>
+
+        {/* XP bar */}
+        <div className="mt-4">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-[10px] font-bold text-violet-400 uppercase tracking-wider">{level.label}</span>
+            <span className="text-[10px] text-violet-500">{totalStars}/{level.max} → next level</span>
+          </div>
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/10">
+            <motion.div className={cn("h-full rounded-full bg-gradient-to-r",level.grad)}
+              initial={{width:"0%"}} animate={{width:`${xpPct}%`}}
+              transition={{type:"spring",stiffness:140,damping:24}}
+              style={{boxShadow:"0 0 10px rgba(251,191,36,0.4)"}}/>
+          </div>
         </div>
       </header>
 
-      {/* Star exchange rate */}
-      <div className="relative z-10 mx-4 mb-4 rounded-2xl bg-white/8 border border-white/15 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/20">
-            <Wallet className="h-5 w-5 text-amber-400" strokeWidth={1.5} />
-          </div>
-          <div>
-            <p className="text-[12px] font-bold text-white">Star Exchange Rate</p>
-            <p className="flex items-center gap-1 text-[11px] text-violet-300">1 <StarIcon size={11} className="text-amber-400" /> = £{EXCHANGE_RATE.toFixed(2)} funded by Mum &amp; Dad</p>
-          </div>
-          <div className="ml-auto text-right">
-            <p className="text-[11px] font-black text-emerald-400">£{(totalStars * EXCHANGE_RATE).toFixed(2)}</p>
-            <p className="text-[9px] text-violet-400">total earned</p>
-          </div>
-        </div>
-      </div>
+      {/* ── DAILY VISIT BONUS ── */}
+      <AnimatePresence>
+        {!claimedBonus && (
+          <motion.div initial={{opacity:0,y:-8}} animate={{opacity:1,y:0}} exit={{opacity:0,height:0}}
+            className="relative z-10 mx-4 mb-4">
+            <motion.button onClick={claimVisitBonus} whileTap={{scale:0.95}}
+              className="relative w-full overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-black text-stone-900 shadow-xl shadow-amber-900/40"
+              animate={{boxShadow:["0 0 20px rgba(251,146,60,0.4)","0 0 40px rgba(251,146,60,0.7)","0 0 20px rgba(251,146,60,0.4)"]}}
+              transition={{duration:1.8,repeat:Infinity}}>
+              <div className="pointer-events-none absolute inset-0">
+                {Array.from({length:8},(_,i)=>(
+                  <motion.div key={i} className="absolute h-1.5 w-1.5 rounded-full bg-white/40"
+                    style={{left:`${12+i*11}%`,top:"50%"}}
+                    animate={{y:[0,-18,0],opacity:[0,1,0]}}
+                    transition={{duration:1.4,delay:i*0.18,repeat:Infinity}}/>
+                ))}
+              </div>
+              Claim your daily visit bonus +1
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Target pot */}
+      {/* ── TARGET POT ── */}
       {targetPot && (
-        <div ref={potRef} className="relative z-10 mx-4 mb-5 rounded-2xl bg-white/10 border-2 border-amber-400/40 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/20">
-              <Gift className="h-5 w-5 text-amber-400" strokeWidth={1.5} />
+        <div ref={potRef} className="relative z-10 mx-4 mb-5 rounded-2xl border-2 border-amber-400/35 bg-white/8 px-4 py-3.5"
+          style={{boxShadow:"0 0 24px rgba(251,191,36,0.12)"}}>
+          <p className="text-[10px] font-black uppercase tracking-widest text-amber-400/70 mb-1.5">Stars splashing here</p>
+          <div className="flex items-center gap-3" ref={jarRef}>
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-400/20">
+              <Gift className="h-5.5 w-5.5 text-amber-400" strokeWidth={1.5}/>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] font-bold text-white truncate">{targetPot.title}</p>
-              <div className="mt-1.5 h-3 w-full rounded-full bg-white/15 overflow-hidden">
-                <div
-                  className={cn("h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500", impactPot === targetPot.id && "animate-pulse")}
-                  style={{ width: `${Math.min(100, Math.round((targetPot.raised / targetPot.goal) * 100))}%` }}
-                />
+              <p className="text-[13px] font-bold text-white truncate">{targetPot.title}</p>
+              <div className="mt-1.5 h-3 w-full overflow-hidden rounded-full bg-white/10">
+                <div className={cn("h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700",
+                  impactPot===targetPot.id&&"animate-pulse")}
+                  style={{width:`${Math.min(100,Math.round((targetPot.raised/targetPot.goal)*100))}%`,
+                    boxShadow:"0 0 8px rgba(251,191,36,0.5)"}}/>
               </div>
               <p className="text-[10px] text-violet-300 mt-1">£{targetPot.raised} / £{targetPot.goal} · Stars splash here!</p>
             </div>
-            {impactPot === targetPot.id && (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-400/30 animate-bounce">
-                <Zap className="h-3.5 w-3.5 text-amber-400" />
-              </div>
+            {impactPot===targetPot.id&&(
+              <motion.div initial={{scale:0}} animate={{scale:[0,1.4,1]}} transition={{duration:0.4}}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-400/30">
+                <Zap className="h-4 w-4 text-amber-400"/>
+              </motion.div>
             )}
           </div>
         </div>
       )}
 
-      {/* Daily Adventures */}
+      {/* ── DAILY MISSIONS ── */}
       <section className="relative z-10 px-4 mb-6">
-        <h2 className="text-[14px] font-black text-white mb-1">Daily Adventures</h2>
-        <p className="text-[11px] text-violet-400 mb-3">Tap to complete · Stars fly to your pot!</p>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-[15px] font-black text-white">Daily Missions</h2>
+            <p className="text-[10px] text-violet-400">Resets midnight · Stars fly to your pot!</p>
+          </div>
+          <div className="rounded-xl border border-orange-500/30 bg-orange-500/15 px-2.5 py-1">
+            <p className="text-[10px] font-black text-orange-400">
+              {completedToday.size}/{DAILY_MISSIONS.length} done
+            </p>
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-3">
-          {CHORES.map((chore) => {
-            const done = completedToday.has(chore.id);
+          {DAILY_MISSIONS.map(m=>{
+            const done = completedToday.has(m.id);
+            const flipped = missionFlipped.has(m.id);
             return (
-              <button
-                key={chore.id}
-                onClick={(e) => handleChore(chore, e.currentTarget)}
-                disabled={done}
-                className={cn(
-                  "relative flex flex-col items-center gap-2 rounded-3xl p-4 text-center transition-all duration-300 active:scale-95",
-                  done
-                    ? "bg-white/15 border-2 border-white/30 opacity-80"
-                    : `bg-gradient-to-br ${chore.color} shadow-lg ${chore.shadow}`,
-                )}
-              >
-                {done && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-black/20">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-400 text-stone-900 text-2xl font-black shadow-lg">
-                      ✓
+              <div key={m.id} className="relative" style={{perspective:"600px"}}>
+                <motion.button onClick={e=>handleMission(m,e.currentTarget)}
+                  disabled={done} whileTap={!done?{scale:0.93}:{}}
+                  animate={flipped?{rotateY:180}:{rotateY:0}}
+                  transition={{type:"spring",stiffness:280,damping:26}}
+                  style={{transformStyle:"preserve-3d"}}
+                  className={cn("relative w-full rounded-3xl p-4 text-center shadow-xl",
+                    done?`bg-gradient-to-br ${m.color} opacity-90`:`bg-gradient-to-br ${m.color} ${m.glow}`)}>
+                  {/* Front face */}
+                  <div style={{backfaceVisibility:"hidden"}}>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/25 mx-auto mb-2">
+                      <m.Icon className="h-5 w-5 text-white" strokeWidth={2}/>
+                    </div>
+                    <p className="text-[12px] font-black text-white leading-tight">{m.title}</p>
+                    <p className="text-[9.5px] text-white/75 mt-1 leading-tight">{m.desc}</p>
+                    <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1">
+                      <StarIcon size={10} className="text-amber-300"/>
+                      <span className="text-[11px] font-black text-white">+{m.stars}{m.bonus?" (bonus chance!)":""}</span>
                     </div>
                   </div>
+                </motion.button>
+                {/* Completion overlay — shows on top of the card after flip */}
+                {done&&(
+                  <motion.div initial={{opacity:0,scale:0.5}} animate={{opacity:1,scale:1}}
+                    transition={{type:"spring",stiffness:400,damping:22,delay:0.22}}
+                    className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-black/40">
+                    <motion.div initial={{scale:0}} animate={{scale:[0,1.4,1]}}
+                      transition={{type:"spring",stiffness:500,damping:18,delay:0.3}}
+                      className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-400 shadow-lg shadow-amber-400/50">
+                      <Check className="h-8 w-8 text-stone-900" strokeWidth={3}/>
+                    </motion.div>
+                    <p className="mt-1.5 text-[11px] font-black text-amber-300">Done!</p>
+                  </motion.div>
                 )}
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/25">
-                  <chore.Icon className="h-5 w-5 text-white" strokeWidth={2} />
-                </div>
-                <p className="text-[12px] font-black text-white leading-tight">{chore.title}</p>
-                <p className="text-[10px] text-white/80 leading-tight">{chore.desc}</p>
-                <div className="flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 mt-1">
-                  <StarIcon size={12} className="text-amber-300" />
-                  <span className="text-[11px] font-black text-white">+{chore.stars}</span>
-                </div>
-              </button>
+              </div>
             );
           })}
         </div>
+        {completedToday.size===DAILY_MISSIONS.length&&(
+          <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{delay:0.3}}
+            className="mt-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-center">
+            <p className="text-[13px] font-black text-amber-300">All missions complete!</p>
+            <p className="text-[10px] text-amber-400/70">Come back tomorrow to keep your Day {streakDay+1} streak!</p>
+          </motion.div>
+        )}
       </section>
 
-      {/* 20-step sticker chart */}
-      <section className="relative z-10 mx-4 mb-5 rounded-3xl bg-white/8 border border-white/15 p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Trophy className="h-5 w-5 text-amber-400" strokeWidth={1.75} />
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-black text-white">Star Chart</p>
-            <p className="text-[11px] text-violet-300">Fill 20 stars → unlock your reward!</p>
+      {/* ── GALAXY CHART ── */}
+      <section className="relative z-10 mx-4 mb-6 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-[14px] font-black text-white">Billy&apos;s Galaxy</h2>
+            <p className="text-[10px] text-violet-400">Fill all 40 stars to unlock a MEGA reward!</p>
           </div>
           <div className="text-right">
-            <p className="text-[11px] font-black text-amber-400">{filledCells.size}/20</p>
-            <p className="text-[9px] text-violet-400">filled</p>
+            <p className="text-[14px] font-black text-amber-400">{filledCells.size}<span className="text-[10px] text-violet-400">/40</span></p>
           </div>
         </div>
-        {/* 4×5 sticker grid */}
-        <div className="grid grid-cols-5 gap-2">
-          {Array.from({ length: 20 }, (_, idx) => {
-            const filled = filledCells.has(idx);
-            const isNew = newCell === idx;
-            const isMilestone = idx === 4 || idx === 9 || idx === 14 || idx === 19;
+
+        <svg viewBox="0 0 100 95" className="w-full" style={{height:180}}>
+          {/* Connection lines between consecutive filled stars */}
+          {CONSTELLATION_POS.map((pos,i) => {
+            if (i===0) return null;
+            const prev = CONSTELLATION_POS[i-1]!;
+            const bothFilled = filledCells.has(i-1) && filledCells.has(i);
             return (
-              <motion.button
-                key={idx}
-                onClick={(e) => handleCellTap(idx, e)}
+              <line key={`l${i}`} x1={prev.cx} y1={prev.cy} x2={pos.cx} y2={pos.cy}
+                stroke={bothFilled?"rgba(251,191,36,0.45)":"rgba(255,255,255,0.07)"}
+                strokeWidth={bothFilled?"0.8":"0.5"} strokeDasharray={bothFilled?"":"2,2"}/>
+            );
+          })}
+          {/* Second 20 stars (simpler positions for grid overflow) */}
+          {/* Stars */}
+          {CONSTELLATION_POS.map((pos,i) => {
+            const filled = filledCells.has(i);
+            const isNew = newCell===i;
+            const isMilestone = i===4||i===9||i===14||i===19;
+            const r = isMilestone ? 4.5 : 3;
+            return (
+              <g key={i}>
+                {filled&&(
+                  <circle cx={pos.cx} cy={pos.cy} r={isMilestone?7:5.5}
+                    fill={isMilestone?"rgba(251,146,60,0.25)":"rgba(251,191,36,0.15)"}/>
+                )}
+                <motion.circle cx={pos.cx} cy={pos.cy}
+                  r={filled?r:2.5}
+                  fill={filled?(isMilestone?"#fb923c":"#fbbf24"):"rgba(255,255,255,0.15)"}
+                  style={{filter:filled?`drop-shadow(0 0 ${isMilestone?6:3}px ${isMilestone?"#fb923c":"#fbbf24"})`:"none"}}
+                  initial={false}
+                  animate={isNew?{scale:[0,1.8,0.85,1.1,1]}:{scale:1}}
+                  transition={isNew?{duration:0.6,times:[0,0.3,0.55,0.8,1]}:{type:"spring"}}
+                />
+                {/* Next-to-fill pulse */}
+                {!filled&&i===filledCells.size&&(
+                  <motion.circle cx={pos.cx} cy={pos.cy} r={4.5}
+                    fill="none" stroke="rgba(251,191,36,0.55)" strokeWidth="0.8"
+                    animate={{r:[4.5,7,4.5],opacity:[0.55,0.1,0.55]}}
+                    transition={{duration:1.8,repeat:Infinity,ease:"easeInOut"}}/>
+                )}
+                {isMilestone&&filled&&(
+                  <text x={pos.cx} y={pos.cy-6.5} textAnchor="middle"
+                    fill="#fb923c" fontSize="4" fontWeight="900">!</text>
+                )}
+              </g>
+            );
+          })}
+          {/* Top-right label */}
+          <text x="92" y="90" textAnchor="end" fill="rgba(255,255,255,0.2)" fontSize="5">Galaxy</text>
+        </svg>
+
+        {/* Grid overflow — stars 21-40 in a compact row */}
+        <div className="mt-2 grid grid-cols-10 gap-1">
+          {Array.from({length:20},(_,i)=>{
+            const idx = i+20;
+            const filled = filledCells.has(idx);
+            const isNew = newCell===idx;
+            const isMilestone = idx===24||idx===29||idx===34||idx===39;
+            return (
+              <motion.button key={idx} onClick={e=>handleCellTap(idx,e)}
                 disabled={filled}
-                whileTap={!filled ? { scale: 0.85 } : {}}
-                whileHover={!filled ? { scale: 1.08, borderColor: "rgba(251,191,36,0.6)" } : {}}
-                animate={isNew ? { scale: [0.3, 1.35, 0.95, 1.1, 1] } : {}}
-                transition={isNew ? { duration: 0.55, times: [0, 0.35, 0.55, 0.75, 1], type: "tween" } : { type: "spring", stiffness: 400, damping: 22 }}
-                className={cn(
-                  "relative flex aspect-square items-center justify-center rounded-2xl border-2 text-[18px] transition-colors",
-                  filled
-                    ? isMilestone
-                      ? "border-amber-300 bg-gradient-to-br from-amber-400 to-orange-400 shadow-lg shadow-amber-500/40"
-                      : "border-amber-400/60 bg-gradient-to-br from-yellow-300/40 to-amber-400/30"
-                    : "border-white/20 bg-white/5 cursor-pointer active:bg-white/10",
+                whileTap={!filled?{scale:0.75}:{}}
+                animate={isNew?{scale:[0.2,1.5,0.9,1.1,1]}:{scale:1}}
+                transition={isNew?{duration:0.55}:{type:"spring",stiffness:400,damping:22}}
+                className={cn("aspect-square flex items-center justify-center rounded-lg text-[7px] border transition-colors",
+                  filled?(isMilestone?"border-orange-400/70 bg-gradient-to-br from-amber-400/50 to-orange-400/50":"border-amber-400/40 bg-amber-400/20")
+                    :"border-white/12 bg-white/5")}>
+                {filled?(
+                  <StarIcon size={isMilestone?10:7} className={isMilestone?"text-orange-400":"text-amber-400"}/>
+                ):(
+                  <span className="text-white/20 font-black">{idx+1}</span>
                 )}
-              >
-                {filled ? (
-                  <motion.span
-                    initial={isNew ? { scale: 0, rotate: -30 } : false}
-                    animate={isNew ? { scale: 1, rotate: 0 } : {}}
-                    transition={{ type: "spring", stiffness: 500, damping: 18, delay: 0.05 }}
-                    className="select-none"
-                    style={{ animation: filled && !isNew ? `twinkle ${1.2 + (idx % 5) * 0.25}s ${idx * 0.07}s ease-in-out infinite alternate` : undefined }}
-                  >
-                    <StarIcon size={isMilestone ? 18 : 14} className={isMilestone ? "text-orange-400" : "text-amber-400"} />
-                  </motion.span>
-                ) : (
-                  <span className="text-[10px] font-black text-white/25 select-none">{idx + 1}</span>
-                )}
-                {isMilestone && filled && (
-                  <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[7px] font-black text-white shadow">!</div>
-                )}
-                {/* Pulse ring on empty cells to invite tapping */}
-                {!filled && idx === filledCells.size && (
-                  <motion.div
-                    className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-amber-400/60"
-                    animate={{ opacity: [0.6, 0.1, 0.6], scale: [1, 1.12, 1] }}
-                    transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-                  />
+                {!filled&&idx===filledCells.size&&(
+                  <motion.div className="pointer-events-none absolute inset-0 rounded-lg border border-amber-400/60"
+                    animate={{opacity:[0.6,0.1,0.6]}} transition={{duration:1.6,repeat:Infinity}}/>
                 )}
               </motion.button>
             );
           })}
         </div>
-        <p className="mt-3 text-[10px] text-violet-400 text-center">
-          {filledCells.size >= 20
-            ? "Chart complete! Ask Mum or Dad to redeem your reward!"
-            : `Tap the next square to add your star! ${20 - filledCells.size} to go`}
+        <p className="mt-2 text-center text-[9px] text-violet-400">
+          {filledCells.size>=40?"COMPLETE! Ask Mum or Dad to claim your reward!"
+            :`Tap the next star to fill it in! ${40-filledCells.size} to go`}
         </p>
       </section>
 
-      {/* Redeem CTA */}
+      {/* ── UNLOCK MILESTONES ── */}
+      <section className="relative z-10 px-4 mb-6">
+        <div className="mb-3">
+          <h2 className="text-[15px] font-black text-white">Unlock rewards</h2>
+          <p className="text-[10px] text-violet-400">Earn stars to unlock these prizes!</p>
+        </div>
+        <div className="overflow-x-auto -mx-4 px-4">
+          <div className="flex gap-3 pb-2" style={{minWidth:"max-content"}}>
+            {UNLOCK_MILESTONES.map(m=>{
+              const reached = totalStars>=m.stars;
+              return (
+                <motion.div key={m.stars} whileTap={{scale:0.96}}
+                  className={cn("relative w-36 overflow-hidden rounded-2xl border p-4 flex-shrink-0",
+                    reached?"border-white/30 bg-white/12":"border-white/8 bg-white/5")}
+                  style={reached?{boxShadow:`0 0 24px ${m.color}40`}:{}}>
+                  {!reached&&(
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px] rounded-2xl">
+                      <div className="text-center">
+                        <Lock className="h-5 w-5 text-white/50 mx-auto mb-1"/>
+                        <p className="text-[10px] font-black text-white/60">{m.stars} stars</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl mb-2"
+                    style={{background:m.color+"25"}}>
+                    {reached
+                      ?<StarIcon size={20} className="text-amber-400"/>
+                      :<ShoppingBag className="h-4 w-4" style={{color:m.color}}/>
+                    }
+                  </div>
+                  <p className="text-[11px] font-black text-white leading-tight">{m.label}</p>
+                  <p className="text-[9px] mt-0.5" style={{color:m.color+`cc`}}>{m.sub}</p>
+                  {reached&&(
+                    <div className="mt-2 flex items-center gap-1">
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-400"/>
+                      <p className="text-[9px] font-bold text-emerald-400">Unlocked!</p>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── STREAK COMEBACK HOOK ── */}
+      <div className="relative z-10 mx-4 mb-5 overflow-hidden rounded-2xl border border-orange-500/25 bg-gradient-to-r from-orange-950/60 to-amber-950/40 px-4 py-3.5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Flame className="h-4 w-4 text-orange-400" strokeWidth={2}/>
+              <p className="text-[12px] font-black text-orange-300">Day {streakDay} streak!</p>
+            </div>
+            <p className="text-[11px] text-white/60 leading-snug">Come back <span className="font-bold text-orange-300">tomorrow</span> to unlock your Day {streakDay+1} bonus star and keep your streak alive!</p>
+            <p className="mt-1.5 text-[10px] text-orange-400/70">Bonus: Double stars on Day 7!</p>
+          </div>
+          <div className="shrink-0 rounded-2xl bg-orange-500/20 border border-orange-500/30 px-3 py-2 text-center">
+            <p className="text-[22px] font-black text-orange-300 leading-none">{streakDay}</p>
+            <p className="text-[8px] text-orange-400/70 font-bold uppercase">days</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── COMING SOON TEASE ── */}
+      <div className="relative z-10 mx-4 mb-5">
+        <div className="overflow-hidden rounded-2xl border border-fuchsia-500/20 bg-gradient-to-br from-fuchsia-950/60 to-violet-950/50 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="h-3.5 w-3.5 text-fuchsia-400"/>
+            <p className="text-[10px] font-black uppercase tracking-widest text-fuchsia-400">Coming soon</p>
+          </div>
+          <p className="text-[14px] font-black text-white mb-1">Secret drop this Friday!</p>
+          <p className="text-[11px] text-fuchsia-300/70">Something BIG is being added to the star shop. Rumour has it… it&apos;s legendary.</p>
+          <div className="mt-3 flex gap-2">
+            {["???","???","???"].map((s,i)=>(
+              <div key={i} className="flex-1 rounded-xl border border-fuchsia-500/20 bg-fuchsia-900/30 py-2.5 text-center">
+                <p className="text-[14px] font-black text-fuchsia-400/50">{s}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── REDEEM CTA ── */}
       <div className="relative z-10 mx-4">
-        <button
-          onClick={() => setShowRedeem(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-3xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-black text-stone-900 shadow-xl shadow-amber-900/30 active:scale-[0.97] transition-transform"
-        >
-          <StarIcon size={20} />
-          Exchange Stars for Gift Cards
-        </button>
+        <motion.button onClick={()=>setShowRedeem(true)}
+          whileHover={{scale:1.02,y:-2}} whileTap={{scale:0.97}}
+          className="relative w-full overflow-hidden rounded-3xl py-4.5 text-[15px] font-black text-stone-900 shadow-xl shadow-amber-900/30"
+          style={{background:"linear-gradient(135deg,#fbbf24,#f97316,#fbbf24)",backgroundSize:"200% 100%"}}>
+          <div className="pointer-events-none absolute inset-0">
+            {Array.from({length:12},(_,i)=>(
+              <motion.div key={i} className="absolute h-2 w-2 rounded-full bg-white/30"
+                style={{left:`${8+i*8}%`,top:"50%"}}
+                animate={{y:[0,-24,0],opacity:[0,0.8,0],scale:[1,1.5,0]}}
+                transition={{duration:1.6,delay:i*0.13,repeat:Infinity}}/>
+            ))}
+          </div>
+          <div className="relative flex items-center justify-center gap-2.5">
+            <StarIcon size={18} className="text-stone-900"/>
+            Exchange Stars for Rewards
+            <StarIcon size={18} className="text-stone-900"/>
+          </div>
+        </motion.button>
         <p className="mt-2 text-center text-[10px] text-violet-500">Parent approval required · 0% fees · Instant delivery</p>
       </div>
     </div>
   );
 }
 
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // WOULD YOU RATHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const RANDOM_GIFT_COLORS = ["#f59e0b","#a78bfa","#38bdf8","#4ade80","#fb923c","#f472b6","#60a5fa","#34d399","#fbbf24","#c084fc","#fb7185","#6ee7b7"];
-const RANDOM_GIFTS = [
-  { label: "Socks", price: 8 },
-  { label: "Candle", price: 12 },
-  { label: "Body lotion", price: 9 },
-  { label: "Random book", price: 14 },
-  { label: "Chocolates", price: 7 },
-  { label: "Trinket", price: 11 },
-  { label: "Plant pot", price: 15 },
-  { label: "Picture frame", price: 13 },
-  { label: "Mug", price: 10 },
-  { label: "Mini puzzle", price: 16 },
-  { label: "Desk gadget", price: 18 },
-  { label: "Bath salts", price: 12 },
-];
-
-const DREAM_GIFTS = [
-  {
-    name: "MacBook Air M3",
-    price: 649,
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop&q=80",
-    contributors: 6,
-    each: 108,
-  },
-  {
-    name: "Nike Air Max 270",
-    price: 110,
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&q=80",
-    contributors: 4,
-    each: 28,
-  },
+const CIRCLE_SIZES = [3, 5, 8, 12, 20];
+const CONTRIB_AMOUNTS = [10, 20, 30, 50, 100];
+const UNLOCK_TIERS = [
+  { max: 55,  label: "Starter gift",   desc: "Thoughtful & personal",         grad: "from-teal-500 to-emerald-500"  },
+  { max: 130, label: "Sweet spot",     desc: "Top of most wish lists",         grad: "from-amber-400 to-yellow-500"  },
+  { max: 280, label: "Dream tier",     desc: "The gift they'll never forget",  grad: "from-orange-400 to-amber-500"  },
+  { max: 520, label: "Premium unlock", desc: "Life-changing quality",          grad: "from-violet-500 to-purple-500" },
+  { max: 1e6, label: "No limits",      desc: "Anything is possible",           grad: "from-rose-500 to-pink-500"    },
 ];
 
 function WouldYouRather() {
-  const [side, setSide] = useState<"random" | "dream">("random");
-  const randomTotal = RANDOM_GIFTS.reduce((s, g) => s + g.price, 0);
-  const dreamTotal = DREAM_GIFTS.reduce((s, g) => s + g.price, 0);
+  const [people, setPeople] = useState(5);
+  const [each, setEach] = useState(20);
+  const total = people * each;
+  const tier = UNLOCK_TIERS.find(t => total <= t.max) ?? UNLOCK_TIERS[4]!;
+
+  const matched = useMemo(() => {
+    const inRange = CATALOGUE.filter(c => c.price >= total * 0.6 && c.price <= total * 1.4);
+    const pool = inRange.length >= 2 ? inRange : [...CATALOGUE];
+    return pool.sort((a, b) => Math.abs(a.price - total) - Math.abs(b.price - total)).slice(0, 3);
+  }, [total]);
 
   return (
-    <section className="px-4">
-      {/* Header */}
-      <div className="mb-4 text-center">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-1">Stop and think</p>
-        <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[22px] font-semibold text-stone-800 leading-tight">
-          Would you rather…
+    <section className="px-4 pb-2">
+
+      {/* ── Header ── */}
+      <div className="mb-5 text-center">
+        <p className="mb-1 text-[10px] font-black uppercase tracking-widest text-stone-400">Try it yourself</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }}
+          className="text-[24px] font-semibold leading-tight text-stone-900">
+          What could your circle unlock?
         </h2>
+        <p className="mt-1 text-[12px] text-stone-400">Tap your group size and amount — see your real buying power</p>
       </div>
 
-      {/* Toggle pill */}
-      <div className="flex rounded-2xl bg-stone-100 p-1 gap-1 mb-4">
-        {(["random", "dream"] as const).map((s) => (
-          <motion.button
-            key={s}
-            whileTap={{ scale: 0.96 }}
-            onClick={() => setSide(s)}
-            className={cn(
-              "flex-1 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
-              side === s ? "bg-white shadow-sm text-stone-900" : "text-stone-400",
-            )}
-          >
-            <span className="inline-flex items-center gap-1.5">
-              {s === "random" ? <Gift className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
-              {s === "random" ? "15 random gifts" : "The dream gifts"}
-            </span>
-          </motion.button>
-        ))}
-      </div>
+      {/* ── Main calculator card ── */}
+      <div className="overflow-hidden rounded-3xl border border-stone-100 bg-white shadow-md shadow-stone-100/80">
+        <div className="space-y-5 p-5">
 
-      <AnimatePresence mode="wait">
-        {side === "random" ? (
-          <motion.div
-            key="random"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ type: "spring", stiffness: 380, damping: 32 }}
-          >
-            {/* Random gifts grid */}
-            <div className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm">
-              <div className="grid grid-cols-6 gap-2 mb-4">
-                {RANDOM_GIFTS.map((g, i) => (
-                  <motion.div
-                    key={g.label}
-                    initial={{ opacity: 0, scale: 0.4, rotate: Math.random() * 30 - 15 }}
-                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                    transition={{ delay: i * 0.045, type: "spring", stiffness: 500, damping: 20 }}
-                    className="flex flex-col items-center gap-0.5"
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl"
-                      style={{ background: (RANDOM_GIFT_COLORS[i % RANDOM_GIFT_COLORS.length]!) + "22", animation: `wobble ${2.2 + i * 0.15}s ${i * 0.2}s ease-in-out infinite` }}>
-                      <Gift className="h-4 w-4" style={{ color: RANDOM_GIFT_COLORS[i % RANDOM_GIFT_COLORS.length]! }} strokeWidth={1.5} />
-                    </div>
-                    <span className="text-[8px] text-stone-400 leading-tight text-center">{g.label}</span>
-                  </motion.div>
+          {/* People picker */}
+          <div>
+            <div className="mb-2.5 flex items-center justify-between">
+              <span className="text-[12px] font-semibold text-stone-600">People in your circle</span>
+              <span className="rounded-xl bg-amber-50 border border-amber-100 px-2.5 py-1 text-[12px] font-black text-amber-600">
+                {people} people
+              </span>
+            </div>
+            <div className="flex gap-1.5">
+              {CIRCLE_SIZES.map(n => (
+                <motion.button key={n} whileTap={{ scale: 0.86 }} onClick={() => setPeople(n)}
+                  className={cn(
+                    "flex-1 rounded-xl py-2.5 text-[13px] font-bold transition-all",
+                    people === n
+                      ? "bg-gradient-to-b from-amber-400 to-orange-500 text-stone-900 shadow-sm shadow-amber-200"
+                      : "bg-stone-100 text-stone-400 hover:bg-stone-200",
+                  )}>
+                  {n}
+                </motion.button>
+              ))}
+            </div>
+            <div className="mt-1.5 flex justify-between px-0.5">
+              <span className="text-[9px] text-stone-300">Immediate family</span>
+              <span className="text-[9px] text-stone-300">Big extended circle</span>
+            </div>
+          </div>
+
+          {/* Amount picker */}
+          <div>
+            <div className="mb-2.5 flex items-center justify-between">
+              <span className="text-[12px] font-semibold text-stone-600">Each person chips in</span>
+              <span className="rounded-xl bg-amber-50 border border-amber-100 px-2.5 py-1 text-[12px] font-black text-amber-600">
+                £{each} each
+              </span>
+            </div>
+            <div className="flex gap-1.5">
+              {CONTRIB_AMOUNTS.map(a => (
+                <motion.button key={a} whileTap={{ scale: 0.86 }} onClick={() => setEach(a)}
+                  className={cn(
+                    "flex-1 rounded-xl py-2.5 text-[12px] font-bold transition-all",
+                    each === a
+                      ? "bg-gradient-to-b from-amber-400 to-orange-500 text-stone-900 shadow-sm shadow-amber-200"
+                      : "bg-stone-100 text-stone-400 hover:bg-stone-200",
+                  )}>
+                  £{a}
+                </motion.button>
+              ))}
+            </div>
+            <div className="mt-1.5 flex justify-between px-0.5">
+              <span className="text-[9px] text-stone-300">Birthday card money</span>
+              <span className="text-[9px] text-stone-300">Special occasion</span>
+            </div>
+          </div>
+
+          {/* ── Live result ── */}
+          <AnimatePresence mode="wait">
+            <motion.div key={tier.label}
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ type: "spring", stiffness: 400, damping: 28 }}
+              className={`rounded-2xl bg-gradient-to-br ${tier.grad} p-4`}>
+
+              <div className="flex items-start justify-between gap-3">
+                {/* Left: pot total */}
+                <div className="min-w-0">
+                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-white/60">Combined pot</p>
+                  <motion.p key={total}
+                    initial={{ y: -10, opacity: 0.5 }} animate={{ y: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 520, damping: 22 }}
+                    style={{ fontFamily: "var(--font-display)" }}
+                    className="text-[52px] font-black leading-none text-white">
+                    £{total}
+                  </motion.p>
+                  <div className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-white/18 px-2.5 py-1">
+                    <Sparkles className="h-3 w-3 text-white/90" />
+                    <span className="text-[10px] font-black text-white/90">{tier.label} · {tier.desc}</span>
+                  </div>
+                </div>
+                {/* Right: guesswork comparison */}
+                <div className="shrink-0 rounded-xl bg-black/15 px-3 py-2 text-right">
+                  <p className="text-[9px] uppercase tracking-wider text-white/50">Without Kindled</p>
+                  <p className="mt-0.5 text-[13px] font-bold text-white/45 line-through">{people} random gifts</p>
+                  <p className="text-[9px] text-white/35">same money · zero memory</p>
+                </div>
+              </div>
+
+              {/* Pill trio */}
+              <div className="mt-3 grid grid-cols-3 gap-1.5">
+                {[
+                  { Icon: Users, label: `${people} people` },
+                  { Icon: Check, label: `£${each} each`   },
+                  { Icon: Gift,  label: "1 perfect gift"  },
+                ].map(({ Icon, label }) => (
+                  <div key={label} className="flex items-center justify-center gap-1.5 rounded-xl bg-white/15 py-2">
+                    <Icon className="h-3 w-3 text-white/80" strokeWidth={2} />
+                    <span className="text-[10px] font-bold text-white/90">{label}</span>
+                  </div>
                 ))}
               </div>
-              <div className="border-t border-stone-100 pt-3 flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] text-stone-400">Total spent</p>
-                  <p style={{ fontFamily: "var(--font-display)" }} className="text-[24px] font-bold text-stone-700">~£{randomTotal}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[11px] text-stone-400 leading-tight max-w-[140px]">
-                    Most forgotten by February.<br/>Half already owned.<br/>One returned.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setSide("dream")}
-              className="mt-3 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3 text-[14px] font-semibold text-stone-900 shadow-sm shadow-amber-200"
-            >
-              Or… see what a list could unlock →
-            </motion.button>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="dream"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ type: "spring", stiffness: 380, damping: 32 }}
-            className="space-y-3"
-          >
-            {DREAM_GIFTS.map((g, i) => (
-              <motion.div
-                key={g.name}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, type: "spring", stiffness: 380, damping: 30 }}
-                className="overflow-hidden rounded-3xl border border-stone-100 bg-white shadow-sm"
-              >
-                <div className="relative h-36 overflow-hidden">
-                  <img src={g.image} alt={g.name} className="h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-                    <div>
-                      <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-semibold text-white leading-tight">{g.name}</p>
-                      <p className="text-[13px] font-bold text-amber-400">£{g.price}</p>
-                    </div>
-                    <div className="rounded-xl bg-white/15 backdrop-blur-sm px-2.5 py-1.5 text-right">
-                      <p className="text-[10px] text-white/80">{g.contributors} people</p>
-                      <p className="text-[13px] font-black text-white">£{g.each} each</p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* ── What it unlocks ── */}
+        <div className="border-t border-stone-100 px-5 py-4">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-400">
+              What £{total} unlocks right now
+            </p>
+            <p className="text-[10px] text-stone-300">from the catalogue</p>
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div key={matched.map(m => m.id).join("-")}
+              className="flex gap-3 overflow-x-auto scrollbar-none -mx-1 px-1 pb-1">
+              {matched.map((item, i) => (
+                <motion.div key={item.id}
+                  initial={{ opacity: 0, y: 16, scale: 0.88 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: i * 0.07, type: "spring", stiffness: 400, damping: 26 }}
+                  className="w-[150px] shrink-0 overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-sm">
+                  {/* Product image */}
+                  <div className="relative h-[100px] overflow-hidden bg-stone-100">
+                    <img src={item.image} alt={item.name}
+                      className="h-full w-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
+                    <div className={cn(
+                      "absolute right-2 top-2 rounded-lg px-1.5 py-0.5 text-[9px] font-black text-white",
+                      item.price <= total ? "bg-emerald-500/90 backdrop-blur-sm" : "bg-amber-500/90 backdrop-blur-sm",
+                    )}>
+                      {item.price <= total ? "In budget" : `£${item.price - total} away`}
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2.5">
-                  <div className="flex -space-x-1.5">
-                    {Array.from({ length: g.contributors }).map((_, j) => (
-                      <div key={j} className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-amber-300 to-orange-400 text-stone-900">
-                        <Users className="h-2.5 w-2.5" />
-                      </div>
-                    ))}
+                  {/* Product info */}
+                  <div className="p-2.5">
+                    <p className="line-clamp-2 text-[11px] font-semibold leading-tight text-stone-700">{item.name}</p>
+                    <div className="mt-1.5 flex items-end justify-between">
+                      <span style={{ fontFamily: "var(--font-display)" }}
+                        className="text-[15px] font-black text-amber-600">£{item.price}</span>
+                      <span className="text-[9px] text-stone-400">{item.hearts} wishlists</span>
+                    </div>
                   </div>
-                  <p className="text-[11px] text-stone-500">{g.contributors} people kindling together</p>
-                  <span className="ml-auto flex items-center gap-1 text-[11px] font-semibold text-emerald-500"><Check className="h-3 w-3" /> No duplicates</span>
-                </div>
-              </motion.div>
-            ))}
-            {/* Summary */}
-            <div className="rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 px-4 py-3 flex items-center justify-between">
-              <div>
-                <p className="text-[11px] text-stone-500">Total value unlocked</p>
-                <p style={{ fontFamily: "var(--font-display)" }} className="text-[26px] font-bold text-amber-600">£{dreamTotal}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* ── Comparison row ── */}
+        <div className="border-t border-stone-100 px-5 py-4">
+          <div className="grid grid-cols-2 gap-3">
+            {/* Without */}
+            <div className="rounded-2xl border border-red-100 bg-red-50/60 p-3">
+              <div className="mb-1.5 flex items-center gap-1.5">
+                <X className="h-3.5 w-3.5 text-red-400" strokeWidth={2.5} />
+                <span className="text-[10px] font-black uppercase tracking-wide text-red-400">Without Kindled</span>
               </div>
-              <div className="text-right">
-                <p className="text-[11px] text-stone-500 leading-tight">Remembered forever.<br/>Exactly what they wanted.<br/>Zero guesswork.</p>
-              </div>
+              <p className="text-[12px] font-semibold text-stone-700">
+                {people} separate gifts
+              </p>
+              <p className="mt-0.5 text-[10px] leading-snug text-stone-400">
+                Average £{Math.round(total / people)} each · guesswork · duplicates · forgotten by February
+              </p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {/* With */}
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3">
+              <div className="mb-1.5 flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-emerald-500" strokeWidth={2.5} />
+                <span className="text-[10px] font-black uppercase tracking-wide text-emerald-500">With Kindled</span>
+              </div>
+              <p className="text-[12px] font-semibold text-stone-700">
+                1 gift they actually want
+              </p>
+              <p className="mt-0.5 text-[10px] leading-snug text-stone-400">
+                £{total} pooled · chosen by them · remembered forever · zero duplicates
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── CTA ── */}
+        <div className="px-5 pb-5">
+          <motion.button whileTap={{ scale: 0.97 }} whileHover={{ scale: 1.02 }}
+            className="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900"
+            style={{ boxShadow: "0 4px 24px rgba(251,146,60,0.35)" }}>
+            Start a pot — takes 2 minutes
+          </motion.button>
+          <p className="mt-2 text-center text-[10px] text-stone-400">Free forever · No credit card · Works on any device</p>
+        </div>
+      </div>
+
+      {/* ── Social proof chips ── */}
+      <div className="-mx-4 mt-3 overflow-x-auto px-4">
+        <div className="flex min-w-max gap-2 pb-1">
+          {[
+            { who: "Families of 4–6",   unlock: "Mountain bikes · MacBooks · log burners"    },
+            { who: "Friend groups 8+",  unlock: "Festival tickets · spa days · gaming chairs" },
+            { who: "Work colleagues",   unlock: "Wine experiences · cookery classes · tech"   },
+          ].map(p => (
+            <div key={p.who} className="min-w-[190px] rounded-2xl border border-stone-100 bg-white px-4 py-3 shadow-sm">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">{p.who}</p>
+              <p className="mt-0.5 text-[12px] font-semibold text-stone-700">{p.unlock}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -3630,11 +3352,6 @@ function AboutPage() {
     { title: "Nothing expires", desc: "An unfinished pot carries to the next birthday or Christmas — never a \"failure.\"" },
   ];
 
-  const PLANET = [
-    { Icon: Trash2, title: "23 Million Gifts", body: "Unwanted Christmas presents that end up in UK landfill every single year — most never even unwrapped twice." },
-    { Icon: Package, title: "£1.27 Billion", body: "Spent annually on UK gifts nobody wanted — much of it boxed, wrapped, and binned within weeks." },
-    { Icon: TrendingUp, title: "+30% Waste", body: "The rise in household waste over the festive season alone — wrapping, packaging, and gifts nobody asked for." },
-  ];
 
   return (
     <div className="min-h-screen bg-[#15100C] text-white">
@@ -3792,23 +3509,6 @@ function AboutPage() {
           </div>
         </div>
 
-        {/* ── Planet ── */}
-        <div>
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-1 text-[22px] font-semibold text-white">Good For Them. Good For the Planet.</h2>
-          <p className="mb-5 text-[13px] text-amber-100/50">Unwanted gifts don&apos;t just waste money — they waste resources. Funding what&apos;s actually wanted means less ends up in the bin.</p>
-          <div className="flex flex-col gap-3">
-            {PLANET.map(({ Icon, title, body }) => (
-              <div key={title} className="flex gap-3.5 rounded-2xl border border-white/8 p-4" style={{ background: "linear-gradient(165deg,#1F140A,#241707)" }}>
-                <Icon className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" strokeWidth={1.75} />
-                <div>
-                  <p className="text-[13px] font-semibold text-amber-200">{title}</p>
-                  <p className="mt-0.5 text-[12px] leading-snug text-amber-100/60">{body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* ── Trust ── */}
         <div className="flex gap-4 rounded-2xl border border-white/8 bg-[#1F140A] p-5">
           <ShieldCheck className="mt-0.5 h-8 w-8 shrink-0 text-amber-400" strokeWidth={1.5} />
@@ -3881,22 +3581,36 @@ const EMBERS_V2 = Array.from({ length: 24 }, (_, i) => ({
   drift: `${-20 + (i * 7) % 40}px`,
 }));
 
+const V2_POTS = [
+  { id: "p1", name: "Super-Fast Mountain Bike", sub: "Trek Marlin 5 · Your #1 wish",
+    amount: 310, goal: 310, Icon: Bike,
+    grad: "from-amber-400 to-orange-500", glow: "#f97316", complete: true },
+  { id: "p2", name: "LEGO Millennium Falcon", sub: "Star Wars · 3,187 pieces",
+    amount: 89, goal: 89, Icon: Package,
+    grad: "from-violet-400 to-purple-500", glow: "#8b5cf6", complete: true },
+  { id: "p3", name: "PS5 Gaming Bundle", sub: "3 games · controller included",
+    amount: 75, goal: 80, Icon: Gamepad2,
+    grad: "from-blue-400 to-sky-400", glow: "#38bdf8", complete: false },
+];
+
 const V2_CONTRIBS = [
-  { name: "Mum & Dad", amount: 150, initials: "MD", grad: "from-amber-400 to-orange-500",
+  { name: "Mum & Dad", amount: 150, initials: "MD", grad: "from-amber-400 to-orange-500", pot: "Mountain Bike",
     msg: "We are so proud of who you are becoming. You deserve every single part of this. We love you to the moon and back, always." },
-  { name: "Grandma Linda", amount: 50, initials: "GL", grad: "from-rose-400 to-pink-500",
+  { name: "Grandma Linda", amount: 50, initials: "GL", grad: "from-rose-400 to-pink-500", pot: "Mountain Bike",
     msg: "I've watched you grow into someone truly special. This is just the beginning of your adventures, my darling. Ride fast and smile wide." },
-  { name: "Uncle Steve", amount: 35, initials: "US", grad: "from-blue-400 to-violet-500",
+  { name: "Uncle Steve", amount: 35, initials: "US", grad: "from-blue-400 to-violet-500", pot: "LEGO Set",
     msg: "Every ride is going to be an adventure. I can't wait to hear the stories — go fast, stay safe, have the absolute best time." },
-  { name: "Auntie Claire", amount: 25, initials: "AC", grad: "from-emerald-400 to-teal-500",
+  { name: "Auntie Claire", amount: 25, initials: "AC", grad: "from-emerald-400 to-teal-500", pot: "PS5 Bundle",
     msg: "Happy birthday to the most brilliant kid I know. This is from everyone who loves watching you shine. Enjoy every second." },
-  { name: "Nana Joyce", amount: 30, initials: "NJ", grad: "from-violet-400 to-fuchsia-500",
+  { name: "Nana Joyce", amount: 30, initials: "NJ", grad: "from-violet-400 to-fuchsia-500", pot: "Mountain Bike",
     msg: "I hope every single ride reminds you just how deeply you are loved. You make all of us so incredibly happy and proud." },
-  { name: "School Friends", amount: 20, initials: "SF", grad: "from-teal-400 to-cyan-500",
+  { name: "School Friends", amount: 20, initials: "SF", grad: "from-teal-400 to-cyan-500", pot: "LEGO Set",
     msg: "From all the gang — go absolutely smash it! You are the absolute best. See you at the park very soon." },
 ];
 
-type RevealV2Phase = "idle" | "intro" | "name" | "flash" | "gift" | "contributors" | "share";
+const V2_TOTAL = V2_POTS.reduce((s, p) => s + p.amount, 0);
+
+type RevealV2Phase = "idle" | "intro" | "name" | "flash" | "pots" | "contributors" | "share";
 
 function useFireworks(canvasRef: React.RefObject<HTMLCanvasElement | null>, active: boolean) {
   useEffect(() => {
@@ -3976,25 +3690,37 @@ function RevealV2View() {
   const [phase, setPhase] = useState<RevealV2Phase>("idle");
   const [contribIdx, setContribIdx] = useState(0);
   const [flash, setFlash] = useState(false);
+  const [visiblePots, setVisiblePots] = useState(0);
+  const [showPotsCta, setShowPotsCta] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  useFireworks(canvasRef, phase === "gift" || phase === "contributors" || phase === "share");
+  useFireworks(canvasRef, phase === "pots" || phase === "contributors" || phase === "share");
 
   function launch() {
     setPhase("intro");
     setTimeout(() => setPhase("name"), 3000);
     setTimeout(() => { setFlash(true); setTimeout(() => setFlash(false), 380); setPhase("flash"); }, 5800);
-    setTimeout(() => setPhase("gift"), 6200);
+    setTimeout(() => setPhase("pots"), 6200);
   }
+
+  useEffect(() => {
+    if (phase !== "pots") { setVisiblePots(0); setShowPotsCta(false); return; }
+    const ts = [
+      setTimeout(() => setVisiblePots(1), 300),
+      setTimeout(() => setVisiblePots(2), 1000),
+      setTimeout(() => setVisiblePots(3), 1700),
+      setTimeout(() => setShowPotsCta(true), 3100),
+    ];
+    return () => ts.forEach(clearTimeout);
+  }, [phase]);
 
   function goContributors() { setContribIdx(0); setPhase("contributors"); }
   function nextContrib() { if (contribIdx < V2_CONTRIBS.length - 1) setContribIdx((i) => i + 1); else setPhase("share"); }
-  function reset() { setPhase("idle"); setContribIdx(0); setFlash(false); }
+  function reset() { setPhase("idle"); setContribIdx(0); setFlash(false); setVisiblePots(0); setShowPotsCta(false); }
 
   const contrib = V2_CONTRIBS[contribIdx]!;
 
   return (
     <div className="relative overflow-hidden" style={{ minHeight: "calc(100vh - 120px)", background: "#000" }}>
-      {/* Fireworks canvas */}
       <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-10 h-full w-full" />
 
       {/* White flash */}
@@ -4011,7 +3737,7 @@ function RevealV2View() {
           <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.04 }}
             transition={{ duration: 0.45 }}
             className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center"
-            style={{ background: "radial-gradient(ellipse 90% 65% at 50% 65%, #180900, #000)" }}>
+            style={{ background: "radial-gradient(ellipse 90% 65% at 50% 65%,#180900,#000)" }}>
             {EMBERS_V2.map((e) => (
               <span key={e.id} className="pointer-events-none absolute rounded-full bg-amber-400/55"
                 style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
@@ -4025,7 +3751,7 @@ function RevealV2View() {
             </motion.div>
             <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
               className="mb-2 text-[10px] font-black uppercase tracking-[0.3em] text-amber-400/60">
-              Kindled Reveal · Version 2
+              Kindled · The Big Reveal
             </motion.p>
             <motion.h2 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
               style={{ fontFamily: "var(--font-display)" }}
@@ -4035,10 +3761,21 @@ function RevealV2View() {
                 className="bg-clip-text text-transparent">they&apos;ve been waiting for</span>
             </motion.h2>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-              className="mb-10 max-w-xs text-[14px] leading-relaxed text-white/35">
-              A cinematic reveal ceremony for Billy — with a personalised message from every person who made it happen.
+              className="mb-3 max-w-xs text-[14px] leading-relaxed text-white/35">
+              A cinematic reveal for Billy — {V2_POTS.length} gifts, {V2_CONTRIBS.length} people, one unforgettable moment.
             </motion.p>
-            <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }}
+            {/* Mini pot preview pills */}
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.72 }}
+              className="mb-9 flex flex-wrap justify-center gap-2">
+              {V2_POTS.map((p) => (
+                <div key={p.id} className={`flex items-center gap-1.5 rounded-full bg-gradient-to-r ${p.grad} px-3 py-1.5`}>
+                  <p.Icon className="h-3 w-3 text-white" strokeWidth={2} />
+                  <span className="text-[10px] font-bold text-white">{p.name.split(" ").slice(0, 2).join(" ")}</span>
+                  {p.complete && <span className="ml-0.5 text-[9px] font-black text-white/70">✓</span>}
+                </div>
+              ))}
+            </motion.div>
+            <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85 }}
               whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.05, y: -2 }} onClick={launch}
               className="flex items-center gap-3 rounded-2xl px-8 py-4 text-[16px] font-black text-stone-900"
               style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 40px rgba(251,146,60,0.5),0 8px 32px rgba(0,0,0,0.5)" }}>
@@ -4046,7 +3783,7 @@ function RevealV2View() {
               Ignite Billy&apos;s Reveal
               <Sparkles className="h-5 w-5" />
             </motion.button>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1 }}
               className="mt-4 text-[10px] uppercase tracking-widest text-white/15">Sound on for full experience</motion.p>
           </motion.div>
         )}
@@ -4097,6 +3834,7 @@ function RevealV2View() {
                 </motion.span>
               ))}
             </div>
+            {/* Contributor avatars */}
             <div className="flex flex-wrap justify-center gap-2 px-8">
               {V2_CONTRIBS.map((c, i) => (
                 <motion.div key={c.name} initial={{ opacity: 0, scale: 0, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -4107,64 +3845,158 @@ function RevealV2View() {
               ))}
             </div>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.1 }}
-              className="mt-4 text-[13px] text-white/35">{V2_CONTRIBS.length} people made this happen</motion.p>
+              className="mt-4 text-[13px] text-white/35">{V2_CONTRIBS.length} people · {V2_POTS.length} gifts · £{V2_TOTAL} raised</motion.p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── GIFT REVEAL ── */}
+      {/* ── MULTI-POT REVEAL ── */}
       <AnimatePresence>
-        {(phase === "gift") && (
-          <motion.div key="gift" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 flex flex-col items-center justify-center px-5 overflow-hidden"
-            style={{ background: "radial-gradient(ellipse 110% 80% at 50% 35%,#1c0900,#060100)" }}>
+        {phase === "pots" && (
+          <motion.div key="pots" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.04 }}
+            transition={{ duration: 0.35 }}
+            className="absolute inset-0 z-20 flex flex-col justify-center px-4 overflow-y-auto py-6"
+            style={{ background: "radial-gradient(ellipse 110% 70% at 50% 30%,#120600,#000)" }}>
+
+            {/* Ambient glow */}
             <div className="pointer-events-none absolute inset-0"
-              style={{ background: "radial-gradient(ellipse 70% 50% at 50% 40%,rgba(251,146,60,0.18),transparent)" }} />
-            <motion.p initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-amber-400/55">Billy&apos;s Christmas gift — revealed</motion.p>
-            <motion.div initial={{ y: -180, scale: 1.25, opacity: 0, rotateX: -25 }}
-              animate={{ y: 0, scale: 1, opacity: 1, rotateX: 0 }}
-              transition={{ type: "spring", stiffness: 320, damping: 20 }}
-              className="relative mb-6 w-full max-w-[290px] overflow-hidden rounded-3xl"
-              style={{ background: "linear-gradient(145deg,#1c0900,#090200)",
-                boxShadow: "0 0 0 1px rgba(251,146,60,0.22),0 36px 80px rgba(251,146,60,0.35),0 8px 32px rgba(0,0,0,0.9)" }}>
-              <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500" />
-              <div className="p-5">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-400/12 border border-amber-400/18">
-                    <Flame className="h-5.5 w-5.5 text-amber-400" strokeWidth={1.5} />
+              style={{ background: "radial-gradient(ellipse 55% 40% at 50% 25%,rgba(251,146,60,0.14),transparent)" }} />
+
+            {/* Header */}
+            <div className="mb-5 text-center">
+              <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                className="mb-1.5 text-[10px] font-black uppercase tracking-[0.3em] text-amber-400/55">
+                Billy&apos;s Christmas haul — revealed
+              </motion.p>
+              <motion.div initial={{ opacity: 0, scale: 0.75 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.15, type: "spring", stiffness: 380, damping: 22 }}
+                className="flex items-baseline justify-center gap-2">
+                <span style={{ fontFamily: "var(--font-display)" }}
+                  className="text-[56px] font-black leading-none text-white">£{V2_TOTAL}</span>
+                <span className="pb-1 text-[15px] font-bold text-amber-400/60">raised in total</span>
+              </motion.div>
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
+                className="text-[11px] text-white/30">
+                {V2_POTS.filter(p => p.complete).length} of {V2_POTS.length} gifts fully funded · {V2_CONTRIBS.length} people chipped in
+              </motion.p>
+            </div>
+
+            {/* Pot cards — staggered drop-in */}
+            <div className="flex flex-col gap-3 w-full">
+              {V2_POTS.map((pot, i) => (
+                <AnimatePresence key={pot.id}>
+                  {visiblePots > i && (
+                    <motion.div
+                      key={pot.id}
+                      initial={{ y: -90, opacity: 0, scale: 0.84, rotateX: -20 }}
+                      animate={{ y: 0, opacity: 1, scale: 1, rotateX: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 24 }}
+                      className="relative overflow-hidden rounded-2xl"
+                      style={{
+                        background: "linear-gradient(145deg,#1a0800,#090100)",
+                        border: `1px solid ${pot.complete ? "rgba(251,146,60,0.28)" : "rgba(255,255,255,0.07)"}`,
+                        boxShadow: pot.complete
+                          ? `0 0 0 1px ${pot.glow}22, 0 12px 48px ${pot.glow}35, 0 4px 16px rgba(0,0,0,0.8)`
+                          : "0 4px 20px rgba(0,0,0,0.7)",
+                      }}>
+                      {/* Coloured accent bar */}
+                      <div className={`h-1 w-full bg-gradient-to-r ${pot.grad}`} />
+
+                      <div className="flex items-center gap-3.5 p-4">
+                        {/* Icon badge */}
+                        <motion.div
+                          initial={{ scale: 0, rotate: -30 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ delay: 0.18, type: "spring", stiffness: 500, damping: 20 }}
+                          className={`flex h-13 w-13 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${pot.grad}`}
+                          style={{ boxShadow: `0 4px 20px ${pot.glow}55`, width: 52, height: 52 }}>
+                          <pot.Icon className="h-6 w-6 text-white" strokeWidth={1.75} />
+                        </motion.div>
+
+                        {/* Name + progress */}
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[14px] font-bold text-white leading-tight">{pot.name}</p>
+                          <p className="text-[10px] text-white/30 mb-2">{pot.sub}</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-1.5 overflow-hidden rounded-full bg-white/8">
+                              <motion.div
+                                initial={{ width: "0%" }}
+                                animate={{ width: `${Math.round((pot.amount / pot.goal) * 100)}%` }}
+                                transition={{ delay: 0.28, duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                                className={`h-full rounded-full bg-gradient-to-r ${pot.grad}`}
+                              />
+                            </div>
+                            <span className="shrink-0 text-[10px] font-bold text-white/40">
+                              {Math.round((pot.amount / pot.goal) * 100)}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Amount + badge */}
+                        <div className="shrink-0 text-right ml-1">
+                          <motion.p
+                            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.22 }}
+                            style={{ fontFamily: "var(--font-display)" }}
+                            className="text-[24px] font-black text-white leading-none">
+                            £{pot.amount}
+                          </motion.p>
+                          {pot.complete ? (
+                            <motion.div
+                              initial={{ scale: 0, rotate: -25, opacity: 0 }}
+                              animate={{ scale: 1, rotate: -7, opacity: 1 }}
+                              transition={{ delay: 0.95, type: "spring", stiffness: 650, damping: 16 }}
+                              className={`mt-1.5 inline-block rounded-md bg-gradient-to-r ${pot.grad} px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-white shadow-lg`}>
+                              Funded!
+                            </motion.div>
+                          ) : (
+                            <p className="mt-1.5 text-[9px] text-white/25">of £{pot.goal}</p>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              ))}
+            </div>
+
+            {/* Contributor avatar strip — appears with CTA */}
+            <AnimatePresence>
+              {showPotsCta && (
+                <motion.div key="strip"
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 340, damping: 28 }}
+                  className="mt-4 flex items-center justify-center gap-1.5">
+                  <div className="flex -space-x-2.5">
+                    {V2_CONTRIBS.map((c, i) => (
+                      <div key={i}
+                        className={`flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-gradient-to-br ${c.grad} text-[9px] font-black text-white`}>
+                        {c.initials}
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-400/45">Fully Kindled</p>
-                    <p className="text-[15px] font-bold text-white">Super-Fast Mountain Bike</p>
-                  </div>
-                </div>
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.45 }}
-                  style={{ fontFamily: "var(--font-display)" }} className="text-[52px] font-black text-white leading-none mb-1">£310</motion.p>
-                <p className="mb-4 text-[11px] text-amber-400/55">raised by {V2_CONTRIBS.length} people who love you</p>
-                <div className="h-2.5 overflow-hidden rounded-full bg-white/8">
-                  <motion.div initial={{ width: "0%" }} animate={{ width: "100%" }}
-                    transition={{ delay: 0.25, duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-                    className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" />
-                </div>
-                <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }}
-                  className="mt-4 flex -space-x-2">
-                  {V2_CONTRIBS.map((c, i) => (
-                    <div key={i} className={`flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#090200] bg-gradient-to-br ${c.grad} text-[9px] font-black text-white`}>
-                      {c.initials}
-                    </div>
-                  ))}
+                  <p className="text-[11px] text-white/35 ml-1">{V2_CONTRIBS.length} people made this happen</p>
                 </motion.div>
-              </div>
-            </motion.div>
-            <motion.button initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.9 }}
-              whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.04, y: -2 }} onClick={goContributors}
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-[14px] font-bold text-stone-900"
-              style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.45)" }}>
-              <Users className="h-4 w-4" />
-              Meet everyone who made this happen
-              <ChevronRight className="h-4 w-4" />
-            </motion.button>
+              )}
+            </AnimatePresence>
+
+            {/* CTA */}
+            <AnimatePresence>
+              {showPotsCta && (
+                <motion.button key="pots-cta"
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.1, type: "spring", stiffness: 360, damping: 26 }}
+                  whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.03, y: -2 }}
+                  onClick={goContributors}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-black text-stone-900"
+                  style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 8px 32px rgba(251,146,60,0.45),0 2px 8px rgba(0,0,0,0.5)" }}>
+                  <Users className="h-5 w-5" />
+                  Meet the {V2_CONTRIBS.length} people who made this happen
+                  <ChevronRight className="h-5 w-5" />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
@@ -4177,40 +4009,62 @@ function RevealV2View() {
             exit={{ opacity: 0, y: -55, scale: 1.04 }}
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             className="absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
-            style={{ background: `radial-gradient(ellipse 80% 60% at 50% 50%,#0d0015,#000)` }}>
+            style={{ background: "radial-gradient(ellipse 80% 60% at 50% 50%,#0d0015,#000)" }}>
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
               {EMBERS_V2.slice(0, 10).map((e) => (
-                <span key={e.id} className="absolute rounded-full bg-amber-400/30"
+                <span key={e.id} className="absolute rounded-full bg-amber-400/25"
                   style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
                     animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`, "--sx": e.drift } as React.CSSProperties} />
               ))}
             </div>
-            <p className="mb-5 text-[10px] font-black uppercase tracking-[0.3em] text-white/20">
-              {contribIdx + 1} of {V2_CONTRIBS.length}
-            </p>
+
+            {/* Progress dots */}
+            <div className="mb-5 flex gap-1.5">
+              {V2_CONTRIBS.map((_, i) => (
+                <motion.div key={i}
+                  animate={{ scale: i === contribIdx ? 1 : 0.65, opacity: i === contribIdx ? 1 : 0.3 }}
+                  className={`h-1.5 rounded-full bg-gradient-to-r ${V2_CONTRIBS[i]!.grad}`}
+                  style={{ width: i === contribIdx ? 24 : 6 }} />
+              ))}
+            </div>
+
+            {/* Avatar */}
             <motion.div initial={{ scale: 0, rotate: -160 }} animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 480, damping: 22 }}
-              className={`mb-5 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br ${contrib.grad} text-[28px] font-black text-white shadow-2xl`}
+              className={`mb-5 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br ${contrib.grad} text-[28px] font-black text-white`}
               style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.7),0 0 40px rgba(251,146,60,0.15)" }}>
               {contrib.initials}
             </motion.div>
+
             <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-              style={{ fontFamily: "var(--font-display)" }} className="text-[30px] font-black text-white mb-1">
+              style={{ fontFamily: "var(--font-display)" }} className="text-[30px] font-black text-white mb-0.5">
               {contrib.name}
             </motion.p>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }}
-              className="text-[24px] font-black text-amber-400 mb-6">£{contrib.amount}</motion.p>
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}
-              className="mb-7 w-full max-w-sm rounded-2xl border border-white/8 bg-white/[0.04] px-5 py-4 backdrop-blur-sm text-left">
+
+            {/* Amount + which pot */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+              className="mb-5 flex items-center gap-2">
+              <span className="text-[26px] font-black text-amber-400">£{contrib.amount}</span>
+              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] text-white/40">
+                → {contrib.pot}
+              </span>
+            </motion.div>
+
+            {/* Message card */}
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.46 }}
+              className="mb-6 w-full max-w-sm rounded-2xl border border-white/8 bg-white/[0.04] px-5 py-4 backdrop-blur-sm text-left"
+              style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)" }}>
               <div className="mb-2.5 flex items-center gap-1.5">
                 <Sparkles className="h-3 w-3 text-violet-400" />
                 <p className="text-[9px] font-black uppercase tracking-widest text-violet-400/65">Personal message</p>
               </div>
               <p className="min-h-[72px] text-[13px] leading-relaxed text-white/75 italic">
-                &ldquo;<TypedMessage text={contrib.msg} delay={550} />&rdquo;
+                &ldquo;<TypedMessage text={contrib.msg} delay={500} />&rdquo;
               </p>
             </motion.div>
-            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85 }}
+
+            {/* Next button */}
+            <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.82 }}
               whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.04 }} onClick={nextContrib}
               className={`flex items-center gap-2 rounded-2xl bg-gradient-to-r ${contrib.grad} px-7 py-3.5 text-[14px] font-bold text-white shadow-xl`}>
               {contribIdx < V2_CONTRIBS.length - 1
@@ -4232,12 +4086,14 @@ function RevealV2View() {
                 style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
                   animation: `ember-rise ${e.dur} ${e.delay} ease-out infinite`, "--sx": e.drift } as React.CSSProperties} />
             ))}
+
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 14, -10, 6, 0] }}
               transition={{ type: "spring", stiffness: 400, damping: 18, delay: 0.1 }}
               className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl"
-              style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 50px rgba(251,146,60,0.6)" }}>
+              style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 50px rgba(251,146,60,0.6),0 0 100px rgba(251,146,60,0.25)" }}>
               <Sparkles className="h-10 w-10 text-stone-900" />
             </motion.div>
+
             <motion.h2 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
               style={{ fontFamily: "var(--font-display)" }}
               className="mb-2 text-[44px] font-black leading-tight text-white">
@@ -4246,31 +4102,48 @@ function RevealV2View() {
             </motion.h2>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
               className="mb-7 max-w-xs text-[14px] leading-relaxed text-white/40">
-              {V2_CONTRIBS.length} people came together and raised £310 for this moment. That&apos;s the power of Kindled.
+              {V2_CONTRIBS.length} people came together, raised £{V2_TOTAL}, and funded {V2_POTS.filter(p => p.complete).length} gifts. That&apos;s the power of Kindled.
             </motion.p>
+
+            {/* Stats row */}
             <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.52 }}
               className="mb-7 flex gap-3">
-              {[["7", "contributors"], ["£310", "raised"], ["47", "days"]].map(([v, l]) => (
+              {[[String(V2_CONTRIBS.length), "people"], [`£${V2_TOTAL}`, "raised"], [`${V2_POTS.filter(p=>p.complete).length}/${V2_POTS.length}`, "gifts"]].map(([v, l]) => (
                 <div key={l} className="flex flex-col items-center rounded-2xl border border-white/8 bg-white/[0.05] px-4 py-3">
-                  <span style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-black text-amber-400">{v}</span>
+                  <span style={{ fontFamily: "var(--font-display)" }} className="text-[26px] font-black text-amber-400 leading-tight">{v}</span>
                   <span className="text-[9px] uppercase tracking-wider text-white/30">{l}</span>
                 </div>
               ))}
             </motion.div>
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.68 }}
+
+            {/* Pot recap strip */}
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.62 }}
+              className="mb-6 flex gap-2">
+              {V2_POTS.map((p) => (
+                <div key={p.id} className={`flex items-center gap-1.5 rounded-full bg-gradient-to-r ${p.grad} px-3 py-1.5 opacity-90`}>
+                  <p.Icon className="h-3 w-3 text-white" strokeWidth={2} />
+                  <span className="text-[9px] font-black text-white">{p.complete ? "Funded" : "In progress"}</span>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Action buttons — the "what comes next" */}
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.74 }}
               className="flex w-full max-w-xs flex-col gap-3">
-              <button onClick={() => { void navigator.clipboard.writeText("https://kindledgift.co.uk").catch(() => null); }}
+              <button
+                onClick={() => { void navigator.clipboard.writeText("https://kindledgift.co.uk").catch(() => null); }}
                 className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900"
                 style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.4)" }}>
                 <Share2 className="h-4 w-4" />
                 Share this moment
               </button>
               <a href="/pots/demo"
-                className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 py-4 text-[15px] font-semibold text-white/65 hover:border-white/20 hover:text-white/90 transition-colors">
+                className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] py-4 text-[15px] font-semibold text-white/65 transition-colors hover:border-white/20 hover:text-white/90">
                 <Flame className="h-4 w-4 text-amber-400" />
-                Start my own fire — free
+                Start my own board — free
               </a>
-              <button onClick={reset} className="py-2 text-[12px] text-white/20 transition-colors hover:text-white/45">
+              <button onClick={reset}
+                className="py-2 text-[12px] text-white/20 transition-colors hover:text-white/45">
                 Watch again
               </button>
             </motion.div>
@@ -4285,12 +4158,13 @@ function RevealV2View() {
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about";
+type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about" | "stars";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
   const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
-    { id: "parent", label: "Contribute", Icon: Users },
+    { id: "parent", label: "Kindlers", Icon: Users },
     { id: "receiver", label: "Billy's View", Icon: Sparkles },
+    { id: "stars", label: "Stars", Icon: Star },
     { id: "catalogue", label: "Catalogue", Icon: ShoppingBag },
     { id: "reveal", label: "Reveal", Icon: Sparkles },
     { id: "about", label: "About", Icon: Info },
@@ -4311,15 +4185,19 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
                   ? "bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md"
                   : id === "catalogue"
                     ? "bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md"
-                    : "bg-white shadow-sm text-stone-900"
+                    : id === "stars"
+                      ? "bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md"
+                      : "bg-white shadow-sm text-stone-900"
                 : id === "reveal"
                   ? "text-amber-500"
                   : id === "catalogue"
                     ? "text-violet-400"
-                    : "text-stone-400",
+                    : id === "stars"
+                      ? "text-violet-500"
+                      : "text-stone-400",
             )}
           >
-            {role === id && id !== "reveal" && id !== "catalogue" && (
+            {role === id && id !== "reveal" && id !== "catalogue" && id !== "stars" && (
               <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
             )}
             <Icon className="h-3.5 w-3.5" strokeWidth={role === id ? 2.5 : 1.75} />
@@ -4525,12 +4403,10 @@ function ReceiverProofStats() {
 // RECEIVER VIEW
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ReceiverView({ pots, onOpenStars, onShare, onReveal, onAddGift }: {
+function ReceiverView({ pots, onShare, onReveal }: {
   pots: DemoPot[];
-  onOpenStars: () => void;
   onShare: () => void;
   onReveal: () => void;
-  onAddGift: () => void;
 }) {
   // Exclude checklist pots entirely — receiver must not see "Mum Knows Best" items
   const sparkGoals = pots.filter((p) => !p.isClaimed && !p.isChecklist);
@@ -4567,10 +4443,10 @@ function ReceiverView({ pots, onOpenStars, onShare, onReveal, onAddGift }: {
             className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3.5 py-2 text-[12px] font-semibold text-stone-900 shadow-md shadow-amber-200 active:scale-95"
           >
             <Share2 className="h-3.5 w-3.5" />
-            Guide Buyers
+            Share with family
           </motion.button>
         </div>
-        <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">share your list with the people who love you</p>
+        <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">send your list to the people who love you</p>
 
         {/* ── Total Spark Goal Value hero ── */}
         <div className="mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-stone-900 to-stone-800 px-5 py-4 shadow-xl"
@@ -4686,44 +4562,9 @@ function ReceiverView({ pots, onOpenStars, onShare, onReveal, onAddGift }: {
         {/* ── On-dashboard proof stats ── */}
         <ReceiverProofStats />
 
-        {/* ── Kindled Stars CTA ── */}
-        <motion.button
-          whileHover={{ scale: 1.01, y: -2 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: "spring", stiffness: 400, damping: 28 }}
-          onClick={onOpenStars}
-          className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 p-5 text-left shadow-xl shadow-indigo-900/30"
-        >
-          <div className="pointer-events-none absolute inset-0">
-            {[{l:"12%",t:"18%"},{l:"78%",t:"12%"},{l:"55%",t:"65%"},{l:"88%",t:"55%"},{l:"30%",t:"75%"}].map((p,i)=>(
-              <Star key={i} className="absolute h-2.5 w-2.5 fill-white/70 text-white/70" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.3}s ${i*0.4}s ease-in-out infinite alternate`,opacity:0.7}} />
-            ))}
-          </div>
-          <div className="relative flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20">
-              <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-violet-200 mb-0.5">Kindled Stars</p>
-              <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[19px] font-semibold text-white leading-tight">Your star chart</h3>
-              <p className="flex items-center gap-1 text-[12px] text-violet-200 mt-0.5">24 <Star className="h-3 w-3 fill-current" /> earned · 4 adventures today</p>
-            </div>
-            <span className="rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-black text-stone-900">Open →</span>
-          </div>
-        </motion.button>
+
       </div>
 
-      {/* Add Spark Goal FAB */}
-      <motion.button
-        whileTap={{ scale: 0.94 }}
-        whileHover={{ scale: 1.05 }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        onClick={onAddGift}
-        className="fixed bottom-24 right-5 z-40 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-[13px] font-bold text-white shadow-xl shadow-amber-400/40 active:scale-95"
-      >
-        <Plus className="h-4 w-4" strokeWidth={2.5} />
-        Add a Spark Goal
-      </motion.button>
     </div>
   );
 }
@@ -4738,7 +4579,6 @@ export default function DemoPage() {
   useEffect(() => {
     setIsContributor(new URLSearchParams(window.location.search).get("view") === "contributor");
   }, []);
-  const [showStars, setShowStars] = useState(false);
   const [showNewGift, setShowNewGift] = useState(false);
   const [pots, setPots] = useState<DemoPot[]>([...INITIAL_POTS, ...CHECKLIST_POTS]);
   const [toast, setToast] = useState<string | null>(null);
@@ -4828,15 +4668,45 @@ export default function DemoPage() {
         />
       )}
 
-      {/* ── Kids Space (full-screen overlay) ── */}
-      {showStars && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <KindledStars pots={pots} onClose={() => setShowStars(false)} />
-        </div>
-      )}
-
       {/* ── Role switcher (always visible) ── */}
       <RoleSwitcher role={viewMode} onChange={setViewMode} />
+
+      {/* ── Context strip — tells visitors which perspective they're seeing ── */}
+      <AnimatePresence mode="wait">
+        {viewMode === "parent" && (
+          <motion.div
+            key={isContributor ? "ctx-contributor" : "ctx-parent"}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="mx-1 mb-1 flex items-center gap-2 rounded-xl border border-stone-100 bg-stone-50 px-3.5 py-2"
+          >
+            <div className={cn("h-2 w-2 rounded-full shrink-0", isContributor ? "bg-violet-400" : "bg-amber-400")} />
+            <p className="text-[11px] text-stone-500 leading-snug">
+              {isContributor
+                ? <><span className="font-semibold text-stone-700">Contributor view</span> — you&apos;re seeing Billy&apos;s board as a family member. Tap any gift to chip in.</>
+                : <><span className="font-semibold text-stone-700">Parent / owner view</span> — this is how Billy&apos;s family manages and tracks his wish board. Switch tabs to explore.</>
+              }
+            </p>
+          </motion.div>
+        )}
+        {viewMode === "receiver" && (
+          <motion.div
+            key="ctx-receiver"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="mx-1 mb-1 flex items-center gap-2 rounded-xl border border-stone-100 bg-stone-50 px-3.5 py-2"
+          >
+            <div className="h-2 w-2 rounded-full shrink-0 bg-emerald-400" />
+            <p className="text-[11px] text-stone-500 leading-snug">
+              <span className="font-semibold text-stone-700">Billy&apos;s view</span> — this is what Billy sees on his device. Amounts are hidden — just the excitement of what&apos;s coming.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Views ── */}
       <AnimatePresence mode="wait">
@@ -4852,9 +4722,13 @@ export default function DemoPage() {
         <motion.div key="reveal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
           <RevealV2View />
         </motion.div>
+      ) : viewMode === "stars" ? (
+        <motion.div key="stars" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
+          <KindledStarsTab pots={pots} />
+        </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={pots} onOpenStars={() => setShowStars(true)} onShare={handleShare} onReveal={() => setViewMode("reveal")} onAddGift={() => setShowNewGift(true)} />
+          <ReceiverView pots={pots} onShare={handleShare} onReveal={() => setViewMode("reveal")} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
@@ -4865,7 +4739,7 @@ export default function DemoPage() {
         totalGoal={pots.reduce((s, p) => s + p.goal, 0)}
         onShare={handleShare}
         isContributor={isContributor}
-        onStartReceiving={() => setShowReceiverSignUp(true)}
+        onStartReceiving={() => setShowCreatorModal(true)}
       />
 
       <main className="space-y-7 pb-36 pt-4">
@@ -5131,44 +5005,7 @@ export default function DemoPage() {
         {/* ── Would You Rather ── */}
         {!isContributor && <WouldYouRather />}
 
-        {/* ── Kindled Stars entry — owner/kid admin only ── */}
-        {!isContributor && (
-        <section className="px-4">
-          <motion.button
-            whileHover={{ scale: 1.01, y: -2 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 400, damping: 28 }}
-            onClick={() => setShowStars(true)}
-            className="relative w-full overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 p-5 text-left shadow-xl shadow-indigo-900/30"
-          >
-            {/* Twinkling dots */}
-            <div className="pointer-events-none absolute inset-0">
-              {[{l:"12%",t:"18%"},{l:"78%",t:"12%"},{l:"55%",t:"65%"},{l:"88%",t:"55%"},{l:"30%",t:"75%"}].map((p,i)=>(
-                <Star key={i} className="absolute h-2.5 w-2.5 fill-white/70 text-white/70" style={{left:p.l,top:p.t,animation:`twinkle ${1.2+i*0.3}s ${i*0.4}s ease-in-out infinite alternate`,opacity:0.7}} />
-              ))}
-            </div>
-            <div className="relative flex items-center gap-4">
-              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20">
-                <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-violet-200 mb-0.5">Kids Rewards</p>
-                <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[19px] font-semibold text-white leading-tight">Kindled Stars</h3>
-                <p className="text-[12px] text-violet-200 mt-0.5">Billy&apos;s star chart · 4 adventures today</p>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <span className="rounded-full bg-amber-400 px-2.5 py-1 text-[11px] font-black text-stone-900">Open →</span>
-                <span className="flex items-center gap-1 text-[10px] text-violet-300"><Star className="h-2.5 w-2.5 fill-current" />24 earned</span>
-              </div>
-            </div>
-          </motion.button>
-        </section>
-        )}
-
         {/* ── Catalogue moved to dedicated tab ── */}
-
-        {/* ── Explainer — owner only (contributors see hero CTA instead) ── */}
-        {!isContributor && <ExplainerPlayer />}
 
         {/* ── Why Kindled stats ── */}
         <WhyKindled />

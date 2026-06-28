@@ -352,7 +352,7 @@ function Hero() {
             >
               <Sparkles className="h-3.5 w-3.5 text-amber-400" />
               <span className="text-[11px] font-semibold uppercase tracking-widest text-amber-300/90">
-                The gift registry that works
+                Group gifting for families — finally
               </span>
             </motion.div>
 
@@ -382,7 +382,7 @@ function Hero() {
               transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50"
             >
-              Kindled is the group gifting platform for families. Set up a wishlist, share one link, let everyone chip in — then ignite a magical animated reveal on the big day.
+              Everyone chips in to the gifts that actually matter. No more duplicates, no more guessing. Share one link — family contribute any amount — and on the big day, trigger a reveal ceremony they&apos;ll never forget.
             </motion.p>
 
             <motion.div
@@ -414,7 +414,7 @@ function Hero() {
               transition={{ delay: 0.7, duration: 0.8 }}
               className="mt-6 flex flex-wrap gap-x-5 gap-y-2"
             >
-              {["Free to set up", "No app needed for contributors", "Cancel anytime"].map((t) => (
+              {["Free to set up", "No app needed to contribute", "Works on any device"].map((t) => (
                 <div key={t} className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 shrink-0 text-amber-400" strokeWidth={2.5} />
                   <span className="text-[12px] text-white/35">{t}</span>
@@ -847,10 +847,10 @@ function Stats() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { label: "Families waste on unwanted gifts annually", prefix: "£", suffix: "B", value: 3.2, display: "£3.2B" },
+            { label: "UK families say they struggle to find the right gift", prefix: "", suffix: "%", value: 73, display: "73%" },
             { label: "Minutes to set up your first board", prefix: "", suffix: "", value: 2, display: "2 mins" },
-            { label: "Quarterly Goal Booster Draw prize", prefix: "£", suffix: "", value: 2500, display: "£2,500" },
-            { label: "Spark Balance back on every contribution", prefix: "", suffix: "%", value: 2, display: "2%" },
+            { label: "Quarterly Goal Booster Draw prize · Terms apply", prefix: "£", suffix: "", value: 2500, display: "£2,500" },
+            { label: "Cashback earned via affiliate on every contribution", prefix: "", suffix: "%", value: 2, display: "2%" },
           ].map((s, i) => (
             <Reveal key={s.label} delay={i * 0.1}>
               <div className="rounded-2xl border border-white/8 bg-white/[0.04] p-5 text-center backdrop-blur-sm">
@@ -964,19 +964,19 @@ function FinalCTA() {
                 style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.45)" }}
               >
                 <Flame className="h-5 w-5" />
-                Start your first fire — free
+                Create your board today
               </Link>
               <Link
                 href="/pots/demo"
                 className="flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-200 bg-white px-7 py-4 text-[15px] font-semibold text-stone-700 transition-all hover:border-stone-300 hover:bg-stone-50"
               >
-                Explore the demo
+                See a live board
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
             <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
-              {["Free to set up", "No credit card", "Cancel anytime"].map((t) => (
+              {["Free forever", "No credit card", "Works on any device"].map((t) => (
                 <div key={t} className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-emerald-500" strokeWidth={2.5} />
                   <span className="text-[12px] text-stone-500">{t}</span>
@@ -1005,7 +1005,7 @@ function Footer() {
           </span>
         </div>
         <div className="flex flex-wrap justify-center gap-6">
-          {(["Demo|/pots/demo", "Privacy|#", "Terms|#", "Contact|#"] as const).map((item) => {
+          {(["How it works|#how-it-works", "Features|#features", "Live demo|/pots/demo", "FAQ|/pots/demo", "Privacy|#", "Terms|#", "Contact|#"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-stone-400 hover:text-stone-700 transition-colors">
@@ -1014,7 +1014,7 @@ function Footer() {
             );
           })}
         </div>
-        <p className="text-[12px] text-stone-400">© 2026 Kindled. All rights reserved.</p>
+        <p className="text-[12px] text-stone-400">Made with love in the UK · © 2026 Kindled. All rights reserved.</p>
       </div>
     </footer>
   );
