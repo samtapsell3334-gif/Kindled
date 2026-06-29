@@ -39,6 +39,11 @@
   --vh-cream: #fffdf7;      /* lifted card surface */
 }
 
+/* Outfit UI font only — safe on dark/Midnight surfaces (no bg/colour override). */
+.font-outfit {
+  font-family: var(--font-outfit), 'Outfit', ui-sans-serif, sans-serif;
+}
+
 /* The consumer surface: warm sand, Outfit UI font, subtle paper grain. */
 .vh {
   font-family: var(--font-outfit), 'Outfit', ui-sans-serif, sans-serif;

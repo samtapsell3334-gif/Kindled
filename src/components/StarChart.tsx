@@ -168,7 +168,7 @@ export function StarChart({
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setDrawer(false)} className="fixed inset-0 z-[70] bg-[#0f172a]/40 backdrop-blur-sm" />
             <motion.aside initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 34 }}
-              className="vh fixed inset-y-0 right-0 z-[71] flex w-[88%] max-w-sm flex-col bg-[#fdf6e3] shadow-[-12px_0_40px_-12px_rgba(15,23,42,0.3)]">
+              className="font-outfit fixed inset-y-0 right-0 z-[71] flex w-[88%] max-w-sm flex-col bg-[#fdf6e3] shadow-[-12px_0_40px_-12px_rgba(15,23,42,0.3)]">
               <div className="flex items-center justify-between px-6 pb-3 pt-6">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f59e0b]">Star Quest</p>
