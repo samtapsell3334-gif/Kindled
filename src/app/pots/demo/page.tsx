@@ -363,7 +363,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
           exit={{ y: "100%" }}
           transition={{ type: "spring", stiffness: 340, damping: 38 }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md rounded-t-3xl bg-[#0a0a0a] border-t border-[#ffb800]/20 px-5 pt-5 pb-10 shadow-2xl"
+          className="vh w-full max-w-md rounded-t-[32px] bg-[#0f172a] px-5 pb-10 pt-5 shadow-2xl"
         >
           <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-white/20" />
 
@@ -371,13 +371,13 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
             <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center gap-4 py-6 text-center"
             >
-              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#ffb800] to-[#f59e0b] flex items-center justify-center shadow-lg shadow-[#ffb800]/30">
+              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#f59e0b] to-[#f59e0b] flex items-center justify-center shadow-lg shadow-[#f59e0b]/30">
                 <Flame className="h-8 w-8 text-white" />
               </div>
-              <p className="font-editorial text-[22px] font-semibold text-[#ffb800]">Your spot is reserved</p>
-              <p className="text-[13px] text-white/60 leading-relaxed">We&apos;ll send your invitation to <span className="text-[#ffb800] font-semibold">{email}</span> as soon as your list is ready.</p>
+              <p className="font-editorial text-[22px] font-semibold text-[#f59e0b]">Your spot is reserved</p>
+              <p className="text-[13px] text-white/60 leading-relaxed">We&apos;ll send your invitation to <span className="text-[#f59e0b] font-semibold">{email}</span> as soon as your list is ready.</p>
               <motion.button whileTap={{ scale: 0.95 }} onClick={onClose}
-                className="mt-2 rounded-xl bg-[#ffb800]/20 border border-[#ffb800]/30 px-6 py-2.5 text-[13px] font-semibold text-[#ffb800]">
+                className="mt-2 rounded-xl bg-[#f59e0b]/20 border border-[#f59e0b]/30 px-6 py-2.5 text-[13px] font-semibold text-[#f59e0b]">
                 Done
               </motion.button>
             </motion.div>
@@ -389,7 +389,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                 <p className="mt-1 text-[12px] text-white/50">Step {step} of {totalSteps}</p>
                 <div className="mt-3 flex gap-1.5">
                   {Array.from({ length: totalSteps }).map((_, i) => (
-                    <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i < step ? "bg-[#ffb800]" : "bg-white/15"}`} />
+                    <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i < step ? "bg-[#f59e0b]" : "bg-white/15"}`} />
                   ))}
                 </div>
               </div>
@@ -399,12 +399,12 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                   <motion.div key="s1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3">
                     <p className="text-[13px] font-semibold text-white/70">Your details</p>
                     <input type="text" placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-[#ffb800]/60 focus:outline-none" />
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-[#f59e0b]/60 focus:outline-none" />
                     <input type="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-[#ffb800]/60 focus:outline-none" />
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white placeholder:text-white/30 focus:border-[#f59e0b]/60 focus:outline-none" />
                     <motion.button whileTap={{ scale: 0.97 }} onClick={handleNext}
                       disabled={!name.trim() || !email.trim()}
-                      className="w-full rounded-xl bg-gradient-to-r from-[#ffb800] to-[#ffb800] py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[#ffb800]/30 disabled:opacity-40">
+                      className="w-full rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-[#f59e0b]/30 disabled:opacity-40">
                       Next
                     </motion.button>
                   </motion.div>
@@ -416,7 +416,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                     <div>
                       <label className="mb-1.5 block text-[11px] font-medium text-white/50">Birthday (or main event date)</label>
                       <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)}
-                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white focus:border-[#ffb800]/60 focus:outline-none" />
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-[14px] text-white focus:border-[#f59e0b]/60 focus:outline-none" />
                     </div>
                     <div className="flex gap-2">
                       <motion.button whileTap={{ scale: 0.97 }} onClick={handleBack}
@@ -424,7 +424,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                         Back
                       </motion.button>
                       <motion.button whileTap={{ scale: 0.97 }} onClick={handleNext}
-                        className="flex-[2] rounded-xl bg-gradient-to-r from-[#ffb800] to-[#ffb800] py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
+                        className="flex-[2] rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
                         Next
                       </motion.button>
                     </div>
@@ -434,12 +434,12 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                   <motion.div key="s3" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-3">
                     <p className="text-[13px] font-semibold text-white/70">Who is this list for?</p>
                     <button type="button" onClick={() => setIsParent((v) => !v)}
-                      className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition-colors ${isParent ? "border-[#ffb800]/50 bg-[#ffb800]/10" : "border-white/10 bg-white/5"}`}>
+                      className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 transition-colors ${isParent ? "border-[#f59e0b]/50 bg-[#f59e0b]/10" : "border-white/10 bg-white/5"}`}>
                       <div className="flex items-center gap-2.5">
-                        <Users className="h-4 w-4 text-[#ffb800]" />
+                        <Users className="h-4 w-4 text-[#f59e0b]" />
                         <span className="text-[13px] font-medium text-white">I am a parent / guardian — this is for my child</span>
                       </div>
-                      <div className={`h-5 w-9 rounded-full transition-colors ${isParent ? "bg-[#ffb800]" : "bg-white/20"} relative shrink-0`}>
+                      <div className={`h-5 w-9 rounded-full transition-colors ${isParent ? "bg-[#f59e0b]" : "bg-white/20"} relative shrink-0`}>
                         <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${isParent ? "translate-x-4" : "translate-x-0.5"}`} />
                       </div>
                     </button>
@@ -450,7 +450,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                       </motion.button>
                       <motion.button whileTap={{ scale: 0.97 }} onClick={isParent ? handleNext : () => { void handleSubmit(); }}
                         disabled={loading}
-                        className="flex-[2] rounded-xl bg-gradient-to-r from-[#ffb800] to-[#ffb800] py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
+                        className="flex-[2] rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
                         {isParent ? "Next" : loading ? "Creating…" : "Create My First Fire"}
                       </motion.button>
                     </div>
@@ -463,24 +463,24 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                     <button type="button" onClick={() => setStarChart((v) => !v)}
                       className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Star className="h-3.5 w-3.5 text-[#ffb800]" />
+                        <Star className="h-3.5 w-3.5 text-[#f59e0b]" />
                         <span className="text-[13px] text-white/80">Use a star chart?</span>
                       </div>
-                      <div className={`h-5 w-9 rounded-full transition-colors ${starChart ? "bg-[#ffb800]" : "bg-white/20"} relative shrink-0`}>
+                      <div className={`h-5 w-9 rounded-full transition-colors ${starChart ? "bg-[#f59e0b]" : "bg-white/20"} relative shrink-0`}>
                         <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${starChart ? "translate-x-4" : "translate-x-0.5"}`} />
                       </div>
                     </button>
                     <AnimatePresence>
                       {starChart && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                          <div className="rounded-xl border border-[#ffb800]/20 bg-[#ffb800]/5 px-4 py-3 space-y-2">
+                          <div className="rounded-xl border border-[#f59e0b]/20 bg-[#f59e0b]/5 px-4 py-3 space-y-2">
                             <div className="flex items-center justify-between">
                               <span className="text-[13px] text-white/80">Star value per star</span>
                               <div className="flex items-center gap-1.5">
                                 <span className="text-[12px] text-white/40">£</span>
                                 <input type="number" min="0.10" max="50" step="0.10" value={starValue}
                                   onChange={(e) => setStarValue(e.target.value)}
-                                  className="w-16 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-center text-[13px] text-white focus:border-[#ffb800]/60 focus:outline-none" />
+                                  className="w-16 rounded-lg border border-white/10 bg-white/10 px-2 py-1 text-center text-[13px] text-white focus:border-[#f59e0b]/60 focus:outline-none" />
                               </div>
                             </div>
                             <p className="text-[10px] text-white/30">30 stars to earn — milestone value: £{(parseFloat(starValue || "5") * 30).toFixed(0)}</p>
@@ -492,10 +492,10 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                     <button type="button" onClick={() => setCatalogueCircle((v) => !v)}
                       className="flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <CircleEllipsis className="h-3.5 w-3.5 text-[#ffb800]" />
+                        <CircleEllipsis className="h-3.5 w-3.5 text-[#f59e0b]" />
                         <span className="text-[13px] text-white/80">Enable Catalogue Circling Mode</span>
                       </div>
-                      <div className={`h-5 w-9 rounded-full transition-colors ${catalogueCircle ? "bg-[#ffb800]" : "bg-white/20"} relative shrink-0`}>
+                      <div className={`h-5 w-9 rounded-full transition-colors ${catalogueCircle ? "bg-[#f59e0b]" : "bg-white/20"} relative shrink-0`}>
                         <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${catalogueCircle ? "translate-x-4" : "translate-x-0.5"}`} />
                       </div>
                     </button>
@@ -505,7 +505,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                         Back
                       </motion.button>
                       <motion.button whileTap={{ scale: 0.97 }} onClick={() => { void handleSubmit(); }} disabled={loading}
-                        className="flex-[2] rounded-xl bg-gradient-to-r from-[#ffb800] to-[#ffb800] py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
+                        className="flex-[2] rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
                         {loading ? "Creating…" : "Create My First Fire"}
                       </motion.button>
                     </div>
@@ -1012,8 +1012,8 @@ function ContributionPromptModal({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
           transition={{ type: "spring", stiffness: 360, damping: 34 }}
-          className="w-full max-w-lg overflow-hidden rounded-t-3xl"
-          style={{ background: "linear-gradient(160deg, #0f0f0f 0%, #0a0a0a 100%)", border: "1px solid rgba(255,255,255,0.08)" }}
+          className="vh w-full max-w-lg overflow-hidden rounded-t-[32px]"
+          style={{ background: "linear-gradient(160deg, #0f0f0f 0%, #0f172a 100%)", border: "1px solid rgba(255,255,255,0.08)" }}
         >
           {/* Handle */}
           <div className="flex justify-center pt-3 pb-1">
@@ -1023,13 +1023,13 @@ function ContributionPromptModal({
           <div className="px-5 pb-8 pt-2">
             {/* Header */}
             <div className="mb-4 text-center">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#ffb800] mb-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#f59e0b] mb-1">
                 Chipping in £{amount} to {pot.title}
               </p>
               <p className="font-editorial text-[20px] font-semibold text-white leading-tight">
                 Add a personal touch?
               </p>
-              <p className="mt-1 text-[12px] text-[#f5f5f5]/50">
+              <p className="mt-1 text-[12px] text-[#fdf6e3]/50">
                 Make Billy&apos;s reveal morning even more magical
               </p>
             </div>
@@ -1041,8 +1041,8 @@ function ContributionPromptModal({
                 className={cn(
                   "flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
                   tab === "card"
-                    ? "bg-gradient-to-r from-[#ffb800] to-orange-500 text-[#0a0a0a] shadow-md"
-                    : "text-[#f5f5f5]/50",
+                    ? "bg-gradient-to-r from-[#f59e0b] to-orange-500 text-[#0f172a] shadow-md"
+                    : "text-[#fdf6e3]/50",
                 )}
               >
                 <PenLine className="h-4 w-4" />
@@ -1053,8 +1053,8 @@ function ContributionPromptModal({
                 className={cn(
                   "flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
                   tab === "video"
-                    ? "bg-gradient-to-r from-[#ffb800] to-[#f59e0b] text-white shadow-md"
-                    : "text-[#f5f5f5]/50",
+                    ? "bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] text-white shadow-md"
+                    : "text-[#fdf6e3]/50",
                 )}
               >
                 <Radio className="h-4 w-4" />
@@ -1076,7 +1076,7 @@ function ContributionPromptModal({
                   style={{ borderColor: message.length > 0 ? "#f59e0b" : "rgba(255,255,255,0.1)",
                     boxShadow: message.length > 0 ? "0 0 0 3px rgba(245,158,11,0.15), 0 0 20px rgba(245,158,11,0.12)" : "none" }}
                 >
-                  <div className="absolute left-3 top-2.5 flex items-center gap-1.5 text-[#ffb800]">
+                  <div className="absolute left-3 top-2.5 flex items-center gap-1.5 text-[#f59e0b]">
                     <PenLine className="h-3.5 w-3.5" />
                     <span className="text-[10px] font-semibold uppercase tracking-wider">Your message</span>
                   </div>
@@ -1085,10 +1085,10 @@ function ContributionPromptModal({
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Write a beautiful note to float onto Billy's screen on his big reveal morning…"
                     rows={4}
-                    className="w-full resize-none rounded-2xl bg-transparent px-3 pb-3 pt-8 text-[13px] leading-relaxed text-[#f5f5f5]/85 placeholder:text-[#f5f5f5]/30 focus:outline-none"
+                    className="w-full resize-none rounded-2xl bg-transparent px-3 pb-3 pt-8 text-[13px] leading-relaxed text-[#fdf6e3]/85 placeholder:text-[#fdf6e3]/30 focus:outline-none"
                   />
                 </div>
-                <p className="text-center text-[11px] text-[#f5f5f5]/40">
+                <p className="text-center text-[11px] text-[#fdf6e3]/40">
                   &ldquo;Stoke the Fire with a Digital Card&rdquo; — your words will float onto Billy&apos;s screen at the moment of reveal.
                 </p>
               </motion.div>
@@ -1108,7 +1108,7 @@ function ContributionPromptModal({
                   {[1, 2, 3].map((i) => (
                     <span
                       key={i}
-                      className="absolute rounded-full bg-[#ffb800]/20"
+                      className="absolute rounded-full bg-[#f59e0b]/20"
                       style={{ width: 60 + i * 28, height: 60 + i * 28,
                         animation: `ping ${1 + i * 0.35}s ${i * 0.2}s ease-out infinite` }}
                     />
@@ -1120,7 +1120,7 @@ function ContributionPromptModal({
                       "relative z-10 flex h-16 w-16 items-center justify-center rounded-full transition-all",
                       recording
                         ? "bg-[#f59e0b] shadow-lg shadow-[#241a00]/60"
-                        : "bg-gradient-to-br from-[#ffb800] to-[#f59e0b] shadow-xl shadow-[#241a00]/50",
+                        : "bg-gradient-to-br from-[#f59e0b] to-[#f59e0b] shadow-xl shadow-[#241a00]/50",
                     )}
                   >
                     {recording
@@ -1129,14 +1129,14 @@ function ContributionPromptModal({
                   </motion.button>
                 </div>
                 <div className="text-center">
-                  <p className="text-[13px] font-semibold text-[#f5f5f5]/85">
+                  <p className="text-[13px] font-semibold text-[#fdf6e3]/85">
                     {recording ? "Recording… tap to stop" : "Press to record"}
                   </p>
-                  <p className="mt-1 text-[11px] text-[#f5f5f5]/40">
+                  <p className="mt-1 text-[11px] text-[#fdf6e3]/40">
                     &ldquo;Spark a Smile with a Video Wish&rdquo; — a heartfelt 15-second clip woven into Billy&apos;s cinematic unboxing celebration!
                   </p>
                 </div>
-                <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-[rgba(245,245,245,0.18)] bg-white/5 py-2.5 text-[12px] font-medium text-[#f5f5f5]/50 hover:border-[rgba(245,245,245,0.32)] transition-colors">
+                <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-[rgba(253,246,227,0.18)] bg-white/5 py-2.5 text-[12px] font-medium text-[#fdf6e3]/50 hover:border-[rgba(253,246,227,0.32)] transition-colors">
                   <Plus className="h-3.5 w-3.5" />
                   Or upload a video instead
                   <input type="file" accept="video/*" className="sr-only" />
@@ -1145,25 +1145,25 @@ function ContributionPromptModal({
             )}
 
             {/* Giver incentive callout */}
-            <div className="mt-4 rounded-2xl border border-[#ffb800]/20 bg-gradient-to-br from-[#ffb800]/10 to-[#ffb800]/5 p-3.5 space-y-2.5"
+            <div className="mt-4 rounded-2xl border border-[#f59e0b]/20 bg-gradient-to-br from-[#f59e0b]/10 to-[#f59e0b]/5 p-3.5 space-y-2.5"
               style={{ boxShadow: "0 0 20px rgba(245,158,11,0.08)" }}>
               <div className="flex items-start gap-2.5">
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#ffb800]/20">
-                  <Trophy className="h-3.5 w-3.5 text-[#ffb800]" />
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f59e0b]/20">
+                  <Trophy className="h-3.5 w-3.5 text-[#f59e0b]" />
                 </div>
                 <div>
-                  <p className="text-[12px] font-bold text-[#ffb800]">Stoke &amp; Win</p>
-                  <p className="text-[11px] text-white/55 leading-snug">Chipping in automatically enters you into our active <span className="text-[#ffb800] font-semibold">£2,500 Summer Goal Booster Draw</span> — one entry per £10 contributed.</p>
+                  <p className="text-[12px] font-bold text-[#f59e0b]">Stoke &amp; Win</p>
+                  <p className="text-[11px] text-white/55 leading-snug">Chipping in automatically enters you into our active <span className="text-[#f59e0b] font-semibold">£2,500 Summer Goal Booster Draw</span> — one entry per £10 contributed.</p>
                 </div>
               </div>
               <div className="h-px bg-white/8" />
               <div className="flex items-start gap-2.5">
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#ffb800]/20">
-                  <Flame className="h-3.5 w-3.5 text-[#ffb800]" />
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f59e0b]/20">
+                  <Flame className="h-3.5 w-3.5 text-[#f59e0b]" />
                 </div>
                 <div>
-                  <p className="text-[12px] font-bold text-[#ffb800]">Kindle Back Rewards</p>
-                  <p className="text-[11px] text-white/55 leading-snug">Earn <span className="text-[#ffb800] font-semibold">2% back</span> in Spark Balance on every contribution — ignite your own future Spark Goals when you start your own board.</p>
+                  <p className="text-[12px] font-bold text-[#f59e0b]">Kindle Back Rewards</p>
+                  <p className="text-[11px] text-white/55 leading-snug">Earn <span className="text-[#f59e0b] font-semibold">2% back</span> in Spark Balance on every contribution — ignite your own future Spark Goals when you start your own board.</p>
                 </div>
               </div>
             </div>
@@ -1171,24 +1171,23 @@ function ContributionPromptModal({
             {/* CTAs */}
             <div className="mt-4 flex flex-col gap-2">
               {submitted ? (
-                <div className="flex items-center justify-center gap-2 rounded-2xl bg-[#ffb800] py-4">
-                  <Check className="h-5 w-5 text-[#0a0a0a]" strokeWidth={2.5} />
-                  <span className="text-[15px] font-semibold text-[#0a0a0a]">Contribution sent!</span>
+                <div className="flex items-center justify-center gap-2 rounded-2xl bg-[#f59e0b] py-4">
+                  <Check className="h-5 w-5 text-[#0f172a]" strokeWidth={2.5} />
+                  <span className="text-[15px] font-semibold text-[#0f172a]">Contribution sent!</span>
                 </div>
               ) : (
                 <>
                   <motion.button
                     whileTap={{ scale: 0.97 }}
                     onClick={finalize}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-semibold text-[#0a0a0a]"
-                    style={{ background: "linear-gradient(135deg, #ffb800, #f59e0b)", boxShadow: "0 4px 20px rgba(251,146,60,0.4)" }}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-[#ff6b6b] py-4 text-[15px] font-bold text-white vh-lift"
                   >
                     <Flame className="h-5 w-5" />
                     Send £{amount} {tab === "card" && message.trim() ? "+ Digital Card" : tab === "video" ? "+ Video Wish" : ""}
                   </motion.button>
                   <button
                     onClick={finalize}
-                    className="text-center text-[12px] text-[#f5f5f5]/40 hover:text-[#f5f5f5]/70 transition-colors py-1"
+                    className="text-center text-[12px] text-[#fdf6e3]/40 hover:text-[#fdf6e3]/70 transition-colors py-1"
                   >
                     Skip — just contribute £{amount}
                   </button>
@@ -1246,13 +1245,13 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", stiffness: 340, damping: 36 }}
-        className="relative z-10 w-full max-w-lg overflow-hidden rounded-t-3xl border-t border-[#ffb800]/25"
-        style={{ background: "linear-gradient(160deg, #0a0a0a 0%, #121212 50%, #0a0a0a 100%)" }}
+        className="vh relative z-10 w-full max-w-lg overflow-hidden rounded-t-[32px]"
+        style={{ background: "linear-gradient(160deg, #0f172a 0%, #1f2937 50%, #0f172a 100%)" }}
       >
         {/* Ambient particles */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           {CONFETTI_P.slice(0, 8).map((c) => (
-            <span key={c.id} className="animate-confetti absolute rounded-sm bg-[#ffb800] opacity-30"
+            <span key={c.id} className="animate-confetti absolute rounded-sm bg-[#f59e0b] opacity-30"
               style={{ left: c.left, top: 0, width: c.w, height: c.h,
                 "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
           ))}
@@ -1268,11 +1267,11 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
           </button>
 
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#ffb800] to-[#f59e0b]">
-              <Flame className="h-6 w-6 text-[#0a0a0a]" strokeWidth={2} />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f59e0b] to-[#f59e0b]">
+              <Flame className="h-6 w-6 text-[#0f172a]" strokeWidth={2} />
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#ffb800]/80">For You</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#f59e0b]/80">For You</p>
               <h2 className="font-editorial text-[20px] font-semibold text-white leading-tight">
                 Start Your Own Kindle Board
               </h2>
@@ -1289,18 +1288,18 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="flex flex-col items-center gap-3 rounded-2xl bg-gradient-to-br from-[#ffb800]/20 to-[#f59e0b]/20 border border-[#ffb800]/30 px-5 py-6"
+              className="flex flex-col items-center gap-3 rounded-2xl bg-gradient-to-br from-[#f59e0b]/20 to-[#f59e0b]/20 border border-[#f59e0b]/30 px-5 py-6"
             >
               {/* Golden reservation pass skeuomorph */}
-              <div className="relative flex w-full max-w-xs flex-col items-center overflow-hidden rounded-2xl border-2 border-dashed border-[#ffb800]/60 bg-gradient-to-br from-[#ffb800] to-[#f59e0b] px-6 py-5 shadow-xl shadow-[#0a0a0a]/40">
-                <div className="absolute left-0 top-1/2 h-6 w-3 -translate-y-1/2 rounded-r-full bg-[#0a0a0a]/40" />
-                <div className="absolute right-0 top-1/2 h-6 w-3 -translate-y-1/2 rounded-l-full bg-[#0a0a0a]/40" />
-                <Sparkles className="h-7 w-7 text-[#0a0a0a] mb-1" strokeWidth={2} />
-                <p className="text-[9px] font-bold uppercase tracking-widest text-[#0a0a0a]/70">Kindled · First Kindler Pass</p>
-                <p className="font-editorial text-[19px] font-bold text-[#0a0a0a] text-center leading-tight mt-1">Reserved</p>
-                <p className="text-[11px] text-[#0a0a0a]/70 mt-1">Your Kindle Board is being set up</p>
+              <div className="relative flex w-full max-w-xs flex-col items-center overflow-hidden rounded-2xl border-2 border-dashed border-[#f59e0b]/60 bg-gradient-to-br from-[#f59e0b] to-[#f59e0b] px-6 py-5 shadow-xl shadow-[#0f172a]/40">
+                <div className="absolute left-0 top-1/2 h-6 w-3 -translate-y-1/2 rounded-r-full bg-[#0f172a]/40" />
+                <div className="absolute right-0 top-1/2 h-6 w-3 -translate-y-1/2 rounded-l-full bg-[#0f172a]/40" />
+                <Sparkles className="h-7 w-7 text-[#0f172a] mb-1" strokeWidth={2} />
+                <p className="text-[9px] font-bold uppercase tracking-widest text-[#0f172a]/70">Kindled · First Kindler Pass</p>
+                <p className="font-editorial text-[19px] font-bold text-[#0f172a] text-center leading-tight mt-1">Reserved</p>
+                <p className="text-[11px] text-[#0f172a]/70 mt-1">Your Kindle Board is being set up</p>
               </div>
-              <p className="text-[12px] text-[#ffb800]/80 text-center">We&apos;ll send your magic link to {email}</p>
+              <p className="text-[12px] text-[#f59e0b]/80 text-center">We&apos;ll send your magic link to {email}</p>
             </motion.div>
           ) : (
             <form onSubmit={(e) => { void handleSubmit(e); }} className="flex flex-col gap-3">
@@ -1310,14 +1309,14 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full rounded-2xl border border-[#ffb800]/30 bg-white/10 px-4 py-3.5 text-[14px] text-white placeholder-white/30 outline-none focus:border-[#ffb800]/70 focus:ring-2 focus:ring-[#ffb800]/20 transition-all"
+                className="w-full rounded-2xl border border-[#f59e0b]/30 bg-white/10 px-4 py-3.5 text-[14px] text-white placeholder-white/30 outline-none focus:border-[#f59e0b]/70 focus:ring-2 focus:ring-[#f59e0b]/20 transition-all"
               />
               <motion.button
                 whileTap={{ scale: 0.97 }}
                 whileHover={{ scale: 1.01 }}
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#ffb800] to-[#f59e0b] py-4 text-[15px] font-bold text-[#0a0a0a] shadow-xl shadow-[#0a0a0a]/40 active:scale-95 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] py-4 text-[15px] font-bold text-[#0f172a] shadow-xl shadow-[#0f172a]/40 active:scale-95 disabled:opacity-60"
               >
                 <Flame className="h-[18px] w-[18px]" strokeWidth={2.5} />
                 {loading ? "Lighting the fire…" : "Create My First Fire"}
@@ -3892,14 +3891,64 @@ function JointFireView() {
   );
 }
 
+/**
+ * JointFireFeature — a compact, embeddable promo for Joint Fires. Surfaced inside
+ * both the contributor and receiver views (no longer its own tab): two real Kindlers
+ * pooling every occasion toward one long-term goal. Tapping it opens the full engine.
+ */
+function JointFireFeature({ onOpen }: { onOpen: () => void }) {
+  const goal = MILESTONE_GOALS.EXPEDITION; // The Maldives — a holiday a couple of years out
+  const proj = projectCumulative(JOINT_PARTNERS, JOINT_EVENTS, { years: 2, momentum: 0.12 });
+  const at2 = proj.find((p) => p.year === 2) ?? proj[proj.length - 1]!;
+  const pct = Math.min(100, Math.round((at2.total / goal.value) * 100));
+  return (
+    <motion.button
+      onClick={onOpen}
+      whileTap={{ scale: 0.98 }}
+      transition={VH_BOUNCE}
+      className="vh relative block w-full overflow-hidden rounded-[24px] bg-[#0f172a] text-left vh-lift-lg"
+    >
+      <div className="relative h-28 w-full overflow-hidden">
+        <img src={goal.image} alt={goal.title} loading="lazy" className="h-full w-full object-cover opacity-55" onError={(e) => { e.currentTarget.style.opacity = "0.2"; }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.92) 100%)" }} />
+        <span className="absolute left-4 top-4 flex items-center gap-1 rounded-full bg-[#ff6b6b] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white"><Link2 className="h-3 w-3" /> Joint Fire</span>
+        <div className="absolute right-4 top-4 flex -space-x-3">
+          {JOINT_PARTNERS.map((p) => (
+            <div key={p.name} className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-[#0f172a] bg-[#1f2937]">
+              <span className="flex h-full w-full items-center justify-center text-[11px] font-bold text-white">{p.initials}</span>
+              <img src={p.image} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover" onError={(e) => { e.currentTarget.remove(); }} />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="p-5">
+        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#f59e0b]">Two Kindlers · one big goal</p>
+        <p className="font-editorial mt-1 text-[20px] font-semibold leading-tight text-[#fdf6e3]">Sam &amp; Jess are saving for The Maldives</p>
+        <p className="mt-1.5 text-[12px] leading-relaxed text-[#fdf6e3]/60">
+          Every birthday, Christmas and anniversary stacks toward one thing neither would buy alone — a holiday, a new car, a house deposit.
+        </p>
+        <div className="mt-3.5 flex items-center gap-3">
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#fdf6e3]/15">
+            <div className="h-full rounded-full bg-[#f59e0b]" style={{ width: `${pct}%`, boxShadow: "0 0 8px rgba(245,158,11,0.6)" }} />
+          </div>
+          <span className="shrink-0 text-[12px] font-bold tabular-nums text-[#f59e0b]">{pct}% of £{goal.value.toLocaleString()}</span>
+        </div>
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-[12px] text-[#fdf6e3]/50">On track in ~2 years</span>
+          <span className="flex items-center gap-1 rounded-full bg-[#ff6b6b] px-4 py-2 text-[13px] font-bold text-white">See how it works <ChevronRight className="h-4 w-4" /></span>
+        </div>
+      </div>
+    </motion.button>
+  );
+}
+
 type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about" | "stars" | "investor" | "joint";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
   const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
     { id: "parent", label: "Kindlers", Icon: Users },
-    { id: "receiver", label: "Billy's View", Icon: Sparkles },
+    { id: "receiver", label: "Recipient", Icon: Sparkles },
     { id: "stars", label: "Stars", Icon: Star },
-    { id: "joint", label: "Joint Fire", Icon: Link2 },
     { id: "catalogue", label: "Catalogue", Icon: ShoppingBag },
     { id: "reveal", label: "Reveal", Icon: Sparkles },
     { id: "about", label: "About", Icon: Info },
@@ -4121,10 +4170,11 @@ function ReceiverProofStats() {
 // RECEIVER VIEW
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ReceiverView({ pots, onShare, onReveal }: {
+function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
   pots: DemoPot[];
   onShare: () => void;
   onReveal: () => void;
+  onOpenJoint: () => void;
 }) {
   // Exclude checklist pots entirely — receiver must not see "Mum Knows Best" items
   const sparkGoals = pots.filter((p) => !p.isClaimed && !p.isChecklist);
@@ -4210,6 +4260,15 @@ function ReceiverView({ pots, onShare, onReveal }: {
               <ReceiverPotCard key={pot.id} pot={pot} index={i} />
             ))}
           </div>
+        </div>
+
+        {/* ── Joint Fire feature — works for grown-ups & big goals too ── */}
+        <div>
+          <p className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Not just for kids</p>
+          <JointFireFeature onOpen={onOpenJoint} />
+          <p className="mt-2.5 px-1 text-[11px] leading-relaxed text-[#0f172a]/50">
+            Kindled works for any recipient, any age — a child&apos;s first bike, your own birthday, or two people saving for a holiday or a new car together.
+          </p>
         </div>
 
         {/* ── Receiver Reveal Demo — Midnight feature card ── */}
@@ -4459,7 +4518,7 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={pots} onShare={handleShare} onReveal={() => setViewMode("reveal")} />
+          <ReceiverView pots={pots} onShare={handleShare} onReveal={() => setViewMode("reveal")} onOpenJoint={() => setViewMode("joint")} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }} className="vh vh-paper min-h-screen">
@@ -4532,6 +4591,12 @@ export default function DemoPage() {
               </div>
             </div>
           )}
+
+          {/* ── Joint Fire feature — two Kindlers, one big goal ── */}
+          <div className="mt-3">
+            <p className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Go bigger, together</p>
+            <Reveal><JointFireFeature onOpen={() => setViewMode("joint")} /></Reveal>
+          </div>
 
           {/* ── Sign-up card — Midnight feature card ── */}
           <Reveal>
