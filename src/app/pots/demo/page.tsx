@@ -5089,8 +5089,8 @@ export default function DemoPage() {
                 Billy&apos;s reveal is ready
               </h2>
               <p className="mt-2 text-[13px] leading-relaxed text-stone-400">
-                A personalised cinematic video has been generated just for this moment.
-                Full-screen. No spoilers. One shot.
+                A cinematic reveal, built live from everyone who chipped in.
+                Full-screen, feel-good, and made to be shared.
               </p>
             </div>
             <motion.button
