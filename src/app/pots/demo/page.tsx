@@ -3949,15 +3949,21 @@ const V2_POTS = [
   { id: "p1", name: "Super-Fast Mountain Bike", sub: "Trek Marlin 5 · Your #1 wish",
     amount: 310, goal: 310, Icon: Bike,
     grad: "from-amber-400 to-orange-500", glow: "#f97316", complete: true,
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop&q=85" },
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop&q=85",
+    retailer: "Halfords", boost: 5,
+    buyUrl: "https://www.amazon.co.uk/s?k=Trek+Marlin+5+mountain+bike&tag=kindled-21" },
   { id: "p2", name: "LEGO Millennium Falcon", sub: "Star Wars · 3,187 pieces",
     amount: 89, goal: 89, Icon: Package,
     grad: "from-violet-400 to-purple-500", glow: "#8b5cf6", complete: true,
-    image: "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=600&h=600&fit=crop&q=85" },
+    image: "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=600&h=600&fit=crop&q=85",
+    retailer: "LEGO Store", boost: 4,
+    buyUrl: "https://www.amazon.co.uk/s?k=LEGO+Millennium+Falcon&tag=kindled-21" },
   { id: "p3", name: "PS5 Gaming Bundle", sub: "3 games · controller included",
     amount: 75, goal: 80, Icon: Gamepad2,
     grad: "from-blue-400 to-sky-400", glow: "#38bdf8", complete: false,
-    image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&h=600&fit=crop&q=85" },
+    image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&h=600&fit=crop&q=85",
+    retailer: "Currys", boost: 3,
+    buyUrl: "https://www.amazon.co.uk/s?k=PlayStation+5+console+bundle&tag=kindled-21" },
 ];
 
 const V2_CONTRIBS = [
@@ -4534,6 +4540,108 @@ function RevealV2View() {
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// ─── POST-REVEAL: turn the pot into the real gift ─────────────────────────────
+// This is the affiliate + gift-card revenue moment: buy now (boosted cashback),
+// flexible gift cards, and a top-up for any gift that isn't fully funded.
+function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
+  recipientName: string; totalRaised: number; onReplay: () => void;
+}) {
+  const [toppedUp, setToppedUp] = useState<Set<string>>(new Set());
+  const [addedCards, setAddedCards] = useState<Set<string>>(new Set());
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-stone-950 via-stone-900 to-stone-950 px-4 pb-32 pt-6">
+      {/* Header */}
+      <div className="mb-6 text-center">
+        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-900/30">
+          <Check className="h-7 w-7 text-white" strokeWidth={3} />
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Reveal complete</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="mt-1 text-[24px] font-black text-white">Now make it real</h2>
+        <p className="mx-auto mt-1.5 max-w-xs text-[13px] leading-relaxed text-stone-400">
+          {recipientName}&apos;s £{totalRaised} is ready. Buy each gift for real, or turn it into flexible gift cards.
+        </p>
+      </div>
+
+      {/* Gifts → buy now / top up */}
+      <div className="space-y-3">
+        {V2_POTS.map((g) => {
+          const remaining = Math.max(0, g.goal - g.amount);
+          const funded = g.complete || toppedUp.has(g.id);
+          return (
+            <div key={g.id} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+              <div className="flex gap-3 p-3">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl" style={{ background: g.glow + "22" }}>
+                  <img src={g.image} alt={g.name} loading="lazy" className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.opacity = "0"; }} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[14px] font-black text-white">{g.name}</p>
+                  <p className="text-[11px] text-stone-400">{g.retailer} · £{g.goal}</p>
+                  {funded ? (
+                    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                      <Check className="h-3 w-3" strokeWidth={3} /> Fully funded
+                    </span>
+                  ) : (
+                    <span className="mt-1.5 inline-block rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-400">£{remaining} to go</span>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-2 border-t border-white/5 p-3">
+                {funded ? (
+                  <a href={g.buyUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 py-2.5 text-[13px] font-black text-stone-900 shadow-lg shadow-amber-500/20 active:scale-95 transition-transform">
+                    <ShoppingBag className="h-4 w-4" strokeWidth={2.5} /> Buy now
+                    <span className="rounded-full bg-stone-900/20 px-1.5 py-0.5 text-[9px] font-black">+{g.boost}% back</span>
+                  </a>
+                ) : (
+                  <>
+                    <button onClick={() => setToppedUp((s) => new Set([...s, g.id]))}
+                      className="flex-1 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 py-2.5 text-[13px] font-black text-white transition-transform active:scale-95">
+                      Top up £{remaining}
+                    </button>
+                    <a href={g.buyUrl} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 px-3.5 py-2.5 text-[12px] font-bold text-white">
+                      <ShoppingBag className="h-3.5 w-3.5" /> Buy
+                    </a>
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Gift cards — flexible option */}
+      <div className="mt-5 rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-950/60 to-violet-950/40 p-4">
+        <p className="text-[14px] font-black text-white">Prefer flexibility?</p>
+        <p className="mt-1 text-[12px] leading-relaxed text-stone-400">
+          Turn the pot into gift cards — spend anywhere, and earn cashback into {recipientName}&apos;s wallet for next time.
+        </p>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          {[{ brand: "Amazon", back: 3, color: "#f59e0b" }, { brand: "Currys", back: 4, color: "#a78bfa" }, { brand: "Smyths", back: 5, color: "#34d399" }].map((c) => {
+            const added = addedCards.has(c.brand);
+            return (
+              <button key={c.brand} onClick={() => setAddedCards((s) => new Set([...s, c.brand]))}
+                className={cn("rounded-xl border px-2 py-3 text-center transition-colors", added ? "border-emerald-500/40 bg-emerald-500/10" : "border-white/10 bg-white/[0.06]")}>
+                <p className="text-[12px] font-black text-white">{c.brand}</p>
+                <p className="mt-0.5 text-[10px] font-bold" style={{ color: added ? "#34d399" : c.color }}>{added ? "Added" : `+${c.back}% back`}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <p className="mt-4 text-center text-[10px] leading-relaxed text-stone-500">
+        Buying through Kindled earns a small commission that keeps Kindled free — plus a cashback boost for next time. Real UK retailers only.
+      </p>
+
+      <button onClick={onReplay} className="mx-auto mt-5 flex items-center gap-1.5 text-[12px] font-bold text-stone-500 transition-colors hover:text-stone-300">
+        <Play className="h-3.5 w-3.5" /> Watch the reveal again
+      </button>
+    </div>
+  );
+}
+
 type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about" | "stars" | "investor";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
@@ -4971,6 +5079,7 @@ export default function DemoPage() {
   const [showReceiverSignUp, setShowReceiverSignUp] = useState(false);
   // AI reveal overlay — shown when user clicks into the Reveal tab
   const [showAiReveal, setShowAiReveal] = useState(false);
+  const [showPostReveal, setShowPostReveal] = useState(false);
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));
@@ -5111,8 +5220,15 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "reveal" ? (
         <motion.div key="reveal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
-          {/* AI Reveal trigger card — shown before the overlay fires */}
-          <div className="flex flex-col items-center gap-6 px-6 py-10 text-center">
+          {showPostReveal ? (
+            <PostRevealOptions
+              recipientName="Billy"
+              totalRaised={V2_TOTAL}
+              onReplay={() => { setShowPostReveal(false); setShowAiReveal(true); }}
+            />
+          ) : (
+          /* AI Reveal trigger card — shown before the overlay fires */
+          <div className="flex min-h-screen flex-col items-center gap-6 bg-gradient-to-b from-stone-950 via-stone-900 to-stone-950 px-6 py-10 text-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-xl shadow-amber-900/30">
               <Sparkles className="h-10 w-10 text-stone-900" />
             </div>
@@ -5141,6 +5257,7 @@ export default function DemoPage() {
               <RevealV2View />
             </div>
           </div>
+          )}
         </motion.div>
       ) : viewMode === "stars" ? (
         <motion.div key="stars" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
@@ -5455,7 +5572,7 @@ export default function DemoPage() {
           totalRaised={V2_TOTAL}
           gifts={V2_POTS.map((p) => ({ name: p.name, sub: p.sub, Icon: p.Icon, grad: p.grad, glow: p.glow, image: p.image }))}
           contributors={V2_CONTRIBS.map((c) => ({ name: c.name, initials: c.initials, grad: c.grad, image: c.image }))}
-          onComplete={() => setShowAiReveal(false)}
+          onComplete={() => { setShowAiReveal(false); setShowPostReveal(true); }}
         />
       )}
     </div>
