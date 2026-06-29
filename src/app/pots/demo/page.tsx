@@ -10,7 +10,7 @@ import {
   Landmark, Radio, Wrench, Trophy, Wallet, Eye,
   Bike, Cake, TreePine, PenLine, Waves, Castle,
   AlertCircle, Copy, TrendingUp, Info, CircleEllipsis, CalendarDays, Gamepad2,
-  Heart, Home, Shirt, Ticket, Dumbbell, Blocks, ImageOff, LayoutGrid,
+  Heart, Home, ImageOff,
   Plane, UserPlus, TrendingDown, ExternalLink,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -1283,20 +1283,21 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
     }, 720);
   }, [circling, added, item, onAdd]);
 
-  const imgH = featured ? 196 : 158;
+  const imgH = featured ? 210 : 172;
 
   return (
     <motion.div
       whileHover={!added ? { y: -6 } : {}}
-      whileTap={!added ? { scale: 0.97 } : {}}
+      whileTap={!added ? { scale: 0.98 } : {}}
       transition={{ type: "spring", stiffness: 420, damping: 26 }}
-      className="group relative cursor-pointer overflow-visible rounded-[20px] bg-white"
+      className={cn("group relative cursor-pointer overflow-visible rounded-[18px] border bg-white/80 backdrop-blur-sm",
+        added ? "border-amber-400" : "border-stone-200/80")}
       style={{ boxShadow: added
-        ? `0 0 0 2.5px #34d399, 0 16px 44px ${item.glowColor}3a`
-        : "0 2px 14px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04)" }}
+        ? "0 0 0 1.5px #f59e0b, 0 18px 40px rgba(28,28,31,0.13)"
+        : "0 4px 18px rgba(28,28,31,0.06), 0 1px 2px rgba(28,28,31,0.04)" }}
       onClick={handleClick}
     >
-      {/* Classic blue biro pen circle */}
+      {/* Signature circle-to-add — the modern-nostalgia interaction */}
       {circling && (
         <div className="pointer-events-none absolute z-20" style={{ inset: "-9px" }}>
           <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
@@ -1319,55 +1320,38 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
         </div>
       )}
 
-      {/* Image */}
-      <div className="relative overflow-hidden rounded-t-[20px]">
-        <ProductImage src={item.image} alt={item.name} glowColor={item.glowColor} height={imgH} {...(item.brand ? { brand: item.brand } : {})} />
-        {/* Rich bottom gradient for legible overlays */}
-        <div className="pointer-events-none absolute inset-0" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.08) 48%, transparent 72%)` }} />
-        <div className="pointer-events-none absolute inset-0" style={{ background: `linear-gradient(to top, ${item.glowColor}4d 0%, transparent 42%)` }} />
-
-        {/* Brand pill top-left */}
-        {item.brand && (
-          <div className="absolute left-2.5 top-2.5 rounded-lg bg-white/92 px-2 py-0.5 shadow-sm backdrop-blur-md">
-            <p className="text-[8px] font-black uppercase tracking-wider text-stone-700">{item.brand}</p>
-          </div>
-        )}
-        {/* Tag top-right */}
-        <span className={cn("absolute right-2.5 top-2.5 rounded-lg px-2 py-0.5 text-[8px] font-black uppercase tracking-wider shadow-sm backdrop-blur-sm", item.tagColor)}>
+      {/* Image — clean editorial, no colour wash */}
+      <div className="relative overflow-hidden rounded-t-[18px]">
+        <div className="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
+          <ProductImage src={item.image} alt={item.name} glowColor="#26262b" height={imgH} {...(item.brand ? { brand: item.brand } : {})} />
+        </div>
+        {/* Circled count top-left */}
+        <div className="absolute left-2.5 top-2.5 flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 shadow-sm backdrop-blur-md">
+          <motion.span animate={heartPop ? { scale: [1, 1.9, 0.9, 1.2, 1] } : {}} transition={{ duration: 0.45 }}>
+            <Heart className="h-2.5 w-2.5 fill-amber-500 text-amber-500" />
+          </motion.span>
+          <span className="text-[9px] font-bold tabular-nums text-stone-700">{(heartPop ? item.hearts + 1 : item.hearts).toLocaleString()}</span>
+        </div>
+        {/* Tag top-right — single refined treatment */}
+        <span className="absolute right-2.5 top-2.5 rounded-full bg-stone-900/85 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-white backdrop-blur-sm">
           {item.tag}
         </span>
-        {/* Price overlaid bottom-left */}
-        <div className="absolute bottom-2.5 left-2.5">
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-[23px] font-black leading-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-            £{item.price.toLocaleString()}
-          </span>
-        </div>
-        {/* Circled count bottom-right */}
-        <div className="absolute bottom-3 right-2.5 flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 backdrop-blur-sm">
-          <motion.span animate={heartPop ? { scale: [1, 1.9, 0.9, 1.2, 1] } : {}} transition={{ duration: 0.45 }}>
-            <Heart className="h-2.5 w-2.5 fill-rose-400 text-rose-400" />
-          </motion.span>
-          <span className="text-[9px] font-bold tabular-nums text-white">{(heartPop ? item.hearts + 1 : item.hearts).toLocaleString()}</span>
-        </div>
       </div>
 
-      {/* Info below image */}
-      <div className="px-3 pb-3 pt-2.5">
-        <p style={{ fontFamily: "var(--font-display)" }} className="mb-2 line-clamp-2 min-h-[34px] text-[13px] font-semibold leading-snug text-stone-800">{item.name}</p>
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-1 text-[10px] font-semibold text-stone-400">
-            <ShieldCheck className="h-3 w-3 text-emerald-500" strokeWidth={2.25} />
-            Real UK price
-          </span>
+      {/* Info — editorial type hierarchy */}
+      <div className="px-3.5 pb-3.5 pt-3">
+        {item.brand && <p className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-stone-400">{item.brand}</p>}
+        <p style={{ fontFamily: "var(--font-display)" }} className="line-clamp-2 min-h-[36px] text-[14px] font-bold leading-snug text-stone-900">{item.name}</p>
+        <div className="mt-2.5 flex items-center justify-between">
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-[19px] font-black tabular-nums text-stone-900">£{item.price.toLocaleString()}</span>
           {added ? (
             <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 18 }}
-              className="flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-black text-emerald-600">
+              className="flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-black text-amber-700">
               <Check className="h-3 w-3" /> Added
             </motion.span>
           ) : (
-            <motion.div whileTap={{ scale: 0.88 }} className="flex h-8 w-8 items-center justify-center rounded-full text-white shadow-lg"
-              style={{ background: `linear-gradient(135deg, ${item.glowColor}, ${item.glowColor}aa)`,
-                boxShadow: `0 4px 12px ${item.glowColor}55` }}>
+            <motion.div whileTap={{ scale: 0.88 }} className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-500 text-white"
+              style={{ boxShadow: "0 4px 12px rgba(245,158,11,0.4)" }}>
               <Plus className="h-4 w-4" strokeWidth={2.75} />
             </motion.div>
           )}
@@ -1499,195 +1483,147 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-const CAT_TABS = ["All", "Tech", "Gaming", "Toys", "Sport", "Home", "Fashion", "Experiences"] as const;
-type CatTab = typeof CAT_TABS[number];
-const CAT_ICONS: Record<string, LucideIcon> = {
-  All: LayoutGrid, Tech: Zap, Gaming: Gamepad2, Toys: Blocks,
-  Sport: Dumbbell, Home: Home, Fashion: Shirt, Experiences: Ticket,
+const INTEREST_OPTIONS = ["All interests", "Tech", "Gaming", "Toys", "Sport", "Home", "Fashion", "Experiences"];
+const BUDGET_OPTIONS = ["Any budget", "Under £50", "£50–£150", "£150–£500", "£500+"];
+const OCCASION_OPTIONS = ["Any occasion", "Birthday", "Christmas", "Anniversary", "Wedding", "New baby"];
+const OCCASION_CATS: Record<string, string[]> = {
+  Birthday:    ["Tech", "Gaming", "Toys", "Sport", "Fashion", "Experiences"],
+  Christmas:   ["Tech", "Gaming", "Toys", "Sport", "Home", "Fashion", "Experiences"],
+  Anniversary: ["Experiences", "Fashion", "Home", "Tech"],
+  Wedding:     ["Home", "Experiences", "Fashion"],
+  "New baby":  ["Toys", "Home"],
 };
+function inBudget(price: number, b: string): boolean {
+  switch (b) {
+    case "Under £50": return price < 50;
+    case "£50–£150": return price >= 50 && price < 150;
+    case "£150–£500": return price >= 150 && price < 500;
+    case "£500+": return price >= 500;
+    default: return true;
+  }
+}
+
+function FilterDropdown({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative flex-1">
+      <button onClick={() => setOpen((o) => !o)}
+        className={cn("flex w-full items-center justify-between gap-1 rounded-xl border px-3 py-2 text-left transition-colors",
+          open ? "border-amber-400 bg-white" : "border-stone-200 bg-white/70 hover:border-stone-300")}>
+        <span className="min-w-0">
+          <span className="block text-[8px] font-bold uppercase tracking-widest text-stone-400">{label}</span>
+          <span className="block truncate text-[12px] font-bold text-stone-900">{value}</span>
+        </span>
+        <ChevronDown className={cn("h-4 w-4 shrink-0 text-stone-400 transition-transform", open && "rotate-180")} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <>
+            <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
+            <motion.div initial={{ opacity: 0, y: -6, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-stone-200 bg-white shadow-xl">
+              {options.map((opt) => (
+                <button key={opt} onClick={() => { onChange(opt); setOpen(false); }}
+                  className={cn("flex w-full items-center justify-between px-3 py-2.5 text-left text-[12px] font-semibold transition-colors hover:bg-stone-50",
+                    opt === value ? "text-amber-600" : "text-stone-700")}>
+                  {opt}
+                  {opt === value && <Check className="h-3.5 w-3.5 text-amber-500" strokeWidth={3} />}
+                </button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
-  const [activeTab, setActiveTab] = useState<CatTab>("All");
+  const [interest, setInterest] = useState("All interests");
+  const [budget, setBudget] = useState("Any budget");
+  const [occasion, setOccasion] = useState("Any occasion");
   const [tickerIdx, setTickerIdx] = useState(0);
 
-  const tickerItems = CATALOGUE.filter((c) => c.hearts > 800).slice(0, 6);
+  const tickerItems = useMemo(() => CATALOGUE.filter((c) => c.hearts > 800).slice(0, 6), []);
   useEffect(() => {
     const iv = setInterval(() => setTickerIdx((i) => (i + 1) % tickerItems.length), 2800);
     return () => clearInterval(iv);
   }, [tickerItems.length]);
 
-  const filtered = activeTab === "All" ? CATALOGUE : CATALOGUE.filter((c) => c.category === activeTab);
-  const featured = CATALOGUE.filter((c) => c.hearts > 1000).slice(0, 3);
+  const filtered = useMemo(() => CATALOGUE.filter((c) => {
+    if (interest !== "All interests" && c.category !== interest) return false;
+    if (!inBudget(c.price, budget)) return false;
+    if (occasion !== "Any occasion" && !(OCCASION_CATS[occasion]?.includes(c.category))) return false;
+    return true;
+  }).sort((a, b) => b.hearts - a.hearts), [interest, budget, occasion]);
+
+  const reset = () => { setInterest("All interests"); setBudget("Any budget"); setOccasion("Any occasion"); };
 
   return (
-    <div className="pb-32" style={{ background: "#fdf9f5" }}>
-
-      {/* ── Retro catalogue header banner ── */}
-      <div className="relative overflow-hidden px-4 py-5"
-        style={{ background: "linear-gradient(135deg,#cc0000 0%,#e63946 40%,#cc0000 100%)" }}>
-        {/* Halftone dot pattern */}
-        <div className="pointer-events-none absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "14px 14px" }} />
-        <div className="relative flex items-start justify-between">
-          <div>
-            <div className="mb-1 flex items-center gap-2">
-              <div className="rounded bg-white px-2 py-0.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-red-600">Kindled</p>
-              </div>
-              <div className="rounded bg-amber-400 px-2 py-0.5">
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-stone-900">2025 · 26</p>
-              </div>
-            </div>
-            <p style={{ fontFamily: "var(--font-display)" }}
-              className="text-[28px] font-black uppercase leading-none tracking-tight text-white">
-              THE<br />
-              <span className="text-amber-300">CATALOGUE</span>
-            </p>
-            <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
-              Circle your dreams · {CATALOGUE.length} products
-            </p>
-          </div>
-          {/* Retro catalogue page sticker */}
-          <div className="flex flex-col items-center justify-center rounded-full bg-amber-400 p-3 shadow-xl"
-            style={{ width: 64, height: 64, boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
-            <p className="text-[7px] font-black uppercase leading-none text-stone-900">Circle</p>
-            <p className="text-[18px] font-black leading-none text-stone-900">&amp;</p>
-            <p className="text-[7px] font-black uppercase leading-none text-stone-900">Add</p>
-          </div>
-        </div>
-
-        {/* Live ticker */}
-        <div className="mt-3 flex items-center gap-2 overflow-hidden">
-          <div className="flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1">
-            <TrendingUp className="h-3 w-3 text-amber-300" />
-            <p className="text-[9px] font-bold uppercase tracking-wider text-white/80">Trending now</p>
-          </div>
+    <div className="pb-32" style={{ background: "#f7f4ee" }}>
+      {/* ── Editorial header ── */}
+      <div className="px-5 pt-7 pb-5">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-600">The Kindled Edit · 2026</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="mt-1 text-[34px] font-black leading-[0.95] tracking-tight text-stone-900">The Catalogue</h2>
+        <p className="mt-2 text-[12px] leading-relaxed text-stone-500">{filtered.length} of {CATALOGUE.length} pieces · circle the ones worth keeping.</p>
+        {/* Trending ticker */}
+        <div className="mt-4 flex items-center gap-2 rounded-full border border-stone-200 bg-white/60 px-3 py-1.5">
+          <span className="flex shrink-0 items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-amber-600"><TrendingUp className="h-3 w-3" /> Trending</span>
           <div className="flex-1 overflow-hidden">
             <AnimatePresence mode="wait">
-              <motion.p key={tickerIdx}
-                initial={{ y: 14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -14, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="text-[11px] font-semibold text-white truncate">
-                {tickerItems[tickerIdx]?.name} — {tickerItems[tickerIdx]?.hearts.toLocaleString()} people circled this
+              <motion.p key={tickerIdx} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -12, opacity: 0 }} transition={{ duration: 0.3 }}
+                className="truncate text-[11px] text-stone-600">
+                {tickerItems[tickerIdx]?.name} — circled {tickerItems[tickerIdx]?.hearts.toLocaleString()} times
               </motion.p>
             </AnimatePresence>
           </div>
         </div>
       </div>
 
-      {/* ── Tip strip ── */}
-      <div className="flex items-center gap-2 bg-amber-50 px-4 py-2.5 border-b border-amber-100">
-        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-600">
-          <PenLine className="h-3 w-3 text-white" />
-        </div>
-        <p className="text-[10px] font-semibold text-stone-600">
-          Tap any product — the <span className="font-black text-blue-600">blue biro</span> circles it, then it lands on your fire list.
-        </p>
-      </div>
-
-      {/* ── Trust band ── */}
-      <div className="flex items-center justify-around gap-1 border-b border-stone-100 bg-white px-3 py-2">
-        {[
-          { Icon: ShieldCheck, label: "Real UK prices", color: "text-emerald-500" },
-          { Icon: Heart, label: "Free to circle", color: "text-rose-500" },
-          { Icon: Users, label: "Loved by families", color: "text-amber-500" },
-        ].map(({ Icon, label, color }) => (
-          <div key={label} className="flex items-center gap-1.5">
-            <Icon className={cn("h-3.5 w-3.5", color)} strokeWidth={2.25} />
-            <span className="text-[10px] font-bold text-stone-500">{label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Category tabs ── */}
-      <div className="sticky top-[57px] z-20 bg-white/95 backdrop-blur-sm border-b border-stone-100 shadow-sm">
-        <div className="overflow-x-auto scrollbar-none px-3 py-2.5">
-          <div className="flex gap-1.5 min-w-max">
-            {CAT_TABS.map((tab) => {
-              const count = tab === "All" ? CATALOGUE.length : CATALOGUE.filter((c) => c.category === tab).length;
-              const isActive = activeTab === tab;
-              const Icon = CAT_ICONS[tab];
-              return (
-                <motion.button key={tab} onClick={() => setActiveTab(tab)}
-                  whileTap={{ scale: 0.95 }} whileHover={{ y: -1 }}
-                  className={cn(
-                    "flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold transition-all whitespace-nowrap",
-                    isActive ? "bg-stone-900 text-white shadow-md" : "bg-stone-100 text-stone-500"
-                  )}>
-                  {Icon && <Icon className="h-3.5 w-3.5" strokeWidth={2.25} />}
-                  {tab}
-                  <span className={cn(
-                    "rounded-full px-1.5 py-0.5 text-[9px] font-black",
-                    isActive ? "bg-white/20 text-white" : "bg-stone-200 text-stone-500"
-                  )}>{count}</span>
-                </motion.button>
-              );
-            })}
-          </div>
+      {/* ── Filters — high-performance dropdowns ── */}
+      <div className="sticky top-[57px] z-20 border-y border-stone-200 bg-[#f7f4ee]/92 px-4 py-3 backdrop-blur-md">
+        <div className="flex gap-2">
+          <FilterDropdown label="Interest" value={interest} options={INTEREST_OPTIONS} onChange={setInterest} />
+          <FilterDropdown label="Budget" value={budget} options={BUDGET_OPTIONS} onChange={setBudget} />
+          <FilterDropdown label="Occasion" value={occasion} options={OCCASION_OPTIONS} onChange={setOccasion} />
         </div>
       </div>
 
-      {/* ── Featured strip (only on All tab) ── */}
-      <AnimatePresence mode="wait">
-        {activeTab === "All" && (
-          <motion.div key="featured" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-            className="pt-4">
-            <div className="mb-3 flex items-center gap-2 px-4">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">Most Circled Right Now</p>
-              <div className="h-px flex-1 bg-stone-200" />
-              <p className="text-[9px] text-stone-400">scroll →</p>
-            </div>
-            <div className="overflow-x-auto scrollbar-none pl-4 pr-2">
-              <div className="flex gap-3 pb-1" style={{ width: "max-content" }}>
-                {featured.map((item, i) => (
-                  <motion.div key={item.id} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.08, type: "spring", stiffness: 380, damping: 28 }}
-                    style={{ width: 180 }}>
-                    <CatalogCard item={item} onAdd={onAdd} featured />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-            <div className="mx-4 my-4 flex items-center gap-3">
-              <div className="h-px flex-1 bg-stone-200" />
-              <p className="text-[9px] font-bold uppercase tracking-widest text-stone-400">All {CATALOGUE.length} Products</p>
-              <div className="h-px flex-1 bg-stone-200" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ── Tip ── */}
+      <div className="flex items-center gap-2 px-5 py-3">
+        <PenLine className="h-3.5 w-3.5 shrink-0 text-amber-600" strokeWidth={2} />
+        <p className="text-[10px] text-stone-500">Tap a piece — the <span className="font-bold text-stone-700">blue biro</span> circles it onto your fire list.</p>
+      </div>
 
-      {/* ── Main grid ── */}
-      <AnimatePresence mode="wait">
-        <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
-          className="grid grid-cols-2 gap-3 px-4">
+      {/* ── Gallery grid ── */}
+      {filtered.length === 0 ? (
+        <div className="px-5 py-16 text-center">
+          <p className="text-[14px] font-bold text-stone-700">Nothing matches those filters</p>
+          <button onClick={reset} className="mt-3 rounded-full border border-stone-300 px-4 py-2 text-[12px] font-bold text-stone-700 transition-colors hover:bg-white">Clear filters</button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3.5 px-4">
           {filtered.map((item, i) => (
-            <motion.div key={item.id} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "0px 0px -40px 0px" }}
-              transition={{ delay: (i % 2) * 0.05, type: "spring", stiffness: 380, damping: 28 }}>
+            <motion.div key={item.id} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -50px 0px" }}
+              transition={{ delay: (i % 2) * 0.06, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
               <CatalogCard item={item} onAdd={onAdd} />
             </motion.div>
           ))}
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      )}
 
-      {/* ── Bottom CTA ── */}
-      <div className="mx-4 mt-6 overflow-hidden rounded-2xl"
-        style={{ background: "linear-gradient(135deg,#cc0000,#e63946)", boxShadow: "0 8px 32px rgba(204,0,0,0.3)" }}>
-        <div className="pointer-events-none absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "12px 12px" }} />
-        <div className="relative px-4 py-4 flex items-center gap-4">
-          <div className="flex-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-0.5">Create your own catalogue</p>
-            <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-bold text-white leading-tight">
-              Let family circle the things you&apos;d actually love
-            </p>
-          </div>
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400">
-            <Flame className="h-5 w-5 text-stone-900" />
-          </div>
+      {/* ── Bottom CTA — refined ── */}
+      <div className="mx-4 mt-8 flex items-center gap-4 rounded-2xl border border-stone-900 bg-stone-900 px-5 py-5">
+        <div className="flex-1">
+          <p className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-amber-400">Create your own edit</p>
+          <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-bold leading-tight text-white">
+            Let family circle the things you&apos;d actually love
+          </p>
+        </div>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500">
+          <Flame className="h-5 w-5 text-stone-900" />
         </div>
       </div>
     </div>
