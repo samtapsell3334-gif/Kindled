@@ -96,25 +96,30 @@
     "headline": "The Value Engine",
     "subheadline": "We make money while actively rewarding the user. That alignment is the moat.",
     "fairness": {
-      "title": "No-Fee Withdrawals — The Fairness Strategy",
-      "body": "Cashing a Fire out to a bank account is always free. No exit fee, no trap. That builds the one thing a money product cannot fake: trust.",
-      "lockedLoop": "The incentive is positive, not punitive. Withdraw and you keep 100%. But convert your Fire into a partner gift card and you unlock a Bonus on top — so the user is rewarded for keeping value inside the loop, where it generates affiliate revenue and recirculates.",
+      "title": "Trust on Gifts, Lock-In on Rewards",
+      "body": "Cashing a Fire's gift balance out to a bank is always free — no exit fee, no trap. That builds the one thing a money product cannot fake: trust. Earned cashback is treated differently, by design.",
+      "lockedLoop": "Gift money is freely withdrawable; earned cashback is not. The user's 3% lands as Spark Balance credited only to their own Fires — non-withdrawable, redeemable solely against partner gift cards. To spend it, a contributor has to become a host. So the reward itself acquires the next customer, and every redemption loops back into the catalogue as fresh GMV.",
       "points": [
-        "Withdraw to bank: 100% of the balance, zero fee, builds trust.",
-        "Convert to a partner gift card: balance + a cashback Bonus.",
-        "The 'Locked-In Loop': value that stays in the ecosystem compounds for both the user and the platform."
+        "Gift balance → withdraw to bank: 100%, zero fee, builds trust.",
+        "Earned cashback → Spark Balance: own Fires only, never cashable.",
+        "To spend cashback you start your own board — acquisition, baked in.",
+        "Spark Balance redeems into gift cards, recirculates, and compounds for both sides."
       ]
     },
     "cashbackMath": {
       "title": "The Cashback Math",
-      "intro": "A retailer pays an affiliate commission when a Fire converts into a real purchase. We split it so the user is rewarded and the platform profits from the same transaction.",
+      "intro": "A retailer pays an affiliate commission when a Fire converts into a real purchase. We split it so the user is rewarded and the platform profits — but the user's share is credited as ringfenced Spark Balance, not withdrawable cash.",
       "exampleLabel": "On a £100 partner purchase",
       "commission": { "label": "Retailer commission", "value": "5%", "amount": "£5.00" },
       "split": [
-        { "label": "User Bonus (cashback)", "value": "3%", "amount": "£3.00", "tone": "user" },
+        { "label": "User Spark Balance — own Fires only", "value": "3%", "amount": "£3.00", "tone": "user" },
         { "label": "Platform profit", "value": "2%", "amount": "£2.00", "tone": "platform" }
       ],
-      "takeaway": "The user feels rewarded, the retailer gets a verified buyer, and Kindled earns — all from money that was going to be spent anyway."
+      "compoundLoop": {
+        "title": "Ringfenced & Compounding",
+        "body": "The 3% is never withdrawable. It lands as Spark Balance inside the user's own Fires — so to spend it, a contributor has to start their own board. That's customer acquisition baked into the reward. And because Spark Balance only redeems back into Fires that convert to partner gift cards, every pound recirculates: it earns commission again, credits more Spark Balance, and compounds — GMV that can't leak out of the ecosystem."
+      },
+      "takeaway": "The user feels rewarded, the platform profits on the same transaction, and the reward itself recruits the next host and recirculates as GMV — value that compounds instead of cashing out."
     },
     "revenueModels": [
       {

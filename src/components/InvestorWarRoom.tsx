@@ -321,11 +321,11 @@ function CashbackSplit() {
         {/* Split bar */}
         <div className="mt-4 flex h-9 w-full overflow-hidden rounded-xl">
           <motion.div initial={{ width: 0 }} animate={inView ? { width: "60%" } : {}} transition={{ duration: 0.7, ease: "easeOut" }}
-            className="flex items-center justify-center bg-gradient-to-r from-[#ffb800] to-teal-500 text-[12px] font-black text-white">
+            className="flex items-center justify-center bg-[#ffb800] text-[12px] font-black text-[#0a0a0a]">
             You · 3%
           </motion.div>
           <motion.div initial={{ width: 0 }} animate={inView ? { width: "40%" } : {}} transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
-            className="flex items-center justify-center bg-gradient-to-r from-[#ffb800] to-[#ffb800] text-[12px] font-black text-white">
+            className="flex items-center justify-center bg-[#2a2a2a] text-[12px] font-black text-[#ffb800]">
             Us · 2%
           </motion.div>
         </div>
@@ -333,11 +333,20 @@ function CashbackSplit() {
           {cashbackMath.split.map((s) => (
             <div key={s.label} className="rounded-xl border border-slate-700/40 bg-[#1c1c1c]/40 px-3 py-2.5">
               <p className="text-[16px] font-black text-white">{s.amount}</p>
-              <p className="text-[11px]" style={{ color: s.tone === "user" ? "#34d399" : "#818cf8" }}>{s.label}</p>
+              <p className="text-[11px]" style={{ color: s.tone === "user" ? "#ffb800" : "#94a3b8" }}>{s.label}</p>
             </div>
           ))}
         </div>
       </div>
+      {cashbackMath.compoundLoop && (
+        <div className="mt-4 rounded-xl border border-[#ffb800]/20 bg-[#ffb800]/[0.06] p-3">
+          <div className="flex items-center gap-1.5">
+            <Repeat className="h-3.5 w-3.5 text-[#ffb800]" />
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[#ffb800]">{cashbackMath.compoundLoop.title}</p>
+          </div>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-slate-300">{cashbackMath.compoundLoop.body}</p>
+        </div>
+      )}
       <p className="mt-4 text-[13px] leading-relaxed text-slate-300">{cashbackMath.takeaway}</p>
     </Panel>
   );
