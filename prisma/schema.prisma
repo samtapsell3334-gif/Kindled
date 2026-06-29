@@ -56,6 +56,13 @@ enum MilestoneCategory {
   LEGACY // long-horizon gifts for the future (a child's fund, an heirloom)
 }
 
+/// Duplicate Prevention Engine state for a wishlist item within a Fire.
+enum ItemClaimStatus {
+  AVAILABLE // no one has reserved it
+  PENDING // a giver holds a time-boxed (30-min) reservation while they check out
+  CLAIMED // purchase confirmed (or verified via webhook) — permanently sorted
+}
+
 enum ItemCategory {
   ELECTRONICS
   FASHION
@@ -92,6 +99,8 @@ model User {
   jointPots     Pot[]            @relation("PotPartner")
   contributions Contribution[]   @relation("ContributionGiver")
   intentNodes   IntentDataNode[]
+  /// Wishlist items this user has reserved or gifted (Duplicate Prevention Engine).
+  claimedItems  PotItem[]        @relation("ItemClaimer")
 
   @@index([phone])
   @@index([email])
@@ -250,21 +259,32 @@ model RevealTask {
 }
 
 model PotItem {
-  id          String       @id @default(cuid())
-  potId       String
-  productName String
-  category    ItemCategory
-  price       Decimal      @db.Decimal(10, 2)
-  externalUrl String?
-  isSponsored Boolean      @default(false)
+  id              String          @id @default(cuid())
+  potId           String
+  productName     String
+  category        ItemCategory
+  price           Decimal         @db.Decimal(10, 2)
+  externalUrl     String?
+  isSponsored     Boolean         @default(false)
+  /// Duplicate Prevention Engine — stops two givers buying the same gift for one
+  /// Fire. AVAILABLE → PENDING (30-min reservation) → CLAIMED. The claim is made
+  /// atomic at the DB via a conditional UPDATE; see src/lib/claim-engine.ts.
+  claimStatus     ItemClaimStatus @default(AVAILABLE)
+  /// The giver holding the reservation, or who confirmed the purchase.
+  claimedByUserId String?
+  /// When a CLAIMED item's purchase was confirmed. Null unless CLAIMED.
+  claimedAt       DateTime?
+  /// When a PENDING reservation expires (30-min hold). Null unless PENDING.
+  reservedUntil   DateTime?
   /// Screen X coordinate for visual pin on the pot board (0–1 normalised)
-  pinX        Float?
+  pinX            Float?
   /// Screen Y coordinate for visual pin on the pot board (0–1 normalised)
-  pinY        Float?
-  addedAt     DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  pinY            Float?
+  addedAt         DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 
   pot         Pot              @relation(fields: [potId], references: [id], onDelete: Cascade)
+  claimedBy   User?            @relation("ItemClaimer", fields: [claimedByUserId], references: [id])
   intentNodes IntentDataNode[]
 
   @@index([potId])
@@ -272,6 +292,9 @@ model PotItem {
   @@index([potId, category])
   @@index([isSponsored, category])
   @@index([isSponsored, price, category])
+  // Duplicate Prevention: resolve a Fire's claim state + sweep expired reservations
+  @@index([potId, claimStatus])
+  @@index([claimStatus, reservedUntil])
   @@map("pot_items")
 }
 
