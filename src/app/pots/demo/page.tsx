@@ -2889,8 +2889,8 @@ function AboutPage() {
 
         {/* ── Problem ── */}
         <div>
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-1 text-[22px] font-semibold text-white">We&apos;ve All Been There</h2>
-          <p className="mb-5 text-[13px] text-amber-100/50">The same gifting headaches, year after year — and the numbers prove it&apos;s not just you.</p>
+          <h2 className="font-editorial mb-1 text-[22px] font-semibold text-white">We&apos;ve All Been There</h2>
+          <p className="mb-5 text-[13px] text-[#f5f5f5]/50">The same gifting headaches, year after year — and the numbers prove it&apos;s not just you.</p>
           <div className="flex flex-col gap-3">
             {PROBLEMS.map(({ Icon, title, stat, body }) => (
               <motion.div
@@ -2898,14 +2898,14 @@ function AboutPage() {
                 whileHover={{ y: -3 }}
                 transition={{ type: "spring", stiffness: 400, damping: 28 }}
                 className="rounded-2xl border border-white/8 p-4"
-                style={{ background: "linear-gradient(165deg,#1F140A,#241707)" }}
+                style={{ background: "#121212" }}
               >
                 <div className="mb-2 flex items-center gap-2">
-                  <Icon className="h-5 w-5 shrink-0 text-amber-400" strokeWidth={1.75} />
-                  <p className="text-[14px] font-semibold text-amber-200">{title}</p>
+                  <Icon className="h-5 w-5 shrink-0 text-[#ffb800]" strokeWidth={1.75} />
+                  <p className="text-[14px] font-semibold text-[#ffb800]">{title}</p>
                 </div>
-                <p className="text-[13px] leading-relaxed text-amber-100/60">
-                  <span className="font-bold text-amber-300">{stat} </span>{body}
+                <p className="text-[13px] leading-relaxed text-[#f5f5f5]/60">
+                  <span className="font-bold text-[#ffb800]">{stat} </span>{body}
                 </p>
               </motion.div>
             ))}
@@ -2913,17 +2913,17 @@ function AboutPage() {
         </div>
 
         {/* ── Solution ── */}
-        <div className="rounded-2xl border border-amber-500/25 p-5" style={{ background: "linear-gradient(160deg,rgba(244,140,6,0.14),rgba(232,93,4,0.04))" }}>
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-3 text-[22px] font-semibold text-white">Meet the Pot.</h2>
-          <p className="mb-5 text-[13px] leading-relaxed text-amber-100/70">
+        <div className="rounded-2xl border border-[#ffb800]/25 p-5" style={{ background: "rgba(255,184,0,0.05)" }}>
+          <h2 className="font-editorial mb-3 text-[22px] font-semibold text-white">Meet the Pot.</h2>
+          <p className="mb-5 text-[13px] leading-relaxed text-[#f5f5f5]/65">
             Kindled replaces the guesswork with one shared goal. Build a list — from new trainers to a house deposit. Share a single link. Everyone who loves you chips in whatever they can, big or small. Nothing gets duplicated, nothing gets wasted — and the big moment stays a surprise until everyone&apos;s together to share it.
           </p>
           <div className="grid grid-cols-2 gap-3">
             {STEPS.map((s) => (
               <div key={s.n} className="rounded-xl border border-white/8 bg-white/4 p-3 transition-colors hover:bg-amber-500/8">
-                <span className="mb-2 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 to-orange-500 text-[11px] font-black text-stone-900">{s.n}</span>
+                <span className="mb-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#ffb800] text-[11px] font-semibold text-[#0a0a0a]">{s.n}</span>
                 <p className="text-[13px] font-semibold text-white">{s.title}</p>
-                <p className="mt-0.5 text-[11px] leading-snug text-amber-100/50">{s.desc}</p>
+                <p className="mt-0.5 text-[11px] leading-snug text-[#f5f5f5]/50">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -2931,73 +2931,73 @@ function AboutPage() {
 
         {/* ── Real Life Vignettes ── */}
         <div>
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-1 text-[22px] font-semibold text-white">Real People. Real Pots.</h2>
-          <p className="mb-5 text-[13px] text-amber-100/50">Two ordinary moments, fixed.</p>
+          <h2 className="font-editorial mb-1 text-[22px] font-semibold text-white">Real People. Real Pots.</h2>
+          <p className="mb-5 text-[13px] text-[#f5f5f5]/50">Two ordinary moments, fixed.</p>
           <div className="flex flex-col gap-4">
             {/* Leo's Birthday */}
             <div className="rounded-2xl border border-white/8 bg-white/4 p-4">
               <div className="mb-3 flex items-center gap-2">
-                <Cake className="h-5 w-5 text-violet-400" strokeWidth={1.75} />
+                <Cake className="h-5 w-5 text-[#ffb800]" strokeWidth={1.75} />
                 <h3 className="text-[14px] font-semibold text-white">Leo&apos;s 6th Birthday</h3>
               </div>
               <div className="mb-2 flex gap-2">
-                <span className="mt-0.5 shrink-0 rounded bg-white/8 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-100/40">Before</span>
-                <p className="text-[12px] leading-snug text-amber-100/60">Mum gets 14 &ldquo;what does he want?&rdquo; texts. Grandma and Uncle Dave both buy the LEGO set. £80 of toys get returned or binned.</p>
+                <span className="mt-0.5 shrink-0 rounded bg-white/8 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#f5f5f5]/45">Before</span>
+                <p className="text-[12px] leading-snug text-[#f5f5f5]/60">Mum gets 14 &ldquo;what does he want?&rdquo; texts. Grandma and Uncle Dave both buy the LEGO set. £80 of toys get returned or binned.</p>
               </div>
               <div className="mb-3 flex gap-2">
-                <span className="mt-0.5 shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-300">Kindled</span>
-                <p className="text-[12px] leading-snug text-amber-100/60">One link, 14 relatives — every gift ticked off behind the scenes so nothing doubles up. Leo has no idea what&apos;s coming.</p>
+                <span className="mt-0.5 shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#ffb800]">Kindled</span>
+                <p className="text-[12px] leading-snug text-[#f5f5f5]/60">One link, 14 relatives — every gift ticked off behind the scenes so nothing doubles up. Leo has no idea what&apos;s coming.</p>
               </div>
-              <p className="border-t border-white/8 pt-2.5 text-[12px] font-medium italic text-amber-300">Mum saves £80 — and her sanity.</p>
+              <p className="border-t border-white/8 pt-2.5 text-[12px] font-medium italic text-[#ffb800]">Mum saves £80 — and her sanity.</p>
             </div>
             {/* Dad's Log Burner */}
             <div className="rounded-2xl border border-white/8 bg-white/4 p-4">
               <div className="mb-3 flex items-center gap-2">
-                <Flame className="h-5 w-5 text-orange-400" strokeWidth={1.75} />
+                <Flame className="h-5 w-5 text-[#ffb800]" strokeWidth={1.75} />
                 <h3 className="text-[14px] font-semibold text-white">Dad&apos;s Log Burner</h3>
               </div>
               <div className="mb-2 flex gap-2">
-                <span className="mt-0.5 shrink-0 rounded bg-white/8 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-100/40">Before</span>
-                <p className="text-[12px] leading-snug text-amber-100/60">Everyone gets Dad &ldquo;something&rdquo; for Christmas — ties, socks. The £1,200 log burner he actually wants stays a pipe dream; too much for one person.</p>
+                <span className="mt-0.5 shrink-0 rounded bg-white/8 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#f5f5f5]/45">Before</span>
+                <p className="text-[12px] leading-snug text-[#f5f5f5]/60">Everyone gets Dad &ldquo;something&rdquo; for Christmas — ties, socks. The £1,200 log burner he actually wants stays a pipe dream; too much for one person.</p>
               </div>
               <div className="mb-3 flex gap-2">
-                <span className="mt-0.5 shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-300">Kindled</span>
-                <p className="text-[12px] leading-snug text-amber-100/60">8 family members quietly chip in throughout the year. Christmas morning, with everyone gathered round, Dad finds out exactly how far they got.</p>
+                <span className="mt-0.5 shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#ffb800]">Kindled</span>
+                <p className="text-[12px] leading-snug text-[#f5f5f5]/60">8 family members quietly chip in throughout the year. Christmas morning, with everyone gathered round, Dad finds out exactly how far they got.</p>
               </div>
-              <p className="border-t border-white/8 pt-2.5 text-[12px] font-medium italic text-amber-300">Fully funded or not, every pound brings it closer — and an unfinished pot simply rolls on to his birthday, until the log burner&apos;s real.</p>
+              <p className="border-t border-white/8 pt-2.5 text-[12px] font-medium italic text-[#ffb800]">Fully funded or not, every pound brings it closer — and an unfinished pot simply rolls on to his birthday, until the log burner&apos;s real.</p>
             </div>
           </div>
         </div>
 
         {/* ── Reveal Ceremony ── */}
-        <div className="relative overflow-hidden rounded-2xl border border-amber-500/35 p-6 text-center" style={{ background: "linear-gradient(160deg,rgba(244,140,6,0.20),rgba(232,93,4,0.05))" }}>
+        <div className="relative overflow-hidden rounded-2xl border border-[#ffb800]/30 p-6 text-center" style={{ background: "rgba(255,184,0,0.07)" }}>
           {/* Static confetti dots */}
           {[["10%","8%","#FFC971",10],["88%","16%","#F4684E",8],["6%","72%","#FFC24B",7],["92%","80%","#F48C06",11],["48%","8%","#E85D04",6]].map(([l,t,c,s],i) => (
             <div key={i} className="pointer-events-none absolute rounded-full opacity-60" style={{ left: l as string, top: t as string, background: c as string, width: Number(s), height: Number(s) }} />
           ))}
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="relative z-10 mb-2 text-[22px] font-semibold text-white">The Big Reveal Ceremony</h2>
-          <p className="relative z-10 mx-auto mb-5 max-w-lg text-[13px] leading-relaxed text-amber-100/70">
+          <h2 className="font-editorial relative z-10 mb-2 text-[22px] font-semibold text-white">The Big Reveal Ceremony</h2>
+          <p className="relative z-10 mx-auto mb-5 max-w-lg text-[13px] leading-relaxed text-[#f5f5f5]/65">
             This is the bit other apps skip. When it&apos;s time, everyone gathers — in the room or on a video call — for one big moment. Slide to reveal. Confetti. A wall of photos from everyone who chipped in, plus the odd video message that&apos;ll get someone a little misty-eyed. It&apos;s not a notification — it&apos;s an occasion.
           </p>
           <div className="relative z-10 flex flex-wrap justify-center gap-2">
             {["Slide to reveal","Confetti & photo wall","Video messages","Everyone together"].map((chip) => (
-              <span key={chip} className="rounded-full border border-amber-500/40 bg-white/7 px-3 py-1.5 text-[11px] font-bold text-amber-300">{chip}</span>
+              <span key={chip} className="rounded-full border border-[#ffb800]/40 bg-white/7 px-3 py-1.5 text-[11px] font-bold text-[#ffb800]">{chip}</span>
             ))}
           </div>
         </div>
 
         {/* ── Benefits ── */}
         <div>
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-4 text-[22px] font-semibold text-white">The Bit That Actually Matters</h2>
+          <h2 className="font-editorial mb-4 text-[22px] font-semibold text-white">The Bit That Actually Matters</h2>
           <div className="grid grid-cols-2 gap-3">
             {BENEFITS.map(({ title, desc }) => (
               <div key={title} className="flex gap-2.5 rounded-2xl border border-white/8 bg-white/3 p-3 transition-colors hover:bg-amber-500/6">
                 <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500/15">
-                  <Check className="h-3.5 w-3.5 text-amber-300" strokeWidth={2.5} />
+                  <Check className="h-3.5 w-3.5 text-[#ffb800]" strokeWidth={2.5} />
                 </div>
                 <div>
                   <p className="text-[12px] font-semibold text-white">{title}</p>
-                  <p className="mt-0.5 text-[11px] leading-snug text-amber-100/50">{desc}</p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-[#f5f5f5]/50">{desc}</p>
                 </div>
               </div>
             ))}
@@ -3005,43 +3005,43 @@ function AboutPage() {
         </div>
 
         {/* ── Kids ── */}
-        <div className="rounded-2xl border border-amber-200/17 p-5" style={{ background: "linear-gradient(155deg,rgba(255,201,113,0.08),rgba(244,140,6,0.02))" }}>
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-amber-400">For the Little Ones</p>
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-3 text-[18px] font-semibold text-white">The List They&apos;ve Been Building All Year</h2>
-          <p className="mb-2 text-[13px] leading-relaxed text-amber-100/60">
+        <div className="rounded-2xl border border-[#ffb800]/20 p-5" style={{ background: "rgba(255,184,0,0.05)" }}>
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#ffb800]">For the Little Ones</p>
+          <h2 className="font-editorial mb-3 text-[18px] font-semibold text-white">The List They&apos;ve Been Building All Year</h2>
+          <p className="mb-2 text-[13px] leading-relaxed text-[#f5f5f5]/60">
             We all remember it — the big catalogue landing on the doormat, dog-eared by page two. Circling things in biro. That quietly absorbed, hopeful ritual of building a wish list.
           </p>
-          <p className="mb-4 text-[13px] leading-relaxed text-amber-100/60">
+          <p className="mb-4 text-[13px] leading-relaxed text-[#f5f5f5]/60">
             Kindled gives kids their own digital catalogue to browse, tap, and dream over — starring exactly what they&apos;d love, with no idea which ones are already covered. Good behaviour is built in: stars earned for good days move them closer to the gifts they&apos;re working towards.
           </p>
           <div className="flex flex-wrap gap-2">
             {["Browse & star items","Surprise stays intact","Any age, any occasion","Good days earn stars"].map((chip) => (
-              <span key={chip} className="rounded-full border border-amber-200/25 bg-amber-200/8 px-3 py-1 text-[11px] font-bold text-amber-300">{chip}</span>
+              <span key={chip} className="rounded-full border border-[#ffb800]/25 bg-amber-200/8 px-3 py-1 text-[11px] font-bold text-[#ffb800]">{chip}</span>
             ))}
           </div>
         </div>
 
         {/* ── Trust ── */}
-        <div className="flex gap-4 rounded-2xl border border-white/8 bg-[#1F140A] p-5">
-          <ShieldCheck className="mt-0.5 h-8 w-8 shrink-0 text-amber-400" strokeWidth={1.5} />
+        <div className="flex gap-4 rounded-2xl border border-white/8 bg-[#121212] p-5">
+          <ShieldCheck className="mt-0.5 h-8 w-8 shrink-0 text-[#ffb800]" strokeWidth={1.5} />
           <div>
-            <h3 style={{ fontFamily: "var(--font-display)" }} className="mb-1.5 text-[16px] font-semibold text-white">Every Penny Goes to the Gift.</h3>
-            <p className="text-[13px] leading-relaxed text-amber-100/65">
+            <h3 className="font-editorial mb-1.5 text-[16px] font-semibold text-white">Every Penny Goes to the Gift.</h3>
+            <p className="text-[13px] leading-relaxed text-[#f5f5f5]/60">
               No listing fees. No withdrawal fees. No quiet percentage disappearing along the way. Whether you&apos;re chipping in £5 or running the whole pot, every penny goes toward the gift — not one slice is ever taken, by us or anyone else. Free for the people giving. Free for the people receiving. Always.
             </p>
           </div>
         </div>
 
         {/* ── Waitlist CTA ── */}
-        <div className="rounded-2xl border border-amber-400 p-6 text-center" style={{ background: "linear-gradient(165deg,rgba(244,140,6,0.22),rgba(232,93,4,0.06))", boxShadow: "0 0 24px rgba(244,140,6,0.28), 0 0 50px rgba(232,93,4,0.14)" }}>
-          <h2 style={{ fontFamily: "var(--font-display)" }} className="mb-2 text-[22px] font-semibold text-white">Be Among the First to Light a Pot</h2>
-          <p className="mx-auto mb-5 max-w-sm text-[13px] leading-relaxed text-amber-100/70">
+        <div className="rounded-2xl border border-[#ffb800] p-6 text-center" style={{ background: "rgba(255,184,0,0.08)", boxShadow: "0 0 30px rgba(255,184,0,0.18)" }}>
+          <h2 className="font-editorial mb-2 text-[22px] font-semibold text-white">Be Among the First to Light a Pot</h2>
+          <p className="mx-auto mb-5 max-w-sm text-[13px] leading-relaxed text-[#f5f5f5]/65">
             We&apos;re opening Kindled to early users soon. Join the waitlist and we&apos;ll let you know the moment you can build your first list.
           </p>
           {submitState === "done" ? (
-            <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-500/20 border border-emerald-400/40 py-3.5">
-              <Check className="h-5 w-5 text-emerald-400" strokeWidth={2.5} />
-              <span className="text-[14px] font-semibold text-emerald-300">You&apos;re on the list — we&apos;ll be in touch!</span>
+            <div className="flex items-center justify-center gap-2 border border-[#ffb800]/40 bg-[#ffb800]/15 py-3.5">
+              <Check className="h-5 w-5 text-[#ffb800]" strokeWidth={2.5} />
+              <span className="text-[14px] font-semibold text-[#f5f5f5]">You&apos;re on the list — we&apos;ll be in touch!</span>
             </div>
           ) : (
             <form onSubmit={(e) => { void handleWaitlist(e); }} className="flex gap-2">
@@ -3051,13 +3051,13 @@ function AboutPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@email.com"
-                className="flex-1 rounded-xl border border-white/18 bg-white/6 px-3.5 py-3 text-[13px] text-white placeholder:text-amber-100/35 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                className="flex-1 border border-[rgba(245,245,245,0.18)] bg-[#f5f5f5]/[0.06] px-3.5 py-3 text-[13px] text-white placeholder:text-[#f5f5f5]/35 focus:outline-none focus:ring-2 focus:ring-[#ffb800]/50"
               />
               <motion.button
                 whileTap={{ scale: 0.96 }}
                 type="submit"
                 disabled={submitState === "sending"}
-                className="rounded-xl bg-gradient-to-br from-amber-300 to-orange-500 px-4 py-3 text-[13px] font-bold text-stone-900 shadow-lg shadow-amber-900/40 disabled:opacity-60 whitespace-nowrap"
+                className="rounded-xl bg-[#ffb800] px-4 py-3 text-[13px] font-semibold uppercase tracking-[0.05em] text-[#0a0a0a] disabled:opacity-60 whitespace-nowrap"
                 style={{ animation: "pulseGlow 2.4s ease-in-out infinite" }}
               >
                 {submitState === "sending" ? "Sending…" : "Join the Waitlist →"}
@@ -3065,13 +3065,13 @@ function AboutPage() {
             </form>
           )}
           {submitState === "error" && <p className="mt-2 text-[11px] text-red-400">Something went wrong — try again.</p>}
-          <p className="mt-3 text-[11px] text-amber-100/35">Free forever. No spam, ever.</p>
+          <p className="mt-3 text-[11px] text-[#f5f5f5]/35">Free forever. No spam, ever.</p>
         </div>
 
         {/* ── Footer ── */}
         <div className="flex items-center justify-between border-t border-white/8 pt-4">
-          <span className="text-[12px] text-amber-100/40"><span className="font-bold text-amber-300">Kindled</span> — gifting, the way it should feel.</span>
-          <span className="text-right text-[10px] leading-snug text-amber-100/30">Sources: GiftAFeeling 2025 · GlobalData UK Gifting 2024 · YouGov/MoneySuperMarket 2025</span>
+          <span className="text-[12px] text-[#f5f5f5]/45"><span className="font-bold text-[#ffb800]">Kindled</span> — gifting, the way it should feel.</span>
+          <span className="text-right text-[10px] leading-snug text-[#f5f5f5]/30">Sources: GiftAFeeling 2025 · GlobalData UK Gifting 2024 · YouGov/MoneySuperMarket 2025</span>
         </div>
 
       </div>

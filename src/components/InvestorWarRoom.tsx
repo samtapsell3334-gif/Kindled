@@ -34,7 +34,7 @@ const TABS: { id: Tab; label: string; short: string }[] = [
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/80">{children}</p>;
+  return <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-[#ffb800]/80">{children}</p>;
 }
 function SectionHeadline({ children }: { children: React.ReactNode }) {
   return <h2 className="text-[26px] font-bold leading-tight tracking-tight text-white md:text-[34px]">{children}</h2>;
@@ -43,7 +43,7 @@ function Lead({ children }: { children: React.ReactNode }) {
   return <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-400">{children}</p>;
 }
 function Panel({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("rounded-2xl border border-slate-800 bg-slate-900/50 p-5", className)}>{children}</div>;
+  return <div className={cn("rounded-2xl border border-[#1c1c1c] bg-[#0f0f0f]/50 p-5", className)}>{children}</div>;
 }
 
 function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
@@ -62,7 +62,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 function StatPill({ figure, caption, source }: { figure: string; caption: string; source: string }) {
   return (
     <Reveal>
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+      <div className="rounded-2xl border border-[#1c1c1c] bg-[#0f0f0f]/60 p-5">
         <p className="text-[34px] font-bold leading-none tracking-tight text-white">{figure}</p>
         <p className="mt-1.5 text-[13px] leading-snug text-slate-300">{caption}</p>
         <p className="mt-2 text-[10px] text-slate-600">Source: {source}</p>
@@ -109,7 +109,7 @@ function FlywheelDiagram() {
             <div className="h-2.5 w-2.5 rounded-full bg-white" style={{ boxShadow: "0 0 12px 3px rgba(255,255,255,0.8)" }} />
           </div>
         </motion.div>
-        <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/80 text-center backdrop-blur-sm"
+        <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-slate-700/60 bg-[#0f0f0f]/80 text-center backdrop-blur-sm"
           style={{ boxShadow: `0 0 40px ${stage.color}33`, transition: "box-shadow 0.5s" }}>
           <p className="text-[28px] font-black leading-none text-white">{flywheel.multiplier.value}</p>
           <p className="mt-1 px-2 text-[8.5px] font-semibold leading-tight text-slate-400">{flywheel.multiplier.label}</p>
@@ -134,7 +134,7 @@ function FlywheelDiagram() {
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
           <motion.div key={stage.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }} className="rounded-2xl border bg-slate-900/50 p-5" style={{ borderColor: `${stage.color}40` }}>
+            transition={{ duration: 0.25 }} className="rounded-2xl border bg-[#0f0f0f]/50 p-5" style={{ borderColor: `${stage.color}40` }}>
             <div className="flex items-center gap-2">
               <span className="flex h-6 w-6 items-center justify-center rounded-lg text-[11px] font-black text-white" style={{ background: stage.color }}>{active + 1}</span>
               <p className="text-[15px] font-bold text-white">{stage.title}</p>
@@ -145,16 +145,16 @@ function FlywheelDiagram() {
       </div>
 
       <Reveal>
-        <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-blue-950/20 p-5">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-400/80">{flywheel.compounding.label}</p>
+        <div className="rounded-2xl border border-[#1c1c1c] bg-gradient-to-br from-[#0f0f0f] to-[#161616]/20 p-5">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-[#ffb800]/80">{flywheel.compounding.label}</p>
           <div className="flex items-stretch gap-2 overflow-x-auto scrollbar-none">
             {flywheel.compounding.steps.map((s, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className="min-w-[92px] shrink-0 rounded-xl border border-slate-700/50 bg-slate-800/40 px-3 py-2.5 text-center">
+                <div className="min-w-[92px] shrink-0 rounded-xl border border-slate-700/50 bg-[#1c1c1c]/40 px-3 py-2.5 text-center">
                   <p className="text-[16px] font-black leading-none text-white">{s.people}</p>
                   <p className="mt-1 text-[10px] text-slate-500">{s.tier}</p>
                 </div>
-                {i < flywheel.compounding.steps.length - 1 && <ArrowRight className="h-4 w-4 shrink-0 text-blue-500/60" />}
+                {i < flywheel.compounding.steps.length - 1 && <ArrowRight className="h-4 w-4 shrink-0 text-[#ffb800]/60" />}
               </div>
             ))}
           </div>
@@ -188,7 +188,7 @@ function OpportunityTab() {
             return (
               <Reveal key={p.title} delay={i * 0.05}>
                 <Panel>
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15"><Icon className="h-4 w-4 text-blue-400" /></div>
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/15"><Icon className="h-4 w-4 text-[#ffb800]" /></div>
                   <p className="mb-1.5 text-[14px] font-bold text-white">{p.title}</p>
                   <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
                 </Panel>
@@ -209,8 +209,8 @@ function ProjBar({ year, value, pct, delay }: { year: string; value: string; pct
   return (
     <div ref={ref} className="flex flex-1 flex-col items-center gap-1.5">
       <p className="text-[13px] font-black text-white">{value}</p>
-      <div className="flex h-28 w-full items-end justify-center rounded-xl bg-slate-800/40 p-1.5">
-        <motion.div className="w-full rounded-lg bg-gradient-to-t from-amber-600 to-amber-400"
+      <div className="flex h-28 w-full items-end justify-center rounded-xl bg-[#1c1c1c]/40 p-1.5">
+        <motion.div className="w-full rounded-lg bg-gradient-to-t from-[#ffb800] to-[#ffb800]"
           initial={{ height: "2%" }} animate={inView ? { height: `${pct}%` } : {}} transition={{ duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] }} />
       </div>
       <p className="text-[10px] text-slate-500">{year}</p>
@@ -235,8 +235,8 @@ function MechanismTab() {
             <Reveal key={p.id} delay={i * 0.05}>
               <Panel className="h-full">
                 <div className="mb-3 flex items-center justify-between">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10"><Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} /></div>
-                  <span className="rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-bold text-blue-400">{p.metric}</span>
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/10"><Icon className="h-4 w-4 text-[#ffb800]" strokeWidth={1.75} /></div>
+                  <span className="rounded-full bg-[#ffb800]/10 px-2.5 py-1 text-[10px] font-bold text-[#ffb800]">{p.metric}</span>
                 </div>
                 <p className="mb-1.5 text-[15px] font-bold text-white">{p.title}</p>
                 <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
@@ -252,10 +252,10 @@ function MechanismTab() {
 
       {/* Joint Fires — pitch-ready marketing preview (the Milestone Engine) */}
       <Reveal>
-        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-900 to-amber-950/10 p-6">
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-amber-400/80">{jf.label}</p>
+        <div className="rounded-2xl border border-[#ffb800]/20 bg-gradient-to-br from-[#0f0f0f] to-[#1c1c1c]/10 p-6">
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-[#ffb800]/80">{jf.label}</p>
           <p className="text-[20px] font-bold text-white">{jf.title}</p>
-          <p className="mt-2 text-[16px] font-black leading-snug text-amber-300">{jf.hook}</p>
+          <p className="mt-2 text-[16px] font-black leading-snug text-[#ffb800]">{jf.hook}</p>
           <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-slate-400">{jf.body}</p>
 
           <div className="mt-6 grid gap-5 md:grid-cols-[1.3fr_1fr]">
@@ -265,15 +265,15 @@ function MechanismTab() {
               </div>
               <p className="mt-3 text-[12px] leading-relaxed text-slate-500">{jf.caption}</p>
             </div>
-            <div className="flex flex-col justify-center rounded-2xl border border-amber-500/25 bg-amber-500/[0.07] p-5 text-center">
-              <p className="text-[40px] font-black leading-none text-amber-400">{jf.stat.value}</p>
+            <div className="flex flex-col justify-center rounded-2xl border border-[#ffb800]/25 bg-[#ffb800]/[0.07] p-5 text-center">
+              <p className="text-[40px] font-black leading-none text-[#ffb800]">{jf.stat.value}</p>
               <p className="mx-auto mt-1.5 max-w-[180px] text-[11px] leading-tight text-slate-400">{jf.stat.label}</p>
             </div>
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {jf.pillars.map((p) => (
-              <div key={p.title} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+              <div key={p.title} className="rounded-xl border border-[#1c1c1c] bg-[#0f0f0f]/50 p-4">
                 <p className="mb-1.5 text-[13px] font-bold text-white">{p.title}</p>
                 <p className="text-[12px] leading-relaxed text-slate-400">{p.body}</p>
               </div>
@@ -284,8 +284,8 @@ function MechanismTab() {
             <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">Milestone architecture → retail intent segments</p>
             <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
               {jf.categories.map((c) => (
-                <div key={c.label} className="rounded-xl border border-slate-800 bg-slate-900/40 p-3">
-                  <p className="text-[12px] font-bold text-amber-300">{c.label}</p>
+                <div key={c.label} className="rounded-xl border border-[#1c1c1c] bg-[#0f0f0f]/40 p-3">
+                  <p className="text-[12px] font-bold text-[#ffb800]">{c.label}</p>
                   <p className="mt-0.5 text-[11px] text-slate-400">{c.segment}</p>
                   <p className="mt-1 text-[10px] text-slate-600">{c.horizon}</p>
                 </div>
@@ -307,12 +307,12 @@ function CashbackSplit() {
   return (
     <Panel className="overflow-hidden">
       <div className="flex items-center gap-2">
-        <Percent className="h-4 w-4 text-emerald-400" />
+        <Percent className="h-4 w-4 text-[#ffb800]" />
         <p className="text-[15px] font-bold text-white">{cashbackMath.title}</p>
       </div>
       <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{cashbackMath.intro}</p>
 
-      <div ref={ref} className="mt-5 rounded-2xl border border-slate-700/50 bg-slate-950/60 p-4">
+      <div ref={ref} className="mt-5 rounded-2xl border border-slate-700/50 bg-[#0a0a0a]/60 p-4">
         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{cashbackMath.exampleLabel}</p>
         <div className="mt-2 flex items-baseline gap-2">
           <span className="text-[28px] font-black text-white">{cashbackMath.commission.amount}</span>
@@ -321,17 +321,17 @@ function CashbackSplit() {
         {/* Split bar */}
         <div className="mt-4 flex h-9 w-full overflow-hidden rounded-xl">
           <motion.div initial={{ width: 0 }} animate={inView ? { width: "60%" } : {}} transition={{ duration: 0.7, ease: "easeOut" }}
-            className="flex items-center justify-center bg-gradient-to-r from-emerald-500 to-teal-500 text-[12px] font-black text-white">
+            className="flex items-center justify-center bg-gradient-to-r from-[#ffb800] to-teal-500 text-[12px] font-black text-white">
             You · 3%
           </motion.div>
           <motion.div initial={{ width: 0 }} animate={inView ? { width: "40%" } : {}} transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
-            className="flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-[12px] font-black text-white">
+            className="flex items-center justify-center bg-gradient-to-r from-[#ffb800] to-[#ffb800] text-[12px] font-black text-white">
             Us · 2%
           </motion.div>
         </div>
         <div className="mt-3 grid grid-cols-2 gap-3">
           {cashbackMath.split.map((s) => (
-            <div key={s.label} className="rounded-xl border border-slate-700/40 bg-slate-800/40 px-3 py-2.5">
+            <div key={s.label} className="rounded-xl border border-slate-700/40 bg-[#1c1c1c]/40 px-3 py-2.5">
               <p className="text-[16px] font-black text-white">{s.amount}</p>
               <p className="text-[11px]" style={{ color: s.tone === "user" ? "#34d399" : "#818cf8" }}>{s.label}</p>
             </div>
@@ -359,18 +359,18 @@ function ValueTab() {
         <Reveal>
           <Panel className="h-full">
             <div className="flex items-center gap-2">
-              <Wallet className="h-4 w-4 text-amber-400" />
+              <Wallet className="h-4 w-4 text-[#ffb800]" />
               <p className="text-[15px] font-bold text-white">{f.title}</p>
             </div>
             <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{f.body}</p>
-            <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-3">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-amber-400">The Locked-In Loop</p>
+            <div className="mt-3 rounded-xl border border-[#ffb800]/20 bg-[#ffb800]/[0.06] p-3">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#ffb800]">The Locked-In Loop</p>
               <p className="mt-1 text-[13px] leading-relaxed text-slate-300">{f.lockedLoop}</p>
             </div>
             <div className="mt-3 space-y-2">
               {f.points.map((p, i) => (
                 <div key={i} className="flex items-start gap-2.5">
-                  <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" strokeWidth={2.5} />
+                  <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ffb800]" strokeWidth={2.5} />
                   <p className="text-[12px] leading-snug text-slate-400">{p}</p>
                 </div>
               ))}
@@ -391,8 +391,8 @@ function ValueTab() {
               <Reveal key={m.id} delay={i * 0.05}>
                 <Panel className="h-full">
                   <div className="mb-3 flex items-center justify-between">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10"><Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} /></div>
-                    <span className="rounded-full bg-slate-800 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">{m.tag}</span>
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/10"><Icon className="h-4 w-4 text-[#ffb800]" strokeWidth={1.75} /></div>
+                    <span className="rounded-full bg-[#1c1c1c] px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">{m.tag}</span>
                   </div>
                   <p className="mb-1.5 text-[14px] font-bold text-white">{m.title}</p>
                   <p className="text-[13px] leading-relaxed text-slate-400">{m.body}</p>
@@ -412,25 +412,25 @@ function UnitEconomicsTable() {
   const ue = content.edge.unitEconomics;
   return (
     <Panel className="overflow-hidden p-0">
-      <div className="border-b border-slate-800 p-5">
+      <div className="border-b border-[#1c1c1c] p-5">
         <div className="flex items-center gap-2">
-          <BarChart2 className="h-4 w-4 text-emerald-400" />
+          <BarChart2 className="h-4 w-4 text-[#ffb800]" />
           <p className="text-[15px] font-bold text-white">{ue.title}</p>
         </div>
         <p className="mt-1 text-[12px] text-slate-500">{ue.subtitle}</p>
       </div>
       <div className="grid grid-cols-[1.4fr_1fr_1fr] text-[12px]">
-        <div className="border-b border-slate-800 px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-500"> </div>
-        <div className="flex items-center gap-1.5 border-b border-l border-slate-800 px-3 py-3 text-[11px] font-bold text-rose-300">
+        <div className="border-b border-[#1c1c1c] px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-500"> </div>
+        <div className="flex items-center gap-1.5 border-b border-l border-[#1c1c1c] px-3 py-3 text-[11px] font-bold text-rose-300">
           <CreditCard className="h-3.5 w-3.5" /> {ue.columns[0]}
         </div>
-        <div className="flex items-center gap-1.5 border-b border-l border-slate-800 bg-emerald-500/[0.05] px-3 py-3 text-[11px] font-bold text-emerald-300">
+        <div className="flex items-center gap-1.5 border-b border-l border-[#1c1c1c] bg-[#ffb800]/[0.05] px-3 py-3 text-[11px] font-bold text-[#ffb800]">
           <Landmark className="h-3.5 w-3.5" /> {ue.columns[1]}
         </div>
         {ue.rows.flatMap((r) => [
-          <div key={`${r.label}-l`} className={cn("border-b border-slate-800/70 px-4 py-3.5 font-medium text-slate-300", r.highlight && "text-white")}>{r.label}</div>,
-          <div key={`${r.label}-c`} className={cn("border-b border-l border-slate-800/70 px-3 py-3.5 text-rose-300/90", r.highlight && "font-bold")}>{r.card}</div>,
-          <div key={`${r.label}-o`} className={cn("border-b border-l border-slate-800/70 bg-emerald-500/[0.05] px-3 py-3.5 text-emerald-300", r.highlight && "font-bold")}>{r.openBanking}</div>,
+          <div key={`${r.label}-l`} className={cn("border-b border-[#1c1c1c]/70 px-4 py-3.5 font-medium text-slate-300", r.highlight && "text-white")}>{r.label}</div>,
+          <div key={`${r.label}-c`} className={cn("border-b border-l border-[#1c1c1c]/70 px-3 py-3.5 text-rose-300/90", r.highlight && "font-bold")}>{r.card}</div>,
+          <div key={`${r.label}-o`} className={cn("border-b border-l border-[#1c1c1c]/70 bg-[#ffb800]/[0.05] px-3 py-3.5 text-[#ffb800]", r.highlight && "font-bold")}>{r.openBanking}</div>,
         ])}
       </div>
       <p className="p-5 text-[13px] leading-relaxed text-slate-300">{ue.takeaway}</p>
@@ -450,18 +450,18 @@ function EdgeTab() {
       <div className="grid gap-4 md:grid-cols-2">
         <Reveal>
           <Panel className="h-full">
-            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/15"><Bell className="h-4 w-4 text-amber-400" /></div>
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/15"><Bell className="h-4 w-4 text-[#ffb800]" /></div>
             <p className="mb-1.5 text-[15px] font-bold text-white">{edge.smartShopper.title}</p>
             <p className="text-[13px] leading-relaxed text-slate-400">{edge.smartShopper.body}</p>
-            <p className="mt-3 border-l-2 border-amber-500/40 pl-3 text-[12px] italic leading-relaxed text-amber-200/80">{edge.smartShopper.effect}</p>
+            <p className="mt-3 border-l-2 border-[#ffb800]/40 pl-3 text-[12px] italic leading-relaxed text-[#ffb800]/80">{edge.smartShopper.effect}</p>
           </Panel>
         </Reveal>
         <Reveal delay={0.05}>
           <Panel className="h-full">
-            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15"><ShieldCheck className="h-4 w-4 text-emerald-400" /></div>
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/15"><ShieldCheck className="h-4 w-4 text-[#ffb800]" /></div>
             <p className="mb-1.5 text-[15px] font-bold text-white">{edge.dataBack.title}</p>
             <p className="text-[13px] leading-relaxed text-slate-400">{edge.dataBack.body}</p>
-            <p className="mt-3 border-l-2 border-emerald-500/40 pl-3 text-[12px] italic leading-relaxed text-emerald-200/80">{edge.dataBack.effect}</p>
+            <p className="mt-3 border-l-2 border-[#ffb800]/40 pl-3 text-[12px] italic leading-relaxed text-[#ffb800]/80">{edge.dataBack.effect}</p>
           </Panel>
         </Reveal>
       </div>
@@ -489,10 +489,10 @@ function ExecutionTab() {
             return (
               <Reveal key={it.title} delay={i * 0.05}>
                 <Panel className="h-full">
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10"><Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} /></div>
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/10"><Icon className="h-4 w-4 text-[#ffb800]" strokeWidth={1.75} /></div>
                   <p className="mb-1.5 text-[14px] font-bold text-white">{it.title}</p>
                   <p className="text-[12px] leading-relaxed text-slate-500"><span className="font-semibold text-slate-400">Risk:</span> {it.risk}</p>
-                  <p className="mt-2 text-[12px] leading-relaxed text-slate-300"><span className="font-semibold text-emerald-400">How we win:</span> {it.mitigation}</p>
+                  <p className="mt-2 text-[12px] leading-relaxed text-slate-300"><span className="font-semibold text-[#ffb800]">How we win:</span> {it.mitigation}</p>
                 </Panel>
               </Reveal>
             );
@@ -510,8 +510,8 @@ function ExecutionTab() {
             const Icon = opIcons[i] ?? Target;
             return (
               <Reveal key={p.title} delay={i * 0.05}>
-                <div className="rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-900 to-blue-950/20 p-5">
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15"><Icon className="h-4 w-4 text-blue-400" /></div>
+                <div className="rounded-2xl border border-slate-700/50 bg-gradient-to-br from-[#0f0f0f] to-[#161616]/20 p-5">
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/15"><Icon className="h-4 w-4 text-[#ffb800]" /></div>
                   <p className="mb-1.5 text-[14px] font-bold text-white">{p.title}</p>
                   <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
                 </div>
@@ -531,20 +531,20 @@ function ExecutionTab() {
             <div key={phase.phase} className="space-y-3">
               <div className="flex items-center gap-4">
                 <span className={cn("rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider",
-                  phase.status === "in_progress" ? "bg-blue-500/15 text-blue-400" : "bg-slate-800 text-slate-400")}>
+                  phase.status === "in_progress" ? "bg-[#ffb800]/15 text-[#ffb800]" : "bg-[#1c1c1c] text-slate-400")}>
                   {phase.phase} · {phase.label}
                 </span>
-                <div className="h-px flex-1 bg-slate-800" />
+                <div className="h-px flex-1 bg-[#1c1c1c]" />
                 <span className="text-[11px] text-slate-600">{phase.period}</span>
               </div>
               {phase.milestones.map((m, mi) => {
                 const key = `${phase.phase}-${mi}`;
                 const isOpen = open === key;
                 return (
-                  <div key={key} className={cn("overflow-hidden rounded-2xl border transition-colors", isOpen ? "border-slate-700 bg-slate-900/80" : "border-slate-800/60 bg-slate-900/30")}>
+                  <div key={key} className={cn("overflow-hidden rounded-2xl border transition-colors", isOpen ? "border-slate-700 bg-[#0f0f0f]/80" : "border-[#1c1c1c]/60 bg-[#0f0f0f]/30")}>
                     <button className="flex w-full items-center gap-4 p-4 text-left" onClick={() => setOpen(isOpen ? null : key)}>
                       <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[11px] font-black",
-                        phase.status === "in_progress" ? "bg-blue-500/20 text-blue-400" : "bg-slate-800 text-slate-500")}>{mi + 1}</div>
+                        phase.status === "in_progress" ? "bg-[#ffb800]/20 text-[#ffb800]" : "bg-[#1c1c1c] text-slate-500")}>{mi + 1}</div>
                       <div className="min-w-0 flex-1">
                         <p className="text-[14px] font-semibold text-white">{m.title}</p>
                         <p className="text-[11px] text-slate-500">{m.quarter}</p>
@@ -554,17 +554,17 @@ function ExecutionTab() {
                     <AnimatePresence>
                       {isOpen && (
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
-                          <div className="border-t border-slate-800 px-4 pb-5 pt-4">
+                          <div className="border-t border-[#1c1c1c] px-4 pb-5 pt-4">
                             <div className="grid gap-6 md:grid-cols-2">
                               <div>
-                                <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-400">Strategic Why</p>
+                                <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-[#ffb800]">Strategic Why</p>
                                 <p className="text-[13px] leading-relaxed text-slate-400">{m.why}</p>
                               </div>
                               <div>
                                 <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500">Key Deliverables</p>
                                 <div className="space-y-1.5">
                                   {m.deliverables.map((d, di) => (
-                                    <div key={di} className="flex items-start gap-2.5"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" strokeWidth={2.5} /><p className="text-[12px] text-slate-400">{d}</p></div>
+                                    <div key={di} className="flex items-start gap-2.5"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ffb800]" strokeWidth={2.5} /><p className="text-[12px] text-slate-400">{d}</p></div>
                                   ))}
                                 </div>
                               </div>
@@ -591,16 +591,16 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
 
   return (
     <div className={cn("text-white", embedded ? "relative overflow-hidden rounded-3xl" : "min-h-screen")}
-      style={{ backgroundColor: "#070c18", backgroundImage: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(15,23,42,0.8) 0%, transparent 60%)" }}>
+      style={{ backgroundColor: "#0a0a0a", backgroundImage: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(15,23,42,0.8) 0%, transparent 60%)" }}>
       <div className={cn("pointer-events-none opacity-[0.025]", embedded ? "absolute inset-0" : "fixed inset-0")}
         style={{ backgroundImage: "linear-gradient(rgba(148,163,184,1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,1) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
 
       {/* Header */}
-      <header className={cn("z-40 border-b border-slate-800/80 bg-[#070c18]/90 backdrop-blur-xl", embedded ? "relative" : "sticky top-0")}>
+      <header className={cn("z-40 border-b border-[#1c1c1c]/80 bg-[#0a0a0a]/90 backdrop-blur-xl", embedded ? "relative" : "sticky top-0")}>
         <div className="mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex shrink-0 items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15"><Flame className="h-4 w-4 text-blue-400" strokeWidth={1.5} /></div>
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ffb800]/15"><Flame className="h-4 w-4 text-[#ffb800]" strokeWidth={1.5} /></div>
               <span className="text-[14px] font-bold tracking-tight text-white">{content.meta.company}
                 <span className="ml-1.5 text-[10px] font-normal uppercase tracking-widest text-slate-600">Investor</span>
               </span>
@@ -608,12 +608,12 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
             <nav className="hidden items-center gap-1 md:flex">
               {TABS.map((t) => (
                 <button key={t.id} onClick={() => setTab(t.id)}
-                  className={cn("rounded-lg px-3 py-1.5 text-[12px] font-semibold transition-all", tab === t.id ? "bg-slate-800 text-white" : "text-slate-500 hover:text-slate-300")}>
+                  className={cn("rounded-lg px-3 py-1.5 text-[12px] font-semibold transition-all", tab === t.id ? "bg-[#1c1c1c] text-white" : "text-slate-500 hover:text-slate-300")}>
                   {t.label}
                 </button>
               ))}
             </nav>
-            <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900 px-3 py-1.5">
+            <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-[#1c1c1c] bg-[#0f0f0f] px-3 py-1.5">
               <Lock className="h-3 w-3 text-slate-600" />
               <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-600">Confidential</span>
             </div>
@@ -622,7 +622,7 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
           <div className="mt-2 flex gap-1 overflow-x-auto scrollbar-none md:hidden">
             {TABS.map((t) => (
               <button key={t.id} onClick={() => setTab(t.id)}
-                className={cn("shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-all", tab === t.id ? "bg-slate-800 text-white" : "text-slate-500")}>
+                className={cn("shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-all", tab === t.id ? "bg-[#1c1c1c] text-white" : "text-slate-500")}>
                 {t.short}
               </button>
             ))}
@@ -631,10 +631,10 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
       </header>
 
       {/* Hero */}
-      <div className="relative border-b border-slate-800/50 bg-gradient-to-r from-slate-900/50 to-blue-950/20">
+      <div className="relative border-b border-[#1c1c1c]/50 bg-gradient-to-r from-[#0f0f0f]/50 to-[#161616]/20">
         <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-blue-400/70">{content.hero.eyebrow}</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#ffb800]/70">{content.hero.eyebrow}</p>
             <h1 className="mt-2 max-w-3xl text-[26px] font-bold leading-tight tracking-tight text-white md:text-[38px]">{content.hero.headline}</h1>
             <p className="mt-2 max-w-2xl text-[14px] text-slate-400">{content.hero.subhead}</p>
             <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3">
@@ -662,7 +662,7 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
         </AnimatePresence>
       </main>
 
-      <footer className="relative border-t border-slate-800/60 px-4 py-6 text-center">
+      <footer className="relative border-t border-[#1c1c1c]/60 px-4 py-6 text-center">
         <p className="text-[11px] text-slate-700">{content.meta.confidential} · {content.meta.company} · {new Date().getFullYear()}</p>
       </footer>
     </div>
