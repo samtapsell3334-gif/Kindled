@@ -10,6 +10,7 @@ import {
   Landmark, Radio, Wrench, Trophy, Wallet, Eye,
   Bike, Cake, TreePine, PenLine, Waves, Castle,
   AlertCircle, Copy, TrendingUp, Info, CircleEllipsis, CalendarDays, Gamepad2,
+  Heart, Home, Shirt, Ticket, Dumbbell, Blocks, ImageOff, LayoutGrid,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { FundingBar } from "@/components/pots/FundingBar";
@@ -1226,6 +1227,43 @@ function ContributionPromptModal({
 // CATALOGUE CARD (SVG circle + 3D tilt)
 // ═══════════════════════════════════════════════════════════════════════════════
 
+/**
+ * Premium product image: skeleton shimmer while loading, and a branded
+ * gradient fallback (brand initial + icon) if the photo 404s — so the
+ * catalogue never shows a broken-image glyph.
+ */
+function ProductImage({ src, alt, glowColor, brand, height }: {
+  src: string; alt: string; glowColor: string; brand?: string; height: number;
+}) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">("loading");
+  return (
+    <div className="relative overflow-hidden" style={{ height }}>
+      {/* Skeleton / fallback layer sits under the image */}
+      <div className="absolute inset-0 flex items-center justify-center"
+        style={{ background: `linear-gradient(135deg, ${glowColor}26, ${glowColor}0a)` }}>
+        {status === "loading" && (
+          <div className="absolute inset-0 animate-pulse"
+            style={{ background: `linear-gradient(110deg, ${glowColor}10 30%, ${glowColor}2e 50%, ${glowColor}10 70%)` }} />
+        )}
+        {status === "error" && (
+          <div className="flex flex-col items-center gap-1.5">
+            <ImageOff className="h-5 w-5" style={{ color: glowColor }} strokeWidth={1.75} />
+            {brand && <span className="text-[11px] font-black uppercase tracking-wider" style={{ color: glowColor }}>{brand}</span>}
+          </div>
+        )}
+      </div>
+      {status !== "error" && (
+        <img src={src} alt={alt} loading="lazy" decoding="async"
+          onLoad={() => setStatus("loaded")} onError={() => setStatus("error")}
+          className={cn(
+            "h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110",
+            status === "loaded" ? "opacity-100" : "opacity-0",
+          )} />
+      )}
+    </div>
+  );
+}
+
 function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onAdd: (item: CatalogItem) => void; featured?: boolean }) {
   const [circling, setCircling] = useState(false);
   const [sparkling, setSparkling] = useState(false);
@@ -1237,22 +1275,22 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
     setCircling(true);
     setTimeout(() => {
       setSparkling(true); setHeartPop(true);
-      setTimeout(() => { setSparkling(false); setHeartPop(false); setAdded(true); onAdd(item); }, 700);
+      setTimeout(() => { setSparkling(false); setHeartPop(false); setAdded(true); onAdd(item); }, 600);
       setTimeout(() => setCircling(false), 200);
-    }, 950);
+    }, 720);
   }, [circling, added, item, onAdd]);
 
-  const imgH = featured ? 190 : 152;
+  const imgH = featured ? 196 : 158;
 
   return (
     <motion.div
-      whileHover={!added ? { y: -5 } : {}}
+      whileHover={!added ? { y: -6 } : {}}
       whileTap={!added ? { scale: 0.97 } : {}}
       transition={{ type: "spring", stiffness: 420, damping: 26 }}
-      className="relative overflow-visible rounded-2xl cursor-pointer bg-white"
+      className="group relative cursor-pointer overflow-visible rounded-[20px] bg-white"
       style={{ boxShadow: added
-        ? `0 0 0 2.5px #34d399, 0 12px 40px ${item.glowColor}35`
-        : "0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04)" }}
+        ? `0 0 0 2.5px #34d399, 0 16px 44px ${item.glowColor}3a`
+        : "0 2px 14px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04)" }}
       onClick={handleClick}
     >
       {/* Classic blue biro pen circle */}
@@ -1279,15 +1317,11 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
       )}
 
       {/* Image */}
-      <div className="relative overflow-hidden rounded-t-2xl" style={{ height: imgH }}>
-        <img src={item.image} alt={item.name}
-          className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
-          onError={(e) => { (e.target as HTMLImageElement).style.opacity = "0.2"; }}
-        />
-        {/* Rich bottom gradient */}
-        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 45%, transparent 70%)` }} />
-        {/* Colour tint at very bottom */}
-        <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${item.glowColor}55 0%, transparent 40%)` }} />
+      <div className="relative overflow-hidden rounded-t-[20px]">
+        <ProductImage src={item.image} alt={item.name} glowColor={item.glowColor} height={imgH} {...(item.brand ? { brand: item.brand } : {})} />
+        {/* Rich bottom gradient for legible overlays */}
+        <div className="pointer-events-none absolute inset-0" style={{ background: `linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.08) 48%, transparent 72%)` }} />
+        <div className="pointer-events-none absolute inset-0" style={{ background: `linear-gradient(to top, ${item.glowColor}4d 0%, transparent 42%)` }} />
 
         {/* Brand pill top-left */}
         {item.brand && (
@@ -1299,25 +1333,29 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
         <span className={cn("absolute right-2.5 top-2.5 rounded-lg px-2 py-0.5 text-[8px] font-black uppercase tracking-wider shadow-sm backdrop-blur-sm", item.tagColor)}>
           {item.tag}
         </span>
-        {/* Price overlaid on image bottom-left */}
+        {/* Price overlaid bottom-left */}
         <div className="absolute bottom-2.5 left-2.5">
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-[22px] font-black leading-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+          <span style={{ fontFamily: "var(--font-display)" }} className="text-[23px] font-black leading-none text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
             £{item.price.toLocaleString()}
           </span>
         </div>
-        {/* Hearts bottom-right */}
-        <div className="absolute bottom-3 right-2.5 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
-          <motion.span animate={heartPop ? { scale: [1, 1.8, 0.9, 1.2, 1] } : {}} transition={{ duration: 0.45 }}
-            className="text-[9px] leading-none">❤</motion.span>
-          <span className="text-[9px] font-bold text-white">{(heartPop ? item.hearts + 1 : item.hearts).toLocaleString()}</span>
+        {/* Circled count bottom-right */}
+        <div className="absolute bottom-3 right-2.5 flex items-center gap-1 rounded-full bg-black/55 px-2 py-1 backdrop-blur-sm">
+          <motion.span animate={heartPop ? { scale: [1, 1.9, 0.9, 1.2, 1] } : {}} transition={{ duration: 0.45 }}>
+            <Heart className="h-2.5 w-2.5 fill-rose-400 text-rose-400" />
+          </motion.span>
+          <span className="text-[9px] font-bold tabular-nums text-white">{(heartPop ? item.hearts + 1 : item.hearts).toLocaleString()}</span>
         </div>
       </div>
 
       {/* Info below image */}
       <div className="px-3 pb-3 pt-2.5">
-        <p style={{ fontFamily: "var(--font-display)" }} className="mb-2.5 text-[13px] font-semibold leading-snug text-stone-800">{item.name}</p>
+        <p style={{ fontFamily: "var(--font-display)" }} className="mb-2 line-clamp-2 min-h-[34px] text-[13px] font-semibold leading-snug text-stone-800">{item.name}</p>
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-semibold text-stone-400">{item.hearts.toLocaleString()} on wishlists</p>
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-stone-400">
+            <ShieldCheck className="h-3 w-3 text-emerald-500" strokeWidth={2.25} />
+            Real UK price
+          </span>
           {added ? (
             <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 18 }}
               className="flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-black text-emerald-600">
@@ -1327,7 +1365,7 @@ function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onA
             <motion.div whileTap={{ scale: 0.88 }} className="flex h-8 w-8 items-center justify-center rounded-full text-white shadow-lg"
               style={{ background: `linear-gradient(135deg, ${item.glowColor}, ${item.glowColor}aa)`,
                 boxShadow: `0 4px 12px ${item.glowColor}55` }}>
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" strokeWidth={2.75} />
             </motion.div>
           )}
         </div>
@@ -1460,8 +1498,9 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
 
 const CAT_TABS = ["All", "Tech", "Gaming", "Toys", "Sport", "Home", "Fashion", "Experiences"] as const;
 type CatTab = typeof CAT_TABS[number];
-const CAT_ICONS: Record<string, string> = {
-  All: "✦", Tech: "⚡", Gaming: "🎮", Toys: "🧸", Sport: "🏃", Home: "🏡", Fashion: "✨", Experiences: "🎟",
+const CAT_ICONS: Record<string, LucideIcon> = {
+  All: LayoutGrid, Tech: Zap, Gaming: Gamepad2, Toys: Blocks,
+  Sport: Dumbbell, Home: Home, Fashion: Shirt, Experiences: Ticket,
 };
 
 function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
@@ -1543,6 +1582,20 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
         </p>
       </div>
 
+      {/* ── Trust band ── */}
+      <div className="flex items-center justify-around gap-1 border-b border-stone-100 bg-white px-3 py-2">
+        {[
+          { Icon: ShieldCheck, label: "Real UK prices", color: "text-emerald-500" },
+          { Icon: Heart, label: "Free to circle", color: "text-rose-500" },
+          { Icon: Users, label: "Loved by families", color: "text-amber-500" },
+        ].map(({ Icon, label, color }) => (
+          <div key={label} className="flex items-center gap-1.5">
+            <Icon className={cn("h-3.5 w-3.5", color)} strokeWidth={2.25} />
+            <span className="text-[10px] font-bold text-stone-500">{label}</span>
+          </div>
+        ))}
+      </div>
+
       {/* ── Category tabs ── */}
       <div className="sticky top-[57px] z-20 bg-white/95 backdrop-blur-sm border-b border-stone-100 shadow-sm">
         <div className="overflow-x-auto scrollbar-none px-3 py-2.5">
@@ -1550,6 +1603,7 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
             {CAT_TABS.map((tab) => {
               const count = tab === "All" ? CATALOGUE.length : CATALOGUE.filter((c) => c.category === tab).length;
               const isActive = activeTab === tab;
+              const Icon = CAT_ICONS[tab];
               return (
                 <motion.button key={tab} onClick={() => setActiveTab(tab)}
                   whileTap={{ scale: 0.95 }} whileHover={{ y: -1 }}
@@ -1557,7 +1611,7 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
                     "flex items-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-bold transition-all whitespace-nowrap",
                     isActive ? "bg-stone-900 text-white shadow-md" : "bg-stone-100 text-stone-500"
                   )}>
-                  <span className="text-[11px] leading-none">{CAT_ICONS[tab]}</span>
+                  {Icon && <Icon className="h-3.5 w-3.5" strokeWidth={2.25} />}
                   {tab}
                   <span className={cn(
                     "rounded-full px-1.5 py-0.5 text-[9px] font-black",
@@ -1607,8 +1661,9 @@ function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
           exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
           className="grid grid-cols-2 gap-3 px-4">
           {filtered.map((item, i) => (
-            <motion.div key={item.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04, type: "spring", stiffness: 400, damping: 30 }}>
+            <motion.div key={item.id} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -40px 0px" }}
+              transition={{ delay: (i % 2) * 0.05, type: "spring", stiffness: 380, damping: 28 }}>
               <CatalogCard item={item} onAdd={onAdd} />
             </motion.div>
           ))}
