@@ -20,7 +20,7 @@ import { StarChart } from "@/components/StarChart";
 import { MagneticCard } from "@/components/lux/MagneticCard";
 import { Reveal } from "@/components/lux/Reveal";
 import { VibrantCatalogue } from "@/components/vh/VibrantCatalogue";
-import { LUX_EASE } from "@/lib/motion";
+import { LUX_EASE, VH_BOUNCE } from "@/lib/motion";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
@@ -527,40 +527,39 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
   potCount: number; totalGoal: number; onShare: () => void; isContributor?: boolean; onStartReceiving?: () => void;
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-[rgba(10,10,10,0.1)] bg-[#f5f5f5]/95 backdrop-blur-lg">
-      <div className="px-4 pb-3 pt-4">
+    <header className="vh sticky top-0 z-30 bg-[#fdf6e3]/92 backdrop-blur-lg">
+      <div className="px-5 pb-4 pt-5">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <svg viewBox="0 0 100 100" width="42" height="42" className="shrink-0" role="img" aria-label="Kindled">
-              <rect width="100" height="100" fill="#0a0a0a"/>
-              <g fill="#ffb800">
-                <rect x="28" y="27" width="12" height="46" rx="2"/>
-                <rect x="34" y="33" width="34" height="12" rx="2" transform="rotate(-37 51 39)"/>
-                <rect x="34" y="56" width="34" height="12" rx="2" transform="rotate(37 51 62)"/>
+            <svg viewBox="0 0 100 100" width="44" height="44" className="shrink-0 vh-lift" style={{ borderRadius: 14 }} role="img" aria-label="Kindled">
+              <rect width="100" height="100" rx="24" fill="#0f172a"/>
+              <g fill="#f59e0b">
+                <rect x="28" y="27" width="12" height="46" rx="6"/>
+                <rect x="34" y="33" width="34" height="12" rx="6" transform="rotate(-37 51 39)"/>
+                <rect x="34" y="56" width="34" height="12" rx="6" transform="rotate(37 51 62)"/>
               </g>
-              <path d="M48 22 C41 14 32 17 35.5 25 C38 30 44 29 48 25.5 Z" fill="#ffb800"/>
-              <path d="M48 22 C55 14 64 17 60.5 25 C58 30 52 29 48 25.5 Z" fill="#ffb800"/>
+              <path d="M48 22 C41 14 32 17 35.5 25 C38 30 44 29 48 25.5 Z" fill="#f59e0b"/>
+              <path d="M48 22 C55 14 64 17 60.5 25 C58 30 52 29 48 25.5 Z" fill="#f59e0b"/>
               <circle cx="48" cy="23.5" r="5.5" fill="#fff4e6"/>
             </svg>
             <div>
               <div className="flex items-baseline gap-1.5">
-                <h1 className="font-editorial text-[21px] font-semibold tracking-tight text-[#0a0a0a]">Kindled</h1>
-                <span className="text-[11px] font-medium tracking-tight text-[#0a0a0a]/40">· Billy&apos;s List</span>
+                <h1 className="font-editorial text-[23px] font-semibold tracking-tight text-[#0f172a]">Kindled</h1>
+                <span className="text-[11px] font-medium tracking-tight text-[#0f172a]/40">· Billy&apos;s List</span>
               </div>
-              <p className="text-[11px] tracking-tight text-[#0a0a0a]/45">
+              <p className="text-[11px] tracking-tight text-[#0f172a]/50">
                 {isContributor
-                  ? <>Contributing to <span className="font-semibold text-[#0a0a0a]/70">Billy&apos;s List</span></>
-                  : <>Managed by <span className="font-semibold text-[#0a0a0a]/70">Mum (Sarah)</span></>}
+                  ? <>Contributing to <span className="font-semibold text-[#0f172a]/75">Billy&apos;s List</span></>
+                  : <>Managed by <span className="font-semibold text-[#0f172a]/75">Mum (Sarah)</span></>}
               </p>
             </div>
           </div>
           {isContributor && (
             <motion.button
-              whileTap={{ scale: 0.94 }}
-              whileHover={{ scale: 1.03 }}
-              transition={{ duration: 0.4, ease: LUX_EASE }}
+              whileTap={{ scale: 0.92 }}
+              transition={VH_BOUNCE}
               onClick={onStartReceiving}
-              className="flex shrink-0 items-center gap-1.5 bg-[#ffb800] px-3.5 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#0a0a0a] active:scale-95"
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#ff6b6b] px-4 py-2.5 text-[13px] font-bold text-white vh-lift"
             >
               <Flame className="h-3.5 w-3.5" />
               Create
@@ -568,15 +567,15 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
           )}
         </div>
 
-        <div className="mt-4 grid grid-cols-3 divide-x divide-[rgba(10,10,10,0.1)]">
+        <div className="mt-4 grid grid-cols-3 gap-2.5">
           {[
-            { value: potCount, label: "fires" },
-            { value: `£${totalGoal.toLocaleString()}`, label: "goal" },
-            { value: "4", label: "events" },
-          ].map((stat, i) => (
-            <div key={stat.label} className="px-3 text-center first:pl-0 last:pr-0">
-              <p className={`font-editorial text-[19px] font-semibold leading-none ${i === 1 ? "text-[#ffb800]" : "text-[#0a0a0a]"}`}>{stat.value}</p>
-              <p className="mt-1 text-[9px] uppercase tracking-[0.2em] text-[#0a0a0a]/40">{stat.label}</p>
+            { value: potCount, label: "fires", gold: false },
+            { value: `£${totalGoal.toLocaleString()}`, label: "goal", gold: true },
+            { value: "4", label: "events", gold: false },
+          ].map((stat) => (
+            <div key={stat.label} className="rounded-2xl bg-[#fffdf7] px-3 py-3 text-center vh-lift">
+              <p className={`font-editorial text-[20px] font-semibold leading-none ${stat.gold ? "text-[#f59e0b]" : "text-[#0f172a]"}`}>{stat.value}</p>
+              <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#0f172a]/40">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -654,7 +653,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
     pct >= 25  ? "Kindling" :
     pct > 0    ? "Embers" :
                  "Spark";
-  const statusColor = pot.isClaimed ? "text-[#0a0a0a]/45" : "text-[#0a0a0a]/55";
+  const statusColor = pot.isClaimed ? "text-[#0f172a]/45" : "text-[#0f172a]/55";
 
   function handleKindle(amount: number) {
     if (onAmountSelected) {
@@ -670,39 +669,39 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
 
   return (
     <Reveal>
-    <MagneticCard maxTilt={3} className="relative block overflow-hidden border border-[rgba(10,10,10,0.1)] bg-[#fafafa]">
-      <div className="flex flex-col p-3.5">
+    <MagneticCard maxTilt={3} className="relative block overflow-hidden rounded-[24px] bg-[#fffdf7] vh-lift-lg">
+      <div className="flex flex-col p-5">
         {/* Header row */}
         <div className="flex items-start justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="relative h-11 w-11 shrink-0 overflow-hidden border border-[rgba(10,10,10,0.1)] bg-[#f0f0f0]">
+          <div className="flex min-w-0 items-center gap-3.5">
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-[#f6ecd2]">
               {pot.image ? (
                 <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
-                  <Gift className="h-5 w-5 text-[#0a0a0a]/30" strokeWidth={1.5} />
+                  <Gift className="h-5 w-5 text-[#0f172a]/30" strokeWidth={1.5} />
                 </div>
               )}
               {pot.isClaimed && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a0a]/85">
-                  <Check className="h-5 w-5 text-[#ffb800]" strokeWidth={3} />
+                <div className="absolute inset-0 flex items-center justify-center bg-[#0f172a]/85">
+                  <Check className="h-5 w-5 text-[#f59e0b]" strokeWidth={3} />
                 </div>
               )}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5">
-                <h3 className="font-editorial truncate text-[16px] font-medium tracking-tight text-[#0a0a0a]">{pot.title}</h3>
+                <h3 className="font-editorial truncate text-[17px] font-semibold tracking-tight text-[#0f172a]">{pot.title}</h3>
                 {pot.tag && (
-                  <span className="shrink-0 border border-[rgba(10,10,10,0.18)] px-1.5 py-px text-[9px] font-semibold uppercase tracking-[0.08em] text-[#0a0a0a]/55">
+                  <span className="shrink-0 rounded-full bg-[#f59e0b]/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#f59e0b]">
                     {pot.tag}
                   </span>
                 )}
               </div>
-              <div className="mt-0.5 flex items-center gap-1.5">
-                <p className={cn("text-[11px] font-medium uppercase tracking-[0.1em]", statusColor)}>{statusLabel}</p>
+              <div className="mt-1 flex items-center gap-1.5">
+                <p className={cn("text-[11px] font-bold uppercase tracking-[0.1em]", statusColor)}>{statusLabel}</p>
                 {pot.continuous && !pot.isClaimed && !hideStackNote && (
-                  <span className="border border-[#ffb800]/40 px-1.5 py-px text-[9px] font-semibold text-[#ffb800]">
+                  <span className="rounded-full bg-[#ff6b6b]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff6b6b]">
                     ∞ continuous
                   </span>
                 )}
@@ -711,19 +710,19 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
           </div>
           {onRemove && !pot.isClaimed && (
             <motion.button whileTap={{ scale: 0.9 }} onClick={() => onRemove(pot.id)}
-              className="flex h-6 w-6 shrink-0 items-center justify-center border border-[rgba(10,10,10,0.1)] text-[#0a0a0a]/40 transition-colors hover:border-[#0a0a0a]/30 hover:text-[#0a0a0a]/70">
-              <X className="h-3 w-3" />
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f6ecd2] text-[#0f172a]/40 transition-colors hover:text-[#ff6b6b]">
+              <X className="h-3.5 w-3.5" />
             </motion.button>
           )}
         </div>
 
         {/* Claimed state */}
         {pot.isClaimed && pot.claimedBy && (
-          <div className="mt-3 flex items-center gap-2 border border-[rgba(10,10,10,0.12)] bg-[#f0f0f0] px-3 py-2">
-            <Check className="h-4 w-4 shrink-0 text-[#0a0a0a]" strokeWidth={2.5} />
+          <div className="mt-3 flex items-center gap-2 rounded-2xl bg-[#f6ecd2] px-3.5 py-2.5">
+            <Check className="h-4 w-4 shrink-0 text-[#0f172a]" strokeWidth={2.5} />
             <div className="min-w-0">
-              <p className="text-[12px] font-semibold tracking-tight text-[#0a0a0a]">{pot.claimedBy} — ordered</p>
-              {pot.claimedNote && <p className="truncate text-[11px] text-[#0a0a0a]/55">{pot.claimedNote}</p>}
+              <p className="text-[12px] font-semibold tracking-tight text-[#0f172a]">{pot.claimedBy} — ordered</p>
+              {pot.claimedNote && <p className="truncate text-[11px] text-[#0f172a]/55">{pot.claimedNote}</p>}
             </div>
           </div>
         )}
@@ -733,38 +732,39 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
           <>
             <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" tone="light" />
             <div className="mt-3 flex items-center justify-between">
-              <span className="flex items-center gap-1 text-[11px] tracking-tight text-[#0a0a0a]/45"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
+              <span className="flex items-center gap-1 text-[11px] tracking-tight text-[#0f172a]/45"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
               <CountdownTimer targetIso={pot.eventIso} compact />
             </div>
             {hideStackNote && pot.eventLabel !== "Ongoing" && (
               <div className="mt-2 flex items-center gap-1.5">
-                <CalendarDays className="h-3 w-3 shrink-0 text-[#0a0a0a]/35" />
-                <p className="text-[10px] text-[#0a0a0a]/40">Next event: <span className="font-medium text-[#0a0a0a]/60">{pot.eventLabel} · {pot.eventDate}</span></p>
+                <CalendarDays className="h-3 w-3 shrink-0 text-[#0f172a]/35" />
+                <p className="text-[10px] text-[#0f172a]/40">Next event: <span className="font-medium text-[#0f172a]/60">{pot.eventLabel} · {pot.eventDate}</span></p>
               </div>
             )}
             {pot.stackNote && !hideStackNote && (
-              <div className="mt-2 flex items-start gap-1.5 border border-[#ffb800]/30 bg-[#ffb800]/[0.08] px-2.5 py-1.5">
-                <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-[#ffb800]" />
-                <p className="text-[10px] leading-snug text-[#0a0a0a]/70">{pot.stackNote}</p>
+              <div className="mt-2.5 flex items-start gap-2 rounded-xl bg-[#f59e0b]/[0.1] px-3 py-2">
+                <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-[#f59e0b]" />
+                <p className="text-[10px] leading-snug text-[#0f172a]/70">{pot.stackNote}</p>
               </div>
             )}
 
             {/* Action buttons */}
-            <div className="mt-3 flex gap-2">
+            <div className="mt-4 flex gap-2">
               <motion.button
-                whileTap={{ scale: 0.95 }}
+                whileTap={{ scale: 0.93 }}
+                transition={VH_BOUNCE}
                 onClick={() => setKindleOpen((v) => !v)}
                 className={cn(
-                  "flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[13px] font-semibold uppercase tracking-[0.1em] transition-colors",
+                  "flex flex-1 items-center justify-center gap-2 rounded-full py-3.5 text-[14px] font-bold transition-colors vh-lift",
                   kindled
-                    ? "bg-[#0a0a0a] text-[#ffb800]"
-                    : "bg-[#ffb800] text-[#0a0a0a]",
+                    ? "bg-[#0f172a] text-[#f59e0b]"
+                    : "bg-[#ff6b6b] text-white",
                 )}
               >
                 {kindled
                   ? <Check className="h-4 w-4" />
                   : <Flame className="h-4 w-4" />}
-                {kindled ? "Kindled" : "Kindle"}
+                {kindled ? "Kindled!" : "Kindle"}
               </motion.button>
             </div>
 
@@ -781,7 +781,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                   <div className="mt-3 space-y-2.5">
                     {/* Chip in — pick an amount */}
                     <div>
-                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0a0a0a]/40">Chip in</p>
+                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0f172a]/40">Chip in</p>
                       <div className="grid grid-cols-4 gap-2">
                         {KINDLE_AMOUNTS.map((amt) => (
                           <motion.button
@@ -790,10 +790,10 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                             onClick={() => handleKindle(amt)}
                             disabled={amt > pot.goal - pot.raised}
                             className={cn(
-                              "py-2.5 text-[13px] font-semibold tabular-nums transition-colors",
+                              "rounded-xl py-3 text-[14px] font-bold tabular-nums transition-colors",
                               amt > pot.goal - pot.raised
-                                ? "cursor-not-allowed bg-[#f0f0f0] text-[#0a0a0a]/25"
-                                : "border border-[#ffb800]/40 bg-[#ffb800]/[0.08] text-[#0a0a0a] hover:bg-[#ffb800]/15",
+                                ? "cursor-not-allowed bg-[#f6ecd2] text-[#0f172a]/25"
+                                : "bg-[#f59e0b]/12 text-[#0f172a] vh-lift hover:bg-[#f59e0b]/20",
                             )}
                           >
                             £{amt}
@@ -804,26 +804,27 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
 
                     {/* Divider */}
                     <div className="flex items-center gap-2">
-                      <div className="h-px flex-1 bg-[rgba(10,10,10,0.1)]" />
-                      <span className="text-[10px] text-[#0a0a0a]/30">or</span>
-                      <div className="h-px flex-1 bg-[rgba(10,10,10,0.1)]" />
+                      <div className="h-px flex-1 bg-[rgba(15,23,42,0.1)]" />
+                      <span className="text-[10px] text-[#0f172a]/30">or</span>
+                      <div className="h-px flex-1 bg-[rgba(15,23,42,0.1)]" />
                     </div>
 
                     {/* Light this fire — fund the remaining balance */}
                     {pot.goal - pot.raised > 0 && (
                       <motion.button
-                        whileTap={{ scale: 0.97 }}
+                        whileTap={{ scale: 0.96 }}
+                        transition={VH_BOUNCE}
                         onClick={() => handleKindle(pot.goal - pot.raised)}
-                        className="flex w-full items-center justify-between gap-3 bg-[#ffb800] px-4 py-3 text-left"
+                        className="flex w-full items-center justify-between gap-3 rounded-2xl bg-[#ff6b6b] px-4 py-3.5 text-left vh-lift"
                       >
                         <div className="flex items-center gap-2.5">
-                          <Flame className="h-4 w-4 shrink-0 text-[#0a0a0a]" strokeWidth={2} />
+                          <Flame className="h-4 w-4 shrink-0 text-white" strokeWidth={2} />
                           <div>
-                            <p className="text-[13px] font-semibold leading-tight text-[#0a0a0a]">Light this fire fully</p>
-                            <p className="text-[10px] leading-tight text-[#0a0a0a]/65">Cover the remaining balance — make it happen today</p>
+                            <p className="text-[13px] font-bold leading-tight text-white">Light this fire fully</p>
+                            <p className="text-[10px] leading-tight text-white/80">Cover the remaining balance — make it happen today</p>
                           </div>
                         </div>
-                        <span className="shrink-0 bg-[#0a0a0a] px-2.5 py-1 text-[13px] font-semibold tabular-nums text-[#ffb800]">
+                        <span className="shrink-0 rounded-full bg-white/20 px-3 py-1 text-[13px] font-bold tabular-nums text-white">
                           £{pot.goal - pot.raised}
                         </span>
                       </motion.button>
@@ -831,23 +832,24 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
 
                     {/* Buy outright */}
                     <motion.button
-                      whileTap={{ scale: 0.97 }}
+                      whileTap={{ scale: 0.96 }}
+                      transition={VH_BOUNCE}
                       onClick={() => onBuy?.(pot.id)}
-                      className="flex w-full items-center justify-between gap-3 border border-[rgba(10,10,10,0.15)] bg-[#fafafa] px-4 py-3 text-left transition-colors hover:border-[#0a0a0a]/35"
+                      className="flex w-full items-center justify-between gap-3 rounded-2xl bg-[#f6ecd2] px-4 py-3.5 text-left transition-colors hover:bg-[#f0e4c4]"
                     >
                       <div className="flex items-center gap-2.5">
-                        <ShoppingBag className="h-4 w-4 shrink-0 text-[#0a0a0a]/55" strokeWidth={2} />
+                        <ShoppingBag className="h-4 w-4 shrink-0 text-[#0f172a]/55" strokeWidth={2} />
                         <div>
-                          <p className="text-[13px] font-semibold leading-tight text-[#0a0a0a]">Buy it outright</p>
-                          <p className="text-[10px] leading-tight text-[#0a0a0a]/45">Skip the pot — purchase it directly as your gift</p>
+                          <p className="text-[13px] font-bold leading-tight text-[#0f172a]">Buy it outright</p>
+                          <p className="text-[10px] leading-tight text-[#0f172a]/45">Skip the pot — purchase it directly as your gift</p>
                         </div>
                       </div>
-                      <span className="shrink-0 bg-[#f0f0f0] px-2.5 py-1 text-[13px] font-semibold tabular-nums text-[#0a0a0a]/70">
+                      <span className="shrink-0 rounded-full bg-[#fffdf7] px-3 py-1 text-[13px] font-bold tabular-nums text-[#0f172a]/70">
                         £{pot.goal}
                       </span>
                     </motion.button>
 
-                    <p className="text-center text-[10px] text-[#0a0a0a]/40">
+                    <p className="text-center text-[10px] text-[#0f172a]/40">
                       £{pot.goal - pot.raised} left to fully fund this gift
                     </p>
                   </div>
@@ -4361,13 +4363,13 @@ export default function DemoPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
-            className="mx-1 mb-1 flex items-center gap-2 border border-[rgba(10,10,10,0.1)] bg-[#fafafa] px-3.5 py-2.5"
+            className="vh mx-3 mb-1 flex items-center gap-2 rounded-full bg-[#fffdf7] px-4 py-2.5 vh-lift"
           >
-            <div className={cn("h-1.5 w-1.5 shrink-0", isContributor ? "bg-[#0a0a0a]/40" : "bg-[#ffb800]")} />
-            <p className="text-[11px] leading-snug tracking-tight text-[#0a0a0a]/55">
+            <div className={cn("h-2 w-2 shrink-0 rounded-full", isContributor ? "bg-[#0f172a]/40" : "bg-[#ff6b6b]")} />
+            <p className="text-[11px] leading-snug tracking-tight text-[#0f172a]/55">
               {isContributor
-                ? <><span className="font-semibold text-[#0a0a0a]">Contributor view</span> — you&apos;re seeing Billy&apos;s board as a family member. Tap any gift to chip in.</>
-                : <><span className="font-semibold text-[#0a0a0a]">Parent / owner view</span> — this is how Billy&apos;s family manages and tracks his wish board. Switch tabs to explore.</>
+                ? <><span className="font-bold text-[#0f172a]">Contributor view</span> — you&apos;re seeing Billy&apos;s board as a family member. Tap any gift to chip in.</>
+                : <><span className="font-bold text-[#0f172a]">Parent / owner view</span> — this is how Billy&apos;s family manages and tracks his wish board. Switch tabs to explore.</>
               }
             </p>
           </motion.div>
@@ -4379,11 +4381,11 @@ export default function DemoPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
-            className="mx-1 mb-1 flex items-center gap-2 border border-[rgba(10,10,10,0.1)] bg-[#fafafa] px-3.5 py-2.5"
+            className="vh mx-3 mb-1 flex items-center gap-2 rounded-full bg-[#fffdf7] px-4 py-2.5 vh-lift"
           >
-            <div className="h-1.5 w-1.5 shrink-0 bg-[#0a0a0a]/40" />
-            <p className="text-[11px] leading-snug tracking-tight text-[#0a0a0a]/55">
-              <span className="font-semibold text-[#0a0a0a]">Billy&apos;s view</span> — this is what Billy sees on his device. Amounts are hidden — just the excitement of what&apos;s coming.
+            <div className="h-2 w-2 shrink-0 rounded-full bg-[#0f172a]/40" />
+            <p className="text-[11px] leading-snug tracking-tight text-[#0f172a]/55">
+              <span className="font-bold text-[#0f172a]">Billy&apos;s view</span> — this is what Billy sees on his device. Amounts are hidden — just the excitement of what&apos;s coming.
             </p>
           </motion.div>
         )}
@@ -4461,7 +4463,7 @@ export default function DemoPage() {
           <ReceiverView pots={pots} onShare={handleShare} onReveal={() => setViewMode("reveal")} />
         </motion.div>
       ) : (
-      <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }} className="min-h-screen bg-[#f5f5f5]">
+      <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }} className="vh vh-paper min-h-screen">
       {/* ── Parent Dashboard ── */}
       {<>
       <ProfileHeader
@@ -4475,16 +4477,16 @@ export default function DemoPage() {
       <main className="space-y-7 pb-36 pt-4">
 
         {/* ── All pots grid (always LivePotCard — no hidden amounts) ── */}
-        <section className="px-4">
+        <section className="px-5">
           <div className="mb-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#ffb800]">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff6b6b]">
               {isContributor ? "Active Spark Goals" : "Gift List"}
             </p>
-            <p className="font-editorial mt-1 text-[22px] font-semibold leading-tight text-[#0a0a0a]">
+            <p className="font-editorial mt-1 text-[26px] font-semibold leading-tight text-[#0f172a]">
               {activePots.filter((p) => !p.isChecklist).length} {isContributor ? "fires to stoke" : "gifts to kindle or buy"}
             </p>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3.5">
             {(isContributor ? activePots.filter((p) => !p.isChecklist) : activePots).map((pot) => (
               <LivePotCard
                 key={pot.id}
@@ -4499,15 +4501,15 @@ export default function DemoPage() {
             {/* Add new gift — owner only */}
             {!isContributor && (
               <motion.button
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.4, ease: LUX_EASE }}
+                whileTap={{ scale: 0.97 }}
+                transition={VH_BOUNCE}
                 onClick={() => setShowNewGift(true)}
-                className="flex w-full items-center gap-3 border border-dashed border-[#0a0a0a]/20 bg-[#fafafa] px-4 py-4 text-left transition-colors hover:border-[#ffb800] hover:bg-[#ffb800]/[0.05]"
+                className="flex w-full items-center gap-3.5 rounded-[24px] bg-[#fffdf7] px-5 py-5 text-left vh-lift transition-transform hover:-translate-y-0.5"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#ffb800] text-xl font-semibold text-[#0a0a0a]">+</div>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#ff6b6b] text-xl font-bold text-white">+</div>
                 <div>
-                  <p className="font-editorial text-[16px] font-medium text-[#0a0a0a]">New gift</p>
-                  <p className="text-[12px] text-[#0a0a0a]/45">Paste a link or enter manually</p>
+                  <p className="font-editorial text-[17px] font-semibold text-[#0f172a]">New gift</p>
+                  <p className="text-[12px] text-[#0f172a]/45">Paste a link or enter manually</p>
                 </div>
               </motion.button>
             )}
@@ -4516,7 +4518,7 @@ export default function DemoPage() {
           {/* ── Claimed / ordered pots — contributor view ── */}
           {claimedPots.filter((p) => !p.isChecklist).length > 0 && (
             <div className="mt-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2 mt-4">Ordered &amp; on their way</p>
+              <p className="mb-2 mt-5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#0f172a]/40">Ordered &amp; on their way</p>
               <div className="flex flex-col gap-3">
                 {claimedPots.filter((p) => !p.isChecklist).map((pot) => (
                   <LivePotCard
@@ -4532,52 +4534,50 @@ export default function DemoPage() {
             </div>
           )}
 
-          {/* ── Sign-up card — charcoal feature card ── */}
+          {/* ── Sign-up card — Midnight feature card ── */}
           <Reveal>
-            <div className="mt-2 overflow-hidden border border-[#0a0a0a] bg-[#0a0a0a]">
-              <div className="flex items-center gap-2 border-b border-[rgba(245,245,245,0.1)] px-4 py-2.5">
-                <Flame className="h-3.5 w-3.5 shrink-0 text-[#ffb800]" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Want your own list like this?</p>
+            <div className="mt-3 overflow-hidden rounded-[28px] bg-[#0f172a] p-6 vh-lift-lg">
+              <div className="flex items-center gap-2">
+                <Flame className="h-3.5 w-3.5 shrink-0 text-[#f59e0b]" />
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#f59e0b]">Want your own list like this?</p>
               </div>
-              <div className="px-4 py-4">
-                <p className="font-editorial text-[20px] font-semibold leading-tight text-[#f5f5f5]">
-                  Start receiving kindled gifts yourself
-                </p>
-                <p className="mt-2 text-[12px] leading-relaxed tracking-tight text-[#f5f5f5]/55">
-                  No awkward money conversations, no duplicate gifts — just exactly what you want, chipped in by people who care.
-                </p>
-                <div className="mt-3 space-y-1.5">
-                  {([
-                    [Check, "Friends & family chip in any amount — no app needed"],
-                    [Lock, "Gifts stay secret until your reveal day"],
-                    [Star, "Star chart mode for kids · parent controls built in"],
-                  ] as const).map(([Icon, text]) => (
-                    <div key={text} className="flex items-center gap-2">
-                      <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center border border-[#ffb800]/40">
-                        <Icon className="h-2.5 w-2.5 text-[#ffb800]" strokeWidth={2.5} />
-                      </div>
-                      <p className="text-[11px] tracking-tight text-[#f5f5f5]/70">{text}</p>
+              <p className="font-editorial mt-3 text-[24px] font-semibold leading-tight text-[#fdf6e3]">
+                Start receiving kindled gifts yourself
+              </p>
+              <p className="mt-2.5 text-[13px] leading-relaxed text-[#fdf6e3]/60">
+                No awkward money conversations, no duplicate gifts — just exactly what you want, chipped in by people who care.
+              </p>
+              <div className="mt-4 space-y-2">
+                {([
+                  [Check, "Friends & family chip in any amount — no app needed"],
+                  [Lock, "Gifts stay secret until your reveal day"],
+                  [Star, "Star chart mode for kids · parent controls built in"],
+                ] as const).map(([Icon, text]) => (
+                  <div key={text} className="flex items-center gap-2.5">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#ff6b6b]">
+                      <Icon className="h-2.5 w-2.5 text-white" strokeWidth={2.5} />
                     </div>
-                  ))}
-                </div>
-                <div className="mt-3 flex items-start gap-2 border border-[#ffb800]/30 bg-[#ffb800]/[0.06] px-3 py-2.5">
-                  <Trophy className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ffb800]" />
-                  <p className="text-[10.5px] leading-snug text-[#f5f5f5]/75">
-                    <span className="font-semibold text-[#f5f5f5]">Enter our £2,500 Goal Booster Draw</span> with every contribution.{" "}
-                    Plus earn <span className="font-semibold text-[#ffb800]">2% Spark Balance back</span> on your own future fires.
-                  </p>
-                </div>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.4, ease: LUX_EASE }}
-                  onClick={() => setShowReceiverSignUp(true)}
-                  className="mt-3 flex w-full items-center justify-center gap-2 bg-[#ffb800] py-3 text-[14px] font-semibold uppercase tracking-[0.08em] text-[#0a0a0a]"
-                >
-                  <Flame className="h-4 w-4" />
-                  Create my own fire — it&apos;s free
-                </motion.button>
-                <p className="mt-2 text-center text-[10px] text-[#f5f5f5]/40">No app required · 2 minute setup</p>
+                    <p className="text-[12px] text-[#fdf6e3]/75">{text}</p>
+                  </div>
+                ))}
               </div>
+              <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-[#f59e0b]/[0.12] px-3.5 py-3">
+                <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-[#f59e0b]" />
+                <p className="text-[11px] leading-snug text-[#fdf6e3]/80">
+                  <span className="font-bold text-[#fdf6e3]">Enter our £2,500 Goal Booster Draw</span> with every contribution.{" "}
+                  Plus earn <span className="font-bold text-[#f59e0b]">2% Spark Balance back</span> on your own future fires.
+                </p>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                transition={VH_BOUNCE}
+                onClick={() => setShowReceiverSignUp(true)}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#ff6b6b] py-4 text-[15px] font-bold text-white vh-lift"
+              >
+                <Flame className="h-4 w-4" />
+                Create my own fire — it&apos;s free
+              </motion.button>
+              <p className="mt-2.5 text-center text-[11px] text-[#fdf6e3]/45">No app required · 2 minute setup</p>
             </div>
           </Reveal>
 
