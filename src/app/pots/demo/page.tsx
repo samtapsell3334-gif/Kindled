@@ -1485,7 +1485,7 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
                 disabled={loading}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900 shadow-xl shadow-amber-900/40 active:scale-95 disabled:opacity-60"
               >
-                <Flame className="h-4.5 w-4.5" strokeWidth={2.5} />
+                <Flame className="h-[18px] w-[18px]" strokeWidth={2.5} />
                 {loading ? "Lighting the fire…" : "Create My First Fire"}
               </motion.button>
             </form>
@@ -2021,11 +2021,12 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
     {min:60, max:999, label:"Galaxy Hero",         grad:"from-rose-400 to-pink-500",     badge:"bg-rose-500"  },
   ];
 
+  // Stars are a currency at £0.50 each — these tiers match the Star Shop exactly.
   const UNLOCK_MILESTONES = [
-    {stars:25,  label:"Amazon Gift Card",  sub:"£5 · 0% fees",        color:"#f59e0b", unlocked:true },
-    {stars:50,  label:"Smyths Toys £10",   sub:"Toys & games",         color:"#a78bfa", unlocked:false},
-    {stars:75,  label:"LEGO Store £15",    sub:"Official LEGO shop",   color:"#38bdf8", unlocked:false},
-    {stars:100, label:"??? MEGA PRIZE ???",sub:"Top secret reward",    color:"#f43f5e", unlocked:false},
+    {stars:10,  label:"Amazon Gift Card",   sub:"£5 · 0% fees",        color:"#f59e0b"},
+    {stars:20,  label:"Smyths Toys £10",    sub:"Toys & games",         color:"#a78bfa"},
+    {stars:30,  label:"LEGO Store £15",     sub:"Official LEGO shop",   color:"#38bdf8"},
+    {stars:100, label:"??? MEGA PRIZE ???", sub:"Fill the galaxy + more!", color:"#f43f5e"},
   ];
 
   const DAILY_MISSIONS = [
@@ -2047,6 +2048,7 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
   const [impactPot, setImpactPot] = useState<string|null>(null);
   const [claimedBonus, setClaimedBonus] = useState(false);
   const [showRedeem, setShowRedeem] = useState(false);
+  const [redeemed, setRedeemed] = useState<Set<string>>(new Set());
   const [missionFlipped, setMissionFlipped] = useState<Set<string>>(new Set());
 
   const potRef = useRef<HTMLDivElement>(null);
@@ -2126,7 +2128,7 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
   if (showRedeem) return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-950 via-violet-950 to-indigo-950 px-4 pt-6 pb-32">
       <button onClick={()=>setShowRedeem(false)} className="mb-4 flex items-center gap-2 text-violet-300 text-[13px] font-bold">
-        <span>←</span> Back to Stars
+        <ChevronRight className="h-4 w-4 rotate-180"/> Back to Stars
       </button>
       <div className="text-center mb-6">
         <p className="text-[11px] font-black uppercase tracking-widest text-violet-400 mb-1">Star Shop</p>
@@ -2138,8 +2140,11 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
           {brand:"Amazon",       val:5,  stars:10, color:"#f59e0b"},
           {brand:"Smyths Toys",  val:10, stars:20, color:"#a78bfa"},
           {brand:"LEGO Store",   val:15, stars:30, color:"#38bdf8"},
-          {brand:"Roblox",       val:10, stars:25, color:"#10b981"},
-        ].map(gc=>(
+          {brand:"Roblox",       val:10, stars:20, color:"#10b981"},
+        ].map(gc=>{
+          const isRedeemed = redeemed.has(gc.brand);
+          const canAfford = totalStars>=gc.stars;
+          return (
           <div key={gc.brand} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/8 px-4 py-3.5">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{background:gc.color+"25"}}>
@@ -2152,13 +2157,18 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
             </div>
             <div className="text-right">
               <p className="text-[11px] font-black text-amber-400">{gc.stars} stars</p>
-              <button className={cn("mt-1 rounded-xl px-3 py-1.5 text-[11px] font-bold",
-                totalStars>=gc.stars?"bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900":"bg-white/10 text-white/30 cursor-not-allowed")}>
-                {totalStars>=gc.stars?"Redeem!":"Need more"}
+              <button
+                onClick={()=>{ if(canAfford && !isRedeemed){ chime(); setRedeemed(s=>new Set([...s,gc.brand])); } }}
+                disabled={!canAfford || isRedeemed}
+                className={cn("mt-1 rounded-xl px-3 py-1.5 text-[11px] font-bold transition-colors",
+                isRedeemed?"bg-emerald-500/20 text-emerald-300"
+                  :canAfford?"bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900"
+                  :"bg-white/10 text-white/30 cursor-not-allowed")}>
+                {isRedeemed?"Sent to a grown-up!":canAfford?"Redeem!":"Need more"}
               </button>
             </div>
           </div>
-        ))}
+        );})}
       </div>
       <p className="text-center text-[10px] text-violet-500">Parent approval required · Powered by Kindled × Tillo · Instant delivery</p>
     </div>
@@ -2271,7 +2281,7 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
           <p className="text-[10px] font-black uppercase tracking-widest text-amber-400/70 mb-1.5">Stars splashing here</p>
           <div className="flex items-center gap-3" ref={jarRef}>
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-400/20">
-              <Gift className="h-5.5 w-5.5 text-amber-400" strokeWidth={1.5}/>
+              <Gift className="h-[22px] w-[22px] text-amber-400" strokeWidth={1.5}/>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-bold text-white truncate">{targetPot.title}</p>
@@ -2542,7 +2552,7 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
       <div className="relative z-10 mx-4">
         <motion.button onClick={()=>setShowRedeem(true)}
           whileHover={{scale:1.02,y:-2}} whileTap={{scale:0.97}}
-          className="relative w-full overflow-hidden rounded-3xl py-4.5 text-[15px] font-black text-stone-900 shadow-xl shadow-amber-900/30"
+          className="relative w-full overflow-hidden rounded-3xl py-4 text-[15px] font-black text-stone-900 shadow-xl shadow-amber-900/30"
           style={{background:"linear-gradient(135deg,#fbbf24,#f97316,#fbbf24)",backgroundSize:"200% 100%"}}>
           <div className="pointer-events-none absolute inset-0">
             {Array.from({length:12},(_,i)=>(
@@ -5206,7 +5216,7 @@ export default function DemoPage() {
                   [Star, "Star chart mode for kids · parent controls built in"],
                 ] as const).map(([Icon, text]) => (
                   <div key={text} className="flex items-center gap-2">
-                    <div className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-amber-100">
                       <Icon className="h-2.5 w-2.5 text-amber-600" strokeWidth={2.5} />
                     </div>
                     <p className="text-[11px] text-stone-600">{text}</p>
@@ -5342,7 +5352,7 @@ export default function DemoPage() {
                   ].map(({ Icon, stat, label, desc }) => (
                     <div key={label} className="flex items-start gap-3">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/15">
-                        <Icon className="h-4.5 w-4.5 text-amber-400" strokeWidth={1.75} />
+                        <Icon className="h-[18px] w-[18px] text-amber-400" strokeWidth={1.75} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-1.5">
