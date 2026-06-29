@@ -40,3 +40,17 @@ export const revealOnScroll = {
   viewport: { once: true, margin: "0px 0px -60px 0px" },
   variants: glideUp,
 };
+
+// ─── Vibrant Heritage — playful, tactile motion ──────────────────────────────
+
+/** Bouncy spring for "pop" appearances and button presses. */
+export const VH_BOUNCE: Transition = { type: "spring", stiffness: 480, damping: 16, mass: 0.7 };
+
+/** Pop-in on appear — element scales up past 1 then settles (overshoot). */
+export const popIn: Variants = {
+  hidden: { opacity: 0, scale: 0.9, y: 8 },
+  show: { opacity: 1, scale: 1, y: 0, transition: VH_BOUNCE },
+};
+
+/** Drop-in props for a button that bounces on press. */
+export const bounceTap = { whileTap: { scale: 0.92 }, transition: VH_BOUNCE } as const;

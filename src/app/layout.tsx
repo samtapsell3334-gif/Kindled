@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Fredoka, Fraunces } from "next/font/google";
+import { Geist, Geist_Mono, Fredoka, Fraunces, Outfit } from "next/font/google";
 import "./globals.css";
 
 const fontSans = Geist({
@@ -24,6 +24,13 @@ const fontSerif = Fraunces({
   weight: ["400", "500", "600", "700", "900"],
   style: ["normal", "italic"],
   variable: "--font-serif",
+});
+
+// Vibrant-Heritage UI sans — playful, confident, clean.
+const fontOutfit = Outfit({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-outfit",
 });
 
 export const metadata: Metadata = {
@@ -51,7 +58,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontSerif.variable} font-sans antialiased`}>
+      <body className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontSerif.variable} ${fontOutfit.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

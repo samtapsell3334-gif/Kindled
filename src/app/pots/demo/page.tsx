@@ -18,9 +18,8 @@ import { projectCumulative, goalProgress, timeToGoal, MILESTONE_PROFILES, type J
 import { trackingDecorator, getRetailer, priceDrop, AFFILIATE_LINK_REL, AFFILIATE_DISCLOSURE } from "@/lib/catalog-service";
 import { StarChart } from "@/components/StarChart";
 import { MagneticCard } from "@/components/lux/MagneticCard";
-import { BrandedImage } from "@/components/lux/BrandedImage";
-import { GlassSelect } from "@/components/lux/GlassSelect";
-import { Reveal, RevealGroup, RevealItem } from "@/components/lux/Reveal";
+import { Reveal } from "@/components/lux/Reveal";
+import { VibrantCatalogue } from "@/components/vh/VibrantCatalogue";
 import { LUX_EASE } from "@/lib/motion";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
@@ -293,12 +292,6 @@ const BUBBLES_P = Array.from({ length: 12 }, (_, i) => ({
 
 
 
-
-const SPARKLES = Array.from({ length: 10 }, (_, i) => ({
-  id: i, spx: `${-35 + (i * 37) % 70}px`, spy: `${-30 + (i * 29) % 60}px`,
-  color: ["#f59e0b","#fbbf24","#f97316","#fb923c","#fff"][i % 5]!,
-  delay: `${i * 0.06}s`, size: 4 + (i % 5),
-}));
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // 3D TILT HOOK
@@ -1216,95 +1209,6 @@ function ContributionPromptModal({
  * gradient fallback (brand initial + icon) if the photo 404s — so the
  * catalogue never shows a broken-image glyph.
  */
-function CatalogCard({ item, onAdd, featured = false }: { item: CatalogItem; onAdd: (item: CatalogItem) => void; featured?: boolean }) {
-  const [circling, setCircling] = useState(false);
-  const [sparkling, setSparkling] = useState(false);
-  const [added, setAdded] = useState(false);
-  const [heartPop, setHeartPop] = useState(false);
-
-  const handleClick = useCallback(() => {
-    if (circling || added) return;
-    setCircling(true);
-    setTimeout(() => {
-      setSparkling(true); setHeartPop(true);
-      setTimeout(() => { setSparkling(false); setHeartPop(false); setAdded(true); onAdd(item); }, 600);
-      setTimeout(() => setCircling(false), 200);
-    }, 720);
-  }, [circling, added, item, onAdd]);
-
-  const imgH = featured ? 210 : 172;
-
-  return (
-    <MagneticCard
-      maxTilt={7}
-      ariaLabel={`Add ${item.name}`}
-      onClick={handleClick}
-      className={cn("group relative block cursor-pointer overflow-visible bg-[#fafafa]",
-        added ? "border border-[#ffb800]" : "border border-[rgba(10,10,10,0.1)]")}
-    >
-      {/* Signature circle-to-add — the modern-nostalgia interaction */}
-      {circling && (
-        <div className="pointer-events-none absolute z-20" style={{ inset: "-9px" }}>
-          <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none" fill="none">
-            <path d="M 7 4 C 28 -1, 58 3, 82 0 C 94 -1, 101 9, 99 24 C 102 48, 97 65, 100 82 C 102 95, 90 102, 72 100 C 50 103, 26 98, 10 101 C -2 103, -3 90, 0 73 C -4 52, 3 34, -2 17 C -4 5, 2 1, 7 4 Z"
-              stroke="#ffb800" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"
-              strokeDasharray="460" vectorEffect="non-scaling-stroke"
-              className="animate-draw-circle"
-              style={{ filter: "drop-shadow(0 0 8px rgba(255,184,0,0.7))", opacity: 0.95 }} />
-          </svg>
-        </div>
-      )}
-      {sparkling && (
-        <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center">
-          {SPARKLES.map((s) => (
-            <span key={s.id} className="absolute rounded-full animate-sparkle"
-              style={{ width: s.size, height: s.size, backgroundColor: s.color,
-                "--spx": s.spx, "--spy": s.spy, animationDelay: s.delay,
-                boxShadow: `0 0 8px ${s.color}` } as React.CSSProperties} />
-          ))}
-        </div>
-      )}
-
-      {/* Image — high-res photography with a branded serif fallback */}
-      <div className="relative overflow-hidden">
-        <div className="overflow-hidden transition-transform duration-700 group-hover:scale-[1.05]" style={{ height: imgH, transitionTimingFunction: "cubic-bezier(0.22,1,0.36,1)" }}>
-          <BrandedImage src={item.image} alt={item.name} name={item.name} className="h-full w-full object-cover" />
-        </div>
-        {/* Circled count top-left */}
-        <div className="absolute left-2.5 top-2.5 flex items-center gap-1 border border-[rgba(10,10,10,0.08)] bg-[#fafafa]/90 px-2 py-0.5 backdrop-blur-md">
-          <motion.span animate={heartPop ? { scale: [1, 1.9, 0.9, 1.2, 1] } : {}} transition={{ duration: 0.45 }}>
-            <Heart className="h-2.5 w-2.5 fill-[#ffb800] text-[#ffb800]" />
-          </motion.span>
-          <span className="text-[9px] font-semibold tabular-nums tracking-tight text-[#0a0a0a]/70">{(heartPop ? item.hearts + 1 : item.hearts).toLocaleString()}</span>
-        </div>
-        {/* Tag top-right */}
-        <span className="absolute right-2.5 top-2.5 bg-[#0a0a0a] px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.15em] text-[#f5f5f5]">
-          {item.tag}
-        </span>
-      </div>
-
-      {/* Info — editorial type hierarchy */}
-      <div className="px-3.5 pb-3.5 pt-3">
-        {item.brand && <p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#0a0a0a]/40">{item.brand}</p>}
-        <p className="font-editorial line-clamp-2 min-h-[38px] text-[15px] font-medium leading-snug text-[#0a0a0a]">{item.name}</p>
-        <div className="mt-2.5 flex items-center justify-between">
-          <span className="text-[18px] font-semibold tabular-nums tracking-tight text-[#0a0a0a]">£{item.price.toLocaleString()}</span>
-          {added ? (
-            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.4, ease: LUX_EASE }}
-              className="flex items-center gap-1 border border-[#ffb800] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0a0a0a]">
-              <Check className="h-3 w-3" /> Added
-            </motion.span>
-          ) : (
-            <motion.div whileTap={{ scale: 0.88 }} className="flex h-9 w-9 items-center justify-center bg-[#ffb800] text-[#0a0a0a]">
-              <Plus className="h-4 w-4" strokeWidth={2.5} />
-            </motion.div>
-          )}
-        </div>
-      </div>
-    </MagneticCard>
-  );
-}
-
 // ─── Creator sign-up modal (shown to contributors who click Catalogue) ────────
 function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState("");
@@ -1420,115 +1324,6 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
           )}
         </div>
       </motion.div>
-    </div>
-  );
-}
-
-const INTEREST_OPTIONS = ["All interests", "Tech", "Gaming", "Toys", "Sport", "Home", "Fashion", "Experiences"];
-const BUDGET_OPTIONS = ["Any budget", "Under £50", "£50–£150", "£150–£500", "£500+"];
-const OCCASION_OPTIONS = ["Any occasion", "Birthday", "Christmas", "Anniversary", "Wedding", "New baby"];
-const OCCASION_CATS: Record<string, string[]> = {
-  Birthday:    ["Tech", "Gaming", "Toys", "Sport", "Fashion", "Experiences"],
-  Christmas:   ["Tech", "Gaming", "Toys", "Sport", "Home", "Fashion", "Experiences"],
-  Anniversary: ["Experiences", "Fashion", "Home", "Tech"],
-  Wedding:     ["Home", "Experiences", "Fashion"],
-  "New baby":  ["Toys", "Home"],
-};
-function inBudget(price: number, b: string): boolean {
-  switch (b) {
-    case "Under £50": return price < 50;
-    case "£50–£150": return price >= 50 && price < 150;
-    case "£150–£500": return price >= 150 && price < 500;
-    case "£500+": return price >= 500;
-    default: return true;
-  }
-}
-
-function CatalogueView({ onAdd }: { onAdd: (item: CatalogItem) => void }) {
-  const [interest, setInterest] = useState("All interests");
-  const [budget, setBudget] = useState("Any budget");
-  const [occasion, setOccasion] = useState("Any occasion");
-  const [tickerIdx, setTickerIdx] = useState(0);
-
-  const tickerItems = useMemo(() => CATALOGUE.filter((c) => c.hearts > 800).slice(0, 6), []);
-  useEffect(() => {
-    const iv = setInterval(() => setTickerIdx((i) => (i + 1) % tickerItems.length), 2800);
-    return () => clearInterval(iv);
-  }, [tickerItems.length]);
-
-  const filtered = useMemo(() => CATALOGUE.filter((c) => {
-    if (interest !== "All interests" && c.category !== interest) return false;
-    if (!inBudget(c.price, budget)) return false;
-    if (occasion !== "Any occasion" && !(OCCASION_CATS[occasion]?.includes(c.category))) return false;
-    return true;
-  }).sort((a, b) => b.hearts - a.hearts), [interest, budget, occasion]);
-
-  const reset = () => { setInterest("All interests"); setBudget("Any budget"); setOccasion("Any occasion"); };
-
-  return (
-    <div className="pb-32" style={{ background: "#f5f5f5" }}>
-      {/* ── Editorial header ── */}
-      <div className="px-5 pb-5 pt-8">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#ffb800]">The Kindled Edit · 2026</p>
-        <h2 className="font-editorial mt-1.5 text-[36px] font-semibold leading-[0.95] text-[#0a0a0a]">The Catalogue</h2>
-        <p className="mt-2.5 text-[12px] leading-relaxed tracking-tight text-[#0a0a0a]/50">{filtered.length} of {CATALOGUE.length} pieces · circle the ones worth keeping.</p>
-        {/* Trending ticker */}
-        <div className="mt-5 flex items-center gap-2 border border-[rgba(10,10,10,0.1)] bg-[#fafafa] px-3 py-2">
-          <span className="flex shrink-0 items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#ffb800]"><TrendingUp className="h-3 w-3" /> Trending</span>
-          <div className="flex-1 overflow-hidden">
-            <AnimatePresence mode="wait">
-              <motion.p key={tickerIdx} initial={{ y: 12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -12, opacity: 0 }} transition={{ duration: 0.4, ease: LUX_EASE }}
-                className="truncate text-[11px] tracking-tight text-[#0a0a0a]/65">
-                {tickerItems[tickerIdx]?.name} — circled {tickerItems[tickerIdx]?.hearts.toLocaleString()} times
-              </motion.p>
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Filters — glassmorphism slide-over / popover ── */}
-      <div className="sticky top-[57px] z-20 border-y border-[rgba(10,10,10,0.1)] bg-[#f5f5f5]/92 px-4 py-3 backdrop-blur-md">
-        <div className="flex gap-2">
-          <GlassSelect label="Interest" value={interest} options={INTEREST_OPTIONS} onChange={setInterest} />
-          <GlassSelect label="Budget" value={budget} options={BUDGET_OPTIONS} onChange={setBudget} />
-          <GlassSelect label="Occasion" value={occasion} options={OCCASION_OPTIONS} onChange={setOccasion} />
-        </div>
-      </div>
-
-      {/* ── Tip ── */}
-      <div className="flex items-center gap-2 px-5 py-3">
-        <PenLine className="h-3.5 w-3.5 shrink-0 text-[#ffb800]" strokeWidth={2} />
-        <p className="text-[10px] tracking-tight text-[#0a0a0a]/50">Tap a piece — the <span className="font-semibold text-[#0a0a0a]/75">amber pen</span> circles it onto your fire list.</p>
-      </div>
-
-      {/* ── Gallery grid — staggered glide ── */}
-      {filtered.length === 0 ? (
-        <div className="px-5 py-16 text-center">
-          <p className="font-editorial text-[16px] font-medium text-[#0a0a0a]">Nothing matches those filters</p>
-          <button onClick={reset} className="mt-3 border border-[rgba(10,10,10,0.2)] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#0a0a0a] transition-colors hover:bg-[#fafafa]">Clear filters</button>
-        </div>
-      ) : (
-        <RevealGroup key={`${interest}-${budget}-${occasion}`} className="grid grid-cols-2 gap-3.5 px-4" stagger={0.06}>
-          {filtered.map((item) => (
-            <RevealItem key={item.id}>
-              <CatalogCard item={item} onAdd={onAdd} />
-            </RevealItem>
-          ))}
-        </RevealGroup>
-      )}
-
-      {/* ── Bottom CTA ── */}
-      <div className="mx-4 mt-8 flex items-center gap-4 border border-[#0a0a0a] bg-[#0a0a0a] px-5 py-5">
-        <div className="flex-1">
-          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Create your own edit</p>
-          <p className="font-editorial text-[17px] font-medium leading-tight text-[#f5f5f5]">
-            Let family circle the things you&apos;d actually love
-          </p>
-        </div>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#ffb800]">
-          <Flame className="h-5 w-5 text-[#0a0a0a]" />
-        </div>
-      </div>
     </div>
   );
 }
@@ -4493,7 +4288,6 @@ export default function DemoPage() {
   const [pots, setPots] = useState<DemoPot[]>([...INITIAL_POTS, ...CHECKLIST_POTS]);
   const [toast, setToast] = useState<string | null>(null);
   const [logEntries, setLogEntries] = useState<string[]>([]);
-  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const [pendingContribution, setPendingContribution] = useState<{ pot: DemoPot; amount: number } | null>(null);
   const [previewReceiver, setPreviewReceiver] = useState(false);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
@@ -4513,32 +4307,6 @@ export default function DemoPage() {
     showToast("Link copied to share with family!");
     addLog("Wishlist link shared — referral tracking engaged");
   }, [showToast, addLog]);
-
-  const handleAddItem = useCallback((item: CatalogItem) => {
-    if (addedIds.has(item.id)) return;
-    setAddedIds((s) => new Set([...s, item.id]));
-    const newPot: DemoPot = {
-      id: `new_${item.id}`,
-      title: item.name,
-      goal: item.price,
-      raised: 0,
-      mode: "LIVE_FEED",
-      continuous: true,
-      eventLabel: "Ongoing",
-      eventDate: "Anytime",
-      eventIso: "2027-01-01T00:00:00Z",
-      contributors: 0,
-      boosterEntries: 0,
-      accentGradient: "from-amber-400 to-orange-500",
-      tributes: [],
-    };
-    setPots((prev) => [newPot, ...prev]);
-    showToast(`"${item.name}" added to Billy's Dream Board!`);
-    const intentMsg = item.price >= 200
-      ? `IntentDataNode CREATED: "${item.name}" £${item.price} — High-ticket Day 1 signal`
-      : `Catalogue add: "${item.name}" (£${item.price.toFixed(2)}) — tracking engaged`;
-    addLog(intentMsg);
-  }, [addedIds, showToast, addLog]);
 
   const handleKindle = useCallback((id: string, amount: number) => {
     setPots((prev) => prev.map((p) =>
@@ -4641,7 +4409,7 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "catalogue" ? (
         <motion.div key="catalogue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-          <CatalogueView onAdd={handleAddItem} />
+          <VibrantCatalogue items={CATALOGUE} />
         </motion.div>
       ) : viewMode === "reveal" ? (
         <motion.div key="reveal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
