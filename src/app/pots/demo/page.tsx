@@ -3963,18 +3963,18 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
   const daysUntil = Math.max(0, Math.ceil((new Date(targetIso).getTime() - Date.now()) / 86_400_000));
 
   const th = {
-    bg: "bg-[#0a0a0a]", border: "border-[rgba(245,245,245,0.1)]",
-    giftColor: "text-[#ffb800]", dayColor: "text-[#ffb800]", labelColor: "text-[#f5f5f5]/50",
+    bg: "bg-[#0f172a]",
+    giftColor: "text-[#f59e0b]", dayColor: "text-[#f59e0b]", labelColor: "text-[#fdf6e3]/50",
     modeLabel: isXmas ? "Under Wraps" : "Wrapped Up",
   };
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -60px 0px" }}
-      transition={{ delay: (index % 2) * 0.06, duration: 0.6, ease: LUX_EASE }}
-      className={cn("relative overflow-hidden border", th.bg, th.border)}
+      transition={{ ...VH_BOUNCE, delay: (index % 2) * 0.05 }}
+      className={cn("relative overflow-hidden rounded-[24px] vh-lift-lg", th.bg)}
     >
       {/* Seasonal particle backdrop */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
@@ -4009,8 +4009,8 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
             {/* Lock badge */}
             <div className="absolute right-3 top-3 flex items-center gap-1 bg-black/60 px-2 py-1 backdrop-blur-sm">
-              <Lock className="h-3 w-3 text-[#f5f5f5]/70" strokeWidth={2} />
-              <span className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#f5f5f5]/60">{th.modeLabel}</span>
+              <Lock className="h-3 w-3 text-[#fdf6e3]/70" strokeWidth={2} />
+              <span className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#fdf6e3]/60">{th.modeLabel}</span>
             </div>
             {/* Countdown badge */}
             <div className="absolute left-3 top-3 bg-black/60 px-2.5 py-1 backdrop-blur-sm">
@@ -4025,33 +4025,33 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
           {/* Title row */}
           <div className="flex items-start gap-3">
             {!pot.image && (
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[rgba(245,245,245,0.12)] bg-[#f5f5f5]/[0.04]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[rgba(245,245,245,0.12)] bg-[#fdf6e3]/[0.04]">
                 <Gift className={cn("h-5 w-5", th.giftColor)} strokeWidth={1.5} />
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <h3 className="font-editorial text-[16px] font-semibold leading-snug text-[#f5f5f5]">{pot.title}</h3>
+              <h3 className="font-editorial text-[16px] font-semibold leading-snug text-[#fdf6e3]">{pot.title}</h3>
               <p className={cn("mt-0.5 text-[11px] tracking-tight", th.labelColor)}>
                 {!pot.image && `${isXmas ? "Christmas" : "Birthday"} in ${daysUntil} days · `}Keeping it a secret until the big day
               </p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="text-[9px] uppercase tracking-[0.15em] text-[#f5f5f5]/40">Target</p>
-              <p className="font-editorial text-[17px] font-semibold text-[#f5f5f5]">£{pot.goal.toLocaleString()}</p>
+              <p className="text-[9px] uppercase tracking-[0.15em] text-[#fdf6e3]/40">Target</p>
+              <p className="font-editorial text-[17px] font-semibold text-[#fdf6e3]">£{pot.goal.toLocaleString()}</p>
             </div>
           </div>
 
           {/* Progress hidden from Billy */}
           <div className="mt-3 flex items-center gap-1.5">
-            <Lock className="h-3 w-3 shrink-0 text-[#f5f5f5]/30" />
-            <span className="text-[11px] italic text-[#f5f5f5]/30">Progress hidden until reveal day</span>
+            <Lock className="h-3 w-3 shrink-0 text-[#fdf6e3]/30" />
+            <span className="text-[11px] italic text-[#fdf6e3]/30">Progress hidden until reveal day</span>
           </div>
 
           {/* Stack note */}
           {pot.stackNote && (
-            <div className="mt-2 flex items-start gap-1.5 border border-[rgba(245,245,245,0.08)] bg-[#f5f5f5]/[0.04] px-2.5 py-1.5">
-              <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-[#ffb800]/70" />
-              <p className="text-[10px] leading-snug text-[#f5f5f5]/45">{pot.stackNote}</p>
+            <div className="mt-2 flex items-start gap-1.5 border border-[rgba(245,245,245,0.08)] bg-[#fdf6e3]/[0.04] px-2.5 py-1.5">
+              <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-[#f59e0b]/70" />
+              <p className="text-[10px] leading-snug text-[#fdf6e3]/45">{pot.stackNote}</p>
             </div>
           )}
         </div>
@@ -4088,29 +4088,29 @@ function ReceiverProofStats() {
 
   return (
     <div>
-      <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Why this list matters</p>
-      <p className="font-editorial mb-4 text-[19px] font-semibold leading-tight text-[#0a0a0a]">
+      <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Why this list matters</p>
+      <p className="font-editorial mb-4 text-[21px] font-semibold leading-tight text-[#0f172a]">
         A smarter, kinder way to give
       </p>
       <div className="flex flex-col gap-3">
         {stats.map(({ Icon, value, suffix, label, desc }) => (
-          <div key={label} className="flex gap-4 border border-[rgba(10,10,10,0.12)] bg-[#fafafa] p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-[rgba(10,10,10,0.12)] bg-[#f5f5f5]">
-              <Icon className="h-5 w-5 text-[#0a0a0a]/55" strokeWidth={1.75} />
+          <div key={label} className="flex gap-4 rounded-[20px] bg-[#fffdf7] p-4 vh-lift">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f59e0b]/12">
+              <Icon className="h-5 w-5 text-[#f59e0b]" strokeWidth={1.75} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-1.5">
-                <p className="font-editorial text-[23px] font-semibold text-[#ffb800]">
+                <p className="font-editorial text-[24px] font-semibold text-[#ff6b6b]">
                   {value === 3 ? "£" : ""}<CountUpStat target={value} suffix={suffix} />
                 </p>
-                <p className="text-[12px] font-semibold tracking-tight text-[#0a0a0a]/70">{label}</p>
+                <p className="text-[12px] font-bold tracking-tight text-[#0f172a]/70">{label}</p>
               </div>
-              <p className="mt-0.5 text-[11px] leading-snug tracking-tight text-[#0a0a0a]/50">{desc}</p>
+              <p className="mt-0.5 text-[11px] leading-snug text-[#0f172a]/50">{desc}</p>
             </div>
           </div>
         ))}
       </div>
-      <p className="mt-3 text-center text-[9px] leading-snug text-[#0a0a0a]/40">
+      <p className="mt-3 text-center text-[9px] leading-snug text-[#0f172a]/40">
         Sources: British Retail Consortium · Waste & Resources Action Programme (WRAP) UK · Psychological Science Gifting Surveys
       </p>
     </div>
@@ -4140,25 +4140,24 @@ function ReceiverView({ pots, onShare, onReveal }: {
   const bdayDays = Math.ceil((bdayDate.getTime() - now.getTime()) / 86_400_000);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="vh vh-paper min-h-screen">
       {/* Hero */}
-      <div className="px-5 pb-4 pt-6">
+      <div className="px-5 pb-4 pt-7">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center bg-[#0a0a0a]">
-              <Sparkles className="h-7 w-7 text-[#ffb800]" strokeWidth={1.5} />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#ff6b6b] vh-lift">
+              <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Your Kindled Spark Goals</p>
-              <h1 className="font-editorial text-[26px] font-semibold leading-tight text-[#0a0a0a]">Hey Billy!</h1>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Your Spark Goals</p>
+              <h1 className="font-editorial text-[28px] font-semibold leading-tight text-[#0f172a]">Hey Billy!</h1>
             </div>
           </div>
           <motion.button
-            whileTap={{ scale: 0.94 }}
-            whileHover={{ scale: 1.03 }}
-            transition={{ duration: 0.4, ease: LUX_EASE }}
+            whileTap={{ scale: 0.92 }}
+            transition={VH_BOUNCE}
             onClick={onShare}
-            className="flex shrink-0 items-center gap-1.5 bg-[#ffb800] px-3.5 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#0a0a0a] active:scale-95"
+            className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#ff6b6b] px-4 py-2.5 text-[13px] font-bold text-white vh-lift"
           >
             <Share2 className="h-3.5 w-3.5" />
             Share
@@ -4166,37 +4165,37 @@ function ReceiverView({ pots, onShare, onReveal }: {
         </div>
 
         {/* ── Total Spark Goal Value hero ── */}
-        <div className="mt-5 border border-[#0a0a0a] bg-[#0a0a0a] px-5 py-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Total Spark Goal Value</p>
-          <p className="font-editorial mt-1 text-[40px] font-semibold leading-none text-[#f5f5f5]">
+        <div className="mt-5 rounded-[28px] bg-[#0f172a] px-6 py-6 vh-lift-lg">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f59e0b]">Total Spark Goal Value</p>
+          <p className="font-editorial mt-1.5 text-[44px] font-semibold leading-none text-[#fdf6e3]">
             £{totalTarget.toLocaleString()}
           </p>
-          <p className="mt-2 text-[11px] leading-snug tracking-tight text-[#f5f5f5]/50">
+          <p className="mt-2.5 text-[12px] leading-snug text-[#fdf6e3]/55">
             Across {sparkGoals.length} Kindle Fires — all held under wraps until reveal day
           </p>
         </div>
 
         {/* ── Dual event countdowns ── */}
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-3">
           {[
             { Icon: TreePine, label: "Christmas", days: xmasDays },
             { Icon: Cake,     label: "10th Birthday", days: bdayDays },
           ].map(({ Icon, label, days }) => (
-            <div key={label} className="border border-[rgba(10,10,10,0.12)] bg-[#fafafa] px-3 py-3">
+            <div key={label} className="rounded-2xl bg-[#fffdf7] px-4 py-4 vh-lift">
               <div className="mb-1.5 flex items-center gap-1.5">
-                <Icon className="h-4 w-4 shrink-0 text-[#0a0a0a]/50" strokeWidth={1.75} />
-                <p className="truncate text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0a0a0a]/50">{label}</p>
+                <Icon className="h-4 w-4 shrink-0 text-[#ff6b6b]" strokeWidth={1.75} />
+                <p className="truncate text-[10px] font-bold uppercase tracking-[0.1em] text-[#0f172a]/50">{label}</p>
               </div>
-              <p className="font-editorial text-[30px] font-semibold leading-none text-[#0a0a0a]">{days}</p>
-              <p className="mt-1 text-[9px] uppercase tracking-[0.15em] text-[#0a0a0a]/40">days away</p>
+              <p className="font-editorial text-[32px] font-semibold leading-none text-[#0f172a]">{days}</p>
+              <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#0f172a]/40">days away</p>
             </div>
           ))}
         </div>
 
         {/* Continuous-fire note */}
-        <div className="mt-3 flex items-start gap-2 border border-[#ffb800]/30 bg-[#ffb800]/[0.07] px-3 py-2.5">
-          <Flame className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ffb800]" strokeWidth={2} />
-          <p className="text-[11px] leading-snug tracking-tight text-[#0a0a0a]/70">
+        <div className="mt-3 flex items-start gap-2.5 rounded-2xl bg-[#f59e0b]/[0.1] px-3.5 py-3">
+          <Flame className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f59e0b]" strokeWidth={2} />
+          <p className="text-[11px] leading-snug text-[#0f172a]/70">
             These fires are continuous. A magical Reveal Ceremony will ignite on your next big occasion even if your Kindle Goals are only partially stoked!
           </p>
         </div>
@@ -4205,43 +4204,43 @@ function ReceiverView({ pots, onShare, onReveal }: {
       <div className="space-y-6 px-4 pb-20">
         {/* ── Unified Spark Goals stream — every fire locked under wraps ── */}
         <div>
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Your Spark Goals · all under wraps</p>
-          <div className="flex flex-col gap-3">
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Your Spark Goals · all under wraps</p>
+          <div className="flex flex-col gap-3.5">
             {sparkGoals.map((pot, i) => (
               <ReceiverPotCard key={pot.id} pot={pot} index={i} />
             ))}
           </div>
         </div>
 
-        {/* ── Receiver Reveal Demo — charcoal feature card ── */}
+        {/* ── Receiver Reveal Demo — Midnight feature card ── */}
         <motion.button
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.4, ease: LUX_EASE }}
+          whileTap={{ scale: 0.97 }}
+          transition={VH_BOUNCE}
           onClick={() => onReveal()}
-          className="relative w-full overflow-hidden border border-[#0a0a0a] bg-[#0a0a0a] text-left"
+          className="relative w-full overflow-hidden rounded-[24px] bg-[#0f172a] text-left vh-lift-lg"
         >
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             {CONFETTI_P.slice(0, 6).map((c) => (
-              <span key={c.id} className={cn("animate-confetti absolute opacity-20", c.color)}
+              <span key={c.id} className="animate-confetti absolute bg-[#f59e0b] opacity-25"
                 style={{ left: c.left, top: 0, width: c.w, height: c.h,
                   "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
             ))}
           </div>
-          <div className="relative flex items-center gap-4 p-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center bg-[#ffb800]">
-              <Sparkles className="h-7 w-7 text-[#0a0a0a]" strokeWidth={1.75} />
+          <div className="relative flex items-center gap-4 p-5">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#ff6b6b]">
+              <Sparkles className="h-7 w-7 text-white" strokeWidth={1.75} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="mb-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Experience Your Reveal Day</p>
-              <p className="font-editorial text-[16px] font-semibold leading-snug text-[#f5f5f5]">
+              <p className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.2em] text-[#f59e0b]">Experience Your Reveal Day</p>
+              <p className="font-editorial text-[17px] font-semibold leading-snug text-[#fdf6e3]">
                 See the magical reveal celebration
               </p>
-              <p className="mt-0.5 text-[11px] leading-snug tracking-tight text-[#f5f5f5]/50">
+              <p className="mt-0.5 text-[11px] leading-snug text-[#fdf6e3]/55">
                 Preview the cinematic ceremony your family will ignite when your fires are fully stoked
               </p>
             </div>
-            <div className="shrink-0 bg-[#ffb800] px-3 py-2">
-              <Play className="h-4 w-4 text-[#0a0a0a]" strokeWidth={2.5} />
+            <div className="shrink-0 rounded-full bg-[#ff6b6b] p-2.5">
+              <Play className="h-4 w-4 text-white" strokeWidth={2.5} />
             </div>
           </div>
         </motion.button>
@@ -4249,16 +4248,16 @@ function ReceiverView({ pots, onShare, onReveal }: {
         {/* ── Claimed / sorted ── */}
         {claimed.length > 0 && (
           <div>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0a0a0a]/40">Sorted</p>
-            <div className="flex flex-col gap-2">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#0f172a]/40">Sorted</p>
+            <div className="flex flex-col gap-2.5">
               {claimed.map((pot) => (
-                <div key={pot.id} className="flex items-center gap-3 border border-[rgba(10,10,10,0.12)] bg-[#fafafa] px-4 py-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-[#0a0a0a]">
-                    <Check className="h-4 w-4 text-[#ffb800]" strokeWidth={2.5} />
+                <div key={pot.id} className="flex items-center gap-3 rounded-2xl bg-[#fffdf7] px-4 py-3.5 vh-lift">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f59e0b]">
+                    <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-semibold tracking-tight text-[#0a0a0a]">{pot.title}</p>
-                    <p className="text-[11px] text-[#0a0a0a]/50">{pot.claimedBy} — on its way!</p>
+                    <p className="truncate text-[13px] font-bold tracking-tight text-[#0f172a]">{pot.title}</p>
+                    <p className="text-[11px] text-[#0f172a]/50">{pot.claimedBy} — on its way!</p>
                   </div>
                 </div>
               ))}
