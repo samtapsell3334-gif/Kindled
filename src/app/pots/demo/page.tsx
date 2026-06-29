@@ -11,8 +11,10 @@ import {
   Bike, Cake, TreePine, PenLine, Waves, Castle,
   AlertCircle, Copy, TrendingUp, Info, CircleEllipsis, CalendarDays, Gamepad2,
   Heart, Home, Shirt, Ticket, Dumbbell, Blocks, ImageOff, LayoutGrid,
+  Plane, UserPlus,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { projectCumulative, goalProgress, type JointContributor, type GiftingEvent } from "@/lib/cumulative-projection";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
@@ -4642,13 +4644,211 @@ function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
   );
 }
 
-type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about" | "stars" | "investor";
+// ─── JOINT FIRES — two partners, one Major Goal (Modern-Nostalgia / Monzo feel) ─
+// Charcoal canvas, bone-white type, a single amber action accent, glass cards,
+// an SVG "Momentum Arc" that fills toward the goal, and a 1/2/3-year projection.
+
+const JOINT_PARTNERS: (JointContributor & { initials: string; image: string })[] = [
+  { name: "Sam",  avgPerEvent: 200, initials: "S", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=faces&q=80" },
+  { name: "Jess", avgPerEvent: 130, initials: "J", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=faces&q=80" },
+];
+const JOINT_EVENTS: (GiftingEvent & { Icon: LucideIcon })[] = [
+  { label: "Birthdays",     perYear: 1, Icon: Cake },
+  { label: "Christmas",     perYear: 1, Icon: TreePine },
+  { label: "Anniversary",   perYear: 1, Icon: Heart },
+];
+const JOINT_GOAL = {
+  title: "The Maldives",
+  sub: "Overwater villa · 10 nights · for two",
+  value: 3200,
+  image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=900&h=600&fit=crop&q=85",
+};
+
+function MomentumArc({ progress, milestones }: { progress: number; milestones: { label: string; frac: number }[] }) {
+  const trackRef = useRef<SVGPathElement>(null);
+  const [pts, setPts] = useState<{ x: number; y: number }[]>([]);
+  const [goalPt, setGoalPt] = useState<{ x: number; y: number } | null>(null);
+  const D = "M 26 170 C 120 170, 150 60, 298 42";
+
+  useEffect(() => {
+    const p = trackRef.current;
+    if (!p) return;
+    const len = p.getTotalLength();
+    setPts(milestones.map((m) => { const pt = p.getPointAtLength(len * m.frac); return { x: pt.x, y: pt.y }; }));
+    const end = p.getPointAtLength(len);
+    setGoalPt({ x: end.x, y: end.y });
+  }, [milestones]);
+
+  return (
+    <svg viewBox="0 0 320 200" className="w-full">
+      <defs>
+        <linearGradient id="jfArc" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#d97706" />
+          <stop offset="100%" stopColor="#fbbf24" />
+        </linearGradient>
+        <filter id="jfGlow"><feGaussianBlur stdDeviation="2.4" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+      </defs>
+      <path ref={trackRef} d={D} fill="none" stroke="rgba(148,163,184,0.18)" strokeWidth="3" strokeLinecap="round" strokeDasharray="0.5 7" />
+      <motion.path d={D} fill="none" stroke="url(#jfArc)" strokeWidth="4.5" strokeLinecap="round" filter="url(#jfGlow)"
+        initial={{ pathLength: 0 }} animate={{ pathLength: Math.max(0.001, progress) }} transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }} />
+      {pts.map((pt, i) => {
+        const reached = progress >= milestones[i]!.frac;
+        return (
+          <g key={i}>
+            <circle cx={pt.x} cy={pt.y} r="5.5" fill={reached ? "#fbbf24" : "#1c1f27"} stroke={reached ? "#fff" : "rgba(148,163,184,0.45)"} strokeWidth="1.5" />
+            <text x={pt.x} y={pt.y - 12} textAnchor="middle" fill={reached ? "#fcd34d" : "#64748b"} fontSize="9" fontWeight="700">{milestones[i]!.label}</text>
+          </g>
+        );
+      })}
+      {goalPt && (
+        <g>
+          <circle cx={goalPt.x} cy={goalPt.y} r="6" fill="#1c1410" stroke="#fbbf24" strokeWidth="2.5" />
+          <circle cx={goalPt.x} cy={goalPt.y} r="2.5" fill="#fbbf24" />
+          <circle cx={goalPt.x} cy={goalPt.y} r="9" fill="none" stroke="#fbbf24" strokeOpacity="0.4">
+            <animate attributeName="r" values="9;16;9" dur="2.4s" repeatCount="indefinite" />
+            <animate attributeName="stroke-opacity" values="0.5;0;0.5" dur="2.4s" repeatCount="indefinite" />
+          </circle>
+          <text x={goalPt.x} y={goalPt.y - 14} textAnchor="middle" fill="#fcd34d" fontSize="9" fontWeight="800">GOAL</text>
+        </g>
+      )}
+    </svg>
+  );
+}
+
+function JointFireView() {
+  const projection = projectCumulative(JOINT_PARTNERS, JOINT_EVENTS);
+  const [horizon, setHorizon] = useState(3);
+  const current = projection.find((p) => p.year === horizon) ?? projection[projection.length - 1]!;
+  const progress = goalProgress(projection, JOINT_GOAL.value, horizon);
+  const funded = current.total >= JOINT_GOAL.value;
+  const milestones = [
+    { label: "Birthday", frac: 0.26 },
+    { label: "Xmas", frac: 0.54 },
+    { label: "Anniv.", frac: 0.8 },
+  ];
+
+  const reveal = { initial: { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "0px 0px -60px 0px" }, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } };
+
+  return (
+    <div className="min-h-screen px-4 pb-32 pt-6 text-stone-100" style={{ background: "linear-gradient(180deg,#14161b 0%,#191b22 100%)" }}>
+      {/* Header */}
+      <motion.div {...reveal} className="mb-6">
+        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-400/80">Joint Fire</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="mt-1.5 text-[26px] font-black leading-tight text-stone-50">Two of you. One big goal.</h2>
+        <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed text-slate-400">Link accounts and every birthday, Christmas and anniversary stacks toward something you&apos;d never buy on a single occasion.</p>
+      </motion.div>
+
+      {/* Goal hero card — real photography, glass overlay */}
+      <motion.div {...reveal} className="relative overflow-hidden rounded-3xl border border-white/10">
+        <img src={JOINT_GOAL.image} alt={JOINT_GOAL.title} className="h-52 w-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.opacity = "0.25"; }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,22,27,0.1) 0%, rgba(20,22,27,0.92) 100%)" }} />
+        {/* Dual avatars */}
+        <div className="absolute right-4 top-4 flex -space-x-3">
+          {JOINT_PARTNERS.map((p) => (
+            <div key={p.name} className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-[#14161b] bg-slate-700">
+              <span className="flex h-full w-full items-center justify-center text-[11px] font-black text-white">{p.initials}</span>
+              <img src={p.image} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover" onError={(e) => { e.currentTarget.remove(); }} />
+            </div>
+          ))}
+        </div>
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <div className="flex items-center gap-1.5">
+            <Plane className="h-3.5 w-3.5 text-amber-400" />
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400">Major Goal</p>
+          </div>
+          <p style={{ fontFamily: "var(--font-display)" }} className="mt-1 text-[24px] font-black leading-none text-white">{JOINT_GOAL.title}</p>
+          <p className="text-[12px] text-stone-300/80">{JOINT_GOAL.sub}</p>
+          <div className="mt-3 flex items-end justify-between">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-slate-400">Goal value</p>
+              <p className="text-[20px] font-black text-white tabular-nums">£{JOINT_GOAL.value.toLocaleString()}</p>
+            </div>
+            <span className={cn("rounded-full px-3 py-1 text-[11px] font-bold", funded ? "bg-amber-400 text-stone-900" : "bg-white/10 text-stone-200")}>
+              {funded ? `Funded by Year ${horizon}` : `${Math.round(progress * 100)}% of the way`}
+            </span>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Momentum Arc */}
+      <motion.div {...reveal} className="mt-4 rounded-3xl border border-white/10 bg-white/[0.035] p-5 backdrop-blur-sm">
+        <div className="mb-1 flex items-center justify-between">
+          <p className="text-[13px] font-bold text-stone-100">Momentum</p>
+          <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-400"><TrendingUp className="h-3.5 w-3.5" /> Building</span>
+        </div>
+        <p className="mb-2 text-[11px] text-slate-400">Each occasion is a booster on the way to the goal.</p>
+        <MomentumArc progress={progress} milestones={milestones} />
+      </motion.div>
+
+      {/* Projection calculator */}
+      <motion.div {...reveal} className="mt-4 rounded-3xl border border-white/10 bg-white/[0.035] p-5 backdrop-blur-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Projected Total Fire Value</p>
+            <p className="text-[11px] text-slate-500">Sam &amp; Jess · avg of past gifts · {horizon}-year horizon</p>
+          </div>
+          <div className="flex rounded-xl border border-white/10 bg-black/20 p-0.5">
+            {[1, 2, 3].map((y) => (
+              <button key={y} onClick={() => setHorizon(y)}
+                className={cn("rounded-lg px-3 py-1.5 text-[12px] font-bold transition-colors", horizon === y ? "bg-amber-400 text-stone-900" : "text-slate-400 hover:text-stone-200")}>
+                {y}yr
+              </button>
+            ))}
+          </div>
+        </div>
+        <AnimatePresence mode="wait">
+          <motion.p key={current.total} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            style={{ fontFamily: "var(--font-display)" }} className="mt-3 text-[48px] font-black leading-none text-white tabular-nums">
+            £{current.total.toLocaleString()}
+          </motion.p>
+        </AnimatePresence>
+        <p className="mt-1 text-[12px] text-slate-400">across {current.events} occasions · {Math.round(progress * 100)}% of the way to {JOINT_GOAL.title}</p>
+        {/* progress bar */}
+        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
+          <motion.div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300" initial={{ width: 0 }} animate={{ width: `${Math.round(progress * 100)}%` }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} />
+        </div>
+      </motion.div>
+
+      {/* Event timeline / macro-pot */}
+      <motion.div {...reveal} className="mt-4">
+        <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">What stacks into the goal</p>
+        <div className="space-y-2.5">
+          {JOINT_EVENTS.map((ev) => {
+            const perEvent = JOINT_PARTNERS.reduce((s, p) => s + p.avgPerEvent, 0);
+            return (
+              <div key={ev.label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] p-3.5 backdrop-blur-sm">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10">
+                  <ev.Icon className="h-5 w-5 text-amber-400" strokeWidth={1.75} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-bold text-stone-100">{ev.label}</p>
+                  <p className="text-[11px] text-slate-400">Both circles chip in · adds to the macro-pot</p>
+                </div>
+                <p className="text-[15px] font-black text-amber-400 tabular-nums">+£{perEvent.toLocaleString()}</p>
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      {/* Invite partner CTA */}
+      <motion.button {...reveal}
+        className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/[0.08] py-3.5 text-[14px] font-bold text-amber-300 transition-colors active:scale-[0.99] hover:bg-amber-400/[0.14]">
+        <UserPlus className="h-4 w-4" /> Invite a partner to your Joint Fire
+      </motion.button>
+      <p className="mt-3 text-center text-[10px] leading-relaxed text-slate-500">Free to link · withdraw anytime · funds held on regulated Open Banking rails</p>
+    </div>
+  );
+}
+
+type ViewMode = "parent" | "receiver" | "catalogue" | "reveal" | "about" | "stars" | "investor" | "joint";
 
 function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMode) => void }) {
   const tabs: { id: ViewMode; label: string; Icon: typeof Users }[] = [
     { id: "parent", label: "Kindlers", Icon: Users },
     { id: "receiver", label: "Billy's View", Icon: Sparkles },
     { id: "stars", label: "Stars", Icon: Star },
+    { id: "joint", label: "Joint Fire", Icon: Link2 },
     { id: "catalogue", label: "Catalogue", Icon: ShoppingBag },
     { id: "reveal", label: "Reveal", Icon: Sparkles },
     { id: "about", label: "About", Icon: Info },
@@ -4674,7 +4874,9 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
                       ? "bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md"
                       : id === "investor"
                         ? "bg-gradient-to-br from-slate-800 to-blue-900 text-white shadow-md"
-                        : "bg-white shadow-sm text-stone-900"
+                        : id === "joint"
+                          ? "bg-amber-400 text-stone-900 shadow-md"
+                          : "bg-white shadow-sm text-stone-900"
                 : id === "reveal"
                   ? "text-amber-500"
                   : id === "catalogue"
@@ -4683,10 +4885,12 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
                       ? "text-violet-500"
                       : id === "investor"
                         ? "text-blue-600"
-                        : "text-stone-400",
+                        : id === "joint"
+                          ? "text-amber-600"
+                          : "text-stone-400",
             )}
           >
-            {role === id && id !== "reveal" && id !== "catalogue" && id !== "stars" && id !== "investor" && (
+            {role === id && id !== "reveal" && id !== "catalogue" && id !== "stars" && id !== "investor" && id !== "joint" && (
               <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
             )}
             <Icon className="h-3.5 w-3.5" strokeWidth={role === id ? 2.5 : 1.75} />
@@ -5213,6 +5417,10 @@ export default function DemoPage() {
               <InvestorWarRoom embedded />
             </InvestorPinGate>
           </div>
+        </motion.div>
+      ) : viewMode === "joint" ? (
+        <motion.div key="joint" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
+          <JointFireView />
         </motion.div>
       ) : viewMode === "catalogue" ? (
         <motion.div key="catalogue" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>

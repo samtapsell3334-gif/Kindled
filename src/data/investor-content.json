@@ -67,6 +67,19 @@
     ]
   },
 
+  "jointFires": {
+    "label": "Joint Fires",
+    "title": "The 3-Year Compound Effect",
+    "body": "Two people linking their gifting potential turns scattered, single-occasion spend into a funded Major Goal. Pooled across three years, every birthday, Christmas and anniversary stacks — lifting conversion on high-ticket items and locking both networks into the loop.",
+    "stat": { "value": "+40%", "label": "conversion on high-ticket goals when two partners pool over 3 years" },
+    "projection": [
+      { "year": "Year 1", "value": "£990",   "pct": 30 },
+      { "year": "Year 2", "value": "£2,079", "pct": 63 },
+      { "year": "Year 3", "value": "£3,277", "pct": 100 }
+    ],
+    "caption": "Modelled: two partners, three occasions a year, 10% momentum. A solo pot never reaches the high-ticket goal — a Joint Fire does."
+  },
+
   "valueEngine": {
     "headline": "The Value Engine",
     "subheadline": "We make money while actively rewarding the user. That alignment is the moat.",

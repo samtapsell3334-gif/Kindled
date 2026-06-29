@@ -78,6 +78,8 @@ model User {
   updatedAt             DateTime @updatedAt
 
   potsCreated   Pot[]            @relation("PotCreator")
+  /// Joint Fires this user has been linked into by a partner (they are not the creator).
+  jointPots     Pot[]            @relation("PotPartner")
   contributions Contribution[]   @relation("ContributionGiver")
   intentNodes   IntentDataNode[]
 
@@ -107,6 +109,13 @@ model Pot {
   /// can receive contributions at Christmas AND a birthday without being closed).
   /// Enables the continuous-pot architecture central to the Kindling flywheel.
   continuous     Boolean     @default(true)
+  /// Joint Fire: when true, this pot pools two users' gifting potential toward a
+  /// shared long-term Major Goal (e.g. The Big Holiday), stacking recurring events
+  /// (birthdays, Christmas, anniversaries) into a single macro-pot.
+  isJoint        Boolean     @default(false)
+  /// The partner account linked into this Joint Fire (the second contributor's
+  /// User id). Null for solo pots. Pairs with isJoint.
+  linkedUserId   String?
   /// The next milestone reveal date (e.g. Christmas morning or a birthday).
   /// Null for LIVE_FEED pots with no fixed deadline.
   eventDate      DateTime?
@@ -117,6 +126,8 @@ model Pot {
   updatedAt      DateTime    @updatedAt
 
   creator       User             @relation("PotCreator", fields: [creatorId], references: [id])
+  /// The linked partner on a Joint Fire (the inviter is `creator`).
+  linkedUser    User?            @relation("PotPartner", fields: [linkedUserId], references: [id])
   items         PotItem[]
   contributions Contribution[]
   intentNodes   IntentDataNode[]
@@ -128,6 +139,8 @@ model Pot {
   @@index([creatorId, status])
   // AdTech: segment programmatic bids by gifting mode and status
   @@index([mode, status])
+  // Joint Fires: resolve a partner's linked macro-pots
+  @@index([isJoint, linkedUserId])
   @@map("pots")
 }
 

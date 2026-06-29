@@ -203,8 +203,23 @@ function OpportunityTab() {
 
 // ─── TAB: THE MECHANISM ───────────────────────────────────────────────────────
 
+function ProjBar({ year, value, pct, delay }: { year: string; value: string; pct: number; delay: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  return (
+    <div ref={ref} className="flex flex-1 flex-col items-center gap-1.5">
+      <p className="text-[13px] font-black text-white">{value}</p>
+      <div className="flex h-28 w-full items-end justify-center rounded-xl bg-slate-800/40 p-1.5">
+        <motion.div className="w-full rounded-lg bg-gradient-to-t from-amber-600 to-amber-400"
+          initial={{ height: "2%" }} animate={inView ? { height: `${pct}%` } : {}} transition={{ duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] }} />
+      </div>
+      <p className="text-[10px] text-slate-500">{year}</p>
+    </div>
+  );
+}
+
 function MechanismTab() {
-  const { mechanism } = content;
+  const { mechanism, jointFires: jf } = content;
   const ICONS: Record<string, React.ElementType> = { viral: Users, intent: Database, overhead: Cpu };
   return (
     <div className="space-y-9">
@@ -234,6 +249,27 @@ function MechanismTab() {
         <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">The loop, visualised</p>
         <FlywheelDiagram />
       </div>
+
+      {/* Joint Fires — the 3-year compound effect */}
+      <Reveal>
+        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-900 to-amber-950/10 p-6">
+          <div className="flex flex-wrap items-start justify-between gap-5">
+            <div className="max-w-md">
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-amber-400/80">{jf.label}</p>
+              <p className="text-[18px] font-bold text-white">{jf.title}</p>
+              <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{jf.body}</p>
+            </div>
+            <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.07] px-5 py-4 text-center">
+              <p className="text-[34px] font-black leading-none text-amber-400">{jf.stat.value}</p>
+              <p className="mx-auto mt-1.5 max-w-[150px] text-[10px] leading-tight text-slate-400">{jf.stat.label}</p>
+            </div>
+          </div>
+          <div className="mt-6 flex items-end gap-3">
+            {jf.projection.map((p, i) => <ProjBar key={p.year} year={p.year} value={p.value} pct={p.pct} delay={i * 0.1} />)}
+          </div>
+          <p className="mt-4 text-[12px] leading-relaxed text-slate-500">{jf.caption}</p>
+        </div>
+      </Reveal>
     </div>
   );
 }
