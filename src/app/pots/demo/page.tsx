@@ -2426,10 +2426,10 @@ function parseProductUrl(raw: string): { title: string; price: string; image?: s
 }
 
 const EVENT_OPTIONS: { type: EventType; label: string; color: string }[] = [
-  { type: "birthday",  label: "Birthday",  color: "#f59e0b" },
-  { type: "christmas", label: "Christmas", color: "#ef4444" },
-  { type: "custom",    label: "Other",     color: "#a78bfa" },
-  { type: "ongoing",   label: "Ongoing",   color: "#38bdf8" },
+  { type: "birthday",  label: "Birthday",  color: "#0a0a0a" },
+  { type: "christmas", label: "Christmas", color: "#0a0a0a" },
+  { type: "custom",    label: "Other",     color: "#0a0a0a" },
+  { type: "ongoing",   label: "Ongoing",   color: "#0a0a0a" },
 ];
 
 const ACCENT_GRADIENTS = [
@@ -2565,16 +2565,16 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
       >
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="h-1 w-10 rounded-full bg-stone-300" />
+          <div className="h-1 w-10 rounded-full bg-[rgba(10,10,10,0.22)]" />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 pb-3 pt-1">
           <div>
-            <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold text-stone-900 leading-tight">New Gift</h2>
-            <p className="text-[12px] text-stone-400">Add something special to the list</p>
+            <h2 className="font-editorial text-[20px] font-semibold text-[#0a0a0a] leading-tight">New Gift</h2>
+            <p className="text-[12px] text-[#0a0a0a]/45">Add something special to the list</p>
           </div>
-          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 text-stone-500 active:scale-95 transition-transform">
+          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f0f0f0] text-[#0a0a0a]/55 active:scale-95 transition-transform">
             <span className="text-[14px] font-bold leading-none">✕</span>
           </button>
         </div>
@@ -2583,14 +2583,14 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
         <div className="flex-1 overflow-y-auto px-5 pb-8 space-y-5">
 
           {/* Mode toggle */}
-          <div className="flex rounded-xl bg-stone-100 p-1 gap-1">
+          <div className="flex rounded-xl bg-[#f0f0f0] p-1 gap-1">
             {(["link", "manual"] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => { setMode(m); setTitle(""); setAmount(""); setUrl(""); setFetchState("idle"); }}
                 className={cn(
                   "flex-1 rounded-lg py-2 text-[13px] font-semibold transition-all",
-                  mode === m ? "bg-white shadow text-stone-900" : "text-stone-400",
+                  mode === m ? "bg-white shadow text-[#0a0a0a]" : "text-[#0a0a0a]/45",
                 )}
               >
                 <span className="inline-flex items-center gap-1.5">
@@ -2610,11 +2610,11 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   placeholder="amazon.co.uk/... or any product URL"
                   value={url}
                   onChange={(e) => handleUrlChange(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 pr-20 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none transition-colors"
+                  className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white px-4 py-3 pr-20 text-[14px] text-[#0a0a0a] placeholder:text-[#0a0a0a]/45 focus:border-[#ffb800] focus:outline-none transition-colors"
                 />
                 <button
                   onClick={() => { void handlePaste(); }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-amber-100 px-3 py-1.5 text-[12px] font-semibold text-amber-700 active:scale-95 transition-transform"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#ffb800]/15 px-3 py-1.5 text-[12px] font-semibold text-[#0a0a0a] active:scale-95 transition-transform"
                 >
                   Paste
                 </button>
@@ -2625,18 +2625,18 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3"
+                  className="flex items-center gap-3 rounded-xl bg-[#ffb800]/[0.08] border border-[#ffb800]/30 px-4 py-3"
                 >
                   <div className="flex gap-1">
                     {[0, 1, 2].map((i) => (
                       <span
                         key={i}
-                        className="h-2 w-2 rounded-full bg-amber-400"
+                        className="h-2 w-2 rounded-full bg-[#ffb800]"
                         style={{ animation: `bounce 0.9s ${i * 0.15}s ease-in-out infinite` }}
                       />
                     ))}
                   </div>
-                  <p className="text-[13px] font-medium text-amber-700">Fetching product details…</p>
+                  <p className="text-[13px] font-medium text-[#0a0a0a]">Fetching product details…</p>
                 </motion.div>
               )}
 
@@ -2646,32 +2646,32 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-3"
+                  className="rounded-xl border border-[rgba(10,10,10,0.12)] bg-[#f0f0f0] p-4 space-y-3"
                 >
                   <div className="flex items-start gap-3">
                     {scrapedImage && (
-                      <img src={scrapedImage} alt="" className="h-16 w-16 rounded-lg object-cover shrink-0 border border-emerald-200" />
+                      <img src={scrapedImage} alt="" className="h-16 w-16 rounded-lg object-cover shrink-0 border border-[rgba(10,10,10,0.12)]" />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" strokeWidth={2.5} />
-                        <p className="text-[12px] font-semibold text-emerald-700">Product details found — edit if needed</p>
+                        <Check className="h-3.5 w-3.5 text-[#0a0a0a]/70 shrink-0" strokeWidth={2.5} />
+                        <p className="text-[12px] font-semibold text-[#0a0a0a]">Product details found — edit if needed</p>
                       </div>
                       <input
                         type="text"
                         placeholder="Product name"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none mb-2"
+                        className="w-full rounded-lg border border-[rgba(10,10,10,0.12)] bg-white px-3 py-2 text-[14px] text-[#0a0a0a] focus:border-[#ffb800] focus:outline-none mb-2"
                       />
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-semibold text-stone-400">£</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-semibold text-[#0a0a0a]/45">£</span>
                         <input
                           type="number"
                           placeholder="0.00"
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
-                          className="w-full rounded-lg border border-stone-200 bg-white pl-7 pr-3 py-2 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none"
+                          className="w-full rounded-lg border border-[rgba(10,10,10,0.12)] bg-white pl-7 pr-3 py-2 text-[14px] text-[#0a0a0a] focus:border-[#ffb800] focus:outline-none"
                         />
                       </div>
                     </div>
@@ -2693,16 +2693,16 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 placeholder="Gift name e.g. LEGO Technic Ferrari"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none transition-colors"
+                className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white px-4 py-3 text-[14px] text-[#0a0a0a] placeholder:text-[#0a0a0a]/45 focus:border-[#ffb800] focus:outline-none transition-colors"
               />
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[15px] font-semibold text-stone-400">£</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[15px] font-semibold text-[#0a0a0a]/45">£</span>
                 <input
                   type="number"
                   placeholder="Goal amount"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-white pl-8 pr-4 py-3 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none transition-colors"
+                  className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white pl-8 pr-4 py-3 text-[14px] text-[#0a0a0a] placeholder:text-[#0a0a0a]/45 focus:border-[#ffb800] focus:outline-none transition-colors"
                 />
               </div>
             </motion.div>
@@ -2710,7 +2710,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
 
           {/* Event type */}
           <div className="space-y-2">
-            <p className="text-[12px] font-semibold uppercase tracking-wider text-stone-400">For which event?</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-[#0a0a0a]/45">For which event?</p>
             <div className="grid grid-cols-4 gap-2">
               {EVENT_OPTIONS.map((ev) => (
                 <button
@@ -2719,8 +2719,8 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   className={cn(
                     "flex flex-col items-center gap-1 rounded-xl py-3 text-center transition-all",
                     eventType === ev.type
-                      ? "bg-amber-400 text-stone-900 shadow-md shadow-amber-200"
-                      : "bg-stone-100 text-stone-500",
+                      ? "bg-[#ffb800] text-[#0a0a0a] shadow-md shadow-[#ffb800]/30"
+                      : "bg-[#f0f0f0] text-[#0a0a0a]/55",
                   )}
                 >
                   <div className="h-5 w-5 rounded-full" style={{ background: ev.color }} />
@@ -2745,14 +2745,14 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                     placeholder="Event name e.g. Graduation"
                     value={customLabel}
                     onChange={(e) => setCustomLabel(e.target.value)}
-                    className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-[14px] text-stone-800 placeholder:text-stone-400 focus:border-amber-400 focus:outline-none"
+                    className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white px-4 py-3 text-[14px] text-[#0a0a0a] placeholder:text-[#0a0a0a]/45 focus:border-[#ffb800] focus:outline-none"
                   />
                 )}
                 <input
                   type="date"
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-[14px] text-stone-800 focus:border-amber-400 focus:outline-none"
+                  className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white px-4 py-3 text-[14px] text-[#0a0a0a] focus:border-[#ffb800] focus:outline-none"
                 />
               </motion.div>
             )}
@@ -2768,17 +2768,17 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 onClick={() => setIsSurprise((v) => !v)}
                 className={cn(
                   "flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all",
-                  isSurprise ? "border-amber-300 bg-amber-50" : "border-stone-200 bg-white",
+                  isSurprise ? "border-[#ffb800] bg-[#ffb800]/[0.08]" : "border-[rgba(10,10,10,0.12)] bg-white",
                 )}
               >
                 {isSurprise
-                  ? <Lock className="h-6 w-6 text-amber-500" strokeWidth={1.75} />
-                  : <Eye className="h-6 w-6 text-stone-400" strokeWidth={1.75} />}
+                  ? <Lock className="h-6 w-6 text-[#ffb800]" strokeWidth={1.75} />
+                  : <Eye className="h-6 w-6 text-[#0a0a0a]/45" strokeWidth={1.75} />}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-stone-800">
+                  <p className="text-[14px] font-semibold text-[#0a0a0a]">
                     {isSurprise ? "Keep it a surprise" : "Visible to everyone"}
                   </p>
-                  <p className="text-[12px] text-stone-400 mt-0.5">
+                  <p className="text-[12px] text-[#0a0a0a]/45 mt-0.5">
                     {isSurprise
                       ? "Hidden from the recipient until the big day"
                       : "Recipient can see progress and contributions"}
@@ -2786,7 +2786,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 </div>
                 <div className={cn(
                   "h-6 w-11 rounded-full transition-colors relative",
-                  isSurprise ? "bg-amber-400" : "bg-stone-200",
+                  isSurprise ? "bg-[#ffb800]" : "bg-[rgba(10,10,10,0.12)]",
                 )}>
                   <div className={cn(
                     "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
@@ -2806,8 +2806,8 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
             className={cn(
               "flex w-full items-center justify-center gap-2.5 rounded-2xl py-4 text-[16px] font-semibold transition-all",
               canSubmit
-                ? "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900 shadow-lg shadow-amber-200"
-                : "bg-stone-100 text-stone-400 cursor-not-allowed",
+                ? "bg-gradient-to-r from-[#ffb800] to-[#f59e0b] text-[#0a0a0a] shadow-lg shadow-[#ffb800]/30"
+                : "bg-[#f0f0f0] text-[#0a0a0a]/45 cursor-not-allowed",
             )}
           >
             <Gift className="h-[18px] w-[18px]" strokeWidth={2} />
@@ -3096,41 +3096,41 @@ const EMBERS_V2 = Array.from({ length: 24 }, (_, i) => ({
 const V2_POTS = [
   { id: "p1", name: "Super-Fast Mountain Bike", sub: "Trek Marlin 5 · Your #1 wish",
     amount: 310, goal: 310, Icon: Bike,
-    grad: "from-amber-400 to-orange-500", glow: "#f97316", complete: true,
+    grad: "from-[#ffb800] to-[#f59e0b]", glow: "#ffb800", complete: true,
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop&q=85",
     retailer: "Halfords", boost: 5,
     buyUrl: "https://www.amazon.co.uk/s?k=Trek+Marlin+5+mountain+bike&tag=kindled-21" },
   { id: "p2", name: "LEGO Millennium Falcon", sub: "Star Wars · 3,187 pieces",
     amount: 89, goal: 89, Icon: Package,
-    grad: "from-violet-400 to-purple-500", glow: "#8b5cf6", complete: true,
+    grad: "from-[#ffb800] to-[#f59e0b]", glow: "#ffb800", complete: true,
     image: "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=600&h=600&fit=crop&q=85",
     retailer: "LEGO Store", boost: 4,
     buyUrl: "https://www.amazon.co.uk/s?k=LEGO+Millennium+Falcon&tag=kindled-21" },
   { id: "p3", name: "PS5 Gaming Bundle", sub: "3 games · controller included",
     amount: 75, goal: 80, Icon: Gamepad2,
-    grad: "from-blue-400 to-sky-400", glow: "#38bdf8", complete: false,
+    grad: "from-[#ffb800] to-[#f59e0b]", glow: "#ffb800", complete: false,
     image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&h=600&fit=crop&q=85",
     retailer: "Currys", boost: 3,
     buyUrl: "https://www.amazon.co.uk/s?k=PlayStation+5+console+bundle&tag=kindled-21" },
 ];
 
 const V2_CONTRIBS = [
-  { name: "Mum & Dad", amount: 150, initials: "MD", grad: "from-amber-400 to-orange-500", pot: "Mountain Bike",
+  { name: "Mum & Dad", amount: 150, initials: "MD", grad: "from-[#ffb800] to-[#f59e0b]", pot: "Mountain Bike",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "We are so proud of who you are becoming. You deserve every single part of this. We love you to the moon and back, always." },
-  { name: "Grandma Linda", amount: 50, initials: "GL", grad: "from-rose-400 to-pink-500", pot: "Mountain Bike",
+  { name: "Grandma Linda", amount: 50, initials: "GL", grad: "from-[#ffb800] to-[#f59e0b]", pot: "Mountain Bike",
     image: "https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "I've watched you grow into someone truly special. This is just the beginning of your adventures, my darling. Ride fast and smile wide." },
-  { name: "Uncle Steve", amount: 35, initials: "US", grad: "from-blue-400 to-violet-500", pot: "LEGO Set",
+  { name: "Uncle Steve", amount: 35, initials: "US", grad: "from-[#ffb800] to-[#f59e0b]", pot: "LEGO Set",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "Every ride is going to be an adventure. I can't wait to hear the stories — go fast, stay safe, have the absolute best time." },
-  { name: "Auntie Claire", amount: 25, initials: "AC", grad: "from-emerald-400 to-teal-500", pot: "PS5 Bundle",
+  { name: "Auntie Claire", amount: 25, initials: "AC", grad: "from-[#ffb800] to-[#f59e0b]", pot: "PS5 Bundle",
     image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "Happy birthday to the most brilliant kid I know. This is from everyone who loves watching you shine. Enjoy every second." },
-  { name: "Nana Joyce", amount: 30, initials: "NJ", grad: "from-violet-400 to-fuchsia-500", pot: "Mountain Bike",
+  { name: "Nana Joyce", amount: 30, initials: "NJ", grad: "from-[#ffb800] to-[#f59e0b]", pot: "Mountain Bike",
     image: "https://images.unsplash.com/photo-1592621385612-4d7129426394?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "I hope every single ride reminds you just how deeply you are loved. You make all of us so incredibly happy and proud." },
-  { name: "School Friends", amount: 20, initials: "SF", grad: "from-teal-400 to-cyan-500", pot: "LEGO Set",
+  { name: "School Friends", amount: 20, initials: "SF", grad: "from-[#ffb800] to-[#f59e0b]", pot: "LEGO Set",
     image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop&q=80",
     msg: "From all the gang — go absolutely smash it! You are the absolute best. See you at the park very soon." },
 ];
@@ -3153,7 +3153,7 @@ function useFireworks(canvasRef: React.RefObject<HTMLCanvasElement | null>, acti
     let raf = 0;
     interface FParticle { x: number; y: number; vx: number; vy: number; alpha: number; color: string; size: number; trail: [number, number][]; }
     const particles: FParticle[] = [];
-    const COLORS = ["#fbbf24", "#f97316", "#ef4444", "#a855f7", "#3b82f6", "#10b981", "#f43f5e", "#fff"];
+    const COLORS = ["#ffb800", "#ffb800", "#ef4444", "#a855f7", "#3b82f6", "#10b981", "#ffb800", "#fff"];
     let t = 0;
 
     function explode(x: number, y: number) {
@@ -3264,7 +3264,7 @@ function RevealV2View() {
           <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.04 }}
             transition={{ duration: 0.45 }}
             className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center"
-            style={{ background: "radial-gradient(ellipse 90% 65% at 50% 65%,#180900,#000)" }}>
+            style={{ background: "radial-gradient(ellipse 90% 65% at 50% 65%,#101010,#000)" }}>
             {EMBERS_V2.map((e) => (
               <span key={e.id} className="pointer-events-none absolute rounded-full bg-amber-400/55"
                 style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
@@ -3273,7 +3273,7 @@ function RevealV2View() {
             <motion.div animate={{ scale: [1, 1.1, 1], opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
               className="mb-7 flex h-20 w-20 items-center justify-center rounded-3xl"
-              style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 50px rgba(251,146,60,0.65),0 0 100px rgba(251,146,60,0.3)" }}>
+              style={{ background: "linear-gradient(135deg,#ffb800,#ffb800)", boxShadow: "0 0 50px rgba(251,146,60,0.65),0 0 100px rgba(251,146,60,0.3)" }}>
               <Flame className="h-10 w-10 text-stone-900" strokeWidth={1.5} />
             </motion.div>
             <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
@@ -3284,7 +3284,7 @@ function RevealV2View() {
               style={{ fontFamily: "var(--font-display)" }}
               className="mb-3 text-[40px] font-black leading-tight text-white md:text-[52px]">
               The moment<br />
-              <span style={{ backgroundImage: "linear-gradient(135deg,#fbbf24,#f97316,#f43f5e)" }}
+              <span style={{ backgroundImage: "linear-gradient(135deg,#ffb800,#ffb800,#ffb800)" }}
                 className="bg-clip-text text-transparent">they&apos;ve been waiting for</span>
             </motion.h2>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
@@ -3305,7 +3305,7 @@ function RevealV2View() {
             <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.85 }}
               whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.05, y: -2 }} onClick={launch}
               className="flex items-center gap-3 rounded-2xl px-8 py-4 text-[16px] font-black text-stone-900"
-              style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 40px rgba(251,146,60,0.5),0 8px 32px rgba(0,0,0,0.5)" }}>
+              style={{ background: "linear-gradient(135deg,#ffb800,#ffb800)", boxShadow: "0 0 40px rgba(251,146,60,0.5),0 8px 32px rgba(0,0,0,0.5)" }}>
               <Flame className="h-5 w-5" />
               Ignite Billy&apos;s Reveal
               <Sparkles className="h-5 w-5" />
@@ -3341,7 +3341,7 @@ function RevealV2View() {
           <motion.div key="name" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.08 }}
             transition={{ duration: 0.35 }}
             className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden"
-            style={{ background: "radial-gradient(ellipse 110% 80% at 50% 60%,#220b00,#000)" }}>
+            style={{ background: "radial-gradient(ellipse 110% 80% at 50% 60%,#141414,#000)" }}>
             {EMBERS_V2.map((e) => (
               <span key={e.id} className="pointer-events-none absolute rounded-full bg-amber-400/70"
                 style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
@@ -3354,7 +3354,7 @@ function RevealV2View() {
                 <motion.span key={i} initial={{ opacity: 0, y: 50, scale: 0.4 }} animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{ delay: 0.25 + i * 0.11, type: "spring", stiffness: 520, damping: 22 }}
                   style={{ fontFamily: "var(--font-display)",
-                    backgroundImage: "linear-gradient(180deg,#fde68a 0%,#fbbf24 35%,#f97316 100%)",
+                    backgroundImage: "linear-gradient(180deg,#fde68a 0%,#ffb800 35%,#ffb800 100%)",
                     textShadow: "0 0 40px rgba(251,146,60,0.9),0 0 80px rgba(251,146,60,0.45)" }}
                   className="bg-clip-text text-[80px] font-black leading-none text-transparent md:text-[110px]">
                   {letter}
@@ -3384,7 +3384,7 @@ function RevealV2View() {
           <motion.div key="pots" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.04 }}
             transition={{ duration: 0.35 }}
             className="absolute inset-0 z-20 flex flex-col justify-center px-4 overflow-y-auto py-6"
-            style={{ background: "radial-gradient(ellipse 110% 70% at 50% 30%,#120600,#000)" }}>
+            style={{ background: "radial-gradient(ellipse 110% 70% at 50% 30%,#0d0d0d,#000)" }}>
 
             {/* Ambient glow */}
             <div className="pointer-events-none absolute inset-0"
@@ -3421,7 +3421,7 @@ function RevealV2View() {
                       transition={{ type: "spring", stiffness: 400, damping: 24 }}
                       className="relative overflow-hidden rounded-2xl"
                       style={{
-                        background: "linear-gradient(145deg,#1a0800,#090100)",
+                        background: "linear-gradient(145deg,#111111,#0a0a0a)",
                         border: `1px solid ${pot.complete ? "rgba(251,146,60,0.28)" : "rgba(255,255,255,0.07)"}`,
                         boxShadow: pot.complete
                           ? `0 0 0 1px ${pot.glow}22, 0 12px 48px ${pot.glow}35, 0 4px 16px rgba(0,0,0,0.8)`
@@ -3519,7 +3519,7 @@ function RevealV2View() {
                   whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.03, y: -2 }}
                   onClick={goContributors}
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-black text-stone-900"
-                  style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 8px 32px rgba(251,146,60,0.45),0 2px 8px rgba(0,0,0,0.5)" }}>
+                  style={{ background: "linear-gradient(135deg,#ffb800,#ffb800)", boxShadow: "0 8px 32px rgba(251,146,60,0.45),0 2px 8px rgba(0,0,0,0.5)" }}>
                   <Users className="h-5 w-5" />
                   Meet the {V2_CONTRIBS.length} people who made this happen
                   <ChevronRight className="h-5 w-5" />
@@ -3538,7 +3538,7 @@ function RevealV2View() {
             exit={{ opacity: 0, y: -55, scale: 1.04 }}
             transition={{ type: "spring", stiffness: 380, damping: 28 }}
             className="absolute inset-0 z-30 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
-            style={{ background: "radial-gradient(ellipse 80% 60% at 50% 50%,#0d0015,#000)" }}>
+            style={{ background: "radial-gradient(ellipse 80% 60% at 50% 50%,#0c0c0c,#000)" }}>
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
               {EMBERS_V2.slice(0, 10).map((e) => (
                 <span key={e.id} className="absolute rounded-full bg-amber-400/25"
@@ -3585,8 +3585,8 @@ function RevealV2View() {
               className="mb-6 w-full max-w-sm rounded-2xl border border-white/8 bg-white/[0.04] px-5 py-4 backdrop-blur-sm text-left"
               style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)" }}>
               <div className="mb-2.5 flex items-center gap-1.5">
-                <Sparkles className="h-3 w-3 text-violet-400" />
-                <p className="text-[9px] font-black uppercase tracking-widest text-violet-400/65">Personal message</p>
+                <Sparkles className="h-3 w-3 text-[#ffb800]" />
+                <p className="text-[9px] font-black uppercase tracking-widest text-[#ffb800]/65">Personal message</p>
               </div>
               <p className="min-h-[72px] text-[13px] leading-relaxed text-white/75 italic">
                 &ldquo;<TypedMessage text={contrib.msg} delay={500} />&rdquo;
@@ -3610,7 +3610,7 @@ function RevealV2View() {
         {phase === "share" && (
           <motion.div key="share" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center overflow-hidden"
-            style={{ background: "radial-gradient(ellipse 100% 70% at 50% 40%,#1c0800,#000)" }}>
+            style={{ background: "radial-gradient(ellipse 100% 70% at 50% 40%,#121212,#000)" }}>
             {EMBERS_V2.map((e) => (
               <span key={e.id} className="pointer-events-none absolute rounded-full bg-amber-400/45"
                 style={{ left: e.left, bottom: 0, width: e.size, height: e.size,
@@ -3620,7 +3620,7 @@ function RevealV2View() {
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 14, -10, 6, 0] }}
               transition={{ type: "spring", stiffness: 400, damping: 18, delay: 0.1 }}
               className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl"
-              style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", boxShadow: "0 0 50px rgba(251,146,60,0.6),0 0 100px rgba(251,146,60,0.25)" }}>
+              style={{ background: "linear-gradient(135deg,#ffb800,#ffb800)", boxShadow: "0 0 50px rgba(251,146,60,0.6),0 0 100px rgba(251,146,60,0.25)" }}>
               <Sparkles className="h-10 w-10 text-stone-900" />
             </motion.div>
 
@@ -3628,7 +3628,7 @@ function RevealV2View() {
               style={{ fontFamily: "var(--font-display)" }}
               className="mb-2 text-[44px] font-black leading-tight text-white">
               That&apos;s a wrap,{" "}
-              <span style={{ backgroundImage: "linear-gradient(135deg,#fbbf24,#f97316)" }} className="bg-clip-text text-transparent">Billy!</span>
+              <span style={{ backgroundImage: "linear-gradient(135deg,#ffb800,#ffb800)" }} className="bg-clip-text text-transparent">Billy!</span>
             </motion.h2>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
               className="mb-7 max-w-xs text-[14px] leading-relaxed text-white/40">
@@ -3662,7 +3662,7 @@ function RevealV2View() {
               className="flex w-full max-w-xs flex-col gap-3">
               <button
                 onClick={() => { void navigator.clipboard.writeText("https://kindledgift.co.uk").catch(() => null); }}
-                className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900"
+                className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#ffb800] to-[#f59e0b] py-4 text-[15px] font-bold text-stone-900"
                 style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.4)" }}>
                 <Share2 className="h-4 w-4" />
                 Share this moment
@@ -3701,7 +3701,7 @@ function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
     <div className="min-h-screen bg-gradient-to-b from-stone-950 via-stone-900 to-stone-950 px-4 pb-32 pt-6">
       {/* Header */}
       <div className="mb-6 text-center">
-        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-900/30">
+        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#ffb800] to-[#f59e0b] shadow-lg shadow-emerald-900/30">
           <Check className="h-7 w-7 text-white" strokeWidth={3} />
         </div>
         <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Reveal complete</p>
@@ -3737,7 +3737,7 @@ function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
               <div className="flex gap-2 border-t border-white/5 p-3">
                 {funded ? (
                   <a href={trackingDecorator(g.buyUrl, "amazon")} target="_blank" rel={AFFILIATE_LINK_REL}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 py-2.5 text-[13px] font-black text-stone-900 shadow-lg shadow-amber-500/20 active:scale-95 transition-transform">
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#ffb800] to-[#f59e0b] py-2.5 text-[13px] font-black text-stone-900 shadow-lg shadow-amber-500/20 active:scale-95 transition-transform">
                     <ShoppingBag className="h-4 w-4" strokeWidth={2.5} /> Buy now
                     <span className="rounded-full bg-stone-900/20 px-1.5 py-0.5 text-[9px] font-black">+{g.boost}% back</span>
                   </a>

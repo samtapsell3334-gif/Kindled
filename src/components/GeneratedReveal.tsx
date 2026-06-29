@@ -75,7 +75,7 @@ function useCountUp(target: number, run: boolean, durationMs = 1400) {
 
 // ─── Confetti burst ─────────────────────────────────────────────────────────────
 
-const CONFETTI_COLORS = ["#f97316", "#fbbf24", "#34d399", "#38bdf8", "#a78bfa", "#f472b6", "#ffffff"];
+const CONFETTI_COLORS = ["#f59e0b", "#ffb800", "#f59e0b", "#ffb800", "#ffd166", "#ffb800", "#ffffff"];
 
 function Confetti({ count = 64 }: { count?: number }) {
   const pieces = useMemo(
@@ -170,7 +170,7 @@ export function GeneratedReveal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="fixed inset-0 z-50 overflow-hidden bg-[#0a0710]"
+          className="fixed inset-0 z-50 overflow-hidden bg-[#0a0a0a]"
           style={{ isolation: "isolate" }}
         >
           {/* Ambient gradient wash */}
@@ -219,7 +219,7 @@ export function GeneratedReveal({
                   </p>
                   <h2 className="max-w-[16ch] text-[30px] font-black leading-[1.05] text-white">
                     {recipientName} has{" "}
-                    <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-[#ffd166] to-[#ffb800] bg-clip-text text-transparent">
                       no idea
                     </span>{" "}
                     what&apos;s coming…
@@ -335,11 +335,11 @@ export function GeneratedReveal({
               {/* ── LOVE ── */}
               {phase === "love" && (
                 <motion.div key="love" className="flex w-full max-w-sm flex-col items-center gap-4">
-                  <Heart className="h-9 w-9 text-rose-400" fill="currentColor" />
+                  <Heart className="h-9 w-9 text-[#ffb800]" fill="currentColor" />
                   <p className="text-[20px] font-black leading-tight text-white">
                     the group chat
                     <br />
-                    <span className="bg-gradient-to-r from-rose-300 to-pink-400 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-[#ffd166] to-[#ffb800] bg-clip-text text-transparent">
                       came through
                     </span>
                   </p>
@@ -415,7 +415,7 @@ export function GeneratedReveal({
 
                   <button
                     onClick={close}
-                    className="mt-5 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-7 py-3.5 text-[15px] font-black text-stone-900 shadow-lg transition-transform active:scale-95"
+                    className="mt-5 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#ffb800] to-[#f59e0b] px-7 py-3.5 text-[15px] font-black text-stone-900 shadow-lg transition-transform active:scale-95"
                   >
                     <Share2 className="h-4 w-4" />
                     Share this moment
