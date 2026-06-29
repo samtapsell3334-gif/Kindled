@@ -20,7 +20,7 @@ import { StarChart } from "@/components/StarChart";
 import { MagneticCard } from "@/components/lux/MagneticCard";
 import { BrandedImage } from "@/components/lux/BrandedImage";
 import { GlassSelect } from "@/components/lux/GlassSelect";
-import { RevealGroup, RevealItem } from "@/components/lux/Reveal";
+import { Reveal, RevealGroup, RevealItem } from "@/components/lux/Reveal";
 import { LUX_EASE } from "@/lib/motion";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
@@ -534,38 +534,30 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
   potCount: number; totalGoal: number; onShare: () => void; isContributor?: boolean; onStartReceiving?: () => void;
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-orange-100/80 bg-[#fdf9f5]/95 backdrop-blur-lg">
-      {/* Warm accent line */}
-      <div className="h-0.5 w-full bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400" />
-      <div className="px-4 pt-3.5 pb-3">
+    <header className="sticky top-0 z-30 border-b border-[rgba(10,10,10,0.1)] bg-[#f5f5f5]/95 backdrop-blur-lg">
+      <div className="px-4 pb-3 pt-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <svg viewBox="0 0 100 100" width="44" height="44" className="shrink-0 drop-shadow-md" role="img" aria-label="Kindled">
-              <defs>
-                <linearGradient id="hdr-tile" x1="0" y1="0" x2="60" y2="100" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#FFB845"/>
-                  <stop offset="100%" stopColor="#F26B2C"/>
-                </linearGradient>
-              </defs>
-              <rect width="100" height="100" rx="22" fill="url(#hdr-tile)"/>
-              <g fill="#FFF4E6">
-                <rect x="28" y="27" width="12" height="46" rx="6"/>
-                <rect x="34" y="33" width="34" height="12" rx="6" transform="rotate(-37 51 39)"/>
-                <rect x="34" y="56" width="34" height="12" rx="6" transform="rotate(37 51 62)"/>
+            <svg viewBox="0 0 100 100" width="42" height="42" className="shrink-0" role="img" aria-label="Kindled">
+              <rect width="100" height="100" fill="#0a0a0a"/>
+              <g fill="#ffb800">
+                <rect x="28" y="27" width="12" height="46" rx="2"/>
+                <rect x="34" y="33" width="34" height="12" rx="2" transform="rotate(-37 51 39)"/>
+                <rect x="34" y="56" width="34" height="12" rx="2" transform="rotate(37 51 62)"/>
               </g>
-              <path d="M48 22 C41 14 32 17 35.5 25 C38 30 44 29 48 25.5 Z" fill="#FFF4E6"/>
-              <path d="M48 22 C55 14 64 17 60.5 25 C58 30 52 29 48 25.5 Z" fill="#FFF4E6"/>
-              <circle cx="48" cy="23.5" r="5.5" fill="#FFD27A"/>
+              <path d="M48 22 C41 14 32 17 35.5 25 C38 30 44 29 48 25.5 Z" fill="#ffb800"/>
+              <path d="M48 22 C55 14 64 17 60.5 25 C58 30 52 29 48 25.5 Z" fill="#ffb800"/>
+              <circle cx="48" cy="23.5" r="5.5" fill="#fff4e6"/>
             </svg>
             <div>
               <div className="flex items-baseline gap-1.5">
-                <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[20px] font-semibold tracking-tight text-stone-900 leading-tight">Kindled</h1>
-                <span className="text-[11px] font-medium text-stone-400">· Billy&apos;s List</span>
+                <h1 className="font-editorial text-[21px] font-semibold tracking-tight text-[#0a0a0a]">Kindled</h1>
+                <span className="text-[11px] font-medium tracking-tight text-[#0a0a0a]/40">· Billy&apos;s List</span>
               </div>
-              <p className="text-[11px] text-stone-400">
+              <p className="text-[11px] tracking-tight text-[#0a0a0a]/45">
                 {isContributor
-                  ? <>Contributing to <span className="font-semibold text-amber-500">Billy&apos;s List</span></>
-                  : <>Managed by <span className="font-semibold text-amber-500">Mum (Sarah)</span></>}
+                  ? <>Contributing to <span className="font-semibold text-[#0a0a0a]/70">Billy&apos;s List</span></>
+                  : <>Managed by <span className="font-semibold text-[#0a0a0a]/70">Mum (Sarah)</span></>}
               </p>
             </div>
           </div>
@@ -573,28 +565,25 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
             <motion.button
               whileTap={{ scale: 0.94 }}
               whileHover={{ scale: 1.03 }}
-              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              transition={{ duration: 0.4, ease: LUX_EASE }}
               onClick={onStartReceiving}
-              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3.5 py-2 text-[12px] font-semibold text-stone-900 shadow-md shadow-amber-200 active:scale-95"
+              className="flex shrink-0 items-center gap-1.5 bg-[#ffb800] px-3.5 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#0a0a0a] active:scale-95"
             >
               <Flame className="h-3.5 w-3.5" />
-              Create my own fire
+              Create
             </motion.button>
           )}
         </div>
-        {isContributor && (
-          <p className="mt-1 text-right text-[10px] text-stone-400 pr-0.5">contributing to Billy&apos;s list</p>
-        )}
 
-        <div className="mt-3 grid grid-cols-3 divide-x divide-stone-100">
+        <div className="mt-4 grid grid-cols-3 divide-x divide-[rgba(10,10,10,0.1)]">
           {[
-            { value: potCount, label: "fires", color: "text-amber-500" },
-            { value: `£${totalGoal.toLocaleString()}`, label: "goal", color: "text-orange-500" },
-            { value: "4", label: "events", color: "text-rose-500" },
-          ].map((stat) => (
-            <div key={stat.label} className="px-3 first:pl-0 last:pr-0 text-center">
-              <p style={{ fontFamily: "var(--font-display)" }} className={`text-[18px] font-semibold leading-none ${stat.color}`}>{stat.value}</p>
-              <p className="text-[9px] uppercase tracking-wider text-stone-400 mt-0.5">{stat.label}</p>
+            { value: potCount, label: "fires" },
+            { value: `£${totalGoal.toLocaleString()}`, label: "goal" },
+            { value: "4", label: "events" },
+          ].map((stat, i) => (
+            <div key={stat.label} className="px-3 text-center first:pl-0 last:pr-0">
+              <p className={`font-editorial text-[19px] font-semibold leading-none ${i === 1 ? "text-[#ffb800]" : "text-[#0a0a0a]"}`}>{stat.value}</p>
+              <p className="mt-1 text-[9px] uppercase tracking-[0.2em] text-[#0a0a0a]/40">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -672,13 +661,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
     pct >= 25  ? "Kindling" :
     pct > 0    ? "Embers" :
                  "Spark";
-  const statusColor =
-    pot.isClaimed    ? "text-emerald-500" :
-    pct >= 100 ? "text-emerald-500" :
-    pct >= 75  ? "text-orange-500" :
-    pct >= 50  ? "text-amber-500" :
-    pct >= 25  ? "text-amber-400" :
-                 "text-orange-400";
+  const statusColor = pot.isClaimed ? "text-[#0a0a0a]/45" : "text-[#0a0a0a]/55";
 
   function handleKindle(amount: number) {
     if (onAmountSelected) {
@@ -693,46 +676,40 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
   }
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 380, damping: 32 }}
-      className="relative overflow-hidden rounded-2xl bg-white"
-      style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04)" }}
-    >
-      <div className={cn("h-[3px] w-full bg-gradient-to-r", pot.accentGradient)} />
+    <Reveal>
+    <MagneticCard maxTilt={3} className="relative block overflow-hidden border border-[rgba(10,10,10,0.1)] bg-[#fafafa]">
       <div className="flex flex-col p-3.5">
         {/* Header row */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl bg-amber-50 shadow-[inset_0_1px_3px_rgba(0,0,0,0.06)]">
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden border border-[rgba(10,10,10,0.1)] bg-[#f0f0f0]">
               {pot.image ? (
                 <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
-                  <Gift className="h-5 w-5 text-stone-400" strokeWidth={1.5} />
+                  <Gift className="h-5 w-5 text-[#0a0a0a]/30" strokeWidth={1.5} />
                 </div>
               )}
               {pot.isClaimed && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-emerald-500/80">
-                  <Check className="h-5 w-5 text-white" strokeWidth={3} />
+                <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a0a]/85">
+                  <Check className="h-5 w-5 text-[#ffb800]" strokeWidth={3} />
                 </div>
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h3 style={{ fontFamily: "var(--font-display)" }} className="truncate text-[15px] font-medium tracking-tight text-stone-900">{pot.title}</h3>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <h3 className="font-editorial truncate text-[16px] font-medium tracking-tight text-[#0a0a0a]">{pot.title}</h3>
                 {pot.tag && (
-                  <span className="shrink-0 rounded-full bg-violet-50 border border-violet-200 px-2 py-px text-[9px] font-semibold text-violet-600">
+                  <span className="shrink-0 border border-[rgba(10,10,10,0.18)] px-1.5 py-px text-[9px] font-semibold uppercase tracking-[0.08em] text-[#0a0a0a]/55">
                     {pot.tag}
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <p className={cn("text-[11px] font-medium", statusColor)}>{statusLabel}</p>
+              <div className="mt-0.5 flex items-center gap-1.5">
+                <p className={cn("text-[11px] font-medium uppercase tracking-[0.1em]", statusColor)}>{statusLabel}</p>
                 {pot.continuous && !pot.isClaimed && !hideStackNote && (
-                  <span className="rounded-full bg-teal-50 border border-teal-200 px-1.5 py-px text-[9px] font-semibold text-teal-600">
+                  <span className="border border-[#ffb800]/40 px-1.5 py-px text-[9px] font-semibold text-[#ffb800]">
                     ∞ continuous
                   </span>
                 )}
@@ -741,7 +718,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
           </div>
           {onRemove && !pot.isClaimed && (
             <motion.button whileTap={{ scale: 0.9 }} onClick={() => onRemove(pot.id)}
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-stone-100 text-stone-400 hover:bg-red-50 hover:text-red-400 transition-colors">
+              className="flex h-6 w-6 shrink-0 items-center justify-center border border-[rgba(10,10,10,0.1)] text-[#0a0a0a]/40 transition-colors hover:border-[#0a0a0a]/30 hover:text-[#0a0a0a]/70">
               <X className="h-3 w-3" />
             </motion.button>
           )}
@@ -749,11 +726,11 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
 
         {/* Claimed state */}
         {pot.isClaimed && pot.claimedBy && (
-          <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2">
-            <Check className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2.5} />
+          <div className="mt-3 flex items-center gap-2 border border-[rgba(10,10,10,0.12)] bg-[#f0f0f0] px-3 py-2">
+            <Check className="h-4 w-4 shrink-0 text-[#0a0a0a]" strokeWidth={2.5} />
             <div className="min-w-0">
-              <p className="text-[12px] font-semibold text-emerald-700">{pot.claimedBy} — ordered</p>
-              {pot.claimedNote && <p className="text-[11px] text-emerald-600/80 truncate">{pot.claimedNote}</p>}
+              <p className="text-[12px] font-semibold tracking-tight text-[#0a0a0a]">{pot.claimedBy} — ordered</p>
+              {pot.claimedNote && <p className="truncate text-[11px] text-[#0a0a0a]/55">{pot.claimedNote}</p>}
             </div>
           </div>
         )}
@@ -761,21 +738,21 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
         {/* Progress — Under Wraps: heat-themed, totals hidden */}
         {!pot.isClaimed && (
           <>
-            <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" />
+            <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" tone="light" />
             <div className="mt-3 flex items-center justify-between">
-              <span className="flex items-center gap-1 text-[11px] text-stone-400"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
+              <span className="flex items-center gap-1 text-[11px] tracking-tight text-[#0a0a0a]/45"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
               <CountdownTimer targetIso={pot.eventIso} compact />
             </div>
             {hideStackNote && pot.eventLabel !== "Ongoing" && (
               <div className="mt-2 flex items-center gap-1.5">
-                <CalendarDays className="h-3 w-3 shrink-0 text-stone-400" />
-                <p className="text-[10px] text-stone-400">Next event: <span className="font-medium text-stone-500">{pot.eventLabel} · {pot.eventDate}</span></p>
+                <CalendarDays className="h-3 w-3 shrink-0 text-[#0a0a0a]/35" />
+                <p className="text-[10px] text-[#0a0a0a]/40">Next event: <span className="font-medium text-[#0a0a0a]/60">{pot.eventLabel} · {pot.eventDate}</span></p>
               </div>
             )}
             {pot.stackNote && !hideStackNote && (
-              <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-amber-50 border border-amber-200/70 px-2.5 py-1.5">
-                <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
-                <p className="text-[10px] leading-snug text-amber-700">{pot.stackNote}</p>
+              <div className="mt-2 flex items-start gap-1.5 border border-[#ffb800]/30 bg-[#ffb800]/[0.08] px-2.5 py-1.5">
+                <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-[#ffb800]" />
+                <p className="text-[10px] leading-snug text-[#0a0a0a]/70">{pot.stackNote}</p>
               </div>
             )}
 
@@ -785,18 +762,16 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setKindleOpen((v) => !v)}
                 className={cn(
-                  "flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-[13px] font-semibold transition-all",
+                  "flex flex-1 items-center justify-center gap-1.5 py-2.5 text-[13px] font-semibold uppercase tracking-[0.1em] transition-colors",
                   kindled
-                    ? "bg-emerald-500 text-white"
-                    : kindleOpen
-                      ? "bg-amber-500 text-stone-900 shadow-md shadow-amber-200"
-                      : "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900 shadow-sm shadow-amber-200",
+                    ? "bg-[#0a0a0a] text-[#ffb800]"
+                    : "bg-[#ffb800] text-[#0a0a0a]",
                 )}
               >
                 {kindled
                   ? <Check className="h-4 w-4" />
                   : <Flame className="h-4 w-4" />}
-                {kindled ? "Kindled!" : "Kindle"}
+                {kindled ? "Kindled" : "Kindle"}
               </motion.button>
             </div>
 
@@ -813,7 +788,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                   <div className="mt-3 space-y-2.5">
                     {/* Chip in — pick an amount */}
                     <div>
-                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-stone-400">Chip in</p>
+                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0a0a0a]/40">Chip in</p>
                       <div className="grid grid-cols-4 gap-2">
                         {KINDLE_AMOUNTS.map((amt) => (
                           <motion.button
@@ -822,10 +797,10 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                             onClick={() => handleKindle(amt)}
                             disabled={amt > pot.goal - pot.raised}
                             className={cn(
-                              "rounded-xl py-2.5 text-[13px] font-bold transition-all",
+                              "py-2.5 text-[13px] font-semibold tabular-nums transition-colors",
                               amt > pot.goal - pot.raised
-                                ? "bg-stone-100 text-stone-300 cursor-not-allowed"
-                                : "bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100",
+                                ? "cursor-not-allowed bg-[#f0f0f0] text-[#0a0a0a]/25"
+                                : "border border-[#ffb800]/40 bg-[#ffb800]/[0.08] text-[#0a0a0a] hover:bg-[#ffb800]/15",
                             )}
                           >
                             £{amt}
@@ -836,27 +811,26 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
 
                     {/* Divider */}
                     <div className="flex items-center gap-2">
-                      <div className="h-px flex-1 bg-stone-100" />
-                      <span className="text-[10px] text-stone-300">or</span>
-                      <div className="h-px flex-1 bg-stone-100" />
+                      <div className="h-px flex-1 bg-[rgba(10,10,10,0.1)]" />
+                      <span className="text-[10px] text-[#0a0a0a]/30">or</span>
+                      <div className="h-px flex-1 bg-[rgba(10,10,10,0.1)]" />
                     </div>
 
                     {/* Light this fire — fund the remaining balance */}
                     {pot.goal - pot.raised > 0 && (
                       <motion.button
                         whileTap={{ scale: 0.97 }}
-                        whileHover={{ scale: 1.01 }}
                         onClick={() => handleKindle(pot.goal - pot.raised)}
-                        className="flex w-full items-center justify-between gap-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-left shadow-md shadow-amber-200"
+                        className="flex w-full items-center justify-between gap-3 bg-[#ffb800] px-4 py-3 text-left"
                       >
                         <div className="flex items-center gap-2.5">
-                          <Flame className="h-4 w-4 shrink-0 text-stone-900" strokeWidth={2} />
+                          <Flame className="h-4 w-4 shrink-0 text-[#0a0a0a]" strokeWidth={2} />
                           <div>
-                            <p className="text-[13px] font-bold text-stone-900 leading-tight">Light this fire fully</p>
-                            <p className="text-[10px] text-stone-900/65 leading-tight">Cover the remaining balance — make it happen today</p>
+                            <p className="text-[13px] font-semibold leading-tight text-[#0a0a0a]">Light this fire fully</p>
+                            <p className="text-[10px] leading-tight text-[#0a0a0a]/65">Cover the remaining balance — make it happen today</p>
                           </div>
                         </div>
-                        <span className="shrink-0 rounded-lg bg-stone-900/15 px-2.5 py-1 text-[13px] font-black text-stone-900">
+                        <span className="shrink-0 bg-[#0a0a0a] px-2.5 py-1 text-[13px] font-semibold tabular-nums text-[#ffb800]">
                           £{pot.goal - pot.raised}
                         </span>
                       </motion.button>
@@ -866,21 +840,21 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                     <motion.button
                       whileTap={{ scale: 0.97 }}
                       onClick={() => onBuy?.(pot.id)}
-                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-left hover:border-stone-300 transition-colors"
+                      className="flex w-full items-center justify-between gap-3 border border-[rgba(10,10,10,0.15)] bg-[#fafafa] px-4 py-3 text-left transition-colors hover:border-[#0a0a0a]/35"
                     >
                       <div className="flex items-center gap-2.5">
-                        <ShoppingBag className="h-4 w-4 shrink-0 text-stone-500" strokeWidth={2} />
+                        <ShoppingBag className="h-4 w-4 shrink-0 text-[#0a0a0a]/55" strokeWidth={2} />
                         <div>
-                          <p className="text-[13px] font-semibold text-stone-800 leading-tight">Buy it outright</p>
-                          <p className="text-[10px] text-stone-400 leading-tight">Skip the pot — purchase it directly as your gift</p>
+                          <p className="text-[13px] font-semibold leading-tight text-[#0a0a0a]">Buy it outright</p>
+                          <p className="text-[10px] leading-tight text-[#0a0a0a]/45">Skip the pot — purchase it directly as your gift</p>
                         </div>
                       </div>
-                      <span className="shrink-0 rounded-lg bg-stone-100 px-2.5 py-1 text-[13px] font-bold text-stone-600">
+                      <span className="shrink-0 bg-[#f0f0f0] px-2.5 py-1 text-[13px] font-semibold tabular-nums text-[#0a0a0a]/70">
                         £{pot.goal}
                       </span>
                     </motion.button>
 
-                    <p className="text-center text-[10px] text-stone-400">
+                    <p className="text-center text-[10px] text-[#0a0a0a]/40">
                       £{pot.goal - pot.raised} left to fully fund this gift
                     </p>
                   </div>
@@ -890,7 +864,8 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
           </>
         )}
       </div>
-    </motion.article>
+    </MagneticCard>
+    </Reveal>
   );
 }
 
@@ -4659,13 +4634,13 @@ export default function DemoPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
-            className="mx-1 mb-1 flex items-center gap-2 rounded-xl border border-stone-100 bg-stone-50 px-3.5 py-2"
+            className="mx-1 mb-1 flex items-center gap-2 border border-[rgba(10,10,10,0.1)] bg-[#fafafa] px-3.5 py-2.5"
           >
-            <div className={cn("h-2 w-2 rounded-full shrink-0", isContributor ? "bg-violet-400" : "bg-amber-400")} />
-            <p className="text-[11px] text-stone-500 leading-snug">
+            <div className={cn("h-1.5 w-1.5 shrink-0", isContributor ? "bg-[#0a0a0a]/40" : "bg-[#ffb800]")} />
+            <p className="text-[11px] leading-snug tracking-tight text-[#0a0a0a]/55">
               {isContributor
-                ? <><span className="font-semibold text-stone-700">Contributor view</span> — you&apos;re seeing Billy&apos;s board as a family member. Tap any gift to chip in.</>
-                : <><span className="font-semibold text-stone-700">Parent / owner view</span> — this is how Billy&apos;s family manages and tracks his wish board. Switch tabs to explore.</>
+                ? <><span className="font-semibold text-[#0a0a0a]">Contributor view</span> — you&apos;re seeing Billy&apos;s board as a family member. Tap any gift to chip in.</>
+                : <><span className="font-semibold text-[#0a0a0a]">Parent / owner view</span> — this is how Billy&apos;s family manages and tracks his wish board. Switch tabs to explore.</>
               }
             </p>
           </motion.div>
@@ -4677,11 +4652,11 @@ export default function DemoPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
-            className="mx-1 mb-1 flex items-center gap-2 rounded-xl border border-stone-100 bg-stone-50 px-3.5 py-2"
+            className="mx-1 mb-1 flex items-center gap-2 border border-[rgba(10,10,10,0.1)] bg-[#fafafa] px-3.5 py-2.5"
           >
-            <div className="h-2 w-2 rounded-full shrink-0 bg-emerald-400" />
-            <p className="text-[11px] text-stone-500 leading-snug">
-              <span className="font-semibold text-stone-700">Billy&apos;s view</span> — this is what Billy sees on his device. Amounts are hidden — just the excitement of what&apos;s coming.
+            <div className="h-1.5 w-1.5 shrink-0 bg-[#0a0a0a]/40" />
+            <p className="text-[11px] leading-snug tracking-tight text-[#0a0a0a]/55">
+              <span className="font-semibold text-[#0a0a0a]">Billy&apos;s view</span> — this is what Billy sees on his device. Amounts are hidden — just the excitement of what&apos;s coming.
             </p>
           </motion.div>
         )}
@@ -4759,7 +4734,7 @@ export default function DemoPage() {
           <ReceiverView pots={pots} onShare={handleShare} onReveal={() => setViewMode("reveal")} />
         </motion.div>
       ) : (
-      <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
+      <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }} className="min-h-screen bg-[#f5f5f5]">
       {/* ── Parent Dashboard ── */}
       {<>
       <ProfileHeader
@@ -4774,11 +4749,11 @@ export default function DemoPage() {
 
         {/* ── All pots grid (always LivePotCard — no hidden amounts) ── */}
         <section className="px-4">
-          <div className="mb-3">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400">
+          <div className="mb-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#ffb800]">
               {isContributor ? "Active Spark Goals" : "Gift List"}
             </p>
-            <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-medium text-stone-800 leading-tight">
+            <p className="font-editorial mt-1 text-[22px] font-semibold leading-tight text-[#0a0a0a]">
               {activePots.filter((p) => !p.isChecklist).length} {isContributor ? "fires to stoke" : "gifts to kindle or buy"}
             </p>
           </div>
@@ -4797,16 +4772,15 @@ export default function DemoPage() {
             {/* Add new gift — owner only */}
             {!isContributor && (
               <motion.button
-                whileHover={{ scale: 1.01, y: -1 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.4, ease: LUX_EASE }}
                 onClick={() => setShowNewGift(true)}
-                className="flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/60 px-4 py-4 text-left transition-colors hover:border-amber-400 hover:bg-amber-50"
+                className="flex w-full items-center gap-3 border border-dashed border-[#0a0a0a]/20 bg-[#fafafa] px-4 py-4 text-left transition-colors hover:border-[#ffb800] hover:bg-[#ffb800]/[0.05]"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-400 text-xl font-bold text-stone-900 shadow">+</div>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#ffb800] text-xl font-semibold text-[#0a0a0a]">+</div>
                 <div>
-                  <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-medium text-stone-700">New gift</p>
-                  <p className="text-[12px] text-stone-400">Paste a link or enter manually</p>
+                  <p className="font-editorial text-[16px] font-medium text-[#0a0a0a]">New gift</p>
+                  <p className="text-[12px] text-[#0a0a0a]/45">Paste a link or enter manually</p>
                 </div>
               </motion.button>
             )}
@@ -4831,60 +4805,54 @@ export default function DemoPage() {
             </div>
           )}
 
-          {/* ── Sign-up card — below pots list ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 340, damping: 32 }}
-            className="mt-2 overflow-hidden rounded-2xl bg-white"
-            style={{ boxShadow: "0 2px 20px rgba(245,158,11,0.18), 0 0 0 2px rgba(245,158,11,0.3)" }}
-          >
-            <div className="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 px-4 py-2.5 flex items-center gap-2">
-              <Flame className="h-3.5 w-3.5 text-white shrink-0" />
-              <p className="text-[11px] font-black uppercase tracking-widest text-white">Want your own list like this?</p>
-            </div>
-            <div className="px-4 py-4">
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-bold text-stone-900 leading-tight">
-                Start receiving kindled gifts yourself
-              </p>
-              <p className="mt-1.5 text-[12px] text-stone-500 leading-relaxed">
-                No awkward money conversations, no duplicate gifts — just exactly what you want, chipped in by people who care.
-              </p>
-              <div className="mt-2.5 space-y-1.5">
-                {([
-                  [Check, "Friends & family chip in any amount — no app needed"],
-                  [Lock, "Gifts stay secret until your reveal day"],
-                  [Star, "Star chart mode for kids · parent controls built in"],
-                ] as const).map(([Icon, text]) => (
-                  <div key={text} className="flex items-center gap-2">
-                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-amber-100">
-                      <Icon className="h-2.5 w-2.5 text-amber-600" strokeWidth={2.5} />
-                    </div>
-                    <p className="text-[11px] text-stone-600">{text}</p>
-                  </div>
-                ))}
+          {/* ── Sign-up card — charcoal feature card ── */}
+          <Reveal>
+            <div className="mt-2 overflow-hidden border border-[#0a0a0a] bg-[#0a0a0a]">
+              <div className="flex items-center gap-2 border-b border-[rgba(245,245,245,0.1)] px-4 py-2.5">
+                <Flame className="h-3.5 w-3.5 shrink-0 text-[#ffb800]" />
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Want your own list like this?</p>
               </div>
-              <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
-                <Trophy className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
-                <p className="text-[10.5px] leading-snug text-amber-900">
-                  <span className="font-bold">Enter our £2,500 Goal Booster Draw</span> with every contribution.{" "}
-                  Plus earn <span className="font-bold text-orange-600">2% Spark Balance back</span> on your own future fires.
+              <div className="px-4 py-4">
+                <p className="font-editorial text-[20px] font-semibold leading-tight text-[#f5f5f5]">
+                  Start receiving kindled gifts yourself
                 </p>
+                <p className="mt-2 text-[12px] leading-relaxed tracking-tight text-[#f5f5f5]/55">
+                  No awkward money conversations, no duplicate gifts — just exactly what you want, chipped in by people who care.
+                </p>
+                <div className="mt-3 space-y-1.5">
+                  {([
+                    [Check, "Friends & family chip in any amount — no app needed"],
+                    [Lock, "Gifts stay secret until your reveal day"],
+                    [Star, "Star chart mode for kids · parent controls built in"],
+                  ] as const).map(([Icon, text]) => (
+                    <div key={text} className="flex items-center gap-2">
+                      <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center border border-[#ffb800]/40">
+                        <Icon className="h-2.5 w-2.5 text-[#ffb800]" strokeWidth={2.5} />
+                      </div>
+                      <p className="text-[11px] tracking-tight text-[#f5f5f5]/70">{text}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex items-start gap-2 border border-[#ffb800]/30 bg-[#ffb800]/[0.06] px-3 py-2.5">
+                  <Trophy className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ffb800]" />
+                  <p className="text-[10.5px] leading-snug text-[#f5f5f5]/75">
+                    <span className="font-semibold text-[#f5f5f5]">Enter our £2,500 Goal Booster Draw</span> with every contribution.{" "}
+                    Plus earn <span className="font-semibold text-[#ffb800]">2% Spark Balance back</span> on your own future fires.
+                  </p>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ duration: 0.4, ease: LUX_EASE }}
+                  onClick={() => setShowReceiverSignUp(true)}
+                  className="mt-3 flex w-full items-center justify-center gap-2 bg-[#ffb800] py-3 text-[14px] font-semibold uppercase tracking-[0.08em] text-[#0a0a0a]"
+                >
+                  <Flame className="h-4 w-4" />
+                  Create my own fire — it&apos;s free
+                </motion.button>
+                <p className="mt-2 text-center text-[10px] text-[#f5f5f5]/40">No app required · 2 minute setup</p>
               </div>
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                whileHover={{ scale: 1.02, y: -1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 26 }}
-                onClick={() => setShowReceiverSignUp(true)}
-                className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-[14px] font-bold text-white"
-                style={{ background: "linear-gradient(135deg, #f59e0b, #f97316)", boxShadow: "0 4px 16px rgba(249,115,22,0.4)" }}
-              >
-                <Flame className="h-4 w-4" />
-                Create my own fire — it&apos;s free
-              </motion.button>
-              <p className="mt-1.5 text-center text-[10px] text-stone-400">No app required · 2 minute setup</p>
             </div>
-          </motion.div>
+          </Reveal>
 
           {/* Reveal preview — contributor only */}
           {isContributor && surprisePots.length > 0 && (

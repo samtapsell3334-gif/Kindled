@@ -8,6 +8,8 @@ interface FundingBarProps {
   className?: string;
   /** Under Wraps mode — hides the exact raised £ and numeric %, showing a heat-themed label instead. */
   hideAmounts?: boolean;
+  /** Palette: "dark" for charcoal/reveal surfaces (default), "light" for bone Monochrome-Luxe cards. */
+  tone?: "dark" | "light";
 }
 
 function heatLabel(pct: number) {
@@ -17,11 +19,14 @@ function heatLabel(pct: number) {
   return "Spark Level: Smoldering";
 }
 
-export function FundingBar({ raised, goal, className, hideAmounts }: FundingBarProps) {
+export function FundingBar({ raised, goal, className, hideAmounts, tone = "dark" }: FundingBarProps) {
   const pct = Math.min(100, Math.round((raised / goal) * 100));
+  const light = tone === "light";
 
-  const trackColor =
-    pct >= 100
+  // Light (Monochrome Luxe) uses the single Electric-Amber accent; dark keeps the heat ramp.
+  const trackColor = light
+    ? "bg-[#ffb800]"
+    : pct >= 100
       ? "bg-emerald-500"
       : pct >= 50
         ? "bg-amber-400"
@@ -30,7 +35,7 @@ export function FundingBar({ raised, goal, className, hideAmounts }: FundingBarP
   return (
     <div className={cn("space-y-2", className)}>
       {/* Track */}
-      <div className="relative h-2 w-full overflow-hidden rounded-full bg-stone-700/60">
+      <div className={cn("relative h-2 w-full overflow-hidden", light ? "bg-[rgba(10,10,10,0.1)]" : "rounded-full bg-stone-700/60")}>
         <div
           role="progressbar"
           aria-valuenow={hideAmounts ? undefined : pct}
@@ -39,8 +44,9 @@ export function FundingBar({ raised, goal, className, hideAmounts }: FundingBarP
           aria-label={hideAmounts ? heatLabel(pct) : `${pct}% funded`}
           style={{ width: `${pct}%` }}
           className={cn(
-            "h-full rounded-full transition-all duration-700 ease-out",
-            "shadow-[0_0_8px_0_rgba(251,191,36,0.45)]",
+            "h-full transition-all duration-700 ease-out",
+            light ? "" : "rounded-full",
+            "shadow-[0_0_8px_0_rgba(255,184,0,0.5)]",
             trackColor,
           )}
         />
@@ -49,19 +55,19 @@ export function FundingBar({ raised, goal, className, hideAmounts }: FundingBarP
       {/* Legend */}
       {hideAmounts ? (
         <div className="flex items-baseline justify-between">
-          <p className="text-[13px] font-medium text-amber-300">{heatLabel(pct)}</p>
-          <span className="text-[12px] font-semibold text-stone-400">
+          <p className={cn("text-[13px] font-medium", light ? "text-[#0a0a0a]/70" : "text-amber-300")}>{heatLabel(pct)}</p>
+          <span className={cn("text-[12px] font-semibold", light ? "text-[#0a0a0a]/45" : "text-stone-400")}>
             Target: £{goal.toLocaleString()}
           </span>
         </div>
       ) : (
         <div className="flex items-baseline justify-between">
-          <p className="text-[13px] font-medium text-stone-200">
-            <span className="text-amber-400">£{raised.toLocaleString()}</span>
-            <span className="text-stone-400"> raised of </span>
-            <span className="text-stone-300">£{goal.toLocaleString()}</span>
+          <p className="text-[13px] font-medium">
+            <span className={light ? "font-semibold text-[#0a0a0a]" : "text-amber-400"}>£{raised.toLocaleString()}</span>
+            <span className={light ? "text-[#0a0a0a]/45" : "text-stone-400"}> raised of </span>
+            <span className={light ? "text-[#0a0a0a]/60" : "text-stone-300"}>£{goal.toLocaleString()}</span>
           </p>
-          <span className="text-[12px] font-semibold tabular-nums text-stone-400">
+          <span className={cn("text-[12px] font-semibold tabular-nums", light ? "text-[#0a0a0a]/50" : "text-stone-400")}>
             {pct}%
           </span>
         </div>
