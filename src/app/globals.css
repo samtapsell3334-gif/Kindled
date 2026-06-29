@@ -2,11 +2,64 @@
 
 @theme {
   --font-family-display: var(--font-display), 'Fredoka', sans-serif;
+  --font-family-serif: var(--font-serif), 'Fraunces', Georgia, serif;
 }
 
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
+
+  /* ── Monochrome Luxe design tokens ── */
+  --lux-charcoal: #0a0a0a;   /* deep charcoal base */
+  --lux-bone: #f5f5f5;       /* crisp bone white */
+  --lux-amber: #ffb800;      /* singular Electric Amber accent */
+  --lux-hairline: rgba(245, 245, 245, 0.12); /* hairline borders on dark */
+  --lux-hairline-ink: rgba(10, 10, 10, 0.10); /* hairline borders on light */
+  /* Apple-grade easing + duration, standardised across the app. */
+  --lux-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --lux-duration: 0.6s;
+}
+
+/* Editorial serif headers (Monochrome Luxe). */
+.font-editorial {
+  font-family: var(--font-serif), 'Fraunces', Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+/* Metallic skeleton shimmer — sleek loading state (not a spinner). */
+@keyframes lux-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.lux-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0.04) 30%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.04) 70%
+  );
+  background-size: 200% 100%;
+  animation: lux-shimmer 1.8s var(--lux-ease) infinite;
+}
+.lux-shimmer-ink {
+  background-image: linear-gradient(
+    100deg,
+    rgba(10, 10, 10, 0.04) 30%,
+    rgba(10, 10, 10, 0.10) 50%,
+    rgba(10, 10, 10, 0.04) 70%
+  );
+  background-size: 200% 100%;
+  animation: lux-shimmer 1.8s var(--lux-ease) infinite;
+}
+
+/* Screen-wide "bloom" confirm — a soft radial flash on satisfying actions. */
+@keyframes lux-bloom {
+  0% { opacity: 0; transform: scale(0.7); }
+  35% { opacity: 0.55; }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+.lux-bloom {
+  animation: lux-bloom 0.7s var(--lux-ease) forwards;
 }
 
 @media (prefers-color-scheme: dark) {
