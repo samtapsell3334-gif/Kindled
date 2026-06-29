@@ -159,6 +159,34 @@
     }
   },
 
+  "flywheel": {
+    "headline": "Why Kindled Compounds",
+    "subheadline": "Every reveal is a free advert. Every giver is a future host. The loop turns itself — no ad budget required.",
+    "loop": [
+      { "id": "light",   "title": "A host lights a Fire", "body": "Someone sets up a pot for a birthday, baby shower or Christmas — in 90 seconds, for free.", "icon": "flame",    "color": "#f59e0b" },
+      { "id": "rally",   "title": "They rally ~6 people",  "body": "One share in the family chat pulls an average of six contributors onto the platform.",        "icon": "share",    "color": "#3b82f6" },
+      { "id": "give",    "title": "Givers chip in",        "body": "Each pays via Open Banking in seconds — and quietly declares exactly what they'd love too.",   "icon": "gift",     "color": "#10b981" },
+      { "id": "reveal",  "title": "The reveal goes off",   "body": "A cinematic, shareable moment. People screenshot it. It reaches new faces at zero ad spend.",  "icon": "sparkles", "color": "#8b5cf6" },
+      { "id": "convert", "title": "Givers become hosts",   "body": "Around 1 in 6 starts their own Fire — and the loop begins again, bigger each turn.",          "icon": "repeat",   "color": "#f43f5e" }
+    ],
+    "multiplier": { "value": "6×", "label": "people per Fire — every one a future host" },
+    "compounding": {
+      "label": "What one Fire becomes",
+      "steps": [
+        { "tier": "1 Fire",          "people": "6 reached" },
+        { "tier": "1-in-6 converts", "people": "6 new Fires" },
+        { "tier": "Those reach",     "people": "36 reached" },
+        { "tier": "And again",       "people": "216 reached" }
+      ],
+      "caption": "Three turns of the loop from a single Fire. No paid acquisition — the product is the marketing."
+    },
+    "power": [
+      { "title": "Zero-CAC growth",     "body": "The reveal moment is the advert. Distribution is built into the product, not bought." },
+      { "title": "Intent at the source","body": "Every wishlist item is a purchase declared before any money is spent — the most valuable signal in commerce." },
+      { "title": "Silent monetisation", "body": "0.5% on every contribution today; licensed intent data and reveal-window ads tomorrow. No ads, no subscriptions." }
+    ]
+  },
+
   "journey": {
     "headline": "Four Moments. One Memory.",
     "subheadline": "This is what Kindled feels like from the inside.",

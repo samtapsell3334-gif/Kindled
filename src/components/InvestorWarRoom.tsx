@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
   TrendingUp, Users, Flame, Gift, Lock, ChevronRight,
   BarChart2, Globe, Zap, Shield, Check, ArrowRight,
   Target, Database, CreditCard, Sparkles, Building2,
+  Repeat, Share2,
 } from "lucide-react";
 import content from "@/data/investor-content.json";
 
@@ -22,13 +23,14 @@ function cn(...classes: (string | undefined | false | null)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-type Tab = "why" | "engine" | "journey" | "roadmap";
+type Tab = "why" | "flywheel" | "engine" | "journey" | "roadmap";
 
 const TABS: { id: Tab; label: string; shortLabel: string }[] = [
-  { id: "why",     label: "The Why & Why Now",  shortLabel: "The Why"  },
-  { id: "engine",  label: "The Engine",          shortLabel: "Engine"   },
-  { id: "journey", label: "Customer Journey",    shortLabel: "Journey"  },
-  { id: "roadmap", label: "Roadmap & Execution", shortLabel: "Roadmap"  },
+  { id: "why",      label: "The Why & Why Now",  shortLabel: "The Why"  },
+  { id: "flywheel", label: "The Flywheel",        shortLabel: "Flywheel" },
+  { id: "engine",   label: "The Engine",          shortLabel: "Engine"   },
+  { id: "journey",  label: "Customer Journey",    shortLabel: "Journey"  },
+  { id: "roadmap",  label: "Roadmap & Execution", shortLabel: "Roadmap"  },
 ];
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
@@ -511,6 +513,169 @@ function RoadmapTab() {
   );
 }
 
+// ─── TAB: THE FLYWHEEL ────────────────────────────────────────────────────────
+
+const LOOP_ICONS: Record<string, React.ElementType> = {
+  flame: Flame, share: Share2, gift: Gift, sparkles: Sparkles, repeat: Repeat,
+};
+const POWER_ICONS = [TrendingUp, Database, CreditCard];
+
+function FlywheelTab() {
+  const { flywheel } = content;
+  const loop = flywheel.loop;
+  const [active, setActive] = useState(0);
+
+  // Auto-advance the highlighted stage so the loop tells its own story.
+  useEffect(() => {
+    const t = setInterval(() => setActive(a => (a + 1) % loop.length), 2600);
+    return () => clearInterval(t);
+  }, [loop.length]);
+
+  // Position each stage evenly around a circle (radius 38% of the box).
+  const R = 38;
+  const nodes = loop.map((s, i) => {
+    const ang = (-90 + i * (360 / loop.length)) * (Math.PI / 180);
+    return { ...s, x: 50 + R * Math.cos(ang), y: 50 + R * Math.sin(ang) };
+  });
+
+  const activeStage = loop[active]!;
+  const compRef = useRef<HTMLDivElement>(null);
+  const compInView = useInView(compRef, { once: true, amount: 0.4 });
+
+  return (
+    <div className="space-y-10">
+      <div>
+        <SectionLabel>The Growth Engine</SectionLabel>
+        <SectionHeadline>{flywheel.headline}</SectionHeadline>
+        <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-slate-400">{flywheel.subheadline}</p>
+      </div>
+
+      {/* ── The flywheel diagram ── */}
+      <div className="relative mx-auto aspect-square w-full max-w-[400px]">
+        {/* Ring */}
+        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(148,163,184,0.14)" strokeWidth="0.6" />
+          <circle cx="50" cy="50" r="38" fill="none" stroke={activeStage.color} strokeOpacity="0.5"
+            strokeWidth="0.8" strokeDasharray="3 5" strokeLinecap="round"
+            style={{ transition: "stroke 0.5s" }}>
+            <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="22s" repeatCount="indefinite" />
+          </circle>
+        </svg>
+
+        {/* Orbiting spark */}
+        <motion.div className="pointer-events-none absolute inset-0"
+          animate={{ rotate: 360 }} transition={{ duration: 11, repeat: Infinity, ease: "linear" }}>
+          <div className="absolute left-1/2" style={{ top: "12%", transform: "translate(-50%,-50%)" }}>
+            <div className="h-2.5 w-2.5 rounded-full bg-white" style={{ boxShadow: "0 0 12px 3px rgba(255,255,255,0.8)" }} />
+          </div>
+        </motion.div>
+
+        {/* Centre hub */}
+        <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/80 text-center backdrop-blur-sm"
+          style={{ boxShadow: `0 0 40px ${activeStage.color}33`, transition: "box-shadow 0.5s" }}>
+          <motion.p key={flywheel.multiplier.value} className="text-[30px] font-black leading-none text-white">
+            {flywheel.multiplier.value}
+          </motion.p>
+          <p className="mt-1 px-2 text-[8.5px] font-semibold leading-tight text-slate-400">{flywheel.multiplier.label}</p>
+        </div>
+
+        {/* Stage nodes */}
+        {nodes.map((n, i) => {
+          const Icon = LOOP_ICONS[n.icon] ?? Flame;
+          const isActive = i === active;
+          return (
+            <button key={n.id} onClick={() => setActive(i)}
+              className="absolute flex flex-col items-center"
+              style={{ left: `${n.x}%`, top: `${n.y}%`, transform: "translate(-50%,-50%)", width: "30%" }}>
+              <motion.div
+                animate={{ scale: isActive ? 1.15 : 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="flex h-11 w-11 items-center justify-center rounded-2xl border"
+                style={{
+                  background: isActive ? n.color : "rgba(15,23,42,0.9)",
+                  borderColor: isActive ? n.color : "rgba(148,163,184,0.25)",
+                  boxShadow: isActive ? `0 0 24px ${n.color}88` : "none",
+                }}>
+                <Icon className="h-5 w-5" style={{ color: isActive ? "#fff" : n.color }} strokeWidth={2} />
+              </motion.div>
+              <span className="mt-1.5 text-center text-[9px] font-bold leading-tight"
+                style={{ color: isActive ? "#fff" : "rgb(100,116,139)" }}>
+                {n.title}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Active stage explainer ── */}
+      <div className="mx-auto max-w-md">
+        <AnimatePresence mode="wait">
+          <motion.div key={activeStage.id}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            className="rounded-2xl border bg-slate-900/50 p-5"
+            style={{ borderColor: `${activeStage.color}40` }}>
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg text-[11px] font-black text-white"
+                style={{ background: activeStage.color }}>{active + 1}</span>
+              <p className="text-[15px] font-bold text-white">{activeStage.title}</p>
+            </div>
+            <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{activeStage.body}</p>
+            <div className="mt-3 flex gap-1.5">
+              {loop.map((_, i) => (
+                <div key={i} className="h-1 flex-1 rounded-full transition-colors duration-300"
+                  style={{ background: i === active ? activeStage.color : "rgba(148,163,184,0.18)" }} />
+              ))}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* ── Compounding strip ── */}
+      <div ref={compRef} className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-blue-950/20 p-6">
+        <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-400/80">{flywheel.compounding.label}</p>
+        <div className="flex items-stretch gap-2 overflow-x-auto scrollbar-none">
+          {flywheel.compounding.steps.map((s, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <motion.div
+                initial={{ opacity: 0, y: 14, scale: 0.9 }}
+                animate={compInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+                transition={{ delay: i * 0.12, type: "spring", stiffness: 300, damping: 22 }}
+                className="min-w-[96px] shrink-0 rounded-xl border border-slate-700/50 bg-slate-800/40 px-3 py-3 text-center">
+                <p className="text-[17px] font-black leading-none text-white">{s.people}</p>
+                <p className="mt-1 text-[10px] font-medium text-slate-500">{s.tier}</p>
+              </motion.div>
+              {i < flywheel.compounding.steps.length - 1 && (
+                <ArrowRight className="h-4 w-4 shrink-0 text-blue-500/60" />
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-[12px] leading-relaxed text-slate-400">{flywheel.compounding.caption}</p>
+      </div>
+
+      {/* ── Why it's powerful ── */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {flywheel.power.map((p, i) => {
+          const Icon = POWER_ICONS[i] ?? Zap;
+          return (
+            <motion.div key={p.title}
+              initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ delay: i * 0.06 }}
+              className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10">
+                <Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} />
+              </div>
+              <p className="mb-1.5 text-[14px] font-bold text-white">{p.title}</p>
+              <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── WAR ROOM SHELL ───────────────────────────────────────────────────────────
 
 export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
@@ -614,10 +779,11 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
-            {activeTab === "why"     && <WhyTab />}
-            {activeTab === "engine"  && <EngineTab />}
-            {activeTab === "journey" && <JourneyTab />}
-            {activeTab === "roadmap" && <RoadmapTab />}
+            {activeTab === "why"      && <WhyTab />}
+            {activeTab === "flywheel" && <FlywheelTab />}
+            {activeTab === "engine"   && <EngineTab />}
+            {activeTab === "journey"  && <JourneyTab />}
+            {activeTab === "roadmap"  && <RoadmapTab />}
           </motion.div>
         </AnimatePresence>
       </main>

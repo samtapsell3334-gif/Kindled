@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import { Flame, Shield } from "lucide-react";
 import content from "@/data/investor-content.json";
 import { InvestorWarRoom } from "@/components/InvestorWarRoom";
@@ -20,34 +20,23 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
   const [digits, setDigits]   = useState("");
   const [shake, setShake]     = useState(false);
   const [success, setSuccess] = useState(false);
-  const submittedRef = useRef(false);
 
-  const submit = useCallback((pin: string) => {
-    if (pin === CORRECT_PIN) {
-      setSuccess(true);
-      setTimeout(onUnlock, 600);
-    } else {
-      setShake(true);
-      setTimeout(() => { setShake(false); setDigits(""); }, 550);
-    }
-  }, [onUnlock]);
-
+  // Same proven pattern as the demo's gate: validate inline in the handler.
   const handle = useCallback((k: string) => {
-    if (submittedRef.current) return;
-    setDigits((d) => {
-      if (d.length >= 4) return d;
-      const next = d + k;
-      if (next.length === 4) { submittedRef.current = true; submit(next); }
-      return next;
-    });
-  }, [submit]);
+    const next = (digits + k).slice(0, 4);
+    setDigits(next);
+    if (next.length === 4) {
+      if (next === CORRECT_PIN) {
+        setSuccess(true);
+        setTimeout(onUnlock, 600);
+      } else {
+        setShake(true);
+        setTimeout(() => { setShake(false); setDigits(""); }, 550);
+      }
+    }
+  }, [digits, onUnlock]);
 
   const del = useCallback(() => setDigits(d => d.slice(0, -1)), []);
-
-  // Reset the submit latch whenever the digits are cleared after a wrong PIN.
-  useEffect(() => {
-    if (digits.length === 0) submittedRef.current = false;
-  }, [digits]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -136,17 +125,17 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
                   {row.map((key, ki) => key === "" ? (
                     <div key={ki} />
                   ) : (
-                    <motion.button key={ki} whileTap={{ scale: 0.92 }}
+                    <button key={ki} type="button"
                       onClick={() => key === "⌫" ? del() : handle(key)}
                       className={cn(
-                        "flex items-center justify-center rounded-xl border text-[16px] font-semibold transition-colors",
+                        "flex items-center justify-center rounded-xl border text-[16px] font-semibold transition-all active:scale-95",
                         key === "⌫"
                           ? "border-slate-700/60 bg-slate-800/40 text-slate-400 hover:bg-slate-700/60"
                           : "border-slate-700/60 bg-slate-800/60 text-white hover:border-slate-600 hover:bg-slate-700/80",
                       )}
                       style={{ height: "52px" }}>
                       {key}
-                    </motion.button>
+                    </button>
                   ))}
                 </div>
               ))}
@@ -176,21 +165,14 @@ export default function InvestorPage() {
     setUnlocked(true);
   }, []);
 
-  return (
-    <AnimatePresence mode="wait">
-      {unlocked ? (
-        <motion.div key="room"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}>
-          <InvestorWarRoom />
-        </motion.div>
-      ) : (
-        <motion.div key="gate"
-          exit={{ opacity: 0, scale: 0.97 }}
-          transition={{ duration: 0.4 }}>
-          <PinGate onUnlock={handleUnlock} />
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+  // Plain conditional render (same as the demo gate). An AnimatePresence
+  // "wait" swap here could stall on the gate's exit and never mount the room.
+  if (unlocked) {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+        <InvestorWarRoom />
+      </motion.div>
+    );
+  }
+  return <PinGate onUnlock={handleUnlock} />;
 }
