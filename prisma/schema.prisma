@@ -10,10 +10,10 @@ datasource db {
 // ─── Enums ─────────────────────────────────────────────────────────────────
 
 enum PotStatus {
-  ACTIVE   // Pot is live, accepting contributions
-  HALFWAY  // ≥ 50% of targetAmount reached
-  FUNDED   // targetAmount reached or exceeded
-  STALLED  // No contribution activity for a configured period
+  ACTIVE // Pot is live, accepting contributions
+  HALFWAY // ≥ 50% of targetAmount reached
+  FUNDED // targetAmount reached or exceeded
+  STALLED // No contribution activity for a configured period
 }
 
 enum PaymentMethod {
@@ -50,10 +50,10 @@ enum GiftingMode {
 /// macro-pot is funding. Drives projection horizons, UI theming/imagery, and the
 /// high-value retail intent segment (Foundation -> Home/DIY, Expedition -> Travel).
 enum MilestoneCategory {
-  EXPEDITION  // travel & adventure — typically 1–2 year horizons
-  FOUNDATION  // home, property, life-building — 2–3+ year horizons
+  EXPEDITION // travel & adventure — typically 1–2 year horizons
+  FOUNDATION // home, property, life-building — 2–3+ year horizons
   CELEBRATION // a landmark event (wedding, big party) — near-term
-  LEGACY      // long-horizon gifts for the future (a child's fund, an heirloom)
+  LEGACY // long-horizon gifts for the future (a child's fund, an heirloom)
 }
 
 enum ItemCategory {
@@ -104,43 +104,47 @@ model User {
 /// The pot accumulates a lifetime balance; eventDate represents the *next*
 /// target reveal milestone, not a deletion deadline.
 model Pot {
-  id             String      @id @default(cuid())
-  creatorId      String
+  id                  String             @id @default(cuid())
+  creatorId           String
   /// Human-readable name for the item/goal — persists across gifting cycles.
-  title          String
-  description    String?
-  targetAmount   Decimal     @db.Decimal(10, 2)
-  currentBalance Decimal     @default(0) @db.Decimal(10, 2)
-  status         PotStatus   @default(ACTIVE)
+  title               String
+  description         String?
+  targetAmount        Decimal            @db.Decimal(10, 2)
+  currentBalance      Decimal            @default(0) @db.Decimal(10, 2)
+  status              PotStatus          @default(ACTIVE)
   /// Determines reveal mechanic, UX theming, and AdTech segmentation bucket.
   /// See GiftingMode enum for full semantics.
-  mode           GiftingMode @default(LIVE_FEED)
+  mode                GiftingMode        @default(LIVE_FEED)
   /// When true, this pot persists across multiple gifting cycles (the same goal
   /// can receive contributions at Christmas AND a birthday without being closed).
   /// Enables the continuous-pot architecture central to the Kindling flywheel.
-  continuous     Boolean     @default(true)
+  continuous          Boolean            @default(true)
   /// Joint Fire: when true, this pot pools two users' gifting potential toward a
   /// shared long-term Major Goal (e.g. The Big Holiday), stacking recurring events
   /// (birthdays, Christmas, anniversaries) into a single macro-pot.
-  isJoint        Boolean     @default(false)
+  isJoint             Boolean            @default(false)
   /// The partner account linked into this Joint Fire (the second contributor's
   /// User id). Null for solo pots. Pairs with isJoint.
-  linkedUserId   String?
+  linkedUserId        String?
   /// The Milestone taxonomy bucket for a Joint Fire's Major Goal. Drives the
   /// projection horizon, the dashboard's Legacy Arc imagery, and the retail
   /// intent segment sold to partners. Null for ad-hoc (non-milestone) pots.
-  milestoneCategory MilestoneCategory?
+  milestoneCategory   MilestoneCategory?
   /// Target date for the Major Goal (e.g. the holiday booking window). Distinct
   /// from eventDate (the next reveal) — this is the long-horizon finish line.
   targetMilestoneDate DateTime?
   /// The next milestone reveal date (e.g. Christmas morning or a birthday).
   /// Null for LIVE_FEED pots with no fixed deadline.
-  eventDate      DateTime?
+  eventDate           DateTime?
   /// CDN URL of the AI-generated reveal video, populated once generation succeeds.
   /// Null until a RevealTask for this pot reaches status COMPLETED.
-  revealVideoUrl String?
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  revealVideoUrl      String?
+  /// Star Chart ("1/30th engine"): a goal is always divided into this many stars.
+  /// Fixed at 30 — each star is worth targetAmount/starCount (goal_value/30). The
+  /// 30-star grid is a *front-end view*; currentBalance remains the source of truth.
+  starCount           Int                @default(30)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 
   creator       User             @relation("PotCreator", fields: [creatorId], references: [id])
   /// The linked partner on a Joint Fire (the inviter is `creator`).
@@ -149,6 +153,8 @@ model Pot {
   contributions Contribution[]
   intentNodes   IntentDataNode[]
   revealTasks   RevealTask[]
+  behaviors     Behavior[]
+  starAwards    StarAward[]
 
   @@index([creatorId])
   @@index([status])
@@ -161,34 +167,82 @@ model Pot {
   @@map("pots")
 }
 
+/// A parent-approved routine behaviour (chore) that earns a child stars on a
+/// Fire's Star Chart. Toggling/assigning these is the "Behaviour Manager".
+model Behavior {
+  id           String   @id @default(cuid())
+  potId        String
+  /// Human-readable label, e.g. "Homework finished", "Tidied bedroom".
+  description  String
+  /// Stars granted each time this behaviour is completed (1–starCount).
+  starsAwarded Int      @default(1)
+  /// Routine behaviours can be completed repeatedly; one-offs cannot.
+  isRecurring  Boolean  @default(true)
+  /// Parents can switch a behaviour off without deleting it.
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pot    Pot         @relation(fields: [potId], references: [id], onDelete: Cascade)
+  awards StarAward[]
+
+  @@index([potId, enabled])
+  @@map("behaviors")
+}
+
+/// Immutable audit log for the Star Chart: records exactly which behaviour filled
+/// which stars and the £ it added to the pot. Essential for parent transparency —
+/// the financial truth (currentBalance) must always be explainable from this log.
+model StarAward {
+  id                  String   @id @default(cuid())
+  potId               String
+  /// Null if the behaviour was later deleted (the description is kept inline).
+  behaviorId          String?
+  /// Snapshot of the behaviour label at award time (survives behaviour deletion).
+  behaviorDescription String
+  /// Stars actually filled by this award (after clamping to the starCount ceiling).
+  starsAwarded        Int
+  /// Pounds this award added to the pot: starsAwarded × (targetAmount / starCount).
+  valueAdded          Decimal  @db.Decimal(10, 2)
+  /// First star slot (0-indexed) this award filled — for reconstructing the grid.
+  starIndexStart      Int
+  createdAt           DateTime @default(now())
+
+  pot      Pot       @relation(fields: [potId], references: [id], onDelete: Cascade)
+  behavior Behavior? @relation(fields: [behaviorId], references: [id], onDelete: SetNull)
+
+  @@index([potId, createdAt])
+  @@map("star_awards")
+}
+
 enum RevealTaskStatus {
-  PENDING    // Submitted to provider, awaiting processing
+  PENDING // Submitted to provider, awaiting processing
   PROCESSING // Provider has started rendering
-  COMPLETED  // Video ready at videoUrl
-  FAILED     // Generation failed — surface fallback ceremony
+  COMPLETED // Video ready at videoUrl
+  FAILED // Generation failed — surface fallback ceremony
 }
 
 /// Tracks an AI video generation job for a pot's reveal ceremony.
 /// One pot may have multiple tasks if the first fails and is retried.
 /// Only the most recent COMPLETED task's videoUrl is shown.
 model RevealTask {
-  id         String           @id @default(cuid())
-  potId      String
+  id             String           @id @default(cuid())
+  potId          String
   /// Opaque task identifier returned by the video provider (Kling / Runway).
-  providerTaskId String       @unique
+  providerTaskId String           @unique
   /// Which provider was used — allows swapping without losing history.
-  provider   String           @default("kling")
+  provider       String           @default("kling")
   /// The prompt submitted to the provider, stored for debugging / replay.
-  prompt     String           @db.Text
-  status     RevealTaskStatus @default(PENDING)
+  prompt         String           @db.Text
+  status         RevealTaskStatus @default(PENDING)
   /// Final CDN URL from the provider once status = COMPLETED.
-  videoUrl   String?
+  videoUrl       String?
   /// Raw error payload from the provider if status = FAILED.
-  errorPayload String?        @db.Text
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+  errorPayload   String?          @db.Text
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
-  pot        Pot              @relation(fields: [potId], references: [id], onDelete: Cascade)
+  pot Pot @relation(fields: [potId], references: [id], onDelete: Cascade)
 
   @@index([potId, status])
   @@index([status, createdAt])
@@ -222,21 +276,21 @@ model PotItem {
 }
 
 model Contribution {
-  id              String             @id @default(cuid())
-  potId           String
+  id             String             @id @default(cuid())
+  potId          String
   /// Null for anonymous contributions
-  giverId         String?
-  amount          Decimal            @db.Decimal(10, 2)
-  paymentMethod   PaymentMethod
-  status          ContributionStatus @default(PENDING)
+  giverId        String?
+  amount         Decimal            @db.Decimal(10, 2)
+  paymentMethod  PaymentMethod
+  status         ContributionStatus @default(PENDING)
   /// Stripe PaymentIntent ID — set once the intent is created, used for webhook reconciliation.
-  stripeIntentId  String?            @unique
+  stripeIntentId String?            @unique
   /// Optional text tribute shown in the reveal ceremony message cards
-  message         String?
+  message        String?
   /// Optional video tribute URL shown in the reveal ceremony showreel
-  videoUrl        String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  videoUrl       String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
   pot   Pot   @relation(fields: [potId], references: [id])
   giver User? @relation("ContributionGiver", fields: [giverId], references: [id])
