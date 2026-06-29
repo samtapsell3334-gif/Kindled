@@ -2127,6 +2127,7 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
 
   if (showRedeem) return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-950 via-violet-950 to-indigo-950 px-4 pt-6 pb-32">
+      <AnimatePresence>{burst&&<StarBurst key={burst.key} x={burst.x} y={burst.y}/>}</AnimatePresence>
       <button onClick={()=>setShowRedeem(false)} className="mb-4 flex items-center gap-2 text-violet-300 text-[13px] font-bold">
         <ChevronRight className="h-4 w-4 rotate-180"/> Back to Stars
       </button>
@@ -2158,11 +2159,11 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
             <div className="text-right">
               <p className="text-[11px] font-black text-amber-400">{gc.stars} stars</p>
               <button
-                onClick={()=>{ if(canAfford && !isRedeemed){ chime(); setRedeemed(s=>new Set([...s,gc.brand])); } }}
+                onClick={(e)=>{ if(canAfford && !isRedeemed){ chime(); setRedeemed(s=>new Set([...s,gc.brand])); setBurst({x:e.clientX,y:e.clientY,key:Date.now()}); setTimeout(()=>setBurst(null),750); } }}
                 disabled={!canAfford || isRedeemed}
-                className={cn("mt-1 rounded-xl px-3 py-1.5 text-[11px] font-bold transition-colors",
+                className={cn("mt-1 rounded-xl px-3 py-1.5 text-[11px] font-bold transition-all active:scale-90",
                 isRedeemed?"bg-emerald-500/20 text-emerald-300"
-                  :canAfford?"bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900"
+                  :canAfford?"bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900 shadow-lg shadow-amber-500/30"
                   :"bg-white/10 text-white/30 cursor-not-allowed")}>
                 {isRedeemed?"Sent to a grown-up!":canAfford?"Redeem!":"Need more"}
               </button>
@@ -2250,6 +2251,26 @@ function KindledStarsTab({ pots }: { pots: DemoPot[] }) {
           </div>
         </div>
       </header>
+
+      {/* ── HOW STARS WORK — quick flow ── */}
+      <div className="relative z-10 mx-4 mb-4 flex items-stretch gap-2">
+        {[
+          { Icon: Check,     label: "Earn",  sub: "Do missions",     grad: "from-sky-500 to-blue-600" },
+          { Icon: Gift,      label: "Splash", sub: "Into Billy's pot", grad: "from-amber-400 to-orange-500" },
+          { Icon: ShoppingBag, label: "Swap", sub: "For real rewards", grad: "from-rose-500 to-pink-600" },
+        ].map(({ Icon, label, sub, grad }, i) => (
+          <div key={label} className="flex flex-1 items-center gap-2">
+            <div className="flex-1 rounded-2xl border border-white/10 bg-white/[0.06] px-2.5 py-2.5 text-center">
+              <div className={cn("mx-auto mb-1 flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-br", grad)}>
+                <Icon className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
+              </div>
+              <p className="text-[11px] font-black text-white leading-none">{label}</p>
+              <p className="mt-0.5 text-[8.5px] text-violet-300/80 leading-tight">{sub}</p>
+            </div>
+            {i < 2 && <ChevronRight className="h-3.5 w-3.5 shrink-0 text-white/25" />}
+          </div>
+        ))}
+      </div>
 
       {/* ── DAILY VISIT BONUS ── */}
       <AnimatePresence>
@@ -3927,13 +3948,16 @@ const EMBERS_V2 = Array.from({ length: 24 }, (_, i) => ({
 const V2_POTS = [
   { id: "p1", name: "Super-Fast Mountain Bike", sub: "Trek Marlin 5 · Your #1 wish",
     amount: 310, goal: 310, Icon: Bike,
-    grad: "from-amber-400 to-orange-500", glow: "#f97316", complete: true },
+    grad: "from-amber-400 to-orange-500", glow: "#f97316", complete: true,
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop&q=85" },
   { id: "p2", name: "LEGO Millennium Falcon", sub: "Star Wars · 3,187 pieces",
     amount: 89, goal: 89, Icon: Package,
-    grad: "from-violet-400 to-purple-500", glow: "#8b5cf6", complete: true },
+    grad: "from-violet-400 to-purple-500", glow: "#8b5cf6", complete: true,
+    image: "https://images.unsplash.com/photo-1608889476518-738c9b1dcb40?w=600&h=600&fit=crop&q=85" },
   { id: "p3", name: "PS5 Gaming Bundle", sub: "3 games · controller included",
     amount: 75, goal: 80, Icon: Gamepad2,
-    grad: "from-blue-400 to-sky-400", glow: "#38bdf8", complete: false },
+    grad: "from-blue-400 to-sky-400", glow: "#38bdf8", complete: false,
+    image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&h=600&fit=crop&q=85" },
 ];
 
 const V2_CONTRIBS = [
@@ -5420,7 +5444,7 @@ export default function DemoPage() {
           recipientName="Billy"
           occasion="Birthday"
           totalRaised={V2_TOTAL}
-          gifts={V2_POTS.map((p) => ({ name: p.name, sub: p.sub, Icon: p.Icon, grad: p.grad, glow: p.glow }))}
+          gifts={V2_POTS.map((p) => ({ name: p.name, sub: p.sub, Icon: p.Icon, grad: p.grad, glow: p.glow, image: p.image }))}
           contributors={V2_CONTRIBS.map((c) => ({ name: c.name, initials: c.initials, grad: c.grad }))}
           onComplete={() => setShowAiReveal(false)}
         />

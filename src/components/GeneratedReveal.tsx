@@ -24,6 +24,8 @@ export interface RevealGift {
   Icon: LucideIcon;
   grad: string;
   glow: string;
+  /** Real product photo — shown cinematically in the gifts phase */
+  image?: string;
 }
 
 export interface RevealContributor {
@@ -297,15 +299,29 @@ export function GeneratedReveal({
                       transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.15 + i * 0.5 }}
                       className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur-sm"
                     >
+                      {/* Real product photo over a gradient+icon fallback */}
                       <div
-                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${g.grad}`}
+                        className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br ${g.grad}`}
                         style={{ boxShadow: `0 8px 24px ${g.glow}66` }}
                       >
-                        <g.Icon className="h-6 w-6 text-white" strokeWidth={2} />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <g.Icon className="h-7 w-7 text-white" strokeWidth={2} />
+                        </div>
+                        {g.image && (
+                          <motion.img
+                            src={g.image} alt={g.name} loading="lazy" decoding="async"
+                            initial={{ scale: 1.15, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.3 + i * 0.5 }}
+                            className="absolute inset-0 h-full w-full object-cover"
+                            onError={(e) => { e.currentTarget.remove(); }}
+                          />
+                        )}
                       </div>
                       <div className="min-w-0 flex-1 text-left">
                         <p className="truncate text-[15px] font-black text-white">{g.name}</p>
-                        <p className="text-[11px] font-bold uppercase tracking-wide text-amber-300/80">
+                        {g.sub && <p className="truncate text-[11px] text-white/55">{g.sub}</p>}
+                        <p className="mt-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-300/80">
                           {GIFT_CAPTIONS[i % GIFT_CAPTIONS.length]}
                         </p>
                       </div>
