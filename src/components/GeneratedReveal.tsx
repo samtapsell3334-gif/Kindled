@@ -32,6 +32,8 @@ export interface RevealContributor {
   name: string;
   initials: string;
   grad: string;
+  /** Real portrait photo — shown instead of initials, falls back to initials */
+  image?: string;
 }
 
 interface GeneratedRevealProps {
@@ -351,9 +353,16 @@ export function GeneratedReveal({
                         className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] py-1 pl-1 pr-3"
                       >
                         <span
-                          className={`flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br ${c.grad} text-[10px] font-black text-white`}
+                          className={`relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br ${c.grad} text-[10px] font-black text-white`}
                         >
                           {c.initials}
+                          {c.image && (
+                            <img
+                              src={c.image} alt={c.name} loading="lazy" decoding="async"
+                              className="absolute inset-0 h-full w-full object-cover"
+                              onError={(e) => { e.currentTarget.remove(); }}
+                            />
+                          )}
                         </span>
                         <span className="text-[12px] font-bold text-white/90">{c.name}</span>
                       </motion.div>

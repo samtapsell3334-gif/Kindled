@@ -3962,16 +3962,22 @@ const V2_POTS = [
 
 const V2_CONTRIBS = [
   { name: "Mum & Dad", amount: 150, initials: "MD", grad: "from-amber-400 to-orange-500", pot: "Mountain Bike",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "We are so proud of who you are becoming. You deserve every single part of this. We love you to the moon and back, always." },
   { name: "Grandma Linda", amount: 50, initials: "GL", grad: "from-rose-400 to-pink-500", pot: "Mountain Bike",
+    image: "https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "I've watched you grow into someone truly special. This is just the beginning of your adventures, my darling. Ride fast and smile wide." },
   { name: "Uncle Steve", amount: 35, initials: "US", grad: "from-blue-400 to-violet-500", pot: "LEGO Set",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "Every ride is going to be an adventure. I can't wait to hear the stories — go fast, stay safe, have the absolute best time." },
   { name: "Auntie Claire", amount: 25, initials: "AC", grad: "from-emerald-400 to-teal-500", pot: "PS5 Bundle",
+    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "Happy birthday to the most brilliant kid I know. This is from everyone who loves watching you shine. Enjoy every second." },
   { name: "Nana Joyce", amount: 30, initials: "NJ", grad: "from-violet-400 to-fuchsia-500", pot: "Mountain Bike",
+    image: "https://images.unsplash.com/photo-1592621385612-4d7129426394?w=200&h=200&fit=crop&crop=faces&q=80",
     msg: "I hope every single ride reminds you just how deeply you are loved. You make all of us so incredibly happy and proud." },
   { name: "School Friends", amount: 20, initials: "SF", grad: "from-teal-400 to-cyan-500", pot: "LEGO Set",
+    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop&q=80",
     msg: "From all the gang — go absolutely smash it! You are the absolute best. See you at the park very soon." },
 ];
 
@@ -4206,8 +4212,9 @@ function RevealV2View() {
               {V2_CONTRIBS.map((c, i) => (
                 <motion.div key={c.name} initial={{ opacity: 0, scale: 0, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ delay: 1.1 + i * 0.14, type: "spring", stiffness: 480, damping: 24 }}
-                  className={`flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br ${c.grad} text-[11px] font-black text-white shadow-lg`}>
+                  className={`relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${c.grad} text-[11px] font-black text-white shadow-lg`}>
                   {c.initials}
+                  {c.image && <img src={c.image} alt={c.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover" onError={(e)=>{e.currentTarget.remove();}} />}
                 </motion.div>
               ))}
             </div>
@@ -4337,8 +4344,9 @@ function RevealV2View() {
                   <div className="flex -space-x-2.5">
                     {V2_CONTRIBS.map((c, i) => (
                       <div key={i}
-                        className={`flex h-8 w-8 items-center justify-center rounded-full border-2 border-black bg-gradient-to-br ${c.grad} text-[9px] font-black text-white`}>
+                        className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-2 border-black bg-gradient-to-br ${c.grad} text-[9px] font-black text-white`}>
                         {c.initials}
+                        {c.image && <img src={c.image} alt={c.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover" onError={(e)=>{e.currentTarget.remove();}} />}
                       </div>
                     ))}
                   </div>
@@ -4398,9 +4406,10 @@ function RevealV2View() {
             {/* Avatar */}
             <motion.div initial={{ scale: 0, rotate: -160 }} animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 480, damping: 22 }}
-              className={`mb-5 flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br ${contrib.grad} text-[28px] font-black text-white`}
+              className={`relative mb-5 flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br ${contrib.grad} text-[28px] font-black text-white`}
               style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.7),0 0 40px rgba(251,146,60,0.15)" }}>
               {contrib.initials}
+              {contrib.image && <img src={contrib.image} alt={contrib.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover" onError={(e)=>{e.currentTarget.remove();}} />}
             </motion.div>
 
             <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
@@ -5445,7 +5454,7 @@ export default function DemoPage() {
           occasion="Birthday"
           totalRaised={V2_TOTAL}
           gifts={V2_POTS.map((p) => ({ name: p.name, sub: p.sub, Icon: p.Icon, grad: p.grad, glow: p.glow, image: p.image }))}
-          contributors={V2_CONTRIBS.map((c) => ({ name: c.name, initials: c.initials, grad: c.grad }))}
+          contributors={V2_CONTRIBS.map((c) => ({ name: c.name, initials: c.initials, grad: c.grad, image: c.image }))}
           onComplete={() => setShowAiReveal(false)}
         />
       )}
