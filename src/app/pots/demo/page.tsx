@@ -3958,12 +3958,12 @@ function JointFireView() {
   const reveal = { initial: { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "0px 0px -60px 0px" }, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } };
 
   return (
-    <div className="min-h-screen px-4 pb-32 pt-6 text-stone-100" style={{ background: "linear-gradient(180deg,#14161b 0%,#191b22 100%)" }}>
+    <div className="min-h-screen bg-[#0a0a0a] px-4 pb-32 pt-6 text-[#f5f5f5]">
       {/* Header */}
       <motion.div {...reveal} className="mb-5">
-        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-400/80">Joint Fire · Milestone Engine</p>
-        <h2 style={{ fontFamily: "var(--font-display)" }} className="mt-1.5 text-[26px] font-black leading-tight text-stone-50">Stack your birthdays. Combine your Christmases.</h2>
-        <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed text-slate-400">Link accounts, pick a milestone, and every occasion stacks toward something neither of you would buy on a single day.</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#ffb800]">Joint Fire · Milestone Engine</p>
+        <h2 className="font-editorial mt-1.5 text-[27px] font-semibold leading-tight text-[#f5f5f5]">Stack your birthdays. Combine your Christmases.</h2>
+        <p className="mt-2 max-w-sm text-[13px] leading-relaxed tracking-tight text-[#f5f5f5]/55">Link accounts, pick a milestone, and every occasion stacks toward something neither of you would buy on a single day.</p>
       </motion.div>
 
       {/* Milestone category selector */}
@@ -3992,10 +3992,10 @@ function JointFireView() {
           <motion.img key={goal.image} src={goal.image} alt={goal.title} initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }} className="h-52 w-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.opacity = "0.25"; }} />
         </AnimatePresence>
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,22,27,0.1) 0%, rgba(20,22,27,0.92) 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,10,0.1) 0%, rgba(10,10,10,0.94) 100%)" }} />
         <div className="absolute right-4 top-4 flex -space-x-3">
           {JOINT_PARTNERS.map((p) => (
-            <div key={p.name} className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-[#14161b] bg-slate-700">
+            <div key={p.name} className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-[#0a0a0a] bg-[#1a1a1a]">
               <span className="flex h-full w-full items-center justify-center text-[11px] font-black text-white">{p.initials}</span>
               <img src={p.image} alt={p.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover" onError={(e) => { e.currentTarget.remove(); }} />
             </div>
@@ -4003,17 +4003,17 @@ function JointFireView() {
         </div>
         <div className="absolute inset-x-0 bottom-0 p-5">
           <div className="flex items-center gap-1.5">
-            <HeroIcon className="h-3.5 w-3.5 text-amber-400" />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400">{profile.label} · Major Goal</p>
+            <HeroIcon className="h-3.5 w-3.5 text-[#ffb800]" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">{profile.label} · Major Goal</p>
           </div>
-          <p style={{ fontFamily: "var(--font-display)" }} className="mt-1 text-[24px] font-black leading-none text-white">{goal.title}</p>
-          <p className="text-[12px] text-stone-300/80">{goal.sub}</p>
+          <p className="font-editorial mt-1 text-[25px] font-semibold leading-none text-[#f5f5f5]">{goal.title}</p>
+          <p className="text-[12px] tracking-tight text-[#f5f5f5]/70">{goal.sub}</p>
           <div className="mt-3 flex items-end justify-between">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slate-400">Goal value</p>
-              <p className="text-[20px] font-black text-white tabular-nums">£{goal.value.toLocaleString()}</p>
+              <p className="text-[10px] uppercase tracking-[0.15em] text-[#f5f5f5]/45">Goal value</p>
+              <p className="text-[20px] font-semibold tabular-nums text-[#f5f5f5]">£{goal.value.toLocaleString()}</p>
             </div>
-            <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold text-stone-200">{Math.round(progress * 100)}% in {horizon} yrs</span>
+            <span className="bg-[#f5f5f5]/10 px-3 py-1 text-[11px] font-semibold text-[#f5f5f5]/85">{Math.round(progress * 100)}% in {horizon} yrs</span>
           </div>
         </div>
       </motion.div>
@@ -4043,8 +4043,8 @@ function JointFireView() {
         </div>
         <AnimatePresence mode="wait">
           <motion.div key={`${category}-${combined}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-3 flex items-end gap-3">
-            <p style={{ fontFamily: "var(--font-display)" }} className="text-[48px] font-black leading-none text-white tabular-nums">{fmtYears(ttg)}</p>
-            {combined && faster > 0 && <span className="mb-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[12px] font-bold text-emerald-400">{faster}% faster together</span>}
+            <p className="font-editorial text-[48px] font-semibold leading-none tabular-nums text-[#f5f5f5]">{fmtYears(ttg)}</p>
+            {combined && faster > 0 && <span className="mb-1.5 border border-[#ffb800]/40 bg-[#ffb800]/[0.1] px-2.5 py-1 text-[12px] font-semibold text-[#ffb800]">{faster}% faster together</span>}
           </motion.div>
         </AnimatePresence>
         <p className="mt-1 text-[12px] text-slate-400">{combined ? "Sam & Jess pooling" : "Sam on their own"} · {profile.label} velocity</p>
@@ -4052,8 +4052,8 @@ function JointFireView() {
           <div className="rounded-xl border border-white/10 bg-black/20 py-2.5"><p className="text-[10px] uppercase tracking-wider text-slate-500">Solo</p><p className="text-[15px] font-black text-slate-300">{fmtYears(ttgSolo)}</p></div>
           <div className="rounded-xl border border-amber-400/30 bg-amber-400/[0.08] py-2.5"><p className="text-[10px] uppercase tracking-wider text-amber-400/80">Combined</p><p className="text-[15px] font-black text-amber-300">{fmtYears(ttgCombined)}</p></div>
         </div>
-        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
-          <motion.div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300" initial={{ width: 0 }} animate={{ width: `${Math.round(progress * 100)}%` }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} />
+        <div className="mt-4 h-1.5 w-full overflow-hidden bg-[#f5f5f5]/10">
+          <motion.div className="h-full bg-[#ffb800]" style={{ boxShadow: "0 0 6px #ffb800" }} initial={{ width: 0 }} animate={{ width: `${Math.round(progress * 100)}%` }} transition={{ duration: 1, ease: LUX_EASE }} />
         </div>
         <p className="mt-2 text-[11px] text-slate-500">Projected pot at {horizon} yrs: <span className="font-bold text-stone-300">£{current.total.toLocaleString()}</span> across {current.events} occasions
           <span className="ml-2 inline-flex gap-1">{[1, 2, 3].map((y) => (
@@ -4112,45 +4112,23 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
     { id: "investor", label: "Investor", Icon: Lock },
   ];
   return (
-    <div className="sticky top-0 z-30 px-4 pt-3 pb-2 bg-[#fdf9f5]/90 backdrop-blur-md border-b border-stone-100">
-      <div className="overflow-x-auto scrollbar-none -mx-1 px-1">
-      <div className="flex min-w-max rounded-2xl bg-stone-100 p-1 gap-1 shadow-inner w-full">
+    <div className="sticky top-0 z-30 border-b border-[rgba(10,10,10,0.1)] bg-[#f5f5f5]/90 px-4 pb-2 pt-3 backdrop-blur-md">
+      <div className="-mx-1 overflow-x-auto px-1 scrollbar-none">
+      <div className="flex w-full min-w-max gap-1 border border-[rgba(10,10,10,0.08)] bg-[#fafafa] p-1">
         {tabs.map(({ id, label, Icon }) => (
           <motion.button
             key={id}
             whileTap={{ scale: 0.96 }}
             onClick={() => onChange(id)}
             className={cn(
-              "relative flex flex-col items-center justify-center gap-0.5 rounded-xl px-2.5 py-2 text-[10px] font-semibold transition-all min-w-[52px]",
-              role === id
-                ? id === "reveal"
-                  ? "bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900 shadow-md"
-                  : id === "catalogue"
-                    ? "bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md"
-                    : id === "stars"
-                      ? "bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md"
-                      : id === "investor"
-                        ? "bg-gradient-to-br from-slate-800 to-blue-900 text-white shadow-md"
-                        : id === "joint"
-                          ? "bg-amber-400 text-stone-900 shadow-md"
-                          : "bg-white shadow-sm text-stone-900"
-                : id === "reveal"
-                  ? "text-amber-500"
-                  : id === "catalogue"
-                    ? "text-violet-400"
-                    : id === "stars"
-                      ? "text-violet-500"
-                      : id === "investor"
-                        ? "text-blue-600"
-                        : id === "joint"
-                          ? "text-amber-600"
-                          : "text-stone-400",
+              "relative flex min-w-[52px] flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-[10px] font-semibold transition-colors",
+              role === id ? "text-[#f5f5f5]" : "text-[#0a0a0a]/45 hover:text-[#0a0a0a]/70",
             )}
           >
-            {role === id && id !== "reveal" && id !== "catalogue" && id !== "stars" && id !== "investor" && id !== "joint" && (
-              <motion.div layoutId="role-pill" className="absolute inset-0 rounded-xl bg-white shadow-sm" style={{ zIndex: -1 }} />
+            {role === id && (
+              <motion.div layoutId="role-pill" className="absolute inset-0 bg-[#0a0a0a]" style={{ zIndex: -1 }} transition={{ duration: 0.4, ease: LUX_EASE }} />
             )}
-            <Icon className="h-3.5 w-3.5" strokeWidth={role === id ? 2.5 : 1.75} />
+            <Icon className={cn("h-3.5 w-3.5", role === id && "text-[#ffb800]")} strokeWidth={role === id ? 2.5 : 1.75} />
             <span>{label}</span>
           </motion.button>
         ))}
