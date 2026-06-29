@@ -11,11 +11,11 @@ import {
   Bike, Cake, TreePine, PenLine, Waves, Castle,
   AlertCircle, Copy, TrendingUp, Info, CircleEllipsis, CalendarDays, Gamepad2,
   Heart, Home, Shirt, Ticket, Dumbbell, Blocks, ImageOff, LayoutGrid,
-  Plane, UserPlus,
+  Plane, UserPlus, TrendingDown, ExternalLink,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { projectCumulative, goalProgress, timeToGoal, MILESTONE_PROFILES, type JointContributor, type GiftingEvent, type MilestoneCategory } from "@/lib/cumulative-projection";
-import { trackingDecorator, AFFILIATE_LINK_REL, AFFILIATE_DISCLOSURE } from "@/lib/catalog-service";
+import { trackingDecorator, getRetailer, priceDrop, AFFILIATE_LINK_REL, AFFILIATE_DISCLOSURE } from "@/lib/catalog-service";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
@@ -4721,6 +4721,70 @@ function MomentumArc({ progress, milestones }: { progress: number; milestones: {
 
 const MILESTONE_ICONS: Record<MilestoneCategory, LucideIcon> = { EXPEDITION: Plane, FOUNDATION: Home, CELEBRATION: Sparkles, LEGACY: Heart };
 
+// Discovery products — what the Conversion Engine surfaces for each goal. In
+// production these come from CatalogService.fetchProductFeed; here they're a
+// curated demo set, with a few price-drops to show the Smart-Shopper monitor.
+interface DiscoveryProduct {
+  id: string; name: string; price: number; prevPrice?: number;
+  image: string; retailerId: string; category: MilestoneCategory; url: string;
+}
+const IMG = (id: string) => `https://images.unsplash.com/photo-${id}?w=400&h=300&fit=crop&q=80`;
+const DISCOVERY_PRODUCTS: DiscoveryProduct[] = [
+  { id: "x1", category: "EXPEDITION", name: "7-Night Maldives Escape", price: 2890, prevPrice: 3200, retailerId: "tui",          image: IMG("1514282401047-d79a71a590e8"), url: "https://www.tui.co.uk/holidays" },
+  { id: "x2", category: "EXPEDITION", name: "Osprey 70L Travel Pack",   price: 185,                 retailerId: "cotswold",     image: IMG("1553062407-98eeb64c6a62"),    url: "https://www.cotswoldoutdoor.com" },
+  { id: "x3", category: "EXPEDITION", name: "Learn-to-Surf Week",       price: 299,                 retailerId: "gooutdoors",   image: IMG("1502680390469-be75c86b636f"), url: "https://www.gooutdoors.co.uk" },
+  { id: "f1", category: "FOUNDATION", name: "Velvet 3-Seater Sofa",     price: 649, prevPrice: 799, retailerId: "dunelm",       image: IMG("1555041469-a586c61ea9bc"),    url: "https://www.dunelm.com" },
+  { id: "f2", category: "FOUNDATION", name: "Artisan Stand Mixer",      price: 429,                 retailerId: "johnlewis",    image: IMG("1556909114-f6e7ad7d3136"),    url: "https://www.johnlewis.com" },
+  { id: "f3", category: "FOUNDATION", name: "Bean-to-Cup Coffee Machine", price: 549,               retailerId: "wayfair",      image: IMG("1495474472287-4d71bcdd2085"), url: "https://www.wayfair.co.uk" },
+  { id: "c1", category: "CELEBRATION", name: "Hot Air Balloon for Two", price: 198,                 retailerId: "virginexperience", image: IMG("1471879832106-c7ab9e0cee23"), url: "https://www.virginexperiencedays.co.uk" },
+  { id: "c2", category: "CELEBRATION", name: "Luxury Spa Day for Two",  price: 149, prevPrice: 179, retailerId: "buyagift",     image: IMG("1540555700478-4be289fbecef"), url: "https://www.buyagift.co.uk" },
+  { id: "c3", category: "CELEBRATION", name: "Michelin Dinner for Two", price: 249,                 retailerId: "redletterdays", image: IMG("1414235077428-338989a2e8c0"), url: "https://www.redletterdays.co.uk" },
+  { id: "l1", category: "LEGACY", name: "9ct Gold Locket",             price: 240, prevPrice: 295, retailerId: "beaverbrooks", image: IMG("1535632787350-4e68ef0ac584"), url: "https://www.beaverbrooks.co.uk" },
+  { id: "l2", category: "LEGACY", name: "Engraved Automatic Watch",    price: 495,                 retailerId: "goldsmiths",   image: IMG("1523275335684-37898b6baf30"), url: "https://www.goldsmiths.co.uk" },
+  { id: "l3", category: "LEGACY", name: "Heirloom Fragrance Set",      price: 160,                 retailerId: "etsy",         image: IMG("1541643600914-78b084683702"), url: "https://www.etsy.com" },
+];
+
+function GoalDiscovery({ category }: { category: MilestoneCategory }) {
+  const products = DISCOVERY_PRODUCTS.filter((p) => p.category === category);
+  return (
+    <div>
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Discover · curated for this goal</p>
+        <span className="text-[10px] text-slate-600">Partner retailers</span>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {products.map((p) => {
+          const drop = p.prevPrice ? priceDrop(p.prevPrice, p.price) : null;
+          const retailer = getRetailer(p.retailerId);
+          return (
+            <a key={p.id} href={trackingDecorator(p.url, p.retailerId)} target="_blank" rel={AFFILIATE_LINK_REL}
+              className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.07]">
+              <div className="relative h-28 overflow-hidden">
+                <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.style.opacity = "0.2"; }} />
+                {drop?.dropped && (
+                  <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-amber-400 px-2 py-0.5 text-[9px] font-black text-stone-900">
+                    <TrendingDown className="h-2.5 w-2.5" strokeWidth={3} /> {drop.pct}% · save £{drop.saved}
+                  </span>
+                )}
+              </div>
+              <div className="p-3">
+                <p className="truncate text-[12px] font-bold text-stone-100">{p.name}</p>
+                <p className="text-[10px] text-slate-500">{retailer?.name ?? p.retailerId}</p>
+                <div className="mt-1.5 flex items-baseline gap-1.5">
+                  <span className="text-[15px] font-black text-amber-400 tabular-nums">£{p.price.toLocaleString()}</span>
+                  {drop?.dropped && <span className="text-[11px] text-slate-600 line-through">£{p.prevPrice!.toLocaleString()}</span>}
+                  <ExternalLink className="ml-auto h-3 w-3 text-slate-600 transition-colors group-hover:text-amber-400" />
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-[10px] leading-relaxed text-slate-600">{AFFILIATE_DISCLOSURE}</p>
+    </div>
+  );
+}
+
 function JointFireView() {
   const [category, setCategory] = useState<MilestoneCategory>("EXPEDITION");
   const [combined, setCombined] = useState(true);
@@ -4875,8 +4939,13 @@ function JointFireView() {
         </div>
       </motion.div>
 
+      {/* Discovery — the Conversion Engine, filtered to this goal */}
+      <motion.div {...reveal} className="mt-6">
+        <GoalDiscovery category={category} />
+      </motion.div>
+
       <motion.button {...reveal}
-        className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/[0.08] py-3.5 text-[14px] font-bold text-amber-300 transition-colors active:scale-[0.99] hover:bg-amber-400/[0.14]">
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/[0.08] py-3.5 text-[14px] font-bold text-amber-300 transition-colors active:scale-[0.99] hover:bg-amber-400/[0.14]">
         <UserPlus className="h-4 w-4" /> Invite a partner to your Joint Fire
       </motion.button>
       <p className="mt-3 text-center text-[10px] leading-relaxed text-slate-500">Free to link · withdraw anytime · funds held on regulated Open Banking rails</p>
