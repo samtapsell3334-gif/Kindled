@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { projectCumulative, goalProgress, timeToGoal, MILESTONE_PROFILES, type JointContributor, type GiftingEvent, type MilestoneCategory } from "@/lib/cumulative-projection";
+import { trackingDecorator, AFFILIATE_LINK_REL, AFFILIATE_DISCLOSURE } from "@/lib/catalog-service";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
@@ -4590,7 +4591,7 @@ function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
               </div>
               <div className="flex gap-2 border-t border-white/5 p-3">
                 {funded ? (
-                  <a href={g.buyUrl} target="_blank" rel="noopener noreferrer"
+                  <a href={trackingDecorator(g.buyUrl, "amazon")} target="_blank" rel={AFFILIATE_LINK_REL}
                     className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 py-2.5 text-[13px] font-black text-stone-900 shadow-lg shadow-amber-500/20 active:scale-95 transition-transform">
                     <ShoppingBag className="h-4 w-4" strokeWidth={2.5} /> Buy now
                     <span className="rounded-full bg-stone-900/20 px-1.5 py-0.5 text-[9px] font-black">+{g.boost}% back</span>
@@ -4601,7 +4602,7 @@ function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
                       className="flex-1 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 py-2.5 text-[13px] font-black text-white transition-transform active:scale-95">
                       Top up £{remaining}
                     </button>
-                    <a href={g.buyUrl} target="_blank" rel="noopener noreferrer"
+                    <a href={trackingDecorator(g.buyUrl, "amazon")} target="_blank" rel={AFFILIATE_LINK_REL}
                       className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 px-3.5 py-2.5 text-[12px] font-bold text-white">
                       <ShoppingBag className="h-3.5 w-3.5" /> Buy
                     </a>
@@ -4634,7 +4635,7 @@ function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
       </div>
 
       <p className="mt-4 text-center text-[10px] leading-relaxed text-stone-500">
-        Buying through Kindled earns a small commission that keeps Kindled free — plus a cashback boost for next time. Real UK retailers only.
+        <span className="font-semibold text-stone-400">{AFFILIATE_DISCLOSURE}</span> The commission keeps Kindled free, with a cashback boost for next time. Real UK retailers only.
       </p>
 
       <button onClick={onReplay} className="mx-auto mt-5 flex items-center gap-1.5 text-[12px] font-bold text-stone-500 transition-colors hover:text-stone-300">

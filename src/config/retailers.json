@@ -1,0 +1,40 @@
+{
+  "_comment": "UK affiliate retailers powering the Conversion Engine. commission_rate is a percent. category maps to the MilestoneCategory taxonomy so Discovery can surface goal-relevant retailers. network is the affiliate platform the feed/links come from.",
+  "retailers": [
+    { "id": "tui",              "name": "TUI",                    "commission_rate": 3.0,  "category": "EXPEDITION",  "network": "Awin",   "domain": "tui.co.uk" },
+    { "id": "booking",          "name": "Booking.com",            "commission_rate": 4.0,  "category": "EXPEDITION",  "network": "Impact", "domain": "booking.com" },
+    { "id": "expedia",          "name": "Expedia",                "commission_rate": 5.0,  "category": "EXPEDITION",  "network": "Awin",   "domain": "expedia.co.uk" },
+    { "id": "jet2holidays",     "name": "Jet2holidays",           "commission_rate": 3.0,  "category": "EXPEDITION",  "network": "Awin",   "domain": "jet2holidays.com" },
+    { "id": "loveholidays",     "name": "loveholidays",           "commission_rate": 2.5,  "category": "EXPEDITION",  "network": "Awin",   "domain": "loveholidays.com" },
+    { "id": "onthebeach",       "name": "On the Beach",           "commission_rate": 3.0,  "category": "EXPEDITION",  "network": "Awin",   "domain": "onthebeach.co.uk" },
+    { "id": "trainline",        "name": "Trainline",              "commission_rate": 4.0,  "category": "EXPEDITION",  "network": "Impact", "domain": "thetrainline.com" },
+    { "id": "cotswold",         "name": "Cotswold Outdoor",       "commission_rate": 6.0,  "category": "EXPEDITION",  "network": "Awin",   "domain": "cotswoldoutdoor.com" },
+    { "id": "gooutdoors",       "name": "GO Outdoors",            "commission_rate": 5.0,  "category": "EXPEDITION",  "network": "Awin",   "domain": "gooutdoors.co.uk" },
+
+    { "id": "bandq",            "name": "B&Q",                    "commission_rate": 3.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "diy.com" },
+    { "id": "wickes",           "name": "Wickes",                 "commission_rate": 4.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "wickes.co.uk" },
+    { "id": "screwfix",         "name": "Screwfix",               "commission_rate": 3.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "screwfix.com" },
+    { "id": "dunelm",           "name": "Dunelm",                 "commission_rate": 6.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "dunelm.com" },
+    { "id": "johnlewis",        "name": "John Lewis",             "commission_rate": 4.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "johnlewis.com" },
+    { "id": "ikea",             "name": "IKEA",                   "commission_rate": 3.0,  "category": "FOUNDATION",  "network": "Impact", "domain": "ikea.com" },
+    { "id": "wayfair",          "name": "Wayfair",                "commission_rate": 7.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "wayfair.co.uk" },
+    { "id": "habitat",          "name": "Habitat",                "commission_rate": 6.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "habitat.co.uk" },
+    { "id": "furniturevillage", "name": "Furniture Village",      "commission_rate": 5.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "furniturevillage.co.uk" },
+    { "id": "homebase",         "name": "Homebase",               "commission_rate": 4.0,  "category": "FOUNDATION",  "network": "Awin",   "domain": "homebase.co.uk" },
+
+    { "id": "moonpig",          "name": "Moonpig",                "commission_rate": 10.0, "category": "CELEBRATION", "network": "Awin",   "domain": "moonpig.com" },
+    { "id": "notonthehighstreet","name": "notonthehighstreet",    "commission_rate": 8.0,  "category": "CELEBRATION", "network": "Awin",   "domain": "notonthehighstreet.com" },
+    { "id": "bloomandwild",     "name": "Bloom & Wild",           "commission_rate": 12.0, "category": "CELEBRATION", "network": "Awin",   "domain": "bloomandwild.com" },
+    { "id": "virginexperience", "name": "Virgin Experience Days", "commission_rate": 8.0,  "category": "CELEBRATION", "network": "Awin",   "domain": "virginexperiencedays.co.uk" },
+    { "id": "buyagift",         "name": "Buyagift",               "commission_rate": 10.0, "category": "CELEBRATION", "network": "Awin",   "domain": "buyagift.co.uk" },
+    { "id": "redletterdays",    "name": "Red Letter Days",        "commission_rate": 9.0,  "category": "CELEBRATION", "network": "Awin",   "domain": "redletterdays.co.uk" },
+    { "id": "cardfactory",      "name": "Card Factory",           "commission_rate": 6.0,  "category": "CELEBRATION", "network": "Awin",   "domain": "cardfactory.co.uk" },
+
+    { "id": "beaverbrooks",     "name": "Beaverbrooks",           "commission_rate": 5.0,  "category": "LEGACY",      "network": "Awin",   "domain": "beaverbrooks.co.uk" },
+    { "id": "goldsmiths",       "name": "Goldsmiths",             "commission_rate": 4.0,  "category": "LEGACY",      "network": "Awin",   "domain": "goldsmiths.co.uk" },
+    { "id": "ernestjones",      "name": "Ernest Jones",           "commission_rate": 4.0,  "category": "LEGACY",      "network": "Awin",   "domain": "ernestjones.co.uk" },
+    { "id": "etsy",             "name": "Etsy",                   "commission_rate": 4.0,  "category": "LEGACY",      "network": "Awin",   "domain": "etsy.com" },
+    { "id": "thortful",         "name": "thortful",               "commission_rate": 8.0,  "category": "LEGACY",      "network": "Awin",   "domain": "thortful.com" },
+    { "id": "amazon",           "name": "Amazon",                 "commission_rate": 3.0,  "category": "CELEBRATION", "network": "Amazon", "domain": "amazon.co.uk" }
+  ]
+}
