@@ -14,7 +14,7 @@ import {
   Plane, UserPlus,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { projectCumulative, goalProgress, type JointContributor, type GiftingEvent } from "@/lib/cumulative-projection";
+import { projectCumulative, goalProgress, timeToGoal, MILESTONE_PROFILES, type JointContributor, type GiftingEvent, type MilestoneCategory } from "@/lib/cumulative-projection";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
@@ -4657,12 +4657,15 @@ const JOINT_EVENTS: (GiftingEvent & { Icon: LucideIcon })[] = [
   { label: "Christmas",     perYear: 1, Icon: TreePine },
   { label: "Anniversary",   perYear: 1, Icon: Heart },
 ];
-const JOINT_GOAL = {
-  title: "The Maldives",
-  sub: "Overwater villa · 10 nights · for two",
-  value: 3200,
-  image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=900&h=600&fit=crop&q=85",
+// Each milestone category has its own Major Goal and aspirational imagery —
+// the Legacy Arc and hero re-skin when the category changes.
+const MILESTONE_GOALS: Record<MilestoneCategory, { title: string; sub: string; value: number; image: string }> = {
+  EXPEDITION:  { title: "The Maldives",      sub: "Overwater villa · 10 nights",   value: 3200, image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=900&h=600&fit=crop&q=85" },
+  FOUNDATION:  { title: "The Dream Kitchen", sub: "Full renovation · fitted",       value: 6000, image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&h=600&fit=crop&q=85" },
+  CELEBRATION: { title: "The 40th",          sub: "Venue, the works · one big night", value: 2400, image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=900&h=600&fit=crop&q=85" },
+  LEGACY:      { title: "Theo's Future Fund", sub: "A head start for our son",       value: 4500, image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=900&h=600&fit=crop&q=85" },
 };
+const MILESTONE_ORDER: MilestoneCategory[] = ["EXPEDITION", "FOUNDATION", "CELEBRATION", "LEGACY"];
 
 function MomentumArc({ progress, milestones }: { progress: number; milestones: { label: string; frac: number }[] }) {
   const trackRef = useRef<SVGPathElement>(null);
@@ -4715,34 +4718,71 @@ function MomentumArc({ progress, milestones }: { progress: number; milestones: {
   );
 }
 
+const MILESTONE_ICONS: Record<MilestoneCategory, LucideIcon> = { EXPEDITION: Plane, FOUNDATION: Home, CELEBRATION: Sparkles, LEGACY: Heart };
+
 function JointFireView() {
-  const projection = projectCumulative(JOINT_PARTNERS, JOINT_EVENTS);
+  const [category, setCategory] = useState<MilestoneCategory>("EXPEDITION");
+  const [combined, setCombined] = useState(true);
   const [horizon, setHorizon] = useState(3);
+
+  const goal = MILESTONE_GOALS[category];
+  const profile = MILESTONE_PROFILES[category];
+  const HeroIcon = MILESTONE_ICONS[category];
+  const contributors = combined ? JOINT_PARTNERS : [JOINT_PARTNERS[0]!];
+
+  const projection = projectCumulative(contributors, JOINT_EVENTS, { years: 3, momentum: profile.momentum });
   const current = projection.find((p) => p.year === horizon) ?? projection[projection.length - 1]!;
-  const progress = goalProgress(projection, JOINT_GOAL.value, horizon);
-  const funded = current.total >= JOINT_GOAL.value;
+  const progress = goalProgress(projection, goal.value, horizon);
+
+  const ttgCombined = timeToGoal(JOINT_PARTNERS, JOINT_EVENTS, goal.value, category);
+  const ttgSolo = timeToGoal([JOINT_PARTNERS[0]!], JOINT_EVENTS, goal.value, category);
+  const ttg = combined ? ttgCombined : ttgSolo;
+  const faster = Number.isFinite(ttgSolo) && Number.isFinite(ttgCombined) && ttgSolo > 0 ? Math.round((1 - ttgCombined / ttgSolo) * 100) : 0;
+  const fmtYears = (y: number) => (Number.isFinite(y) ? `${y.toFixed(1)} yrs` : "5+ yrs");
+
   const milestones = [
     { label: "Birthday", frac: 0.26 },
     { label: "Xmas", frac: 0.54 },
     { label: "Anniv.", frac: 0.8 },
   ];
-
   const reveal = { initial: { opacity: 0, y: 28 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: "0px 0px -60px 0px" }, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } };
 
   return (
     <div className="min-h-screen px-4 pb-32 pt-6 text-stone-100" style={{ background: "linear-gradient(180deg,#14161b 0%,#191b22 100%)" }}>
       {/* Header */}
-      <motion.div {...reveal} className="mb-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-400/80">Joint Fire</p>
-        <h2 style={{ fontFamily: "var(--font-display)" }} className="mt-1.5 text-[26px] font-black leading-tight text-stone-50">Two of you. One big goal.</h2>
-        <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed text-slate-400">Link accounts and every birthday, Christmas and anniversary stacks toward something you&apos;d never buy on a single occasion.</p>
+      <motion.div {...reveal} className="mb-5">
+        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-400/80">Joint Fire · Milestone Engine</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="mt-1.5 text-[26px] font-black leading-tight text-stone-50">Stack your birthdays. Combine your Christmases.</h2>
+        <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed text-slate-400">Link accounts, pick a milestone, and every occasion stacks toward something neither of you would buy on a single day.</p>
       </motion.div>
 
-      {/* Goal hero card — real photography, glass overlay */}
+      {/* Milestone category selector */}
+      <motion.div {...reveal} className="mb-4 grid grid-cols-2 gap-2">
+        {MILESTONE_ORDER.map((c) => {
+          const Icon = MILESTONE_ICONS[c];
+          const on = c === category;
+          return (
+            <button key={c} onClick={() => setCategory(c)}
+              className={cn("flex items-center gap-2.5 rounded-2xl border p-3 text-left transition-colors", on ? "border-amber-400/60 bg-amber-400/[0.1]" : "border-white/10 bg-white/[0.035] hover:bg-white/[0.06]")}>
+              <div className={cn("flex h-9 w-9 items-center justify-center rounded-xl", on ? "bg-amber-400 text-stone-900" : "bg-white/5 text-slate-300")}>
+                <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+              </div>
+              <div className="min-w-0">
+                <p className={cn("text-[13px] font-bold leading-tight", on ? "text-amber-200" : "text-stone-200")}>{MILESTONE_PROFILES[c].label}</p>
+                <p className="truncate text-[10px] text-slate-500">{MILESTONE_PROFILES[c].tagline}</p>
+              </div>
+            </button>
+          );
+        })}
+      </motion.div>
+
+      {/* Goal hero card — category-specific photography */}
       <motion.div {...reveal} className="relative overflow-hidden rounded-3xl border border-white/10">
-        <img src={JOINT_GOAL.image} alt={JOINT_GOAL.title} className="h-52 w-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.opacity = "0.25"; }} />
+        <AnimatePresence mode="wait">
+          <motion.img key={goal.image} src={goal.image} alt={goal.title} initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }} className="h-52 w-full object-cover" loading="lazy" onError={(e) => { e.currentTarget.style.opacity = "0.25"; }} />
+        </AnimatePresence>
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,22,27,0.1) 0%, rgba(20,22,27,0.92) 100%)" }} />
-        {/* Dual avatars */}
         <div className="absolute right-4 top-4 flex -space-x-3">
           {JOINT_PARTNERS.map((p) => (
             <div key={p.name} className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-[#14161b] bg-slate-700">
@@ -4753,19 +4793,17 @@ function JointFireView() {
         </div>
         <div className="absolute inset-x-0 bottom-0 p-5">
           <div className="flex items-center gap-1.5">
-            <Plane className="h-3.5 w-3.5 text-amber-400" />
-            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400">Major Goal</p>
+            <HeroIcon className="h-3.5 w-3.5 text-amber-400" />
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400">{profile.label} · Major Goal</p>
           </div>
-          <p style={{ fontFamily: "var(--font-display)" }} className="mt-1 text-[24px] font-black leading-none text-white">{JOINT_GOAL.title}</p>
-          <p className="text-[12px] text-stone-300/80">{JOINT_GOAL.sub}</p>
+          <p style={{ fontFamily: "var(--font-display)" }} className="mt-1 text-[24px] font-black leading-none text-white">{goal.title}</p>
+          <p className="text-[12px] text-stone-300/80">{goal.sub}</p>
           <div className="mt-3 flex items-end justify-between">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-slate-400">Goal value</p>
-              <p className="text-[20px] font-black text-white tabular-nums">£{JOINT_GOAL.value.toLocaleString()}</p>
+              <p className="text-[20px] font-black text-white tabular-nums">£{goal.value.toLocaleString()}</p>
             </div>
-            <span className={cn("rounded-full px-3 py-1 text-[11px] font-bold", funded ? "bg-amber-400 text-stone-900" : "bg-white/10 text-stone-200")}>
-              {funded ? `Funded by Year ${horizon}` : `${Math.round(progress * 100)}% of the way`}
-            </span>
+            <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold text-stone-200">{Math.round(progress * 100)}% in {horizon} yrs</span>
           </div>
         </div>
       </motion.div>
@@ -4773,40 +4811,45 @@ function JointFireView() {
       {/* Momentum Arc */}
       <motion.div {...reveal} className="mt-4 rounded-3xl border border-white/10 bg-white/[0.035] p-5 backdrop-blur-sm">
         <div className="mb-1 flex items-center justify-between">
-          <p className="text-[13px] font-bold text-stone-100">Momentum</p>
+          <p className="text-[13px] font-bold text-stone-100">The Legacy Arc</p>
           <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-400"><TrendingUp className="h-3.5 w-3.5" /> Building</span>
         </div>
-        <p className="mb-2 text-[11px] text-slate-400">Each occasion is a booster on the way to the goal.</p>
+        <p className="mb-2 text-[11px] text-slate-400">Each occasion is an energy booster flowing into the macro-pot.</p>
         <MomentumArc progress={progress} milestones={milestones} />
       </motion.div>
 
-      {/* Projection calculator */}
+      {/* Dynamic calculator — Individual vs Combined, Time-to-Goal */}
       <motion.div {...reveal} className="mt-4 rounded-3xl border border-white/10 bg-white/[0.035] p-5 backdrop-blur-sm">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Projected Total Fire Value</p>
-            <p className="text-[11px] text-slate-500">Sam &amp; Jess · avg of past gifts · {horizon}-year horizon</p>
-          </div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Time to your goal</p>
           <div className="flex rounded-xl border border-white/10 bg-black/20 p-0.5">
-            {[1, 2, 3].map((y) => (
-              <button key={y} onClick={() => setHorizon(y)}
-                className={cn("rounded-lg px-3 py-1.5 text-[12px] font-bold transition-colors", horizon === y ? "bg-amber-400 text-stone-900" : "text-slate-400 hover:text-stone-200")}>
-                {y}yr
+            {([["Individual", false], ["Combined", true]] as const).map(([label, val]) => (
+              <button key={label} onClick={() => setCombined(val)}
+                className={cn("rounded-lg px-3 py-1.5 text-[11px] font-bold transition-colors", combined === val ? "bg-amber-400 text-stone-900" : "text-slate-400 hover:text-stone-200")}>
+                {label}
               </button>
             ))}
           </div>
         </div>
         <AnimatePresence mode="wait">
-          <motion.p key={current.total} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            style={{ fontFamily: "var(--font-display)" }} className="mt-3 text-[48px] font-black leading-none text-white tabular-nums">
-            £{current.total.toLocaleString()}
-          </motion.p>
+          <motion.div key={`${category}-${combined}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-3 flex items-end gap-3">
+            <p style={{ fontFamily: "var(--font-display)" }} className="text-[48px] font-black leading-none text-white tabular-nums">{fmtYears(ttg)}</p>
+            {combined && faster > 0 && <span className="mb-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[12px] font-bold text-emerald-400">{faster}% faster together</span>}
+          </motion.div>
         </AnimatePresence>
-        <p className="mt-1 text-[12px] text-slate-400">across {current.events} occasions · {Math.round(progress * 100)}% of the way to {JOINT_GOAL.title}</p>
-        {/* progress bar */}
+        <p className="mt-1 text-[12px] text-slate-400">{combined ? "Sam & Jess pooling" : "Sam on their own"} · {profile.label} velocity</p>
+        <div className="mt-3 grid grid-cols-2 gap-2 text-center">
+          <div className="rounded-xl border border-white/10 bg-black/20 py-2.5"><p className="text-[10px] uppercase tracking-wider text-slate-500">Solo</p><p className="text-[15px] font-black text-slate-300">{fmtYears(ttgSolo)}</p></div>
+          <div className="rounded-xl border border-amber-400/30 bg-amber-400/[0.08] py-2.5"><p className="text-[10px] uppercase tracking-wider text-amber-400/80">Combined</p><p className="text-[15px] font-black text-amber-300">{fmtYears(ttgCombined)}</p></div>
+        </div>
         <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
           <motion.div className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-300" initial={{ width: 0 }} animate={{ width: `${Math.round(progress * 100)}%` }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }} />
         </div>
+        <p className="mt-2 text-[11px] text-slate-500">Projected pot at {horizon} yrs: <span className="font-bold text-stone-300">£{current.total.toLocaleString()}</span> across {current.events} occasions
+          <span className="ml-2 inline-flex gap-1">{[1, 2, 3].map((y) => (
+            <button key={y} onClick={() => setHorizon(y)} className={cn("rounded px-1.5 py-0.5 text-[10px] font-bold", horizon === y ? "bg-white/15 text-white" : "text-slate-500")}>{y}yr</button>
+          ))}</span>
+        </p>
       </motion.div>
 
       {/* Event timeline / macro-pot */}
@@ -4814,7 +4857,7 @@ function JointFireView() {
         <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">What stacks into the goal</p>
         <div className="space-y-2.5">
           {JOINT_EVENTS.map((ev) => {
-            const perEvent = JOINT_PARTNERS.reduce((s, p) => s + p.avgPerEvent, 0);
+            const perEvent = contributors.reduce((s, p) => s + p.avgPerEvent, 0);
             return (
               <div key={ev.label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.035] p-3.5 backdrop-blur-sm">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10">
@@ -4822,7 +4865,7 @@ function JointFireView() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[14px] font-bold text-stone-100">{ev.label}</p>
-                  <p className="text-[11px] text-slate-400">Both circles chip in · adds to the macro-pot</p>
+                  <p className="text-[11px] text-slate-400">{combined ? "Both circles chip in" : "One circle chips in"} · adds to the macro-pot</p>
                 </div>
                 <p className="text-[15px] font-black text-amber-400 tabular-nums">+£{perEvent.toLocaleString()}</p>
               </div>
@@ -4831,7 +4874,6 @@ function JointFireView() {
         </div>
       </motion.div>
 
-      {/* Invite partner CTA */}
       <motion.button {...reveal}
         className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/[0.08] py-3.5 text-[14px] font-bold text-amber-300 transition-colors active:scale-[0.99] hover:bg-amber-400/[0.14]">
         <UserPlus className="h-4 w-4" /> Invite a partner to your Joint Fire

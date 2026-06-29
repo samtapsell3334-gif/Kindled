@@ -68,16 +68,28 @@
   },
 
   "jointFires": {
-    "label": "Joint Fires",
-    "title": "The 3-Year Compound Effect",
-    "body": "Two people linking their gifting potential turns scattered, single-occasion spend into a funded Major Goal. Pooled across three years, every birthday, Christmas and anniversary stacks — lifting conversion on high-ticket items and locking both networks into the loop.",
+    "label": "Joint Fires · Milestone Engine",
+    "title": "From Clutter to Life-Milestones",
+    "hook": "Stack your birthdays. Combine your Christmases. Accelerate your Expedition.",
+    "body": "Two people link accounts and every occasion stacks toward a categorised Major Goal. This moves users from buying clutter to funding life-milestones — and moves Kindled from a one-off utility to a multi-year relationship.",
     "stat": { "value": "+40%", "label": "conversion on high-ticket goals when two partners pool over 3 years" },
     "projection": [
       { "year": "Year 1", "value": "£990",   "pct": 30 },
       { "year": "Year 2", "value": "£2,079", "pct": 63 },
       { "year": "Year 3", "value": "£3,277", "pct": 100 }
     ],
-    "caption": "Modelled: two partners, three occasions a year, 10% momentum. A solo pot never reaches the high-ticket goal — a Joint Fire does."
+    "caption": "Modelled: two partners, three occasions a year, category-weighted momentum. A solo pot never reaches the high-ticket goal — a Joint Fire does.",
+    "pillars": [
+      { "title": "The 3-Year Compound Effect", "body": "Pooling birthdays and Christmases turns scattered, low-value spend into a funded milestone. The same households that would have bought clutter now save toward a holiday, a kitchen, a child's future — and convert on high-ticket items they'd never reach alone." },
+      { "title": "3-Year Predictive Intent", "body": "Categorised milestones give us multi-year forward intent. We don't just know a couple wants to spend — we know whether they're Foundation builders (Home & DIY) or Expedition seekers (Travel & Adventure), and roughly when they'll book. That forward window is worth a premium in retail data licensing." },
+      { "title": "Multi-Year Lock-In", "body": "A shared, years-long goal makes leaving costly and staying rewarding. Joint Fires shift Kindled from a one-off gifting utility to a long-term relational tool — the retention engine behind durable lifetime value." }
+    ],
+    "categories": [
+      { "label": "Expedition",  "segment": "Travel & adventure",  "horizon": "1–2 yr" },
+      { "label": "Foundation",  "segment": "Home, DIY & interiors", "horizon": "2–3+ yr" },
+      { "label": "Celebration", "segment": "Events & hospitality",  "horizon": "near-term" },
+      { "label": "Legacy",      "segment": "Finance & keepsakes",   "horizon": "long-horizon" }
+    ]
   },
 
   "valueEngine": {

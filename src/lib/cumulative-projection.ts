@@ -94,3 +94,64 @@ export function goalProgress(points: ProjectionPoint[], goalValue: number, atYea
   if (!point) return 0;
   return Math.min(1, point.total / goalValue);
 }
+
+// ─── Milestone taxonomy ─────────────────────────────────────────────────────────
+
+export type MilestoneCategory = "EXPEDITION" | "FOUNDATION" | "CELEBRATION" | "LEGACY";
+
+export interface CategoryProfile {
+  label: string;
+  tagline: string;
+  /** Typical planning horizon in years (the projection's upper bound). */
+  horizon: number;
+  /** Category-specific momentum: how fast per-event contribution velocity grows. */
+  momentum: number;
+}
+
+/**
+ * Each milestone category implies a different planning horizon and contribution
+ * velocity — Expeditions are funded fast (1–2 yrs, high momentum); Foundations
+ * are patient (2–3+ yrs, steady). These also map to a retail intent segment.
+ */
+export const MILESTONE_PROFILES: Record<MilestoneCategory, CategoryProfile> = {
+  EXPEDITION:  { label: "Expedition",  tagline: "Travel & adventure",   horizon: 2, momentum: 0.12 },
+  FOUNDATION:  { label: "Foundation",  tagline: "Home & life-building", horizon: 3, momentum: 0.08 },
+  CELEBRATION: { label: "Celebration", tagline: "A landmark moment",    horizon: 1, momentum: 0.15 },
+  LEGACY:      { label: "Legacy",      tagline: "A gift for the future", horizon: 3, momentum: 0.06 },
+};
+
+/** Project a category's full horizon using its weighted momentum. */
+export function projectForCategory(
+  contributors: JointContributor[],
+  events: GiftingEvent[],
+  category: MilestoneCategory,
+): ProjectionPoint[] {
+  const p = MILESTONE_PROFILES[category];
+  return projectCumulative(contributors, events, { years: p.horizon, momentum: p.momentum });
+}
+
+/**
+ * Category-weighted Time-to-Goal, in (fractional) years, for a given goal value.
+ * Returns Infinity if the goal is never reached within a 12-year ceiling.
+ */
+export function timeToGoal(
+  contributors: JointContributor[],
+  events: GiftingEvent[],
+  goalValue: number,
+  category: MilestoneCategory,
+): number {
+  const { momentum } = MILESTONE_PROFILES[category];
+  const baseAnnual = perEventValue(contributors) * eventsPerYear(events);
+  if (baseAnnual <= 0 || goalValue <= 0) return Infinity;
+
+  let cum = 0;
+  for (let year = 1; year <= 12; year++) {
+    const prev = cum;
+    cum += baseAnnual * Math.pow(1 + momentum, year - 1);
+    if (cum >= goalValue) {
+      const frac = (goalValue - prev) / (cum - prev); // linear within the year
+      return year - 1 + frac;
+    }
+  }
+  return Infinity;
+}

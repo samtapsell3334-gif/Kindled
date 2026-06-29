@@ -46,6 +46,16 @@ enum GiftingMode {
   WRAPPED_UP
 }
 
+/// Milestone taxonomy for Joint Fires — categorises the long-term Major Goal a
+/// macro-pot is funding. Drives projection horizons, UI theming/imagery, and the
+/// high-value retail intent segment (Foundation -> Home/DIY, Expedition -> Travel).
+enum MilestoneCategory {
+  EXPEDITION  // travel & adventure — typically 1–2 year horizons
+  FOUNDATION  // home, property, life-building — 2–3+ year horizons
+  CELEBRATION // a landmark event (wedding, big party) — near-term
+  LEGACY      // long-horizon gifts for the future (a child's fund, an heirloom)
+}
+
 enum ItemCategory {
   ELECTRONICS
   FASHION
@@ -116,6 +126,13 @@ model Pot {
   /// The partner account linked into this Joint Fire (the second contributor's
   /// User id). Null for solo pots. Pairs with isJoint.
   linkedUserId   String?
+  /// The Milestone taxonomy bucket for a Joint Fire's Major Goal. Drives the
+  /// projection horizon, the dashboard's Legacy Arc imagery, and the retail
+  /// intent segment sold to partners. Null for ad-hoc (non-milestone) pots.
+  milestoneCategory MilestoneCategory?
+  /// Target date for the Major Goal (e.g. the holiday booking window). Distinct
+  /// from eventDate (the next reveal) — this is the long-horizon finish line.
+  targetMilestoneDate DateTime?
   /// The next milestone reveal date (e.g. Christmas morning or a birthday).
   /// Null for LIVE_FEED pots with no fixed deadline.
   eventDate      DateTime?

@@ -250,24 +250,48 @@ function MechanismTab() {
         <FlywheelDiagram />
       </div>
 
-      {/* Joint Fires — the 3-year compound effect */}
+      {/* Joint Fires — pitch-ready marketing preview (the Milestone Engine) */}
       <Reveal>
         <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-900 to-amber-950/10 p-6">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div className="max-w-md">
-              <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-amber-400/80">{jf.label}</p>
-              <p className="text-[18px] font-bold text-white">{jf.title}</p>
-              <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{jf.body}</p>
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-amber-400/80">{jf.label}</p>
+          <p className="text-[20px] font-bold text-white">{jf.title}</p>
+          <p className="mt-2 text-[16px] font-black leading-snug text-amber-300">{jf.hook}</p>
+          <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-slate-400">{jf.body}</p>
+
+          <div className="mt-6 grid gap-5 md:grid-cols-[1.3fr_1fr]">
+            <div>
+              <div className="flex items-end gap-3">
+                {jf.projection.map((p, i) => <ProjBar key={p.year} year={p.year} value={p.value} pct={p.pct} delay={i * 0.1} />)}
+              </div>
+              <p className="mt-3 text-[12px] leading-relaxed text-slate-500">{jf.caption}</p>
             </div>
-            <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.07] px-5 py-4 text-center">
-              <p className="text-[34px] font-black leading-none text-amber-400">{jf.stat.value}</p>
-              <p className="mx-auto mt-1.5 max-w-[150px] text-[10px] leading-tight text-slate-400">{jf.stat.label}</p>
+            <div className="flex flex-col justify-center rounded-2xl border border-amber-500/25 bg-amber-500/[0.07] p-5 text-center">
+              <p className="text-[40px] font-black leading-none text-amber-400">{jf.stat.value}</p>
+              <p className="mx-auto mt-1.5 max-w-[180px] text-[11px] leading-tight text-slate-400">{jf.stat.label}</p>
             </div>
           </div>
-          <div className="mt-6 flex items-end gap-3">
-            {jf.projection.map((p, i) => <ProjBar key={p.year} year={p.year} value={p.value} pct={p.pct} delay={i * 0.1} />)}
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {jf.pillars.map((p) => (
+              <div key={p.title} className="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+                <p className="mb-1.5 text-[13px] font-bold text-white">{p.title}</p>
+                <p className="text-[12px] leading-relaxed text-slate-400">{p.body}</p>
+              </div>
+            ))}
           </div>
-          <p className="mt-4 text-[12px] leading-relaxed text-slate-500">{jf.caption}</p>
+
+          <div className="mt-6">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">Milestone architecture → retail intent segments</p>
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+              {jf.categories.map((c) => (
+                <div key={c.label} className="rounded-xl border border-slate-800 bg-slate-900/40 p-3">
+                  <p className="text-[12px] font-bold text-amber-300">{c.label}</p>
+                  <p className="mt-0.5 text-[11px] text-slate-400">{c.segment}</p>
+                  <p className="mt-1 text-[10px] text-slate-600">{c.horizon}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </Reveal>
     </div>
