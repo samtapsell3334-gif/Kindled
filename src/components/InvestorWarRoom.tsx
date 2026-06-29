@@ -3,674 +3,522 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
-  TrendingUp, Users, Flame, Gift, Lock, ChevronRight,
-  BarChart2, Globe, Zap, Shield, Check, ArrowRight,
-  Target, Database, CreditCard, Sparkles, Building2,
-  Repeat, Share2,
+  Users, Flame, Gift, Lock, ChevronRight, BarChart2, Globe,
+  Zap, Shield, ShieldCheck, Check, ArrowRight, Target, Database, CreditCard,
+  Sparkles, Repeat, Share2, Wallet, Percent, Tag, Cpu, GitBranch, Landmark, Bell,
 } from "lucide-react";
 import content from "@/data/investor-content.json";
 
 /**
- * InvestorWarRoom — the four-tab private investor briefing.
+ * InvestorWarRoom — a dark, fintech-grade investor dashboard.
  *
- * Shared by the standalone /investor route and the PIN-gated "Investor" tab
- * inside the demo. Pass `embedded` when rendering inside another scroll
- * container (the demo) so the ambient grid and header don't fight the host
- * layout's fixed/sticky positioning.
+ * Five pitch-ready tabs, every word pulled from investor-content.json so the
+ * narrative stays cohesive. Shared by the /investor route and the PIN-gated
+ * "Investor" tab in the demo (`embedded`).
  */
 
-function cn(...classes: (string | undefined | false | null)[]) {
-  return classes.filter(Boolean).join(" ");
+function cn(...c: (string | undefined | false | null)[]) {
+  return c.filter(Boolean).join(" ");
 }
 
-type Tab = "why" | "flywheel" | "engine" | "journey" | "roadmap";
+type Tab = "opportunity" | "mechanism" | "value" | "edge" | "execution";
 
-const TABS: { id: Tab; label: string; shortLabel: string }[] = [
-  { id: "why",      label: "The Why & Why Now",  shortLabel: "The Why"  },
-  { id: "flywheel", label: "The Flywheel",        shortLabel: "Flywheel" },
-  { id: "engine",   label: "The Engine",          shortLabel: "Engine"   },
-  { id: "journey",  label: "Customer Journey",    shortLabel: "Journey"  },
-  { id: "roadmap",  label: "Roadmap & Execution", shortLabel: "Roadmap"  },
+const TABS: { id: Tab; label: string; short: string }[] = [
+  { id: "opportunity", label: "Why Now",         short: "Why Now"    },
+  { id: "mechanism",   label: "The Mechanism",   short: "Mechanism"  },
+  { id: "value",       label: "The Value Engine", short: "Value"     },
+  { id: "edge",        label: "The Edge",         short: "Edge"      },
+  { id: "execution",   label: "Execution",        short: "Execution" },
 ];
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/80">
-      {children}
-    </p>
-  );
+  return <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/80">{children}</p>;
+}
+function SectionHeadline({ children }: { children: React.ReactNode }) {
+  return <h2 className="text-[26px] font-bold leading-tight tracking-tight text-white md:text-[34px]">{children}</h2>;
+}
+function Lead({ children }: { children: React.ReactNode }) {
+  return <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-400">{children}</p>;
+}
+function Panel({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={cn("rounded-2xl border border-slate-800 bg-slate-900/50 p-5", className)}>{children}</div>;
 }
 
-function SectionHeadline({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <h2 className={cn("text-[28px] font-bold leading-tight tracking-tight text-white md:text-[36px]", className)}>
-      {children}
-    </h2>
-  );
-}
-
-function Card({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={cn("rounded-2xl border border-slate-800 bg-slate-900/50 p-6", className)}>
-      {children}
-    </div>
-  );
-}
-
-function StatPill({ figure, caption, source }: { figure: string; caption: string; source: string }) {
+function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const inView = useInView(ref, { once: true, amount: 0.35 });
   return (
     <motion.div ref={ref}
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ type: "spring", stiffness: 300, damping: 28 }}
-      className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
-      <p className="text-[36px] font-bold leading-none tracking-tight text-white">{figure}</p>
-      <p className="mt-1.5 text-[13px] leading-snug text-slate-300">{caption}</p>
-      <p className="mt-2 text-[10px] text-slate-600">Source: {source}</p>
+      transition={{ type: "spring", stiffness: 280, damping: 28, delay }}>
+      {children}
     </motion.div>
   );
 }
 
-// ─── TAB: THE WHY & WHY NOW ───────────────────────────────────────────────────
-
-type WhyView = "problem" | "solution" | "howItWorks" | "whyNow";
-const WHY_SUB = [
-  { id: "problem" as WhyView,    label: "The Problem"  },
-  { id: "solution" as WhyView,   label: "Why We Win"   },
-  { id: "howItWorks" as WhyView, label: "How It Works" },
-  { id: "whyNow" as WhyView,     label: "Why Now"      },
-];
-
-function WhyTab() {
-  const { why } = content;
-  const [view, setView] = useState<WhyView>("problem");
-
+function StatPill({ figure, caption, source }: { figure: string; caption: string; source: string }) {
   return (
-    <div className="space-y-8">
-      <div>
-        <SectionLabel>The Opportunity</SectionLabel>
-        <SectionHeadline>{why.headline}</SectionHeadline>
-        <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-slate-400">{why.subheadline}</p>
+    <Reveal>
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+        <p className="text-[34px] font-bold leading-none tracking-tight text-white">{figure}</p>
+        <p className="mt-1.5 text-[13px] leading-snug text-slate-300">{caption}</p>
+        <p className="mt-2 text-[10px] text-slate-600">Source: {source}</p>
       </div>
-
-      <div className="flex gap-0 overflow-x-auto scrollbar-none border-b border-slate-800">
-        {WHY_SUB.map(t => (
-          <button key={t.id} onClick={() => setView(t.id)}
-            className={cn(
-              "shrink-0 border-b-2 px-5 pb-3 text-[13px] font-semibold transition-colors",
-              view === t.id
-                ? "border-blue-500 text-white"
-                : "border-transparent text-slate-500 hover:text-slate-300",
-            )}>
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      <AnimatePresence mode="wait">
-        {view === "problem" && (
-          <motion.div key="problem"
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}
-            className="space-y-6">
-            <p className="max-w-2xl text-[15px] leading-relaxed text-slate-400">{why.problem.copy}</p>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {why.problem.stats.map(s => <StatPill key={s.figure} {...s} />)}
-            </div>
-          </motion.div>
-        )}
-
-        {view === "solution" && (
-          <motion.div key="solution"
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}
-            className="space-y-6">
-            <div>
-              <p className="text-[18px] font-semibold text-white">{why.solution.headline}</p>
-              <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-slate-400">{why.solution.copy}</p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {why.solution.points.map((p, i) => (
-                <Card key={i}>
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15">
-                    {i === 0 ? <Users className="h-4 w-4 text-blue-400" /> :
-                     i === 1 ? <Shield className="h-4 w-4 text-blue-400" /> :
-                               <TrendingUp className="h-4 w-4 text-blue-400" />}
-                  </div>
-                  <p className="mb-1.5 text-[14px] font-bold text-white">{p.title}</p>
-                  <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
-                </Card>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {view === "howItWorks" && (
-          <motion.div key="how"
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}
-            className="space-y-4">
-            <p className="text-[18px] font-semibold text-white">{why.howItWorks.headline}</p>
-            <div className="space-y-3">
-              {why.howItWorks.steps.map((step, i) => (
-                <motion.div key={step.number}
-                  initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="flex gap-5 rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
-                  <span className="shrink-0 text-[32px] font-black leading-none text-blue-500/30">
-                    {step.number}
-                  </span>
-                  <div>
-                    <p className="text-[15px] font-bold text-white">{step.title}</p>
-                    <p className="mt-1 text-[13px] leading-relaxed text-slate-400">{step.body}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {view === "whyNow" && (
-          <motion.div key="whynow"
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}
-            className="space-y-4">
-            <p className="text-[18px] font-semibold text-white">{why.whyNow.headline}</p>
-            <div className="grid gap-4 md:grid-cols-3">
-              {why.whyNow.points.map((p, i) => (
-                <Card key={i}>
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800">
-                    {i === 0 ? <CreditCard className="h-4 w-4 text-emerald-400" /> :
-                     i === 1 ? <Sparkles className="h-4 w-4 text-violet-400" /> :
-                               <Globe className="h-4 w-4 text-amber-400" />}
-                  </div>
-                  <p className="mb-1.5 text-[14px] font-bold text-white">{p.title}</p>
-                  <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
-                </Card>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    </Reveal>
   );
 }
 
-// ─── TAB: THE ENGINE ──────────────────────────────────────────────────────────
-
-const PILLAR_ICONS: Record<string, React.ElementType> = {
-  "The Viral Loop": Users,
-  "Intent Data Capture": Database,
-  "Open Banking Revenue": CreditCard,
-  "Cashback Flywheel": Zap,
-  "Predictive B2B Licensing": BarChart2,
-  "Temporal Advantage Windows": Target,
-  "Stripe Connect Payouts": Shield,
-  "Enterprise Gifting API": Building2,
-};
-
-function EngineTab() {
-  const { engine } = content;
-  const [activePhase, setActivePhase] = useState<1 | 2>(1);
-  const phase = activePhase === 1 ? engine.phase1 : engine.phase2;
-
-  return (
-    <div className="space-y-8">
-      <div>
-        <SectionLabel>Business Model</SectionLabel>
-        <SectionHeadline>{engine.headline}</SectionHeadline>
-        <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-slate-400">{engine.subheadline}</p>
-      </div>
-
-      <div className="inline-flex rounded-xl border border-slate-800 bg-slate-900/60 p-1">
-        {([1, 2] as const).map(p => (
-          <button key={p} onClick={() => setActivePhase(p)}
-            className={cn(
-              "rounded-lg px-5 py-2 text-[13px] font-semibold transition-all",
-              activePhase === p
-                ? "bg-blue-600 text-white shadow-lg"
-                : "text-slate-400 hover:text-slate-200",
-            )}>
-            Phase {p} — {p === 1 ? engine.phase1.label : engine.phase2.label}
-          </button>
-        ))}
-      </div>
-
-      <AnimatePresence mode="wait">
-        <motion.div key={activePhase}
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}
-          className="space-y-6">
-
-          <div className="rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-900 to-blue-950/20 p-6">
-            <div className="flex flex-wrap items-start justify-between gap-6">
-              <div className="flex-1 min-w-0">
-                <span className="inline-block rounded-full bg-blue-500/15 px-2.5 py-0.5 text-[11px] font-bold text-blue-400">
-                  {phase.period}
-                </span>
-                <p className="mt-2 text-[18px] font-bold text-white">{phase.tagline}</p>
-                <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-slate-400">{phase.summary}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-3 shrink-0">
-                {phase.metrics.map((m, i) => (
-                  <div key={i} className="rounded-xl border border-slate-700/40 bg-slate-800/50 px-3 py-2.5">
-                    <p className="text-[15px] font-bold text-white">{m.value}</p>
-                    <p className="text-[10px] text-slate-500">{m.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {phase.pillars.map((pillar, i) => {
-              const Icon = PILLAR_ICONS[pillar.title] ?? Zap;
-              return (
-                <motion.div key={pillar.title}
-                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06 }}
-                  className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10">
-                    <Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} />
-                  </div>
-                  <p className="mb-1.5 text-[14px] font-bold text-white">{pillar.title}</p>
-                  <p className="text-[13px] leading-relaxed text-slate-400">{pillar.body}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ─── TAB: CUSTOMER JOURNEY ────────────────────────────────────────────────────
-
-type JourneyId = "host" | "giver" | "reveal" | "loop";
-const JOURNEY_ICONS: Record<JourneyId, React.ElementType> = {
-  host: Flame, giver: CreditCard, reveal: Sparkles, loop: ArrowRight,
-};
-const JOURNEY_COLORS: Record<JourneyId, { accent: string; glow: string; badge: string }> = {
-  host:   { accent: "#f59e0b", glow: "rgba(245,158,11,0.12)",  badge: "bg-amber-500/15 text-amber-400"   },
-  giver:  { accent: "#3b82f6", glow: "rgba(59,130,246,0.12)",  badge: "bg-blue-500/15 text-blue-400"     },
-  reveal: { accent: "#8b5cf6", glow: "rgba(139,92,246,0.12)",  badge: "bg-violet-500/15 text-violet-400" },
-  loop:   { accent: "#10b981", glow: "rgba(16,185,129,0.12)",  badge: "bg-emerald-500/15 text-emerald-400" },
-};
-
-function JourneyTab() {
-  const { journey } = content;
-  const [active, setActive] = useState(0);
-  const stage = journey.stages[active]!;
-  const id = stage.id as JourneyId;
-  const Icon = JOURNEY_ICONS[id] ?? Gift;
-  const colors = JOURNEY_COLORS[id] ?? JOURNEY_COLORS.host;
-
-  return (
-    <div className="space-y-8">
-      <div>
-        <SectionLabel>The Experience</SectionLabel>
-        <SectionHeadline>{journey.headline}</SectionHeadline>
-        <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-slate-400">{journey.subheadline}</p>
-      </div>
-
-      {/* Stage selector */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {journey.stages.map((s, i) => {
-          const sid = s.id as JourneyId;
-          const c = JOURNEY_COLORS[sid] ?? JOURNEY_COLORS.host;
-          const SI = JOURNEY_ICONS[sid] ?? Gift;
-          return (
-            <button key={s.id} onClick={() => setActive(i)}
-              className={cn(
-                "rounded-2xl border p-4 text-left transition-all",
-                active === i
-                  ? "border-slate-700 bg-slate-800/80"
-                  : "border-slate-800/60 bg-slate-900/40 hover:border-slate-700",
-              )}>
-              <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-xl"
-                style={{ background: c.glow }}>
-                <SI className="h-4 w-4" style={{ color: c.accent }} strokeWidth={1.75} />
-              </div>
-              <p className="text-[11px] font-bold uppercase tracking-wider"
-                style={{ color: active === i ? c.accent : "rgb(100,116,139)" }}>
-                {s.persona}
-              </p>
-              <p className={cn("mt-0.5 text-[12px] font-semibold", active === i ? "text-white" : "text-slate-500")}>
-                {s.moment}
-              </p>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Detail card */}
-      <AnimatePresence mode="wait">
-        <motion.div key={stage.id}
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}
-          className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-8">
-          <div className="grid gap-8 md:grid-cols-2">
-            <div>
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-700"
-                  style={{ background: colors.glow }}>
-                  <Icon className="h-5 w-5" style={{ color: colors.accent }} strokeWidth={1.75} />
-                </div>
-                <div>
-                  <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider", colors.badge)}>
-                    {stage.persona}
-                  </span>
-                  <p className="mt-0.5 text-[16px] font-bold text-white">{stage.moment}</p>
-                </div>
-              </div>
-              <p className="text-[13px] italic leading-relaxed text-slate-400">
-                &ldquo;{stage.narrative}&rdquo;
-              </p>
-              <div className="mt-4 rounded-xl border border-slate-700/50 bg-slate-800/40 p-4">
-                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: colors.accent }}>
-                  The Insight
-                </p>
-                <p className="mt-1 text-[13px] leading-relaxed text-slate-300">{stage.insight}</p>
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-slate-500">What happens</p>
-              <div className="space-y-3">
-                {stage.steps.map((step, i) => (
-                  <motion.div key={i}
-                    initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.06 }}
-                    className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
-                      style={{ background: `${colors.accent}22` }}>
-                      <Check className="h-3 w-3" style={{ color: colors.accent }} strokeWidth={2.5} />
-                    </div>
-                    <p className="text-[13px] leading-snug text-slate-300">{step}</p>
-                  </motion.div>
-                ))}
-              </div>
-              <div className="mt-6 flex justify-between">
-                <button onClick={() => setActive(i => Math.max(0, i - 1))}
-                  disabled={active === 0}
-                  className="text-[12px] text-slate-600 transition-colors hover:text-slate-400 disabled:opacity-20">
-                  ← Previous
-                </button>
-                <button onClick={() => setActive(i => Math.min(journey.stages.length - 1, i + 1))}
-                  disabled={active === journey.stages.length - 1}
-                  className="text-[12px] text-slate-400 transition-colors hover:text-white disabled:opacity-20">
-                  Next →
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ─── TAB: ROADMAP ─────────────────────────────────────────────────────────────
-
-function RoadmapTab() {
-  const { roadmap } = content;
-  const [open, setOpen] = useState<string | null>(null);
-
-  return (
-    <div className="space-y-8">
-      <div>
-        <SectionLabel>Execution Plan</SectionLabel>
-        <SectionHeadline>{roadmap.headline}</SectionHeadline>
-        <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-slate-400">{roadmap.subheadline}</p>
-      </div>
-
-      {roadmap.phases.map(phase => (
-        <div key={phase.phase} className="space-y-3">
-          <div className="flex items-center gap-4">
-            <span className={cn(
-              "rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider",
-              phase.status === "in_progress"
-                ? "bg-blue-500/15 text-blue-400"
-                : "bg-slate-800 text-slate-400",
-            )}>
-              {phase.phase} · {phase.label}
-            </span>
-            <div className="h-px flex-1 bg-slate-800" />
-            <span className="text-[11px] text-slate-600">{phase.period}</span>
-          </div>
-
-          {phase.milestones.map((m, mi) => {
-            const key = `${phase.phase}-${mi}`;
-            const isOpen = open === key;
-            return (
-              <div key={key} className={cn(
-                "overflow-hidden rounded-2xl border transition-colors",
-                isOpen ? "border-slate-700 bg-slate-900/80" : "border-slate-800/60 bg-slate-900/30",
-              )}>
-                <button className="flex w-full items-center gap-4 p-4 text-left"
-                  onClick={() => setOpen(isOpen ? null : key)}>
-                  <div className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[11px] font-black",
-                    phase.status === "in_progress"
-                      ? "bg-blue-500/20 text-blue-400"
-                      : "bg-slate-800 text-slate-500",
-                  )}>
-                    {mi + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-white">{m.title}</p>
-                    <p className="text-[11px] text-slate-500">{m.quarter}</p>
-                  </div>
-                  <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
-                    <ChevronRight className="h-4 w-4 text-slate-600" />
-                  </motion.div>
-                </button>
-
-                <AnimatePresence>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}>
-                      <div className="border-t border-slate-800 px-4 pb-5 pt-4">
-                        <div className="grid gap-6 md:grid-cols-2">
-                          <div>
-                            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-400">
-                              Strategic Why
-                            </p>
-                            <p className="text-[13px] leading-relaxed text-slate-400">{m.why}</p>
-                          </div>
-                          <div>
-                            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                              Key Deliverables
-                            </p>
-                            <div className="space-y-1.5">
-                              {m.deliverables.map((d, di) => (
-                                <div key={di} className="flex items-start gap-2.5">
-                                  <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" strokeWidth={2.5} />
-                                  <p className="text-[12px] text-slate-400">{d}</p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ─── TAB: THE FLYWHEEL ────────────────────────────────────────────────────────
+// ─── Flywheel diagram (reused inside The Mechanism) ────────────────────────────
 
 const LOOP_ICONS: Record<string, React.ElementType> = {
   flame: Flame, share: Share2, gift: Gift, sparkles: Sparkles, repeat: Repeat,
 };
-const POWER_ICONS = [TrendingUp, Database, CreditCard];
 
-function FlywheelTab() {
+function FlywheelDiagram() {
   const { flywheel } = content;
   const loop = flywheel.loop;
   const [active, setActive] = useState(0);
-
-  // Auto-advance the highlighted stage so the loop tells its own story.
   useEffect(() => {
-    const t = setInterval(() => setActive(a => (a + 1) % loop.length), 2600);
+    const t = setInterval(() => setActive((a) => (a + 1) % loop.length), 2600);
     return () => clearInterval(t);
   }, [loop.length]);
 
-  // Position each stage evenly around a circle (radius 38% of the box).
   const R = 38;
   const nodes = loop.map((s, i) => {
     const ang = (-90 + i * (360 / loop.length)) * (Math.PI / 180);
     return { ...s, x: 50 + R * Math.cos(ang), y: 50 + R * Math.sin(ang) };
   });
-
-  const activeStage = loop[active]!;
-  const compRef = useRef<HTMLDivElement>(null);
-  const compInView = useInView(compRef, { once: true, amount: 0.4 });
+  const stage = loop[active]!;
 
   return (
-    <div className="space-y-10">
-      <div>
-        <SectionLabel>The Growth Engine</SectionLabel>
-        <SectionHeadline>{flywheel.headline}</SectionHeadline>
-        <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-slate-400">{flywheel.subheadline}</p>
-      </div>
-
-      {/* ── The flywheel diagram ── */}
-      <div className="relative mx-auto aspect-square w-full max-w-[400px]">
-        {/* Ring */}
+    <div className="space-y-6">
+      <div className="relative mx-auto aspect-square w-full max-w-[380px]">
         <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full">
           <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(148,163,184,0.14)" strokeWidth="0.6" />
-          <circle cx="50" cy="50" r="38" fill="none" stroke={activeStage.color} strokeOpacity="0.5"
-            strokeWidth="0.8" strokeDasharray="3 5" strokeLinecap="round"
-            style={{ transition: "stroke 0.5s" }}>
+          <circle cx="50" cy="50" r="38" fill="none" stroke={stage.color} strokeOpacity="0.5" strokeWidth="0.8"
+            strokeDasharray="3 5" strokeLinecap="round" style={{ transition: "stroke 0.5s" }}>
             <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="22s" repeatCount="indefinite" />
           </circle>
         </svg>
-
-        {/* Orbiting spark */}
-        <motion.div className="pointer-events-none absolute inset-0"
-          animate={{ rotate: 360 }} transition={{ duration: 11, repeat: Infinity, ease: "linear" }}>
+        <motion.div className="pointer-events-none absolute inset-0" animate={{ rotate: 360 }}
+          transition={{ duration: 11, repeat: Infinity, ease: "linear" }}>
           <div className="absolute left-1/2" style={{ top: "12%", transform: "translate(-50%,-50%)" }}>
             <div className="h-2.5 w-2.5 rounded-full bg-white" style={{ boxShadow: "0 0 12px 3px rgba(255,255,255,0.8)" }} />
           </div>
         </motion.div>
-
-        {/* Centre hub */}
         <div className="absolute left-1/2 top-1/2 flex h-[34%] w-[34%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border border-slate-700/60 bg-slate-900/80 text-center backdrop-blur-sm"
-          style={{ boxShadow: `0 0 40px ${activeStage.color}33`, transition: "box-shadow 0.5s" }}>
-          <motion.p key={flywheel.multiplier.value} className="text-[30px] font-black leading-none text-white">
-            {flywheel.multiplier.value}
-          </motion.p>
+          style={{ boxShadow: `0 0 40px ${stage.color}33`, transition: "box-shadow 0.5s" }}>
+          <p className="text-[28px] font-black leading-none text-white">{flywheel.multiplier.value}</p>
           <p className="mt-1 px-2 text-[8.5px] font-semibold leading-tight text-slate-400">{flywheel.multiplier.label}</p>
         </div>
-
-        {/* Stage nodes */}
         {nodes.map((n, i) => {
           const Icon = LOOP_ICONS[n.icon] ?? Flame;
-          const isActive = i === active;
+          const on = i === active;
           return (
-            <button key={n.id} onClick={() => setActive(i)}
-              className="absolute flex flex-col items-center"
+            <button key={n.id} onClick={() => setActive(i)} className="absolute flex flex-col items-center"
               style={{ left: `${n.x}%`, top: `${n.y}%`, transform: "translate(-50%,-50%)", width: "30%" }}>
-              <motion.div
-                animate={{ scale: isActive ? 1.15 : 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              <motion.div animate={{ scale: on ? 1.15 : 1 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="flex h-11 w-11 items-center justify-center rounded-2xl border"
-                style={{
-                  background: isActive ? n.color : "rgba(15,23,42,0.9)",
-                  borderColor: isActive ? n.color : "rgba(148,163,184,0.25)",
-                  boxShadow: isActive ? `0 0 24px ${n.color}88` : "none",
-                }}>
-                <Icon className="h-5 w-5" style={{ color: isActive ? "#fff" : n.color }} strokeWidth={2} />
+                style={{ background: on ? n.color : "rgba(15,23,42,0.9)", borderColor: on ? n.color : "rgba(148,163,184,0.25)", boxShadow: on ? `0 0 24px ${n.color}88` : "none" }}>
+                <Icon className="h-5 w-5" style={{ color: on ? "#fff" : n.color }} strokeWidth={2} />
               </motion.div>
-              <span className="mt-1.5 text-center text-[9px] font-bold leading-tight"
-                style={{ color: isActive ? "#fff" : "rgb(100,116,139)" }}>
-                {n.title}
-              </span>
+              <span className="mt-1.5 text-center text-[9px] font-bold leading-tight" style={{ color: on ? "#fff" : "rgb(100,116,139)" }}>{n.title}</span>
             </button>
           );
         })}
       </div>
 
-      {/* ── Active stage explainer ── */}
       <div className="mx-auto max-w-md">
         <AnimatePresence mode="wait">
-          <motion.div key={activeStage.id}
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-            className="rounded-2xl border bg-slate-900/50 p-5"
-            style={{ borderColor: `${activeStage.color}40` }}>
+          <motion.div key={stage.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }} className="rounded-2xl border bg-slate-900/50 p-5" style={{ borderColor: `${stage.color}40` }}>
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-lg text-[11px] font-black text-white"
-                style={{ background: activeStage.color }}>{active + 1}</span>
-              <p className="text-[15px] font-bold text-white">{activeStage.title}</p>
+              <span className="flex h-6 w-6 items-center justify-center rounded-lg text-[11px] font-black text-white" style={{ background: stage.color }}>{active + 1}</span>
+              <p className="text-[15px] font-bold text-white">{stage.title}</p>
             </div>
-            <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{activeStage.body}</p>
-            <div className="mt-3 flex gap-1.5">
-              {loop.map((_, i) => (
-                <div key={i} className="h-1 flex-1 rounded-full transition-colors duration-300"
-                  style={{ background: i === active ? activeStage.color : "rgba(148,163,184,0.18)" }} />
-              ))}
-            </div>
+            <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{stage.body}</p>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* ── Compounding strip ── */}
-      <div ref={compRef} className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-blue-950/20 p-6">
-        <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-400/80">{flywheel.compounding.label}</p>
-        <div className="flex items-stretch gap-2 overflow-x-auto scrollbar-none">
-          {flywheel.compounding.steps.map((s, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <motion.div
-                initial={{ opacity: 0, y: 14, scale: 0.9 }}
-                animate={compInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-                transition={{ delay: i * 0.12, type: "spring", stiffness: 300, damping: 22 }}
-                className="min-w-[96px] shrink-0 rounded-xl border border-slate-700/50 bg-slate-800/40 px-3 py-3 text-center">
-                <p className="text-[17px] font-black leading-none text-white">{s.people}</p>
-                <p className="mt-1 text-[10px] font-medium text-slate-500">{s.tier}</p>
-              </motion.div>
-              {i < flywheel.compounding.steps.length - 1 && (
-                <ArrowRight className="h-4 w-4 shrink-0 text-blue-500/60" />
-              )}
+      <Reveal>
+        <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-blue-950/20 p-5">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-400/80">{flywheel.compounding.label}</p>
+          <div className="flex items-stretch gap-2 overflow-x-auto scrollbar-none">
+            {flywheel.compounding.steps.map((s, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="min-w-[92px] shrink-0 rounded-xl border border-slate-700/50 bg-slate-800/40 px-3 py-2.5 text-center">
+                  <p className="text-[16px] font-black leading-none text-white">{s.people}</p>
+                  <p className="mt-1 text-[10px] text-slate-500">{s.tier}</p>
+                </div>
+                {i < flywheel.compounding.steps.length - 1 && <ArrowRight className="h-4 w-4 shrink-0 text-blue-500/60" />}
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[12px] leading-relaxed text-slate-400">{flywheel.compounding.caption}</p>
+        </div>
+      </Reveal>
+    </div>
+  );
+}
+
+// ─── TAB: WHY NOW (opportunity) ───────────────────────────────────────────────
+
+function OpportunityTab() {
+  const { opportunity } = content;
+  const ICONS = [CreditCard, Sparkles, Globe];
+  return (
+    <div className="space-y-9">
+      <div>
+        <SectionLabel>The Opportunity</SectionLabel>
+        <SectionHeadline>{opportunity.headline}</SectionHeadline>
+        <Lead>{opportunity.subheadline}</Lead>
+      </div>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        {opportunity.stats.map((s) => <StatPill key={s.figure} {...s} />)}
+      </div>
+      <div>
+        <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Why this is the moment</p>
+        <div className="grid gap-4 md:grid-cols-3">
+          {opportunity.whyNow.map((p, i) => {
+            const Icon = ICONS[i] ?? Globe;
+            return (
+              <Reveal key={p.title} delay={i * 0.05}>
+                <Panel>
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15"><Icon className="h-4 w-4 text-blue-400" /></div>
+                  <p className="mb-1.5 text-[14px] font-bold text-white">{p.title}</p>
+                  <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
+                </Panel>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── TAB: THE MECHANISM ───────────────────────────────────────────────────────
+
+function MechanismTab() {
+  const { mechanism } = content;
+  const ICONS: Record<string, React.ElementType> = { viral: Users, intent: Database, overhead: Cpu };
+  return (
+    <div className="space-y-9">
+      <div>
+        <SectionLabel>The Engine</SectionLabel>
+        <SectionHeadline>{mechanism.headline}</SectionHeadline>
+        <Lead>{mechanism.subheadline}</Lead>
+      </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {mechanism.pillars.map((p, i) => {
+          const Icon = ICONS[p.id] ?? Zap;
+          return (
+            <Reveal key={p.id} delay={i * 0.05}>
+              <Panel className="h-full">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10"><Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} /></div>
+                  <span className="rounded-full bg-blue-500/10 px-2.5 py-1 text-[10px] font-bold text-blue-400">{p.metric}</span>
+                </div>
+                <p className="mb-1.5 text-[15px] font-bold text-white">{p.title}</p>
+                <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
+              </Panel>
+            </Reveal>
+          );
+        })}
+      </div>
+      <div>
+        <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">The loop, visualised</p>
+        <FlywheelDiagram />
+      </div>
+    </div>
+  );
+}
+
+// ─── TAB: THE VALUE ENGINE ────────────────────────────────────────────────────
+
+function CashbackSplit() {
+  const { cashbackMath } = content.valueEngine;
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  return (
+    <Panel className="overflow-hidden">
+      <div className="flex items-center gap-2">
+        <Percent className="h-4 w-4 text-emerald-400" />
+        <p className="text-[15px] font-bold text-white">{cashbackMath.title}</p>
+      </div>
+      <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{cashbackMath.intro}</p>
+
+      <div ref={ref} className="mt-5 rounded-2xl border border-slate-700/50 bg-slate-950/60 p-4">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{cashbackMath.exampleLabel}</p>
+        <div className="mt-2 flex items-baseline gap-2">
+          <span className="text-[28px] font-black text-white">{cashbackMath.commission.amount}</span>
+          <span className="text-[12px] text-slate-500">{cashbackMath.commission.label} ({cashbackMath.commission.value})</span>
+        </div>
+        {/* Split bar */}
+        <div className="mt-4 flex h-9 w-full overflow-hidden rounded-xl">
+          <motion.div initial={{ width: 0 }} animate={inView ? { width: "60%" } : {}} transition={{ duration: 0.7, ease: "easeOut" }}
+            className="flex items-center justify-center bg-gradient-to-r from-emerald-500 to-teal-500 text-[12px] font-black text-white">
+            You · 3%
+          </motion.div>
+          <motion.div initial={{ width: 0 }} animate={inView ? { width: "40%" } : {}} transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
+            className="flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-[12px] font-black text-white">
+            Us · 2%
+          </motion.div>
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          {cashbackMath.split.map((s) => (
+            <div key={s.label} className="rounded-xl border border-slate-700/40 bg-slate-800/40 px-3 py-2.5">
+              <p className="text-[16px] font-black text-white">{s.amount}</p>
+              <p className="text-[11px]" style={{ color: s.tone === "user" ? "#34d399" : "#818cf8" }}>{s.label}</p>
             </div>
           ))}
         </div>
-        <p className="mt-4 text-[12px] leading-relaxed text-slate-400">{flywheel.compounding.caption}</p>
+      </div>
+      <p className="mt-4 text-[13px] leading-relaxed text-slate-300">{cashbackMath.takeaway}</p>
+    </Panel>
+  );
+}
+
+function ValueTab() {
+  const { valueEngine } = content;
+  const f = valueEngine.fairness;
+  return (
+    <div className="space-y-9">
+      <div>
+        <SectionLabel>Revenue & Incentives</SectionLabel>
+        <SectionHeadline>{valueEngine.headline}</SectionHeadline>
+        <Lead>{valueEngine.subheadline}</Lead>
       </div>
 
-      {/* ── Why it's powerful ── */}
-      <div className="grid gap-4 md:grid-cols-3">
-        {flywheel.power.map((p, i) => {
-          const Icon = POWER_ICONS[i] ?? Zap;
-          return (
-            <motion.div key={p.title}
-              initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }} transition={{ delay: i * 0.06 }}
-              className="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
-              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10">
-                <Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} />
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Fairness / no-fee */}
+        <Reveal>
+          <Panel className="h-full">
+            <div className="flex items-center gap-2">
+              <Wallet className="h-4 w-4 text-amber-400" />
+              <p className="text-[15px] font-bold text-white">{f.title}</p>
+            </div>
+            <p className="mt-2 text-[13px] leading-relaxed text-slate-400">{f.body}</p>
+            <div className="mt-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.06] p-3">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-amber-400">The Locked-In Loop</p>
+              <p className="mt-1 text-[13px] leading-relaxed text-slate-300">{f.lockedLoop}</p>
+            </div>
+            <div className="mt-3 space-y-2">
+              {f.points.map((p, i) => (
+                <div key={i} className="flex items-start gap-2.5">
+                  <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" strokeWidth={2.5} />
+                  <p className="text-[12px] leading-snug text-slate-400">{p}</p>
+                </div>
+              ))}
+            </div>
+          </Panel>
+        </Reveal>
+        {/* Cashback math */}
+        <Reveal delay={0.05}><CashbackSplit /></Reveal>
+      </div>
+
+      {/* Revenue models */}
+      <div>
+        <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Phase 1 revenue — three pillars</p>
+        <div className="grid gap-4 md:grid-cols-3">
+          {valueEngine.revenueModels.map((m, i) => {
+            const Icon = [Tag, Database, Sparkles][i] ?? Tag;
+            return (
+              <Reveal key={m.id} delay={i * 0.05}>
+                <Panel className="h-full">
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10"><Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} /></div>
+                    <span className="rounded-full bg-slate-800 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">{m.tag}</span>
+                  </div>
+                  <p className="mb-1.5 text-[14px] font-bold text-white">{m.title}</p>
+                  <p className="text-[13px] leading-relaxed text-slate-400">{m.body}</p>
+                </Panel>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── TAB: THE EDGE ────────────────────────────────────────────────────────────
+
+function UnitEconomicsTable() {
+  const ue = content.edge.unitEconomics;
+  return (
+    <Panel className="overflow-hidden p-0">
+      <div className="border-b border-slate-800 p-5">
+        <div className="flex items-center gap-2">
+          <BarChart2 className="h-4 w-4 text-emerald-400" />
+          <p className="text-[15px] font-bold text-white">{ue.title}</p>
+        </div>
+        <p className="mt-1 text-[12px] text-slate-500">{ue.subtitle}</p>
+      </div>
+      <div className="grid grid-cols-[1.4fr_1fr_1fr] text-[12px]">
+        <div className="border-b border-slate-800 px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-500"> </div>
+        <div className="flex items-center gap-1.5 border-b border-l border-slate-800 px-3 py-3 text-[11px] font-bold text-rose-300">
+          <CreditCard className="h-3.5 w-3.5" /> {ue.columns[0]}
+        </div>
+        <div className="flex items-center gap-1.5 border-b border-l border-slate-800 bg-emerald-500/[0.05] px-3 py-3 text-[11px] font-bold text-emerald-300">
+          <Landmark className="h-3.5 w-3.5" /> {ue.columns[1]}
+        </div>
+        {ue.rows.flatMap((r) => [
+          <div key={`${r.label}-l`} className={cn("border-b border-slate-800/70 px-4 py-3.5 font-medium text-slate-300", r.highlight && "text-white")}>{r.label}</div>,
+          <div key={`${r.label}-c`} className={cn("border-b border-l border-slate-800/70 px-3 py-3.5 text-rose-300/90", r.highlight && "font-bold")}>{r.card}</div>,
+          <div key={`${r.label}-o`} className={cn("border-b border-l border-slate-800/70 bg-emerald-500/[0.05] px-3 py-3.5 text-emerald-300", r.highlight && "font-bold")}>{r.openBanking}</div>,
+        ])}
+      </div>
+      <p className="p-5 text-[13px] leading-relaxed text-slate-300">{ue.takeaway}</p>
+    </Panel>
+  );
+}
+
+function EdgeTab() {
+  const { edge } = content;
+  return (
+    <div className="space-y-9">
+      <div>
+        <SectionLabel>The Competitive Edge</SectionLabel>
+        <SectionHeadline>{edge.headline}</SectionHeadline>
+        <Lead>{edge.subheadline}</Lead>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Reveal>
+          <Panel className="h-full">
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/15"><Bell className="h-4 w-4 text-amber-400" /></div>
+            <p className="mb-1.5 text-[15px] font-bold text-white">{edge.smartShopper.title}</p>
+            <p className="text-[13px] leading-relaxed text-slate-400">{edge.smartShopper.body}</p>
+            <p className="mt-3 border-l-2 border-amber-500/40 pl-3 text-[12px] italic leading-relaxed text-amber-200/80">{edge.smartShopper.effect}</p>
+          </Panel>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <Panel className="h-full">
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15"><ShieldCheck className="h-4 w-4 text-emerald-400" /></div>
+            <p className="mb-1.5 text-[15px] font-bold text-white">{edge.dataBack.title}</p>
+            <p className="text-[13px] leading-relaxed text-slate-400">{edge.dataBack.body}</p>
+            <p className="mt-3 border-l-2 border-emerald-500/40 pl-3 text-[12px] italic leading-relaxed text-emerald-200/80">{edge.dataBack.effect}</p>
+          </Panel>
+        </Reveal>
+      </div>
+      <UnitEconomicsTable />
+    </div>
+  );
+}
+
+// ─── TAB: EXECUTION (risk + operator + roadmap) ───────────────────────────────
+
+function ExecutionTab() {
+  const { risk, operator, roadmap } = content;
+  const [open, setOpen] = useState<string | null>(null);
+  const opIcons = [Target, GitBranch, Sparkles];
+  return (
+    <div className="space-y-10">
+      {/* Risk */}
+      <div>
+        <SectionLabel>Risk, Mitigated</SectionLabel>
+        <SectionHeadline>{risk.headline}</SectionHeadline>
+        <Lead>{risk.subheadline}</Lead>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {risk.items.map((it, i) => {
+            const Icon = [Zap, Sparkles, Shield][i] ?? Shield;
+            return (
+              <Reveal key={it.title} delay={i * 0.05}>
+                <Panel className="h-full">
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10"><Icon className="h-4 w-4 text-blue-400" strokeWidth={1.75} /></div>
+                  <p className="mb-1.5 text-[14px] font-bold text-white">{it.title}</p>
+                  <p className="text-[12px] leading-relaxed text-slate-500"><span className="font-semibold text-slate-400">Risk:</span> {it.risk}</p>
+                  <p className="mt-2 text-[12px] leading-relaxed text-slate-300"><span className="font-semibold text-emerald-400">How we win:</span> {it.mitigation}</p>
+                </Panel>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Operator mindset */}
+      <div>
+        <SectionLabel>The Operator Mindset</SectionLabel>
+        <SectionHeadline>{operator.headline}</SectionHeadline>
+        <Lead>{operator.subheadline}</Lead>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {operator.principles.map((p, i) => {
+            const Icon = opIcons[i] ?? Target;
+            return (
+              <Reveal key={p.title} delay={i * 0.05}>
+                <div className="rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-900 to-blue-950/20 p-5">
+                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15"><Icon className="h-4 w-4 text-blue-400" /></div>
+                  <p className="mb-1.5 text-[14px] font-bold text-white">{p.title}</p>
+                  <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
+                </div>
+              </Reveal>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Roadmap */}
+      <div>
+        <SectionLabel>Execution Plan</SectionLabel>
+        <SectionHeadline>{roadmap.headline}</SectionHeadline>
+        <Lead>{roadmap.subheadline}</Lead>
+        <div className="mt-5 space-y-6">
+          {roadmap.phases.map((phase) => (
+            <div key={phase.phase} className="space-y-3">
+              <div className="flex items-center gap-4">
+                <span className={cn("rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider",
+                  phase.status === "in_progress" ? "bg-blue-500/15 text-blue-400" : "bg-slate-800 text-slate-400")}>
+                  {phase.phase} · {phase.label}
+                </span>
+                <div className="h-px flex-1 bg-slate-800" />
+                <span className="text-[11px] text-slate-600">{phase.period}</span>
               </div>
-              <p className="mb-1.5 text-[14px] font-bold text-white">{p.title}</p>
-              <p className="text-[13px] leading-relaxed text-slate-400">{p.body}</p>
-            </motion.div>
-          );
-        })}
+              {phase.milestones.map((m, mi) => {
+                const key = `${phase.phase}-${mi}`;
+                const isOpen = open === key;
+                return (
+                  <div key={key} className={cn("overflow-hidden rounded-2xl border transition-colors", isOpen ? "border-slate-700 bg-slate-900/80" : "border-slate-800/60 bg-slate-900/30")}>
+                    <button className="flex w-full items-center gap-4 p-4 text-left" onClick={() => setOpen(isOpen ? null : key)}>
+                      <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[11px] font-black",
+                        phase.status === "in_progress" ? "bg-blue-500/20 text-blue-400" : "bg-slate-800 text-slate-500")}>{mi + 1}</div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[14px] font-semibold text-white">{m.title}</p>
+                        <p className="text-[11px] text-slate-500">{m.quarter}</p>
+                      </div>
+                      <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.2 }}><ChevronRight className="h-4 w-4 text-slate-600" /></motion.div>
+                    </button>
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                          <div className="border-t border-slate-800 px-4 pb-5 pt-4">
+                            <div className="grid gap-6 md:grid-cols-2">
+                              <div>
+                                <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-blue-400">Strategic Why</p>
+                                <p className="text-[13px] leading-relaxed text-slate-400">{m.why}</p>
+                              </div>
+                              <div>
+                                <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500">Key Deliverables</p>
+                                <div className="space-y-1.5">
+                                  {m.deliverables.map((d, di) => (
+                                    <div key={di} className="flex items-start gap-2.5"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" strokeWidth={2.5} /><p className="text-[12px] text-slate-400">{d}</p></div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -679,70 +527,43 @@ function FlywheelTab() {
 // ─── WAR ROOM SHELL ───────────────────────────────────────────────────────────
 
 export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
-  const [activeTab, setActiveTab] = useState<Tab>("why");
+  const [tab, setTab] = useState<Tab>("opportunity");
 
   return (
     <div className={cn("text-white", embedded ? "relative overflow-hidden rounded-3xl" : "min-h-screen")}
-      style={{
-        backgroundColor: "#070c18",
-        backgroundImage: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(15,23,42,0.8) 0%, transparent 60%)",
-      }}>
-
-      {/* Ambient grid — absolute when embedded so it stays inside the card */}
+      style={{ backgroundColor: "#070c18", backgroundImage: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(15,23,42,0.8) 0%, transparent 60%)" }}>
       <div className={cn("pointer-events-none opacity-[0.025]", embedded ? "absolute inset-0" : "fixed inset-0")}
-        style={{
-          backgroundImage: "linear-gradient(rgba(148,163,184,1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,1) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-        }} />
+        style={{ backgroundImage: "linear-gradient(rgba(148,163,184,1) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,1) 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
 
       {/* Header */}
-      <header className={cn(
-        "z-40 border-b border-slate-800/80 bg-[#070c18]/90 backdrop-blur-xl",
-        embedded ? "relative" : "sticky top-0",
-      )}>
+      <header className={cn("z-40 border-b border-slate-800/80 bg-[#070c18]/90 backdrop-blur-xl", embedded ? "relative" : "sticky top-0")}>
         <div className="mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5 shrink-0">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15">
-                <Flame className="h-4 w-4 text-blue-400" strokeWidth={1.5} />
-              </div>
-              <span className="text-[14px] font-bold tracking-tight text-white">
-                {content.meta.company}
-                <span className="ml-1.5 text-[10px] font-normal uppercase tracking-widest text-slate-600">
-                  Investor
-                </span>
+            <div className="flex shrink-0 items-center gap-2.5">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/15"><Flame className="h-4 w-4 text-blue-400" strokeWidth={1.5} /></div>
+              <span className="text-[14px] font-bold tracking-tight text-white">{content.meta.company}
+                <span className="ml-1.5 text-[10px] font-normal uppercase tracking-widest text-slate-600">Investor</span>
               </span>
             </div>
-
             <nav className="hidden items-center gap-1 md:flex">
-              {TABS.map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={cn(
-                    "rounded-lg px-3.5 py-1.5 text-[12px] font-semibold transition-all",
-                    activeTab === tab.id
-                      ? "bg-slate-800 text-white"
-                      : "text-slate-500 hover:text-slate-300",
-                  )}>
-                  {tab.label}
+              {TABS.map((t) => (
+                <button key={t.id} onClick={() => setTab(t.id)}
+                  className={cn("rounded-lg px-3 py-1.5 text-[12px] font-semibold transition-all", tab === t.id ? "bg-slate-800 text-white" : "text-slate-500 hover:text-slate-300")}>
+                  {t.label}
                 </button>
               ))}
             </nav>
-
             <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900 px-3 py-1.5">
               <Lock className="h-3 w-3 text-slate-600" />
               <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-600">Confidential</span>
             </div>
           </div>
-
           {/* Mobile tabs */}
           <div className="mt-2 flex gap-1 overflow-x-auto scrollbar-none md:hidden">
-            {TABS.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-all",
-                  activeTab === tab.id ? "bg-slate-800 text-white" : "text-slate-500",
-                )}>
-                {tab.shortLabel}
+            {TABS.map((t) => (
+              <button key={t.id} onClick={() => setTab(t.id)}
+                className={cn("shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-all", tab === t.id ? "bg-slate-800 text-white" : "text-slate-500")}>
+                {t.short}
               </button>
             ))}
           </div>
@@ -753,17 +574,14 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
       <div className="relative border-b border-slate-800/50 bg-gradient-to-r from-slate-900/50 to-blue-950/20">
         <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-blue-400/70">
-              Private Investor Briefing
-            </p>
-            <h1 className="mt-2 max-w-3xl text-[28px] font-bold leading-tight tracking-tight text-white md:text-[40px]">
-              {content.meta.tagline}
-            </h1>
-            <div className="mt-6 flex flex-wrap gap-6">
-              {content.traction.items.map(item => (
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-blue-400/70">{content.hero.eyebrow}</p>
+            <h1 className="mt-2 max-w-3xl text-[26px] font-bold leading-tight tracking-tight text-white md:text-[38px]">{content.hero.headline}</h1>
+            <p className="mt-2 max-w-2xl text-[14px] text-slate-400">{content.hero.subhead}</p>
+            <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3">
+              {content.traction.items.map((item) => (
                 <div key={item.label} className="flex items-baseline gap-2">
                   <span className="text-[22px] font-bold tabular-nums text-white md:text-[26px]">{item.figure}</span>
-                  <span className="max-w-[160px] text-[12px] leading-tight text-slate-500">{item.label}</span>
+                  <span className="max-w-[170px] text-[12px] leading-tight text-slate-500">{item.label}</span>
                 </div>
               ))}
             </div>
@@ -774,24 +592,18 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
       {/* Tab content */}
       <main className="relative mx-auto max-w-6xl px-4 py-10 pb-24">
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
-            {activeTab === "why"      && <WhyTab />}
-            {activeTab === "flywheel" && <FlywheelTab />}
-            {activeTab === "engine"   && <EngineTab />}
-            {activeTab === "journey"  && <JourneyTab />}
-            {activeTab === "roadmap"  && <RoadmapTab />}
+          <motion.div key={tab} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
+            {tab === "opportunity" && <OpportunityTab />}
+            {tab === "mechanism"   && <MechanismTab />}
+            {tab === "value"       && <ValueTab />}
+            {tab === "edge"        && <EdgeTab />}
+            {tab === "execution"   && <ExecutionTab />}
           </motion.div>
         </AnimatePresence>
       </main>
 
       <footer className="relative border-t border-slate-800/60 px-4 py-6 text-center">
-        <p className="text-[11px] text-slate-700">
-          {content.meta.confidential} · {content.meta.company} · {new Date().getFullYear()}
-        </p>
+        <p className="text-[11px] text-slate-700">{content.meta.confidential} · {content.meta.company} · {new Date().getFullYear()}</p>
       </footer>
     </div>
   );

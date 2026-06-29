@@ -117,6 +117,9 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
                 />
               ))}
             </motion.div>
+            <p className="mb-5 text-center text-[11px] text-slate-500">
+              {success ? "Access granted — entering…" : shake ? "Incorrect code — try again" : content.meta.access.hint}
+            </p>
 
             {/* Keypad */}
             <div className="grid gap-3">
