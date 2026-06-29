@@ -2867,23 +2867,22 @@ function AboutPage() {
 
 
   return (
-    <div className="min-h-screen bg-[#15100C] text-white">
-      {/* Ambient glow blobs */}
+    <div className="min-h-screen bg-[#0a0a0a] text-[#f5f5f5]">
+      {/* Ambient glow */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-1/4 -left-1/4 h-[60vw] w-[60vw] rounded-full bg-amber-500/10 blur-[120px]" />
-        <div className="absolute -bottom-1/4 -right-1/4 h-[50vw] w-[50vw] rounded-full bg-orange-600/8 blur-[100px]" />
+        <div className="absolute -left-1/4 -top-1/4 h-[60vw] w-[60vw] rounded-full bg-[#ffb800]/[0.08] blur-[120px]" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-2xl space-y-10 px-4 pb-20 pt-8">
 
         {/* ── Hero ── */}
         <div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-amber-400">Gifting, Reimagined</p>
-          <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[clamp(1.7rem,6vw,2.5rem)] font-bold leading-[1.1] tracking-tight text-white">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#ffb800]">Gifting, Reimagined</p>
+          <h1 className="font-editorial text-[clamp(1.8rem,6.5vw,2.7rem)] font-semibold leading-[1.05] tracking-tight text-[#f5f5f5]">
             Gifting, Without the{" "}
-            <span className="bg-gradient-to-r from-amber-300 to-orange-500 bg-clip-text text-transparent">Guesswork.</span>
+            <span className="text-[#ffb800]">Guesswork.</span>
           </h1>
-          <p className="mt-4 text-[15px] leading-relaxed text-amber-100/70">
+          <p className="mt-4 text-[15px] leading-relaxed tracking-tight text-[#f5f5f5]/60">
             Kindled turns &ldquo;what do you actually want?&rdquo; into one shared goal everyone can chip in on — any amount, no app required, completely free. No more duplicates. No more clutter. Just the thing you really wanted, funded by the people who love you.
           </p>
         </div>
@@ -4191,24 +4190,20 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
   const targetIso = occasionTargetIso(pot);
   const daysUntil = Math.max(0, Math.ceil((new Date(targetIso).getTime() - Date.now()) / 86_400_000));
 
-  const th = isXmas
-    ? { bg: "bg-[#140a08]", border: "border-red-800/40", accent: "from-red-700 via-amber-500 to-red-600",
-        giftColor: "text-amber-400", dayColor: "text-amber-300", labelColor: "text-amber-400/80",
-        modeLabel: "Under Wraps" }
-    : { bg: "bg-[#12091f]", border: "border-violet-600/30", accent: "from-violet-500 via-fuchsia-400 to-pink-400",
-        giftColor: "text-violet-300", dayColor: "text-violet-300", labelColor: "text-violet-400/80",
-        modeLabel: "Wrapped Up" };
+  const th = {
+    bg: "bg-[#0a0a0a]", border: "border-[rgba(245,245,245,0.1)]",
+    giftColor: "text-[#ffb800]", dayColor: "text-[#ffb800]", labelColor: "text-[#f5f5f5]/50",
+    modeLabel: isXmas ? "Under Wraps" : "Wrapped Up",
+  };
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.07, type: "spring", stiffness: 360, damping: 32 }}
-      className={cn("relative overflow-hidden rounded-2xl border shadow-lg shadow-black/30", th.bg, th.border)}
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "0px 0px -60px 0px" }}
+      transition={{ delay: (index % 2) * 0.06, duration: 0.6, ease: LUX_EASE }}
+      className={cn("relative overflow-hidden border", th.bg, th.border)}
     >
-      {/* Accent stripe */}
-      <div className={cn("h-[3px] w-full bg-gradient-to-r", th.accent)} />
-
       {/* Seasonal particle backdrop */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
         {isXmas
@@ -4241,13 +4236,13 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
             <img src={pot.image} alt={pot.title} className="h-full w-full object-cover opacity-40" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
             {/* Lock badge */}
-            <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
-              <Lock className="h-3 w-3 text-white/70" strokeWidth={2} />
-              <span className="text-[9px] font-bold uppercase tracking-wider text-white/60">{th.modeLabel}</span>
+            <div className="absolute right-3 top-3 flex items-center gap-1 bg-black/60 px-2 py-1 backdrop-blur-sm">
+              <Lock className="h-3 w-3 text-[#f5f5f5]/70" strokeWidth={2} />
+              <span className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#f5f5f5]/60">{th.modeLabel}</span>
             </div>
             {/* Countdown badge */}
-            <div className={cn("absolute left-3 top-3 rounded-full px-2.5 py-1 backdrop-blur-sm", isXmas ? "bg-red-900/70" : "bg-violet-900/70")}>
-              <span className={cn("text-[11px] font-bold", th.dayColor)}>
+            <div className="absolute left-3 top-3 bg-black/60 px-2.5 py-1 backdrop-blur-sm">
+              <span className={cn("text-[11px] font-semibold", th.dayColor)}>
                 {isXmas ? "Christmas" : "Birthday"} in {daysUntil} {daysUntil === 1 ? "day" : "days"}
               </span>
             </div>
@@ -4258,33 +4253,33 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
           {/* Title row */}
           <div className="flex items-start gap-3">
             {!pot.image && (
-              <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10")}>
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[rgba(245,245,245,0.12)] bg-[#f5f5f5]/[0.04]">
                 <Gift className={cn("h-5 w-5", th.giftColor)} strokeWidth={1.5} />
               </div>
             )}
-            <div className="flex-1 min-w-0">
-              <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-semibold text-white leading-snug">{pot.title}</h3>
-              <p className={cn("mt-0.5 text-[11px]", th.labelColor)}>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-editorial text-[16px] font-semibold leading-snug text-[#f5f5f5]">{pot.title}</h3>
+              <p className={cn("mt-0.5 text-[11px] tracking-tight", th.labelColor)}>
                 {!pot.image && `${isXmas ? "Christmas" : "Birthday"} in ${daysUntil} days · `}Keeping it a secret until the big day
               </p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="text-[9px] uppercase tracking-wider text-white/40">Target</p>
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[16px] font-bold text-white">£{pot.goal.toLocaleString()}</p>
+              <p className="text-[9px] uppercase tracking-[0.15em] text-[#f5f5f5]/40">Target</p>
+              <p className="font-editorial text-[17px] font-semibold text-[#f5f5f5]">£{pot.goal.toLocaleString()}</p>
             </div>
           </div>
 
           {/* Progress hidden from Billy */}
           <div className="mt-3 flex items-center gap-1.5">
-            <Lock className="h-3 w-3 text-white/30 shrink-0" />
-            <span className="text-[11px] text-white/30 italic">Progress hidden until reveal day</span>
+            <Lock className="h-3 w-3 shrink-0 text-[#f5f5f5]/30" />
+            <span className="text-[11px] italic text-[#f5f5f5]/30">Progress hidden until reveal day</span>
           </div>
 
           {/* Stack note */}
           {pot.stackNote && (
-            <div className="mt-2 flex items-start gap-1.5 rounded-lg border border-white/8 bg-white/5 px-2.5 py-1.5">
-              <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-white/40" />
-              <p className="text-[10px] leading-snug text-white/40">{pot.stackNote}</p>
+            <div className="mt-2 flex items-start gap-1.5 border border-[rgba(245,245,245,0.08)] bg-[#f5f5f5]/[0.04] px-2.5 py-1.5">
+              <RefreshCw className="mt-0.5 h-3 w-3 shrink-0 text-[#ffb800]/70" />
+              <p className="text-[10px] leading-snug text-[#f5f5f5]/45">{pot.stackNote}</p>
             </div>
           )}
         </div>
@@ -4321,29 +4316,29 @@ function ReceiverProofStats() {
 
   return (
     <div>
-      <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-stone-400">Why this list matters</p>
-      <p style={{ fontFamily: "var(--font-display)" }} className="mb-4 text-[17px] font-semibold text-stone-800 leading-tight">
+      <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Why this list matters</p>
+      <p className="font-editorial mb-4 text-[19px] font-semibold leading-tight text-[#0a0a0a]">
         A smarter, kinder way to give
       </p>
       <div className="flex flex-col gap-3">
-        {stats.map(({ Icon, value, suffix, label, desc, color, bg, border }) => (
-          <div key={label} className={cn("flex gap-4 rounded-2xl border p-4", bg, border)}>
-            <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm")}>
-              <Icon className={cn("h-5 w-5", color)} strokeWidth={1.75} />
+        {stats.map(({ Icon, value, suffix, label, desc }) => (
+          <div key={label} className="flex gap-4 border border-[rgba(10,10,10,0.12)] bg-[#fafafa] p-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-[rgba(10,10,10,0.12)] bg-[#f5f5f5]">
+              <Icon className="h-5 w-5 text-[#0a0a0a]/55" strokeWidth={1.75} />
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-1">
-                <p style={{ fontFamily: "var(--font-display)" }} className={cn("text-[22px] font-bold", color)}>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline gap-1.5">
+                <p className="font-editorial text-[23px] font-semibold text-[#ffb800]">
                   {value === 3 ? "£" : ""}<CountUpStat target={value} suffix={suffix} />
                 </p>
-                <p className="text-[12px] font-semibold text-stone-600">{label}</p>
+                <p className="text-[12px] font-semibold tracking-tight text-[#0a0a0a]/70">{label}</p>
               </div>
-              <p className="mt-0.5 text-[11px] leading-snug text-stone-500">{desc}</p>
+              <p className="mt-0.5 text-[11px] leading-snug tracking-tight text-[#0a0a0a]/50">{desc}</p>
             </div>
           </div>
         ))}
       </div>
-      <p className="mt-3 text-center text-[9px] text-stone-400 leading-snug">
+      <p className="mt-3 text-center text-[9px] leading-snug text-[#0a0a0a]/40">
         Sources: British Retail Consortium · Waste & Resources Action Programme (WRAP) UK · Psychological Science Gifting Surveys
       </p>
     </div>
@@ -4373,41 +4368,38 @@ function ReceiverView({ pots, onShare, onReveal }: {
   const bdayDays = Math.ceil((bdayDate.getTime() - now.getTime()) / 86_400_000);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fff8f0] to-[#fdf9f5]">
+    <div className="min-h-screen bg-[#f5f5f5]">
       {/* Hero */}
-      <div className="px-5 pt-6 pb-4">
+      <div className="px-5 pb-4 pt-6">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-orange-400 shadow-lg shadow-amber-200">
-              <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
+            <div className="flex h-14 w-14 items-center justify-center bg-[#0a0a0a]">
+              <Sparkles className="h-7 w-7 text-[#ffb800]" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500">Your Kindled Spark Goals</p>
-              <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[24px] font-semibold text-stone-900 leading-tight">Hey Billy!</h1>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Your Kindled Spark Goals</p>
+              <h1 className="font-editorial text-[26px] font-semibold leading-tight text-[#0a0a0a]">Hey Billy!</h1>
             </div>
           </div>
           <motion.button
             whileTap={{ scale: 0.94 }}
             whileHover={{ scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            transition={{ duration: 0.4, ease: LUX_EASE }}
             onClick={onShare}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3.5 py-2 text-[12px] font-semibold text-stone-900 shadow-md shadow-amber-200 active:scale-95"
+            className="flex shrink-0 items-center gap-1.5 bg-[#ffb800] px-3.5 py-2 text-[12px] font-semibold uppercase tracking-[0.08em] text-[#0a0a0a] active:scale-95"
           >
             <Share2 className="h-3.5 w-3.5" />
-            Share with family
+            Share
           </motion.button>
         </div>
-        <p className="mt-1.5 text-right text-[10px] text-stone-400 pr-0.5">send your list to the people who love you</p>
 
         {/* ── Total Spark Goal Value hero ── */}
-        <div className="mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-stone-900 to-stone-800 px-5 py-4 shadow-xl"
-          style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.06)" }}>
-          <div className="h-[2px] w-full rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-500 mb-3" />
-          <p className="text-[10px] font-bold uppercase tracking-widest text-amber-400/80">Total Spark Goal Value</p>
-          <p style={{ fontFamily: "var(--font-display)" }} className="text-[36px] font-bold text-white leading-none mt-0.5">
+        <div className="mt-5 border border-[#0a0a0a] bg-[#0a0a0a] px-5 py-5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Total Spark Goal Value</p>
+          <p className="font-editorial mt-1 text-[40px] font-semibold leading-none text-[#f5f5f5]">
             £{totalTarget.toLocaleString()}
           </p>
-          <p className="mt-1.5 text-[11px] leading-snug text-white/50">
+          <p className="mt-2 text-[11px] leading-snug tracking-tight text-[#f5f5f5]/50">
             Across {sparkGoals.length} Kindle Fires — all held under wraps until reveal day
           </p>
         </div>
@@ -4415,34 +4407,33 @@ function ReceiverView({ pots, onShare, onReveal }: {
         {/* ── Dual event countdowns ── */}
         <div className="mt-3 grid grid-cols-2 gap-2">
           {[
-            { Icon: TreePine, label: "Christmas", days: xmasDays, color: "text-red-500", accent: "from-red-500 to-amber-500", bg: "bg-red-50", border: "border-red-200/60" },
-            { Icon: Cake,     label: "10th Birthday", days: bdayDays, color: "text-violet-500", accent: "from-violet-500 to-fuchsia-400", bg: "bg-violet-50", border: "border-violet-200/60" },
-          ].map(({ Icon, label, days, color, accent, bg, border }) => (
-            <div key={label} className={cn("overflow-hidden rounded-2xl border px-3 py-3", bg, border)}>
-              <div className={cn("mb-1.5 h-[2px] w-full rounded-full bg-gradient-to-r", accent)} />
-              <div className="flex items-center gap-1.5 mb-1">
-                <Icon className={cn("h-4 w-4 shrink-0", color)} strokeWidth={1.75} />
-                <p className="text-[10px] font-semibold text-stone-500 truncate">{label}</p>
+            { Icon: TreePine, label: "Christmas", days: xmasDays },
+            { Icon: Cake,     label: "10th Birthday", days: bdayDays },
+          ].map(({ Icon, label, days }) => (
+            <div key={label} className="border border-[rgba(10,10,10,0.12)] bg-[#fafafa] px-3 py-3">
+              <div className="mb-1.5 flex items-center gap-1.5">
+                <Icon className="h-4 w-4 shrink-0 text-[#0a0a0a]/50" strokeWidth={1.75} />
+                <p className="truncate text-[10px] font-semibold uppercase tracking-[0.1em] text-[#0a0a0a]/50">{label}</p>
               </div>
-              <p style={{ fontFamily: "var(--font-display)" }} className={cn("text-[28px] font-bold leading-none", color)}>{days}</p>
-              <p className="text-[9px] text-stone-400 mt-0.5">days away</p>
+              <p className="font-editorial text-[30px] font-semibold leading-none text-[#0a0a0a]">{days}</p>
+              <p className="mt-1 text-[9px] uppercase tracking-[0.15em] text-[#0a0a0a]/40">days away</p>
             </div>
           ))}
         </div>
 
         {/* Continuous-fire note */}
-        <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-200/60 bg-amber-50/80 px-3 py-2.5">
-          <Flame className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" strokeWidth={2} />
-          <p className="text-[11px] leading-snug text-amber-800/80">
+        <div className="mt-3 flex items-start gap-2 border border-[#ffb800]/30 bg-[#ffb800]/[0.07] px-3 py-2.5">
+          <Flame className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#ffb800]" strokeWidth={2} />
+          <p className="text-[11px] leading-snug tracking-tight text-[#0a0a0a]/70">
             These fires are continuous. A magical Reveal Ceremony will ignite on your next big occasion even if your Kindle Goals are only partially stoked!
           </p>
         </div>
       </div>
 
-      <div className="space-y-6 pb-20 px-4">
+      <div className="space-y-6 px-4 pb-20">
         {/* ── Unified Spark Goals stream — every fire locked under wraps ── */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-3">Your Spark Goals · all under wraps</p>
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Your Spark Goals · all under wraps</p>
           <div className="flex flex-col gap-3">
             {sparkGoals.map((pot, i) => (
               <ReceiverPotCard key={pot.id} pot={pot} index={i} />
@@ -4450,59 +4441,52 @@ function ReceiverView({ pots, onShare, onReveal }: {
           </div>
         </div>
 
-        {/* ── Receiver Samba Reveal Demo ── */}
+        {/* ── Receiver Reveal Demo — charcoal feature card ── */}
         <motion.button
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: "spring", stiffness: 380, damping: 28 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.4, ease: LUX_EASE }}
           onClick={() => onReveal()}
-          className="relative w-full overflow-hidden rounded-2xl text-left"
-          style={{
-            background: "linear-gradient(135deg, #1a0e08 0%, #2c1810 50%, #1a0e08 100%)",
-            boxShadow: "0 4px 28px rgba(251,146,60,0.25), 0 0 0 1px rgba(251,146,60,0.2)",
-          }}
+          className="relative w-full overflow-hidden border border-[#0a0a0a] bg-[#0a0a0a] text-left"
         >
-          {/* Subtle particle backdrop */}
-          <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
             {CONFETTI_P.slice(0, 6).map((c) => (
-              <span key={c.id} className={cn("animate-confetti absolute rounded-sm opacity-30", c.color)}
+              <span key={c.id} className={cn("animate-confetti absolute opacity-20", c.color)}
                 style={{ left: c.left, top: 0, width: c.w, height: c.h,
                   "--dur": c.dur, "--rot": c.rot, animationDelay: c.delay } as React.CSSProperties} />
             ))}
           </div>
           <div className="relative flex items-center gap-4 p-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-900/40">
-              <Sparkles className="h-7 w-7 text-stone-900" strokeWidth={1.75} />
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center bg-[#ffb800]">
+              <Sparkles className="h-7 w-7 text-[#0a0a0a]" strokeWidth={1.75} />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[9px] font-bold uppercase tracking-widest text-amber-400/80 mb-0.5">Experience Your Reveal Day</p>
-              <p style={{ fontFamily: "var(--font-display)" }} className="text-[15px] font-semibold text-white leading-snug">
+            <div className="min-w-0 flex-1">
+              <p className="mb-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#ffb800]">Experience Your Reveal Day</p>
+              <p className="font-editorial text-[16px] font-semibold leading-snug text-[#f5f5f5]">
                 See the magical reveal celebration
               </p>
-              <p className="mt-0.5 text-[11px] leading-snug text-white/50">
+              <p className="mt-0.5 text-[11px] leading-snug tracking-tight text-[#f5f5f5]/50">
                 Preview the cinematic ceremony your family will ignite when your fires are fully stoked
               </p>
             </div>
-            <div className="shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 px-3 py-2">
-              <Play className="h-4 w-4 text-stone-900" strokeWidth={2.5} />
+            <div className="shrink-0 bg-[#ffb800] px-3 py-2">
+              <Play className="h-4 w-4 text-[#0a0a0a]" strokeWidth={2.5} />
             </div>
           </div>
-          <div className="h-[3px] w-full bg-gradient-to-r from-amber-400 via-orange-400 to-red-500" />
         </motion.button>
 
         {/* ── Claimed / sorted ── */}
         {claimed.length > 0 && (
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone-400 mb-2">Sorted</p>
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0a0a0a]/40">Sorted</p>
             <div className="flex flex-col gap-2">
               {claimed.map((pot) => (
-                <div key={pot.id} className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500">
-                    <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+                <div key={pot.id} className="flex items-center gap-3 border border-[rgba(10,10,10,0.12)] bg-[#fafafa] px-4 py-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-[#0a0a0a]">
+                    <Check className="h-4 w-4 text-[#ffb800]" strokeWidth={2.5} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-stone-700 truncate">{pot.title}</p>
-                    <p className="text-[11px] text-emerald-600">{pot.claimedBy} — on its way!</p>
+                    <p className="truncate text-[13px] font-semibold tracking-tight text-[#0a0a0a]">{pot.title}</p>
+                    <p className="text-[11px] text-[#0a0a0a]/50">{pot.claimedBy} — on its way!</p>
                   </div>
                 </div>
               ))}
