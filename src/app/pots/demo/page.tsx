@@ -2355,20 +2355,20 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", stiffness: 340, damping: 36 }}
-        className="fixed bottom-0 left-0 right-0 z-50 flex max-h-[92dvh] flex-col overflow-hidden rounded-t-3xl bg-[#fdf9f5] shadow-2xl"
+        className="vh fixed bottom-0 left-0 right-0 z-50 flex max-h-[92dvh] flex-col overflow-hidden rounded-t-[32px] bg-[#fdf6e3] shadow-2xl"
       >
         {/* Drag handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="h-1 w-10 rounded-full bg-[rgba(10,10,10,0.22)]" />
+          <div className="h-1 w-10 rounded-full bg-[rgba(15,23,42,0.22)]" />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 pb-3 pt-1">
           <div>
-            <h2 className="font-editorial text-[20px] font-semibold text-[#0a0a0a] leading-tight">New Gift</h2>
-            <p className="text-[12px] text-[#0a0a0a]/45">Add something special to the list</p>
+            <h2 className="font-editorial text-[20px] font-semibold text-[#0f172a] leading-tight">New Gift</h2>
+            <p className="text-[12px] text-[#0f172a]/45">Add something special to the list</p>
           </div>
-          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f0f0f0] text-[#0a0a0a]/55 active:scale-95 transition-transform">
+          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f6ecd2] text-[#0f172a]/55 active:scale-95 transition-transform">
             <span className="text-[14px] font-bold leading-none">✕</span>
           </button>
         </div>
@@ -2377,14 +2377,14 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
         <div className="flex-1 overflow-y-auto px-5 pb-8 space-y-5">
 
           {/* Mode toggle */}
-          <div className="flex rounded-xl bg-[#f0f0f0] p-1 gap-1">
+          <div className="flex rounded-xl bg-[#f6ecd2] p-1 gap-1">
             {(["link", "manual"] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => { setMode(m); setTitle(""); setAmount(""); setUrl(""); setFetchState("idle"); }}
                 className={cn(
                   "flex-1 rounded-lg py-2 text-[13px] font-semibold transition-all",
-                  mode === m ? "bg-white shadow text-[#0a0a0a]" : "text-[#0a0a0a]/45",
+                  mode === m ? "bg-[#fffdf7] shadow text-[#0f172a]" : "text-[#0f172a]/45",
                 )}
               >
                 <span className="inline-flex items-center gap-1.5">
@@ -2404,11 +2404,11 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   placeholder="amazon.co.uk/... or any product URL"
                   value={url}
                   onChange={(e) => handleUrlChange(e.target.value)}
-                  className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white px-4 py-3 pr-20 text-[14px] text-[#0a0a0a] placeholder:text-[#0a0a0a]/45 focus:border-[#ffb800] focus:outline-none transition-colors"
+                  className="w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-[#fffdf7] px-4 py-3 pr-20 text-[14px] text-[#0f172a] placeholder:text-[#0f172a]/45 focus:border-[#f59e0b] focus:outline-none transition-colors"
                 />
                 <button
                   onClick={() => { void handlePaste(); }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#ffb800]/15 px-3 py-1.5 text-[12px] font-semibold text-[#0a0a0a] active:scale-95 transition-transform"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#f59e0b]/15 px-3 py-1.5 text-[12px] font-semibold text-[#0f172a] active:scale-95 transition-transform"
                 >
                   Paste
                 </button>
@@ -2419,18 +2419,18 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 <motion.div
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-3 rounded-xl bg-[#ffb800]/[0.08] border border-[#ffb800]/30 px-4 py-3"
+                  className="flex items-center gap-3 rounded-xl bg-[#f59e0b]/[0.08] border border-[#f59e0b]/30 px-4 py-3"
                 >
                   <div className="flex gap-1">
                     {[0, 1, 2].map((i) => (
                       <span
                         key={i}
-                        className="h-2 w-2 rounded-full bg-[#ffb800]"
+                        className="h-2 w-2 rounded-full bg-[#f59e0b]"
                         style={{ animation: `bounce 0.9s ${i * 0.15}s ease-in-out infinite` }}
                       />
                     ))}
                   </div>
-                  <p className="text-[13px] font-medium text-[#0a0a0a]">Fetching product details…</p>
+                  <p className="text-[13px] font-medium text-[#0f172a]">Fetching product details…</p>
                 </motion.div>
               )}
 
@@ -2440,32 +2440,32 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  className="rounded-xl border border-[rgba(10,10,10,0.12)] bg-[#f0f0f0] p-4 space-y-3"
+                  className="rounded-xl border border-[rgba(15,23,42,0.12)] bg-[#f6ecd2] p-4 space-y-3"
                 >
                   <div className="flex items-start gap-3">
                     {scrapedImage && (
-                      <img src={scrapedImage} alt="" className="h-16 w-16 rounded-lg object-cover shrink-0 border border-[rgba(10,10,10,0.12)]" />
+                      <img src={scrapedImage} alt="" className="h-16 w-16 rounded-lg object-cover shrink-0 border border-[rgba(15,23,42,0.12)]" />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <Check className="h-3.5 w-3.5 text-[#0a0a0a]/70 shrink-0" strokeWidth={2.5} />
-                        <p className="text-[12px] font-semibold text-[#0a0a0a]">Product details found — edit if needed</p>
+                        <Check className="h-3.5 w-3.5 text-[#0f172a]/70 shrink-0" strokeWidth={2.5} />
+                        <p className="text-[12px] font-semibold text-[#0f172a]">Product details found — edit if needed</p>
                       </div>
                       <input
                         type="text"
                         placeholder="Product name"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full rounded-lg border border-[rgba(10,10,10,0.12)] bg-white px-3 py-2 text-[14px] text-[#0a0a0a] focus:border-[#ffb800] focus:outline-none mb-2"
+                        className="w-full rounded-lg border border-[rgba(15,23,42,0.12)] bg-[#fffdf7] px-3 py-2 text-[14px] text-[#0f172a] focus:border-[#f59e0b] focus:outline-none mb-2"
                       />
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-semibold text-[#0a0a0a]/45">£</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] font-semibold text-[#0f172a]/45">£</span>
                         <input
                           type="number"
                           placeholder="0.00"
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
-                          className="w-full rounded-lg border border-[rgba(10,10,10,0.12)] bg-white pl-7 pr-3 py-2 text-[14px] text-[#0a0a0a] focus:border-[#ffb800] focus:outline-none"
+                          className="w-full rounded-lg border border-[rgba(15,23,42,0.12)] bg-[#fffdf7] pl-7 pr-3 py-2 text-[14px] text-[#0f172a] focus:border-[#f59e0b] focus:outline-none"
                         />
                       </div>
                     </div>
@@ -2487,16 +2487,16 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 placeholder="Gift name e.g. LEGO Technic Ferrari"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white px-4 py-3 text-[14px] text-[#0a0a0a] placeholder:text-[#0a0a0a]/45 focus:border-[#ffb800] focus:outline-none transition-colors"
+                className="w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-[#fffdf7] px-4 py-3 text-[14px] text-[#0f172a] placeholder:text-[#0f172a]/45 focus:border-[#f59e0b] focus:outline-none transition-colors"
               />
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[15px] font-semibold text-[#0a0a0a]/45">£</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[15px] font-semibold text-[#0f172a]/45">£</span>
                 <input
                   type="number"
                   placeholder="Goal amount"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white pl-8 pr-4 py-3 text-[14px] text-[#0a0a0a] placeholder:text-[#0a0a0a]/45 focus:border-[#ffb800] focus:outline-none transition-colors"
+                  className="w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-[#fffdf7] pl-8 pr-4 py-3 text-[14px] text-[#0f172a] placeholder:text-[#0f172a]/45 focus:border-[#f59e0b] focus:outline-none transition-colors"
                 />
               </div>
             </motion.div>
@@ -2504,7 +2504,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
 
           {/* Event type */}
           <div className="space-y-2">
-            <p className="text-[12px] font-semibold uppercase tracking-wider text-[#0a0a0a]/45">For which event?</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wider text-[#0f172a]/45">For which event?</p>
             <div className="grid grid-cols-4 gap-2">
               {EVENT_OPTIONS.map((ev) => (
                 <button
@@ -2513,8 +2513,8 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                   className={cn(
                     "flex flex-col items-center gap-1 rounded-xl py-3 text-center transition-all",
                     eventType === ev.type
-                      ? "bg-[#ffb800] text-[#0a0a0a] shadow-md shadow-[#ffb800]/30"
-                      : "bg-[#f0f0f0] text-[#0a0a0a]/55",
+                      ? "bg-[#f59e0b] text-[#0f172a] shadow-md shadow-[#f59e0b]/30"
+                      : "bg-[#f6ecd2] text-[#0f172a]/55",
                   )}
                 >
                   <div className="h-5 w-5 rounded-full" style={{ background: ev.color }} />
@@ -2539,14 +2539,14 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                     placeholder="Event name e.g. Graduation"
                     value={customLabel}
                     onChange={(e) => setCustomLabel(e.target.value)}
-                    className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white px-4 py-3 text-[14px] text-[#0a0a0a] placeholder:text-[#0a0a0a]/45 focus:border-[#ffb800] focus:outline-none"
+                    className="w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-[#fffdf7] px-4 py-3 text-[14px] text-[#0f172a] placeholder:text-[#0f172a]/45 focus:border-[#f59e0b] focus:outline-none"
                   />
                 )}
                 <input
                   type="date"
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
-                  className="w-full rounded-xl border border-[rgba(10,10,10,0.12)] bg-white px-4 py-3 text-[14px] text-[#0a0a0a] focus:border-[#ffb800] focus:outline-none"
+                  className="w-full rounded-xl border border-[rgba(15,23,42,0.12)] bg-[#fffdf7] px-4 py-3 text-[14px] text-[#0f172a] focus:border-[#f59e0b] focus:outline-none"
                 />
               </motion.div>
             )}
@@ -2562,17 +2562,17 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 onClick={() => setIsSurprise((v) => !v)}
                 className={cn(
                   "flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all",
-                  isSurprise ? "border-[#ffb800] bg-[#ffb800]/[0.08]" : "border-[rgba(10,10,10,0.12)] bg-white",
+                  isSurprise ? "border-[#f59e0b] bg-[#f59e0b]/[0.08]" : "border-[rgba(15,23,42,0.12)] bg-[#fffdf7]",
                 )}
               >
                 {isSurprise
-                  ? <Lock className="h-6 w-6 text-[#ffb800]" strokeWidth={1.75} />
-                  : <Eye className="h-6 w-6 text-[#0a0a0a]/45" strokeWidth={1.75} />}
+                  ? <Lock className="h-6 w-6 text-[#f59e0b]" strokeWidth={1.75} />
+                  : <Eye className="h-6 w-6 text-[#0f172a]/45" strokeWidth={1.75} />}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-[#0a0a0a]">
+                  <p className="text-[14px] font-semibold text-[#0f172a]">
                     {isSurprise ? "Keep it a surprise" : "Visible to everyone"}
                   </p>
-                  <p className="text-[12px] text-[#0a0a0a]/45 mt-0.5">
+                  <p className="text-[12px] text-[#0f172a]/45 mt-0.5">
                     {isSurprise
                       ? "Hidden from the recipient until the big day"
                       : "Recipient can see progress and contributions"}
@@ -2580,10 +2580,10 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 </div>
                 <div className={cn(
                   "h-6 w-11 rounded-full transition-colors relative",
-                  isSurprise ? "bg-[#ffb800]" : "bg-[rgba(10,10,10,0.12)]",
+                  isSurprise ? "bg-[#f59e0b]" : "bg-[rgba(15,23,42,0.12)]",
                 )}>
                   <div className={cn(
-                    "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
+                    "absolute top-0.5 h-5 w-5 rounded-full bg-[#fffdf7] shadow transition-transform",
                     isSurprise ? "translate-x-5" : "translate-x-0.5",
                   )} />
                 </div>
@@ -2598,14 +2598,14 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
             onClick={handleSubmit}
             disabled={!canSubmit}
             className={cn(
-              "flex w-full items-center justify-center gap-2.5 rounded-2xl py-4 text-[16px] font-semibold transition-all",
+              "flex w-full items-center justify-center gap-2.5 rounded-full py-4 text-[16px] font-bold transition-all",
               canSubmit
-                ? "bg-gradient-to-r from-[#ffb800] to-[#f59e0b] text-[#0a0a0a] shadow-lg shadow-[#ffb800]/30"
-                : "bg-[#f0f0f0] text-[#0a0a0a]/45 cursor-not-allowed",
+                ? "bg-[#ff6b6b] text-white vh-lift"
+                : "cursor-not-allowed bg-[#f6ecd2] text-[#0f172a]/40",
             )}
           >
             <Gift className="h-[18px] w-[18px]" strokeWidth={2} />
-            <span style={{ fontFamily: "var(--font-display)" }}>Add to list</span>
+            <span>Add to list</span>
           </motion.button>
         </div>
       </motion.div>
