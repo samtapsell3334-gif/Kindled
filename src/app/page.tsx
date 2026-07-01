@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useInView, useScroll, useTransform, AnimatePresence, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import {
   Flame, Lock, Star, Users, Trophy, Check,
@@ -96,27 +96,27 @@ const FEATURES = [
     glow: "rgba(234,88,12,0.12)",
   },
   {
-    icon: Trophy,
-    title: "£2,500 prize draw",
-    desc: "Every contributor is automatically entered into our quarterly prize draw — with a free entry route, no purchase necessary.",
+    icon: RefreshCw,
+    title: "Carry-over balances",
+    desc: "Incomplete birthday goals carry to Christmas seamlessly. Nothing is ever lost or wasted.",
     color: "text-[#ff6b6b]",
     bg: "bg-rose-50",
     border: "border-rose-100",
     glow: "rgba(255,107,107,0.12)",
   },
   {
-    icon: RefreshCw,
-    title: "Carry-over balances",
-    desc: "Incomplete birthday goals carry to Christmas seamlessly. Nothing is ever lost or wasted.",
+    icon: Shield,
+    title: "Parent dashboard",
+    desc: "Event dates, catalogue browsing with virtual marker pens, gift approvals — full family control.",
     color: "text-amber-600",
     bg: "bg-amber-50",
     border: "border-amber-100",
     glow: "rgba(217,119,6,0.12)",
   },
   {
-    icon: Shield,
-    title: "Parent dashboard",
-    desc: "Event dates, catalogue browsing with virtual marker pens, gift approvals — full family control.",
+    icon: Trophy,
+    title: "A little extra: prize draw",
+    desc: "On top of it all, every contributor is entered into our quarterly £2,500 prize draw — free entry route, no purchase necessary.",
     color: "text-orange-600",
     bg: "bg-orange-50",
     border: "border-orange-100",
@@ -383,7 +383,7 @@ function Hero() {
               transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50"
             >
-              Everyone chips in to the gifts that actually matter. No more duplicates, no more guessing. Share one link — family contribute any amount — and on the big day, trigger a reveal they&apos;ll never forget.
+              The gifts they&apos;ll actually love, funded by everyone who loves them. Share one link, family chip in any amount, and reveal it all together on the big day.
             </motion.p>
 
             <motion.div
@@ -675,6 +675,67 @@ function Problem() {
               </div>
             </Reveal>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Reveal preview (WS6) ─────────────────────────────────────────────────────
+// A lightweight, looping "reveal" preview — CSS/Framer only (no heavy video).
+// Respects prefers-reduced-motion: shows the funded end-state statically.
+
+function RevealPreview() {
+  const reduce = useReducedMotion();
+  const barLoop = reduce
+    ? { width: "100%" as const }
+    : { width: ["0%", "100%", "100%", "0%"] };
+  const barTransition = reduce
+    ? { duration: 0 }
+    : { duration: 5, times: [0, 0.5, 0.85, 1], repeat: Infinity, ease: "easeInOut" as const };
+  const popLoop = reduce ? { opacity: 1, scale: 1 } : { opacity: [0, 0, 1, 1, 0], scale: [0.6, 0.6, 1, 1, 0.9] };
+  const popTransition = reduce ? { duration: 0 } : { duration: 5, times: [0, 0.5, 0.6, 0.85, 1], repeat: Infinity };
+
+  return (
+    <section
+      className="relative overflow-hidden px-5 py-24"
+      style={{ background: "radial-gradient(ellipse 90% 60% at 50% 30%, #1a0800 0%, #0a0400 55%, #050200 100%)" }}
+    >
+      <div className="relative mx-auto max-w-2xl text-center">
+        <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-400">The magic moment</p>
+        <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[34px] font-bold leading-tight text-white md:text-[46px]">
+          The reveal is the bit they remember
+        </h2>
+        <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-white/50">
+          When the goal is funded, everyone gathers for the reveal — the gift, who chipped in, and a fair few happy tears.
+        </p>
+
+        <div
+          className="relative mx-auto mt-10 w-full max-w-[340px] overflow-hidden rounded-3xl border border-white/10 p-6"
+          style={{ background: "linear-gradient(145deg, #1a0800, #0d0400)", boxShadow: "0 24px 60px rgba(251,146,60,0.2)" }}
+          aria-label="A preview of a Kindled reveal reaching its goal"
+        >
+          <div className="mb-4 flex items-center justify-center gap-2">
+            <Gift className="h-5 w-5 text-amber-400" />
+            <span className="text-[13px] font-bold text-white">Billy&apos;s birthday pot</span>
+          </div>
+          <p className="mb-2 text-[34px] font-black text-white" style={{ fontFamily: "var(--font-display)" }}>£800</p>
+          <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
+            <motion.div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" animate={barLoop} transition={barTransition} />
+          </div>
+          <motion.div
+            animate={popLoop}
+            transition={popTransition}
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-[13px] font-black text-stone-900"
+          >
+            <Sparkles className="h-4 w-4" /> Fully funded!
+          </motion.div>
+        </div>
+
+        <div className="mt-8">
+          <Link href="/pots/demo" className="inline-flex items-center gap-2 text-[14px] font-semibold text-amber-400 hover:text-amber-300">
+            Watch a full reveal in the demo <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>
@@ -1178,6 +1239,7 @@ export default function LandingPage() {
       <Hero />
       <MarqueeBand />
       <Problem />
+      <RevealPreview />
       <HowItWorks />
       <HowMoneyWorks />
       <AudienceSplit />
