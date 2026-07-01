@@ -25,6 +25,8 @@ import { KindleRecord } from "@/components/KindleRecord";
 import { CompletionValue } from "@/components/CompletionValue";
 import { generateId } from "@/lib/provisioning";
 import type { KindleMemory } from "@/lib/media-service";
+import { recommendForJourney } from "@/lib/recommendation-service";
+import { trackClickThrough, emitClickEvent } from "@/lib/revenue-tracking";
 import { LUX_EASE, VH_BOUNCE } from "@/lib/motion";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
@@ -3664,23 +3666,40 @@ const DISCOVERY_PRODUCTS: DiscoveryProduct[] = [
   { id: "l3", category: "LEGACY", name: "Heirloom Fragrance Set",      price: 160,                 retailerId: "etsy",         image: IMG("1541643600914-78b084683702"), url: "https://www.etsy.com" },
 ];
 
+/** The Boutique Shop — the RecommendationService ranks the feed for this journey. */
 function GoalDiscovery({ category }: { category: MilestoneCategory }) {
-  const products = DISCOVERY_PRODUCTS.filter((p) => p.category === category);
+  const byId = new Map(DISCOVERY_PRODUCTS.map((p) => [p.id, p]));
+  // Relevance Engine: score the whole feed against the milestone category, best-fit first.
+  const recs = recommendForJourney(
+    DISCOVERY_PRODUCTS.map((p) => ({ id: p.id, name: p.name, price: p.price, category: p.category, milestoneAffinity: [p.category] })),
+    category,
+    6,
+  );
+
+  const onOpen = (productId: string, retailerId: string, url: string) => {
+    // Revenue attribution — capture user_id + product_id + milestone_category on click-through.
+    const tracked = trackClickThrough({ userId: "demo_user", productId, retailerId, productUrl: url, milestoneCategory: category });
+    emitClickEvent(tracked.event);
+  };
+
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Discover · curated for this goal</p>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-[#f59e0b]">Recommended for your Journey</p>
         <span className="text-[10px] text-slate-600">Partner retailers</span>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        {products.map((p) => {
+        {recs.map(({ product, reason }) => {
+          const p = byId.get(product.id)!;
           const drop = p.prevPrice ? priceDrop(p.prevPrice, p.price) : null;
           const retailer = getRetailer(p.retailerId);
           return (
             <a key={p.id} href={trackingDecorator(p.url, p.retailerId)} target="_blank" rel={AFFILIATE_LINK_REL}
+              onClick={() => onOpen(p.id, p.retailerId, p.url)}
               className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.07]">
-              <div className="relative h-28 overflow-hidden">
+              <div className="relative h-32 overflow-hidden">
                 <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.style.opacity = "0.2"; }} />
+                <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0f172a] to-transparent px-2.5 pb-1.5 pt-6 text-[9px] font-semibold leading-tight text-[#f59e0b]/90">{reason}</span>
                 {drop?.dropped && (
                   <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-[#f59e0b] px-2 py-0.5 text-[9px] font-black text-[#0f172a]">
                     <TrendingDown className="h-2.5 w-2.5" strokeWidth={3} /> {drop.pct}% · save £{drop.saved}
@@ -3688,10 +3707,10 @@ function GoalDiscovery({ category }: { category: MilestoneCategory }) {
                 )}
               </div>
               <div className="p-3">
-                <p className="truncate text-[12px] font-bold text-[#fdf6e3]">{p.name}</p>
+                <p className="truncate text-[13px] font-bold text-[#fdf6e3]">{p.name}</p>
                 <p className="text-[10px] text-slate-500">{retailer?.name ?? p.retailerId}</p>
                 <div className="mt-1.5 flex items-baseline gap-1.5">
-                  <span className="text-[15px] font-black text-[#f59e0b] tabular-nums">£{p.price.toLocaleString()}</span>
+                  <span className="text-[16px] font-black text-[#f59e0b] tabular-nums">£{p.price.toLocaleString()}</span>
                   {drop?.dropped && <span className="text-[11px] text-slate-600 line-through">£{p.prevPrice!.toLocaleString()}</span>}
                   <ExternalLink className="ml-auto h-3 w-3 text-slate-600 transition-colors group-hover:text-[#f59e0b]" />
                 </div>
