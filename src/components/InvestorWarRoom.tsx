@@ -8,6 +8,7 @@ import {
   Sparkles, Repeat, Share2, Wallet, Percent, Tag, Cpu, GitBranch, Landmark, Bell,
   Copy, Baby,
 } from "lucide-react";
+import { FilmPlayer, type Film } from "@/components/FilmPlayer";
 /**
  * InvestorWarRoom — a dark, fintech-grade investor dashboard.
  *
@@ -350,6 +351,20 @@ function CleanRoomPanel() {
         <p className="mt-3 text-[11px] italic text-slate-500">{c.note}</p>
       </Panel>
     </Reveal>
+  );
+}
+
+// ─── v6: the 90-second brief (gated — scenes arrive via /api/investor only) ────
+
+function InvestorFilm() {
+  const content = useContent();
+  const film = (content as { film?: Film }).film;
+  if (!film) return null;
+  return (
+    <div>
+      <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Watch the 90-second brief</p>
+      <FilmPlayer film={film} />
+    </div>
   );
 }
 
@@ -853,6 +868,7 @@ export function InvestorWarRoom({ embedded = false, content }: { embedded?: bool
             <h1 className="mt-2 max-w-3xl text-[26px] font-bold leading-tight tracking-tight text-white md:text-[38px]">{content.hero.headline}</h1>
             <p className="mt-2 max-w-2xl text-[14px] text-slate-400">{content.hero.subhead}</p>
             <div className="mt-6"><PitchBlock /></div>
+            <div className="mt-5 max-w-2xl"><InvestorFilm /></div>
             <div className="flex flex-wrap gap-x-7 gap-y-3">
               {content.traction.items.map((item) => (
                 <div key={item.label} className="flex items-baseline gap-2">

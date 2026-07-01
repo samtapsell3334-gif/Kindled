@@ -168,3 +168,31 @@ homepage + terms anchor.
 - **Verified in-browser**: all nine beats in order, no-skip on words, gift-card
   outcome → simulated commission event (£2 = 5% of £40), thank-you event, share beat
   screenshot on record. Big-screen/QR mode + captions field: TODO-FOUNDER.
+
+---
+
+# Explainer Film System v6 (branch feat/explainer-v6)
+
+- **Pipeline (WS-V1)**: code-played films via a data-driven FilmPlayer (Remotion
+  rejected for this environment — decision + rationale in PLAN.md). Captions-first:
+  the caption bar is always on; both films land fully muted today. Brand-system
+  visuals only; the v5 Ignition opens both films. No TTS, no stock/gen footage, no
+  music of any kind shipped (nothing to licence — REVIEW note: zero audio assets used;
+  the VO + signature underscore are founder TODOs with pre-built slots).
+- **WS-V2 Investor Film**: scripts/investor-film.md (7 scenes, 90s, every figure
+  matches the investor page; use-of-funds bars carry a visible "placeholder — founder
+  to confirm" label). Scenes live INSIDE investor-content.json → served only by
+  /api/investor after PIN. Bundle grep: film data absent from all client chunks (the
+  only hit is the section label string in component code). Rendered as "Watch the
+  90-second brief" directly under the elevator pitch.
+- **WS-V3 Customer Film**: scripts/customer-film.md (60s + two 9:16 vertical-cut
+  scripts). Public /film page: self-hosted player, captions on, transcript below,
+  waitlist + demo CTAs. Verified playing in-browser with the caption bar.
+- **WS-V4 Placement**: homepage footer "Watch the film" link; /film in the sitemap;
+  investor film absent from public routes/sitemap/bundle. Events wired via the
+  consent-gated layer: film_played, film_completed.
+- **VO-RECORDING-GUIDE.md**: exact-timed scripts, pacing marks, phone-mic guidance,
+  drop-in file paths (with a note that gated investor VO should be served via
+  /api/investor if confidentiality requires).
+- **Honest deltas**: MP4/9:16 renders are a mechanical founder step (scripts +
+  player are the source of truth); film_shared event awaits a share affordance.

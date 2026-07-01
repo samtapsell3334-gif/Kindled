@@ -1280,7 +1280,7 @@ function Footer() {
           </span>
         </div>
         <div className="flex flex-wrap justify-center gap-6">
-          {(["How it works|#how-it-works", "Features|#features", "Live demo|/pots/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
+          {(["How it works|#how-it-works", "Watch the film|/film", "Live demo|/pots/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-stone-400 hover:text-stone-700 transition-colors">
