@@ -35,6 +35,7 @@ import type { GiftingMode } from "@/types/pots";
 import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
 import { DemoWaitlistPill } from "@/components/DemoWaitlistPill";
+import { track } from "@/lib/analytics";
 import { GeneratedReveal } from "@/components/GeneratedReveal";
 import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
 
@@ -133,7 +134,7 @@ const INITIAL_POTS: DemoPot[] = [
     contributors: 3, boosterEntries: 0,
     accentGradient: "from-fuchsia-500 via-purple-400 to-indigo-500",
     tributes: [],
-    stackNote: "Next up: Christmas 2026 — stack balance to unlock an even larger milestone",
+    stackNote: "Carried over from his birthday — stacking on to Christmas 2026",
   },
   {
     id: "p4", title: "Nintendo Switch OLED Bundle",
@@ -1130,8 +1131,8 @@ function ContributionPromptModal({
                   <Trophy className="h-3.5 w-3.5 text-[#f59e0b]" />
                 </div>
                 <div>
-                  <p className="text-[12px] font-bold text-[#f59e0b]">Stoke &amp; Win</p>
-                  <p className="text-[11px] text-white/55 leading-snug">Chipping in automatically enters you into our active <span className="text-[#f59e0b] font-semibold">£2,500 Summer Goal Booster Draw</span> — one entry per £10 contributed.</p>
+                  <p className="text-[12px] font-bold text-[#f59e0b]">Chip In &amp; Win</p>
+                  <p className="text-[11px] text-white/55 leading-snug">Chipping in automatically enters you into our <span className="text-[#f59e0b] font-semibold">£2,500 quarterly prize draw</span> — free entry route available, no purchase necessary.</p>
                 </div>
               </div>
               <div className="h-px bg-white/8" />
@@ -1345,6 +1346,7 @@ function InvestorPinGate({
             const data = (await res.json()) as { content: InvestorContent };
             setContent(data.content);
             setUnlocked(true);
+            track("investor_unlocked", { surface: "demo" });
           } else {
             setShake(true);
             setTimeout(() => { setShake(false); setDigits(""); }, 650);
@@ -2203,7 +2205,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
 
         {/* ── Waitlist CTA ── */}
         <div className="rounded-2xl border border-[#ffb800] p-6 text-center" style={{ background: "rgba(255,184,0,0.08)", boxShadow: "0 0 30px rgba(255,184,0,0.18)" }}>
-          <h2 className="font-editorial mb-2 text-[22px] font-semibold text-white">Be Among the First to Light a Pot</h2>
+          <h2 className="font-editorial mb-2 text-[22px] font-semibold text-white">Be Among the First to Start a Pot</h2>
           <p className="mx-auto mb-5 max-w-sm text-[13px] leading-relaxed text-[#f5f5f5]/65">
             We&apos;re opening Kindled to early users soon. Join the waitlist and we&apos;ll let you know the moment you can build your first list.
           </p>
@@ -3703,7 +3705,7 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
                 See the magical reveal celebration
               </p>
               <p className="mt-0.5 text-[11px] leading-snug text-[#fdf6e3]/55">
-                Preview the reveal your family will trigger when your pots are fully funded
+                Preview the reveal that happens on the big day — fully funded or still growing
               </p>
             </div>
             <div className="shrink-0 rounded-full bg-[#ff6b6b] p-2.5">
@@ -3765,6 +3767,8 @@ export default function DemoPage() {
   const [showPostReveal, setShowPostReveal] = useState(false);
   // Memories captured on contributions — woven into Billy's Reveal.
   const [capturedMemories, setCapturedMemories] = useState<KindleMemory[]>([]);
+
+  useEffect(() => { track("demo_opened"); }, []);
   const [showExplainer, setShowExplainer] = useState(false);
 
   const addLog = useCallback((entry: string) => {
@@ -3785,6 +3789,7 @@ export default function DemoPage() {
     ));
     showToast(`£${amount} kindled!`);
     addLog(`Contribution: £${amount} added to pot`);
+    track("pot_chip_in_completed", { amount });
   }, [showToast, addLog]);
 
   const handleBuy = useCallback((id: string) => {
@@ -3890,7 +3895,7 @@ export default function DemoPage() {
             <PostRevealOptions
               recipientName="Billy"
               totalRaised={V2_TOTAL}
-              onReplay={() => { setShowPostReveal(false); setShowAiReveal(true); }}
+              onReplay={() => { setShowPostReveal(false); setShowAiReveal(true); track("reveal_viewed", { replay: true }); }}
             />
           ) : (
           /* AI Reveal trigger card — shown before the overlay fires */
@@ -3910,7 +3915,7 @@ export default function DemoPage() {
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-              onClick={() => setShowAiReveal(true)}
+              onClick={() => { setShowAiReveal(true); track("reveal_viewed", { replay: false }); }}
               className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 py-4 text-[16px] font-black text-stone-900 shadow-xl shadow-amber-900/40"
             >
               <Play className="h-5 w-5" strokeWidth={3} />
@@ -4041,7 +4046,7 @@ export default function DemoPage() {
               <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-[#f59e0b]/[0.12] px-3.5 py-3">
                 <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-[#f59e0b]" />
                 <p className="text-[11px] leading-snug text-[#fdf6e3]/80">
-                  <span className="font-bold text-[#fdf6e3]">Enter our £2,500 Goal Booster Draw</span> with every contribution.{" "}
+                  <span className="font-bold text-[#fdf6e3]">Enter our £2,500 quarterly prize draw</span> with every contribution — free entry route available.{" "}
                   Plus earn <span className="font-bold text-[#f59e0b]">2% credit back</span> on your own future pots.
                 </p>
               </div>

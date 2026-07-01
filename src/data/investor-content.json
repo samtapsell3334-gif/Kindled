@@ -10,38 +10,75 @@
       "hint": "Enter your 4-digit access code"
     }
   },
-
   "hero": {
     "eyebrow": "Private Investor Briefing",
     "headline": "The gifting platform that turns a family's love into a compounding asset.",
     "subhead": "Consumer-grade delight on the front. Fintech-grade economics underneath."
   },
-
   "traction": {
     "items": [
-      { "figure": "£3.2B", "label": "UK unwanted-gift spend, every year", "source": "Halifax/OnePoll 2023" },
-      { "figure": "10M+", "label": "UK Open Banking users — rails are mature", "source": "Open Banking Ltd, 2023" },
-      { "figure": "6x", "label": "people pulled in per pot (target K-loop)", "source": "Internal model" },
-      { "figure": "0.5%", "label": "platform take on contributions — card-light", "source": "Kindled" }
+      {
+        "figure": "£3.2B",
+        "label": "UK unwanted-gift spend, every year",
+        "source": "Halifax/OnePoll 2023"
+      },
+      {
+        "figure": "10M+",
+        "label": "UK Open Banking users — rails are mature",
+        "source": "Open Banking Ltd, 2023"
+      },
+      {
+        "figure": "6x",
+        "label": "people pulled in per pot (target K-loop)",
+        "source": "Internal model"
+      },
+      {
+        "figure": "0.5%",
+        "label": "platform take on contributions — card-light",
+        "source": "Kindled"
+      }
     ]
   },
-
   "opportunity": {
     "headline": "The Problem Is Universal. The Solution Has Never Existed.",
     "subheadline": "Billions are spent on gifts nobody wanted, by people who felt obliged to guess.",
     "stats": [
-      { "figure": "£3.2B", "caption": "spent on unwanted gifts in the UK each year", "source": "Halifax/OnePoll 2023" },
-      { "figure": "78%", "caption": "of UK adults feel stressed buying gifts", "source": "YouGov UK 2023" },
-      { "figure": "1 in 5", "caption": "gifts are duplicated or returned", "source": "YouGov UK 2023" },
-      { "figure": "30%", "caption": "more household waste in December alone", "source": "WRAP UK 2022" }
+      {
+        "figure": "£3.2B",
+        "caption": "spent on unwanted gifts in the UK each year",
+        "source": "Halifax/OnePoll 2023"
+      },
+      {
+        "figure": "78%",
+        "caption": "of UK adults feel stressed buying gifts",
+        "source": "YouGov UK 2023"
+      },
+      {
+        "figure": "1 in 5",
+        "caption": "gifts are duplicated or returned",
+        "source": "YouGov UK 2023"
+      },
+      {
+        "figure": "30%",
+        "caption": "more household waste in December alone",
+        "source": "WRAP UK 2022"
+      }
     ],
     "whyNow": [
-      { "title": "Open Banking Is Mature", "body": "Account-to-account payments are now fast, trusted, and a fraction of card cost. We are built on these rails from day one — a structural margin advantage over anyone still routing through Visa and Mastercard." },
-      { "title": "AI Unlocked a New Emotion", "body": "A personalised reveal moment cost a fortune two years ago. Today it costs pennies and creates something people genuinely share. That shareability is our distribution." },
-      { "title": "The Market Is Wide Open", "body": "There is no dominant consumer group-gifting product in the UK. Existing tools are clunky (PayPal pools), B2B-only, or charity-shaped (GoFundMe). The everyday gifting moment is unowned." }
+      {
+        "title": "Open Banking Is Mature",
+        "body": "Account-to-account payments are now fast, trusted, and a fraction of card cost. We are built on these rails from day one — a structural margin advantage over anyone still routing through Visa and Mastercard."
+      },
+      {
+        "title": "AI Unlocked a New Emotion",
+        "body": "A personalised reveal moment cost a fortune two years ago. Today it costs pennies and creates something people genuinely share. That shareability is our distribution."
+      },
+      {
+        "title": "The Market Is Wide Open",
+        "body": "There is no dominant consumer group-gifting product in the UK. Existing tools are clunky (PayPal pools), B2B-only, or charity-shaped (GoFundMe). The everyday gifting moment is unowned."
+      }
     ]
   },
-
   "mechanism": {
     "headline": "Three Mechanics, One Compounding Machine",
     "subheadline": "Growth, revenue, and cost advantage are not three problems. They are one design.",
@@ -66,32 +103,70 @@
       }
     ]
   },
-
   "jointFires": {
     "label": "joint pots · Milestone Engine",
     "title": "From Clutter to Life-Milestones",
     "hook": "Stack your birthdays. Combine your Christmases. Accelerate your Expedition.",
     "body": "Two people link accounts and every occasion stacks toward a categorised Major Goal. This moves users from buying clutter to funding life-milestones — and moves Kindled from a one-off utility to a multi-year relationship.",
-    "stat": { "value": "+40%", "label": "conversion on high-ticket goals when two partners pool over 3 years" },
+    "stat": {
+      "value": "+40%",
+      "label": "conversion on high-ticket goals when two partners pool over 3 years"
+    },
     "projection": [
-      { "year": "Year 1", "value": "£990",   "pct": 30 },
-      { "year": "Year 2", "value": "£2,079", "pct": 63 },
-      { "year": "Year 3", "value": "£3,277", "pct": 100 }
+      {
+        "year": "Year 1",
+        "value": "£990",
+        "pct": 30
+      },
+      {
+        "year": "Year 2",
+        "value": "£2,079",
+        "pct": 63
+      },
+      {
+        "year": "Year 3",
+        "value": "£3,277",
+        "pct": 100
+      }
     ],
     "caption": "Modelled: two partners, three occasions a year, category-weighted momentum. A solo pot never reaches the high-ticket goal — a joint pot does.",
     "pillars": [
-      { "title": "The 3-Year Compound Effect", "body": "Pooling birthdays and Christmases turns scattered, low-value spend into a funded milestone. The same households that would have bought clutter now save toward a holiday, a kitchen, a child's future — and convert on high-ticket items they'd never reach alone." },
-      { "title": "3-Year Predictive Intent", "body": "Categorised milestones give us multi-year forward intent. We don't just know a couple wants to spend — we know whether they're Foundation builders (Home & DIY) or Expedition seekers (Travel & Adventure), and roughly when they'll book. That forward window is worth a premium in retail data licensing." },
-      { "title": "Multi-Year Lock-In", "body": "A shared, years-long goal makes leaving costly and staying rewarding. joint pots shift Kindled from a one-off gifting utility to a long-term relational tool — the retention engine behind durable lifetime value." }
+      {
+        "title": "The 3-Year Compound Effect",
+        "body": "Pooling birthdays and Christmases turns scattered, low-value spend into a funded milestone. The same households that would have bought clutter now save toward a holiday, a kitchen, a child's future — and convert on high-ticket items they'd never reach alone."
+      },
+      {
+        "title": "3-Year Predictive Intent",
+        "body": "Categorised milestones give us multi-year forward intent. We don't just know a couple wants to spend — we know whether they're Foundation builders (Home & DIY) or Expedition seekers (Travel & Adventure), and roughly when they'll book. That forward window is worth a premium in retail data licensing."
+      },
+      {
+        "title": "Multi-Year Lock-In",
+        "body": "A shared, years-long goal makes leaving costly and staying rewarding. joint pots shift Kindled from a one-off gifting utility to a long-term relational tool — the retention engine behind durable lifetime value."
+      }
     ],
     "categories": [
-      { "label": "Expedition",  "segment": "Travel & adventure",  "horizon": "1–2 yr" },
-      { "label": "Foundation",  "segment": "Home, DIY & interiors", "horizon": "2–3+ yr" },
-      { "label": "Celebration", "segment": "Events & hospitality",  "horizon": "near-term" },
-      { "label": "Legacy",      "segment": "Finance & keepsakes",   "horizon": "long-horizon" }
+      {
+        "label": "Expedition",
+        "segment": "Travel & adventure",
+        "horizon": "1–2 yr"
+      },
+      {
+        "label": "Foundation",
+        "segment": "Home, DIY & interiors",
+        "horizon": "2–3+ yr"
+      },
+      {
+        "label": "Celebration",
+        "segment": "Events & hospitality",
+        "horizon": "near-term"
+      },
+      {
+        "label": "Legacy",
+        "segment": "Finance & keepsakes",
+        "horizon": "long-horizon"
+      }
     ]
   },
-
   "valueEngine": {
     "headline": "The Value Engine",
     "subheadline": "We make money while actively rewarding the user. That alignment is the moat.",
@@ -110,10 +185,24 @@
       "title": "The Cashback Math",
       "intro": "A retailer pays an affiliate commission when a pot converts into a real purchase. We split it so the user is rewarded and the platform profits — but the user's share is credited as ringfenced credit, not withdrawable cash.",
       "exampleLabel": "On a £100 partner purchase",
-      "commission": { "label": "Retailer commission", "value": "5%", "amount": "£5.00" },
+      "commission": {
+        "label": "Retailer commission",
+        "value": "5%",
+        "amount": "£5.00"
+      },
       "split": [
-        { "label": "User credit — own pots only", "value": "3%", "amount": "£3.00", "tone": "user" },
-        { "label": "Platform profit", "value": "2%", "amount": "£2.00", "tone": "platform" }
+        {
+          "label": "User credit — own pots only",
+          "value": "3%",
+          "amount": "£3.00",
+          "tone": "user"
+        },
+        {
+          "label": "Platform profit",
+          "value": "2%",
+          "amount": "£2.00",
+          "tone": "platform"
+        }
       ],
       "compoundLoop": {
         "title": "Ringfenced & Compounding",
@@ -123,26 +212,25 @@
     },
     "revenueModels": [
       {
+        "id": "giftCards",
+        "title": "Gift Card Commissions",
+        "tag": "Phase 1 · live from launch",
+        "body": "How it works: when a funded pot is redeemed as a retailer gift card, the retailer pays Kindled a commission on the load. Why now: it's immediate and margin-light — retailer-funded, no fee to the family, and it earns from the very first redeemed pot."
+      },
+      {
         "id": "affiliate",
-        "title": "Affiliate Commissions",
-        "tag": "Live in Phase 1",
-        "body": "Every funded pot that converts into a real purchase earns a retailer commission. The catalogue is curated; sponsored placement is auctioned. Revenue scales directly with happy outcomes."
+        "title": "Catalogue Commissions",
+        "tag": "Phase 1 · live from launch",
+        "body": "How it works: pots redeemed through the curated catalogue earn a retailer commission, and sponsored placement is auctioned. Why now: revenue scales with happy outcomes rather than ad spend."
       },
       {
-        "id": "intentData",
-        "title": "Intent Data Licensing",
-        "tag": "Phase 1 foundation → Phase 2 scale",
-        "body": "Anonymised, category-level purchase-intent — declared before the spend — is the highest-value signal in retail. We package it as a licensed feed for brands and programmatic buyers. High margin, near-zero marginal cost."
-      },
-      {
-        "id": "premiumReveals",
-        "title": "Premium AI Reveals",
-        "tag": "Live in Phase 1",
-        "body": "The reveal is the emotional peak and the distribution engine. A premium tier — bespoke cinematic videos, branded moments, keepsakes — monetises the highest-intent, highest-emotion moment on the platform."
+        "id": "retailMedia",
+        "title": "Retail Media",
+        "tag": "Phase 2",
+        "body": "How it works: retailers pay to reach high-intent gift buyers at the moment of decision, on-platform — built on first-party intent (wishlists, occasions, budgets) that Kindled owns. Why then: premium media pricing needs the Phase 1 foundation of declared demand at scale first."
       }
     ]
   },
-
   "edge": {
     "headline": "The Competitive Edge",
     "subheadline": "We don't just hold the data — we hand its value back to the user, and that keeps them coming.",
@@ -159,40 +247,114 @@
     "unitEconomics": {
       "title": "Unit Economics — Why the Rails Matter",
       "subtitle": "Modelled per £100 contributed to a pot",
-      "columns": ["Card processing (Stripe)", "Optimised (Open Banking)"],
+      "columns": [
+        "Card processing (Stripe)",
+        "Optimised (Open Banking)"
+      ],
       "rows": [
-        { "label": "Processing cost", "card": "~£1.70", "openBanking": "~£0.05", "highlight": true },
-        { "label": "Settlement time", "card": "2–7 days", "openBanking": "Seconds" },
-        { "label": "Chargeback / fraud risk", "card": "Present", "openBanking": "None (push payment)" },
-        { "label": "Net reaching the pot", "card": "£98.30", "openBanking": "£99.95", "highlight": true }
+        {
+          "label": "Processing cost",
+          "card": "~£1.70",
+          "openBanking": "~£0.05",
+          "highlight": true
+        },
+        {
+          "label": "Settlement time",
+          "card": "2–7 days",
+          "openBanking": "Seconds"
+        },
+        {
+          "label": "Chargeback / fraud risk",
+          "card": "Present",
+          "openBanking": "None (push payment)"
+        },
+        {
+          "label": "Net reaching the pot",
+          "card": "£98.30",
+          "openBanking": "£99.95",
+          "highlight": true
+        }
       ],
       "takeaway": "~97% lower processing cost and instant settlement. At scale, the rail choice alone is the difference between thin and structural margin."
+    },
+    "cleanRoom": {
+      "title": "Data clean rooms — the path",
+      "body": "Kindled's first-party gifting intent — wishlists, occasions, budgets, declared before the spend — can be matched with a retailer's own data inside a privacy-preserving clean room. No raw personal data changes hands in either direction; both sides work only with privacy-safe aggregates. For retailers, that unlocks closed-loop attribution — this media spend produced these gift purchases — which is what earns premium media pricing.",
+      "path": [
+        "Phase 1 — first-party data foundation, consented and GDPR-clean",
+        "Phase 2 — on-platform retail media",
+        "At scale — clean-room partnerships with major retailers"
+      ],
+      "note": "Stated honestly: this is roadmap. No clean-room partnership exists today."
     }
   },
-
   "flywheel": {
     "headline": "Why Kindled Compounds",
     "subheadline": "Every reveal is a free advert. Every giver is a future host. The loop turns itself.",
     "loop": [
-      { "id": "light",   "title": "A host lights a pot", "body": "Someone sets up a pot for a birthday, baby shower or Christmas — in 90 seconds, for free.", "icon": "flame",    "color": "#f59e0b" },
-      { "id": "rally",   "title": "They rally ~6 people",  "body": "One share in the family chat pulls an average of six contributors onto the platform.",        "icon": "share",    "color": "#3b82f6" },
-      { "id": "give",    "title": "Givers chip in",        "body": "Each pays via Open Banking in seconds — and quietly declares exactly what they'd love too.",   "icon": "gift",     "color": "#10b981" },
-      { "id": "reveal",  "title": "The reveal goes off",   "body": "A cinematic, shareable moment. People screenshot it. It reaches new faces at zero ad spend.",  "icon": "sparkles", "color": "#8b5cf6" },
-      { "id": "convert", "title": "Givers become hosts",   "body": "Around 1 in 6 starts their own pot — and the loop begins again, bigger each turn.",          "icon": "repeat",   "color": "#f43f5e" }
+      {
+        "id": "light",
+        "title": "A host lights a pot",
+        "body": "Someone sets up a pot for a birthday, baby shower or Christmas — in 90 seconds, for free.",
+        "icon": "flame",
+        "color": "#f59e0b"
+      },
+      {
+        "id": "rally",
+        "title": "They rally ~6 people",
+        "body": "One share in the family chat pulls an average of six contributors onto the platform.",
+        "icon": "share",
+        "color": "#3b82f6"
+      },
+      {
+        "id": "give",
+        "title": "Givers chip in",
+        "body": "Each pays via Open Banking in seconds — and quietly declares exactly what they'd love too.",
+        "icon": "gift",
+        "color": "#10b981"
+      },
+      {
+        "id": "reveal",
+        "title": "The reveal goes off",
+        "body": "A cinematic, shareable moment. People screenshot it. It reaches new faces at zero ad spend.",
+        "icon": "sparkles",
+        "color": "#8b5cf6"
+      },
+      {
+        "id": "convert",
+        "title": "Givers become hosts",
+        "body": "Around 1 in 6 starts their own pot — and the loop begins again, bigger each turn.",
+        "icon": "repeat",
+        "color": "#f43f5e"
+      }
     ],
-    "multiplier": { "value": "6×", "label": "people per pot — every one a future host" },
+    "multiplier": {
+      "value": "6×",
+      "label": "people per pot — every one a future host"
+    },
     "compounding": {
       "label": "What one pot becomes",
       "steps": [
-        { "tier": "1 pot",          "people": "6 reached" },
-        { "tier": "1-in-6 converts", "people": "6 new pots" },
-        { "tier": "Those reach",     "people": "36 reached" },
-        { "tier": "And again",       "people": "216 reached" }
+        {
+          "tier": "1 pot",
+          "people": "6 reached"
+        },
+        {
+          "tier": "1-in-6 converts",
+          "people": "6 new pots"
+        },
+        {
+          "tier": "Those reach",
+          "people": "36 reached"
+        },
+        {
+          "tier": "And again",
+          "people": "216 reached"
+        }
       ],
       "caption": "Three turns of the loop from a single pot. No paid acquisition — the product is the marketing."
     }
   },
-
   "risk": {
     "headline": "Risk, Mitigated by Design",
     "subheadline": "We've engineered the three failure modes out of the product, not papered over them.",
@@ -214,7 +376,6 @@
       }
     ]
   },
-
   "operator": {
     "headline": "The Operator Mindset",
     "subheadline": "How we'll actually win: measure the loop, ship fast, and engineer the moment people share.",
@@ -233,7 +394,6 @@
       }
     ]
   },
-
   "roadmap": {
     "headline": "Execution in Phases. Compounding by Design.",
     "subheadline": "Each phase unlocks the next. Every milestone has a clear strategic purpose.",
@@ -248,19 +408,34 @@
             "title": "Core Product + Viral Instrumentation",
             "quarter": "Q3 2026",
             "why": "Nothing compounds until the loop works end-to-end and we can measure the 1-in-6 conversion in practice.",
-            "deliverables": ["pot creation + Open Banking contributions", "Shareable-link infrastructure", "Contributor-to-host funnel tracking", "Cohort + K-factor dashboard"]
+            "deliverables": [
+              "pot creation + Open Banking contributions",
+              "Shareable-link infrastructure",
+              "Contributor-to-host funnel tracking",
+              "Cohort + K-factor dashboard"
+            ]
           },
           {
             "title": "Intent Data + Fee Engine",
             "quarter": "Q4 2026",
             "why": "Lock in the structural cost advantage and start the clock on 12 months of clean, exportable intent data for Phase 2.",
-            "deliverables": ["IntentDataNode capture pipeline", "Anonymisation + GDPR layer", "0.5% fee engine (tested to financial standard)", "Stripe Connect host payouts"]
+            "deliverables": [
+              "IntentDataNode capture pipeline",
+              "Anonymisation + GDPR layer",
+              "0.5% fee engine (tested to financial standard)",
+              "Stripe Connect host payouts"
+            ]
           },
           {
             "title": "AI Reveal GA + Cashback Catalogue",
             "quarter": "Q1–Q2 2027",
             "why": "Turn on the distribution engine and close the cashback loop — contributors earn, spend, and generate more data.",
-            "deliverables": ["Reveal video pipeline + social sharing", "Curated catalogue + sponsored auction", "Cashback wallet + redemption", "First 10 retail partners"]
+            "deliverables": [
+              "Reveal video pipeline + social sharing",
+              "Curated catalogue + sponsored auction",
+              "Cashback wallet + redemption",
+              "First 10 retail partners"
+            ]
           }
         ]
       },
@@ -274,21 +449,150 @@
             "title": "B2B Intent Data Licensing",
             "quarter": "Q3 2027",
             "why": "Activate the high-margin revenue layer Phase 1 quietly built — verified purchase intent as a licensed feed.",
-            "deliverables": ["Segment builder (category, price, recency)", "Data export API", "First 10 paying B2B clients", "£300K ARR target"]
+            "deliverables": [
+              "Segment builder (category, price, recency)",
+              "Data export API",
+              "First 10 paying B2B clients",
+              "£300K ARR target"
+            ]
           },
           {
             "title": "Reveal-Window Ads + Enterprise API",
             "quarter": "Q4 2027",
             "why": "Monetise the verified-intent window before the reveal, and open a zero-CAC enterprise channel.",
-            "deliverables": ["Reveal-window reverse-auction", "White-label pots for HR teams", "Brand placement at the reveal", "First 5 enterprise contracts"]
+            "deliverables": [
+              "Reveal-window reverse-auction",
+              "White-label pots for HR teams",
+              "Brand placement at the reveal",
+              "First 5 enterprise contracts"
+            ]
           },
           {
             "title": "Financial Services Layer",
             "quarter": "Q1 2028",
             "why": "A platform sitting on family money around milestones is the natural home for savings, BNPL contributions, and a cashback card.",
-            "deliverables": ["Recurring savings plans", "BNPL contribution option", "E-money institution partnership", "FCA sandbox application"]
+            "deliverables": [
+              "Recurring savings plans",
+              "BNPL contribution option",
+              "E-money institution partnership",
+              "FCA sandbox application"
+            ]
           }
         ]
+      }
+    ]
+  },
+  "pitch": {
+    "label": "The 20-second version",
+    "text": "Britain wastes £3.2 billion a year on unwanted gifts. Kindled is the group-gifting platform where friends and family pool into meaningful goals — kept secret, then revealed together on the big day. We land with parents and kids' gift lists, the most habitual gifting occasion there is, where every contributor experiences the product just by chipping in. From there we expand into the household's biggest goals. Revenue starts on day one with gift card commissions and scales into retail media built on first-party gifting intent. We're raising £250,000 pre-seed.",
+    "structure": [
+      {
+        "k": "Problem",
+        "v": "£3.2bn wasted a year — group gifting is uncoordinated"
+      },
+      {
+        "k": "Solution",
+        "v": "pooled pots + the reveal"
+      },
+      {
+        "k": "Wedge",
+        "v": "kids' lists — every contributor becomes a user"
+      },
+      {
+        "k": "Moat",
+        "v": "first-party gifting intent + the reveal ritual"
+      },
+      {
+        "k": "Ask",
+        "v": "£250,000 pre-seed"
+      }
+    ]
+  },
+  "wedge": {
+    "eyebrow": "Go-to-market",
+    "headline": "Kids' lists are the wedge. Every pot recruits adults.",
+    "steps": [
+      {
+        "title": "The wedge",
+        "body": "Launch with parents of younger kids. A parent builds the child's list — catalogue circles, star-chart goals — and shares one link with the people who already send the \"what does she want this year?\" text. Kids' occasions are high-frequency and emotionally non-negotiable; Kindled simply formalises a ritual that already exists."
+      },
+      {
+        "title": "The conversion",
+        "body": "Every grandparent, aunt and family friend who chips in experiences the product with zero set-up — and finishes as an activated user with a payment method on file. One child's pot recruits many adults."
+      },
+      {
+        "title": "The snowball",
+        "body": "Converted adults are then shown grown-up goals through playful discovery — \"Would you rather?\" prompts (a log burner, or a Maldives fund?), aspirational pot galleries, stacked-ambition stories — nudging them to start pots of their own. (\"Would you rather?\" is roadmap, not yet built.)"
+      },
+      {
+        "title": "The CAC logic",
+        "body": "The child's pot is the acquisition channel. In the wedge phase, paid CAC is close to zero by design. This is strategy framing — not a forecast, and no conversion rates are claimed."
+      }
+    ]
+  },
+  "landscape": {
+    "eyebrow": "The landscape",
+    "headline": "What people actually use today — and why we win",
+    "axes": {
+      "x": "Group coordination",
+      "y": "Emotional experience (the reveal)"
+    },
+    "alternatives": [
+      {
+        "name": "Cash in a card",
+        "coord": "low / low",
+        "body": "Zero coordination, zero moment. Money without meaning — and it's what Kindled most often replaces."
+      },
+      {
+        "name": "Bank transfer / Monzo split",
+        "coord": "medium / low",
+        "body": "Moves money, organises nothing. No wishlist, no secret, no reveal."
+      },
+      {
+        "name": "Collection-pot sites",
+        "coord": "medium / low",
+        "body": "Collect once, pay out once. No wishlist, no stacking, no ritual to come back for."
+      },
+      {
+        "name": "Retailer wishlists (Amazon)",
+        "coord": "low / low",
+        "body": "Solve what to buy, not buying together. No pooling, no surprise."
+      },
+      {
+        "name": "Registries",
+        "coord": "medium / medium",
+        "body": "Single-occasion and formal — weddings, not birthdays, kids or everyday goals."
+      }
+    ],
+    "whyWeWin": "Kindled is the only option that combines what to buy (wishlists), buying together (pooling) and a moment worth remembering (the reveal) — then adds stacking and the kids/star-chart ecosystem on top. Functional alternatives can't offer the experience; copying the retail-media economics would mean rebuilding a first-party intent dataset from zero."
+  },
+  "behaviour": {
+    "eyebrow": "Behaviour change",
+    "headline": "What has to shift — and why we'll win it",
+    "rows": [
+      {
+        "current": "Cash in a card",
+        "new": "Organised pots",
+        "lever": "One shared link; chip in from a message in seconds",
+        "sticks": "Zero contributor effort — it's WhatsApp-native, not another app to adopt"
+      },
+      {
+        "current": "Guess-buying",
+        "new": "Wishlist-led gifting",
+        "lever": "Receiver-curated lists with real-time claim locking",
+        "sticks": "Removes the anxiety that drives overspend — Mintel's UK Gift Purchasing Journey Report 2025 found the pressure to get the right gift pushes people past what they meant to spend"
+      },
+      {
+        "current": "Single-event gifts",
+        "new": "Stacked ambitions",
+        "lever": "Stack carries a pot from birthday to Christmas and beyond",
+        "sticks": "Bigger dreams with visible progress beat one-off token gifts"
+      },
+      {
+        "current": "Private wishlists",
+        "new": "Shared family rituals",
+        "lever": "Kids' catalogue circling, star charts, and the reveal",
+        "sticks": "Rituals repeat — the reveal becomes the moment everyone anticipates"
       }
     ]
   }

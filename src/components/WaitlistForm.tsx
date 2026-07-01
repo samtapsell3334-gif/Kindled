@@ -4,6 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
+import { useEffect } from "react";
+import { track } from "@/lib/analytics";
 
 /**
  * WaitlistForm — the single primary conversion action for the pre-launch site.
@@ -16,6 +18,8 @@ export function WaitlistForm({ variant = "light" }: { variant?: "light" | "dark"
   const [error, setError] = useState("");
 
   const dark = variant === "dark";
+
+  useEffect(() => { track("waitlist_viewed"); }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,6 +38,7 @@ export function WaitlistForm({ variant = "light" }: { variant?: "light" | "dark"
       });
       if (!res.ok) throw new Error("request failed");
       setStatus("done");
+      track("waitlist_submitted");
     } catch {
       setError("Something went wrong. Please try again.");
       setStatus("error");
