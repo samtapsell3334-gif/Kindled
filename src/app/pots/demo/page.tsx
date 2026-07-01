@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Share2, Check, Lock, Plus, Users, ChevronUp, ChevronDown, ChevronRight,
+  Share2, Check, Lock, Users, ChevronUp, ChevronDown, ChevronRight,
   Play, X, Zap,
   ShoppingBag, RefreshCw, CreditCard, Gift, Flame,
   Package, Leaf, ShieldCheck, Sparkles, Star, Link2,
@@ -21,6 +21,10 @@ import { MagneticCard } from "@/components/lux/MagneticCard";
 import { Reveal } from "@/components/lux/Reveal";
 import { VibrantCatalogue } from "@/components/vh/VibrantCatalogue";
 import { InteractiveExplainer } from "@/components/InteractiveExplainer";
+import { KindleRecord } from "@/components/KindleRecord";
+import { CompletionValue } from "@/components/CompletionValue";
+import { generateId } from "@/lib/provisioning";
+import type { KindleMemory } from "@/lib/media-service";
 import { LUX_EASE, VH_BOUNCE } from "@/lib/motion";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
@@ -980,21 +984,24 @@ function ContributionPromptModal({
   amount,
   onConfirm,
   onClose,
+  onStartOwn,
 }: {
   pot: DemoPot;
   amount: number;
   onConfirm: (id: string, amount: number) => void;
   onClose: () => void;
+  onStartOwn: () => void;
 }) {
   const [tab, setTab] = useState<"card" | "video">("card");
   const [message, setMessage] = useState("");
-  const [recording, setRecording] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [memory, setMemory] = useState<KindleMemory | null>(null);
+  const contributionId = useRef(generateId("contrib")).current;
 
   function finalize() {
     setSubmitted(true);
     onConfirm(pot.id, amount);
-    setTimeout(onClose, 1200);
+    // Stay open on the CompletionValue prompt — the viral loop's top of funnel.
   }
 
   return (
@@ -1095,53 +1102,18 @@ function ContributionPromptModal({
               </motion.div>
             )}
 
-            {/* Option B — Video Wish */}
+            {/* Option B — Video / Voice Memory (real capture) */}
             {tab === "video" && (
-              <motion.div
-                key="video-tab"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col items-center gap-4"
-              >
-                {/* Pulsating record button */}
-                <div className="relative flex items-center justify-center py-4">
-                  {[1, 2, 3].map((i) => (
-                    <span
-                      key={i}
-                      className="absolute rounded-full bg-[#f59e0b]/20"
-                      style={{ width: 60 + i * 28, height: 60 + i * 28,
-                        animation: `ping ${1 + i * 0.35}s ${i * 0.2}s ease-out infinite` }}
-                    />
-                  ))}
-                  <motion.button
-                    whileTap={{ scale: 0.92 }}
-                    onClick={() => setRecording((r) => !r)}
-                    className={cn(
-                      "relative z-10 flex h-16 w-16 items-center justify-center rounded-full transition-all",
-                      recording
-                        ? "bg-[#f59e0b] shadow-lg shadow-[#241a00]/60"
-                        : "bg-gradient-to-br from-[#f59e0b] to-[#f59e0b] shadow-xl shadow-[#241a00]/50",
-                    )}
-                  >
-                    {recording
-                      ? <span className="h-5 w-5 rounded bg-white" />
-                      : <Radio className="h-7 w-7 text-white" strokeWidth={2} />}
-                  </motion.button>
-                </div>
-                <div className="text-center">
-                  <p className="text-[13px] font-semibold text-[#fdf6e3]/85">
-                    {recording ? "Recording… tap to stop" : "Press to record"}
-                  </p>
-                  <p className="mt-1 text-[11px] text-[#fdf6e3]/40">
-                    &ldquo;Spark a Smile with a Video Wish&rdquo; — a heartfelt 15-second clip woven into Billy&apos;s cinematic unboxing celebration!
-                  </p>
-                </div>
-                <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-[rgba(253,246,227,0.18)] bg-white/5 py-2.5 text-[12px] font-medium text-[#fdf6e3]/50 hover:border-[rgba(253,246,227,0.32)] transition-colors">
-                  <Plus className="h-3.5 w-3.5" />
-                  Or upload a video instead
-                  <input type="file" accept="video/*" className="sr-only" />
-                </label>
+              <motion.div key="video-tab" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+                {memory ? (
+                  <div className="flex flex-col items-center gap-2 rounded-2xl bg-[#f59e0b]/[0.1] px-4 py-4 text-center">
+                    <Check className="h-6 w-6 text-[#f59e0b]" strokeWidth={2.5} />
+                    <p className="text-[13px] font-bold text-[#fdf6e3]">{memory.kind === "video" ? "Video" : "Voice"} Memory attached</p>
+                    <p className="text-[11px] text-[#fdf6e3]/50">It&apos;ll play in Billy&apos;s Reveal. <button onClick={() => setMemory(null)} className="font-semibold text-[#ff6b6b]">Change</button></p>
+                  </div>
+                ) : (
+                  <KindleRecord contributionId={contributionId} onRecorded={setMemory} />
+                )}
               </motion.div>
             )}
 
@@ -1172,10 +1144,7 @@ function ContributionPromptModal({
             {/* CTAs */}
             <div className="mt-4 flex flex-col gap-2">
               {submitted ? (
-                <div className="flex items-center justify-center gap-2 rounded-2xl bg-[#f59e0b] py-4">
-                  <Check className="h-5 w-5 text-[#0f172a]" strokeWidth={2.5} />
-                  <span className="text-[15px] font-semibold text-[#0f172a]">Contribution sent!</span>
-                </div>
+                <CompletionValue amount={amount} onStartOwn={() => { onClose(); onStartOwn(); }} />
               ) : (
                 <>
                   <motion.button
@@ -4421,6 +4390,7 @@ export default function DemoPage() {
           amount={pendingContribution.amount}
           onConfirm={handleKindle}
           onClose={() => setPendingContribution(null)}
+          onStartOwn={() => setShowReceiverSignUp(true)}
         />
       )}
 
