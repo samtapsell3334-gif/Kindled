@@ -54,3 +54,48 @@ Tailwind v4, Framer Motion. Investor route: `/investor`, PIN validated server-si
 - **Receiver DOM leak (P3.2):** needs verified restructuring of ReceiverPotCard props, not a
   cosmetic fix. Audited and scoped below before any change.
 - Deploys continue from this branch only after build + click-test verification.
+
+---
+
+# Sandbox MVP v4.1 — Plan (branch feat/sandbox-mvp-v4)
+
+## Phase 0 dependency audit (v3 pieces)
+| Dependency | Status |
+|---|---|
+| Reveal options (take/stack/switch) | PARTIAL — copy exists (P2.4); interactive screen built here (WS-E minimal) |
+| Kids catalogue circle mode + star chart | MISSING (v3 P3.1 deferred) — sandbox uses parent toggle + catalogue picks; circle animation stays deferred |
+| Role views w/ surprise redaction | MISSING server-side — **built properly here** (redaction in API layer, unit-tested) |
+| Terminology rules | DONE (v3 P2.1) |
+| Analytics event layer | DONE (v3 P4.4) — sandbox extends with its own append-only event log |
+
+## Stack & storage decisions
+- **DB:** no `DATABASE_URL` in env (founder TODO since v-prev). Decision: a storage
+  adapter (`src/lib/sandbox/store.ts`) — Prisma/Postgres models are defined and used
+  automatically when `DATABASE_URL` exists; otherwise a process-global in-memory store
+  keeps the whole loop working locally/single-instance. **Limitation logged:** on
+  serverless (Vercel) the fallback does not persist across cold lambdas — cross-device
+  guarantees require the founder to provision Postgres (TODO-FOUNDER). Nothing blocks.
+- **Payments:** no Stripe test keys → per the brief's decision rule, **pure-frontend
+  simulation**: realistic sheet, pre-filled dummy values, fields never transmitted or
+  persisted, "Demo — no money moves" badge. Grep + unit test enforce no card data in
+  payloads/stores.
+- **Video:** MediaRecorder capture (reusing v-prev KindleRecord patterns); object-URL in
+  fallback mode, Vercel Blob when configured (existing media-service). ≤60s cap.
+- **Live updates:** polling on pot pages. No websockets.
+- **Sharing:** copy-link + native share + WhatsApp intent only (guardrail 3).
+
+## Build order
+1. Core lib: types, store adapter, **server-side redaction** (pure fn), event log, seed.
+2. API: create pot / get pot (viewer-aware redaction) / contribute / manager view / reset.
+3. Mandated tests ×3 (redaction, event rows, no-card-data).
+4. WS-A: DEMO banner, `.env.example`, seed + admin reset.
+5. WS-B/C: create-pot flow + public pot page + simulated payment sheet + message step +
+   WS-D thank-you conversion moment ("Would you rather?" + ref chain).
+6. WS-E/F (reveal sim + dashboard): minimal versions this pass; polish next pass.
+   v5 (reveal experience) and v6 (films) execute after v4 foundations — sequenced, not
+   skipped; each has explicit deps on this branch.
+
+## Risks
+- Serverless persistence (above). — Founder DB unblocks fully.
+- Scope: WS-E/F/v5/v6 are large; this pass ships the working consumer loop + evidence
+  spine first, honestly logged.
