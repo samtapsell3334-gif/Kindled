@@ -495,15 +495,15 @@ function SplashScreen({
             <div>
               <p className="text-[13px] font-bold">
                 <span className="animate-gold-shimmer">
-                  Premium Bonds Booster Win!
+                  Prize draw entry!
                 </span>
               </p>
               <p className="mt-1 text-[12px] leading-snug text-stone-300">
                 You&apos;ve earned{" "}
                 <span className="font-bold text-amber-400">{boosterEntries} entries</span> into
                 the{" "}
-                <span className="font-semibold text-stone-200">£2,500 Summer Goal Booster Draw</span>.
-                Draws happen the first Monday of each month. Good luck!
+                <span className="font-semibold text-stone-200">£2,500 quarterly prize draw</span>.
+                There&apos;s a free entry route — no purchase necessary. Good luck!
               </p>
             </div>
           </div>

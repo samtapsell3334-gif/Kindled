@@ -22,14 +22,14 @@ const EMBERS = Array.from({ length: 22 }, (_, i) => ({
 
 const MARQUEE_ITEMS = [
   "No duplicate gifts — ever",
-  "Magical reveal ceremonies",
+  "Magical reveals on the big day",
   "Chip in any amount",
   "Gifts stay secret until the big day",
   "£2,500 quarterly draw",
   "Star charts for kids",
   "One link. Unlimited contributors.",
   "2 minutes to set up",
-  "2% Spark Balance cashback",
+  "2% credit back",
   "Free to start",
 ];
 
@@ -37,7 +37,7 @@ const STEPS = [
   {
     n: "01",
     icon: Flame,
-    title: "Start your fire",
+    title: "Start your pot",
     desc: "Add what you actually want — paste links from any shop, pick from the catalogue, or create custom goals. Takes under 2 minutes.",
     grad: "from-amber-400 to-orange-500",
     shadow: "rgba(251,146,60,0.35)",
@@ -58,7 +58,7 @@ const STEPS = [
     n: "03",
     icon: Sparkles,
     title: "The magical reveal",
-    desc: "On the big day, an animated ceremony reveals exactly what was funded and who made it happen. Tears are practically guaranteed.",
+    desc: "On the big day, an animated reveal shows exactly what was funded and who made it happen. Tears are practically guaranteed.",
     grad: "from-[#ff6b6b] to-[#f59e0b]",
     shadow: "rgba(255,107,107,0.35)",
     bg: "from-rose-50 to-amber-50",
@@ -88,7 +88,7 @@ const FEATURES = [
   {
     icon: Star,
     title: "Star chart for kids",
-    desc: "Turn good behaviour into gift momentum. Stars earned through chores unlock Spark Goals as rewards.",
+    desc: "Turn good behaviour into gift momentum. Stars earned through chores unlock reward goals.",
     color: "text-orange-600",
     bg: "bg-orange-50",
     border: "border-orange-100",
@@ -96,8 +96,8 @@ const FEATURES = [
   },
   {
     icon: Trophy,
-    title: "£2,500 booster draw",
-    desc: "Every contributor is automatically entered into our quarterly Goal Booster Draw. No extra steps.",
+    title: "£2,500 prize draw",
+    desc: "Every contributor is automatically entered into our quarterly prize draw — with a free entry route, no purchase necessary.",
     color: "text-[#ff6b6b]",
     bg: "bg-rose-50",
     border: "border-rose-100",
@@ -146,7 +146,7 @@ const TESTIMONIALS = [
     color: "bg-orange-500",
   },
   {
-    quote: "The reveal ceremony made me tear up watching my niece discover who'd contributed. Most heartwarming thing I've seen at a birthday party.",
+    quote: "The reveal made me tear up watching my niece discover who'd contributed. Most heartwarming thing I've seen at a birthday party.",
     name: "Claire W.",
     role: "Auntie · Edinburgh",
     initials: "CW",
@@ -382,7 +382,7 @@ function Hero() {
               transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50"
             >
-              Everyone chips in to the gifts that actually matter. No more duplicates, no more guessing. Share one link — family contribute any amount — and on the big day, trigger a reveal ceremony they&apos;ll never forget.
+              Everyone chips in to the gifts that actually matter. No more duplicates, no more guessing. Share one link — family contribute any amount — and on the big day, trigger a reveal they&apos;ll never forget.
             </motion.p>
 
             <motion.div
@@ -397,7 +397,7 @@ function Hero() {
                 style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.45)" }}
               >
                 <Flame className="h-5 w-5" />
-                Start your first fire — it&apos;s free
+                Start your first pot — it&apos;s free
               </Link>
               <Link
                 href="/pots/demo"
@@ -422,7 +422,7 @@ function Hero() {
               ))}
             </motion.div>
 
-            {/* Mobile product proof — the real board, shown only on small screens */}
+            {/* Mobile product proof — the real pot, shown only on small screens */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -443,7 +443,7 @@ function Hero() {
                       <Flame className="h-5 w-5 text-amber-400" strokeWidth={1.75} />
                     </div>
                     <div>
-                      <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas Fire</p>
+                      <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas pot</p>
                       <p className="text-[15px] font-bold leading-tight text-white">PlayStation 5</p>
                     </div>
                   </div>
@@ -515,7 +515,7 @@ function Hero() {
                     <Flame className="h-5 w-5 text-amber-400" strokeWidth={1.75} />
                   </div>
                   <div>
-                    <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas Fire</p>
+                    <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas pot</p>
                     <p className="text-[14px] font-bold text-white leading-tight">PlayStation 5</p>
                   </div>
                 </div>
@@ -736,7 +736,7 @@ function HowItWorks() {
             style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.4)" }}
           >
             <Flame className="h-5 w-5" />
-            See a live Kindled board
+            See a live pot
             <ArrowRight className="h-4 w-4" />
           </Link>
           <p className="mt-3 text-[12px] text-stone-400">No sign-up needed to explore the demo</p>
@@ -819,7 +819,7 @@ function AudienceSplit() {
                 Your wishlist.<br />Your rules.
               </h3>
               <p className="text-[14px] text-stone-600 leading-relaxed mb-6">
-                Set up your board in 2 minutes. Add anything — from any shop. Kids get star charts and parent controls. Every gift stays secret until you trigger the reveal.
+                Set up your pot in 2 minutes. Add anything — from any shop. Kids get star charts and parent controls. Every gift stays secret until you trigger the reveal.
               </p>
               <div className="space-y-2.5">
                 {[
@@ -851,15 +851,15 @@ function AudienceSplit() {
                 Give meaningfully.<br />Get rewarded.
               </h3>
               <p className="text-[14px] text-stone-600 leading-relaxed mb-6">
-                Chip in any amount you like — from £5 to £500. No account needed. Every contribution enters you into our £2,500 quarterly draw, plus earns 2% back in Spark Balance.
+                Chip in any amount you like — from £5 to £500. No account needed. Every contribution enters you into our £2,500 quarterly draw, plus earns 2% back in credit.
               </p>
               <div className="space-y-2.5">
                 {[
                   "Chip in any amount — no minimum, no account required",
-                  "Automatic entry to the £2,500 Goal Booster Draw",
-                  "Earn 2% Spark Balance back on every contribution",
+                  "Automatic entry to the £2,500 prize draw (free entry route available)",
+                  "Earn 2% back in credit on catalogue purchases",
                   "Buy smaller items outright if you prefer",
-                  "See who else contributed in the reveal ceremony",
+                  "See who else contributed in the reveal",
                 ].map((t) => (
                   <div key={t} className="flex items-start gap-2.5">
                     <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#ff6b6b]">
@@ -903,8 +903,8 @@ function Stats() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { label: "UK families say they struggle to find the right gift", prefix: "", suffix: "%", value: 73, display: "73%" },
-            { label: "Minutes to set up your first board", prefix: "", suffix: "", value: 2, display: "2 mins" },
-            { label: "Quarterly Goal Booster Draw prize · Terms apply", prefix: "£", suffix: "", value: 2500, display: "£2,500" },
+            { label: "Minutes to set up your first pot", prefix: "", suffix: "", value: 2, display: "2 mins" },
+            { label: "Quarterly prize draw · Free entry route · Terms apply", prefix: "£", suffix: "", value: 2500, display: "£2,500" },
             { label: "Cashback earned via affiliate on every contribution", prefix: "", suffix: "%", value: 2, display: "2%" },
           ].map((s, i) => (
             <Reveal key={s.label} delay={i * 0.1}>
@@ -1009,7 +1009,7 @@ function FinalCTA() {
               Ready to kindle something magical?
             </h2>
             <p className="text-[16px] text-stone-500 leading-relaxed mb-8 max-w-[400px] mx-auto">
-              Join families already turning wishlists into meaningful moments. Set up your first fire in under 2 minutes.
+              Join families already turning wishlists into meaningful moments. Set up your first pot in under 2 minutes.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1019,13 +1019,13 @@ function FinalCTA() {
                 style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.45)" }}
               >
                 <Flame className="h-5 w-5" />
-                Create your board today
+                Create your pot today
               </Link>
               <Link
                 href="/pots/demo"
                 className="flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-200 bg-white px-7 py-4 text-[15px] font-semibold text-stone-700 transition-all hover:border-stone-300 hover:bg-stone-50"
               >
-                See a live board
+                See a live pot
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>

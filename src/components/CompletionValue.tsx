@@ -8,7 +8,7 @@ import { VH_BOUNCE, LUX_EASE } from "@/lib/motion";
 /**
  * CompletionValue — the viral prompt shown right after a contribution. It reflects the
  * amount back to the giver and turns their good deed into the top of the K-loop:
- * "you contributed £X → unlock cashback → start your own Fire".
+ * "you contributed £X → unlock credit → start your own pot".
  */
 export function CompletionValue({
   amount,
@@ -33,7 +33,7 @@ export function CompletionValue({
       <div className="mt-4 flex items-center gap-2.5 rounded-2xl bg-[#f59e0b]/[0.1] px-4 py-3 text-left">
         <Wallet className="h-5 w-5 shrink-0 text-[#f59e0b]" />
         <p className="text-[12px] leading-snug text-[#fdf6e3]/85">
-          Start your own Fire and you unlock <span className="font-bold text-[#f59e0b]">{userSharePct}% back</span> in Spark Balance on every contribution — ring-fenced to your goals.
+          Start your own pot and you unlock <span className="font-bold text-[#f59e0b]">{userSharePct}% back in credit</span> on catalogue purchases — ring-fenced to your goals.
         </p>
       </div>
 
@@ -48,7 +48,7 @@ export function CompletionValue({
         onClick={onStartOwn}
         className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#ff6b6b] py-4 text-[15px] font-bold text-white vh-lift"
       >
-        <Flame className="h-4 w-4" /> Start your own Milestone Fire <ArrowRight className="h-4 w-4" />
+        <Flame className="h-4 w-4" /> Start your own pot <ArrowRight className="h-4 w-4" />
       </motion.button>
       <p className="mt-2.5 text-[11px] text-[#fdf6e3]/40">Free forever · 2-minute setup</p>
     </motion.div>
