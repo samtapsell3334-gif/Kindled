@@ -32,3 +32,29 @@ homepage + terms anchor.
 - **Verified:** build passes; PIN entry → all five sections render in the correct tabs;
   bundle grep: pitch content and PIN absent from client chunks (one "1066" hit was a CSS
   easing decimal `0.991066` — false positive, inspected).
+
+## P2 — Conversion & messaging (public site)
+- **P2.1** Metaphor clash fixed: "Be Among the First to Light a Pot" → "Start a Pot";
+  "Stoke & Win" → "Chip In & Win". Rule enforced: pot verbs for functional copy, fire as
+  brand flavour only ("Slide to ignite" on reveal moments retained deliberately).
+  Sweep also caught two WS1 leftovers: "£2,500 Summer Goal Booster Draw" and "Goal
+  Booster Draw" strings → "quarterly prize draw" + free-entry note. Verify grep: zero
+  mixed pairings, zero orphaned draw names in copy (comments/CSS class names ignored).
+- **P2.2** Already DONE (Phase 0) — waitlist primary, honest labels, demo pill.
+- **P2.3** Friends + family framing: hero badge, hero sub-headline ("friends, family and
+  everyone in between"), Problem intro (leaving-dos added), Features lead, site title +
+  meta description. Family remains the anchor. Friends demo pot deferred → TODO-FOUNDER
+  (belongs in the adult-receiver restructure).
+- **P2.4** Reveal truth made explicit: homepage RevealPreview now says the reveal happens
+  on the day you set, "not just when the pot is full"; HowMoneyWorks point 3 lists the
+  three generous choices (take it / stack forward / switch goal); demo "when your pots are
+  fully funded" line reworded. Verify grep: no copy implies reveal-only-when-full.
+- **P2.5** Mintel beat added under the Problem stats, qualitative, correctly attributed
+  (Mintel UK Gift Purchasing Journey Report 2025), no invented percentage.
+- **P2.6** Stack as a hero feature: new homepage StackSection ("Big dreams take more than
+  one birthday") with a 3-stage animated visual (birthday 45% → Christmas 82% → fully
+  funded), reduced-motion static fallback; partial-funding choice connected to P0.3/P2.4;
+  demo arcade pot now explicitly mid-stack ("Carried over from his birthday").
+- **Verified:** build passes; friends/Mintel/Stack all render on the dev server. (One
+  incident: running the prod build while the dev server shared .next corrupted the dev
+  cache → restart fixed; no code issue.)

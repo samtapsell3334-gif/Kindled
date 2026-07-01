@@ -35,9 +35,9 @@ const fontOutfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Kindled — group gifting for families",
+  title: "Kindled — group gifting for friends & family",
   description:
-    "Everyone chips into shared pots for the gifts that actually matter. No duplicates, no awkward money chat, and a magical reveal on the big day.",
+    "Friends and family chip into shared pots for the gifts that actually matter. No duplicates, no awkward money chat, and a magical reveal on the big day.",
   icons: {
     icon: "/favicon.svg",
     apple: "/favicon.svg",

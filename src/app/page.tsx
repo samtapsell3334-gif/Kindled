@@ -353,7 +353,7 @@ function Hero() {
             >
               <Sparkles className="h-3.5 w-3.5 text-amber-400" />
               <span className="text-[11px] font-semibold uppercase tracking-widest text-amber-300/90">
-                Group gifting for families — finally
+                Group gifting for friends &amp; family — finally
               </span>
             </motion.div>
 
@@ -383,7 +383,7 @@ function Hero() {
               transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50"
             >
-              The gifts they&apos;ll actually love, funded by everyone who loves them. Share one link, family chip in any amount, and reveal it all together on the big day.
+              The gifts they&apos;ll actually love, funded by the people who love them. Share one link — friends, family and everyone in between chip in any amount — and reveal it all together on the big day.
             </motion.p>
 
             <motion.div
@@ -631,7 +631,7 @@ function Problem() {
             <span className="text-stone-400">on gifts nobody wanted.</span>
           </h2>
           <p className="mt-5 max-w-[560px] mx-auto text-[16px] text-stone-500 leading-relaxed">
-            Families mean well. But without coordination, birthdays and Christmases end up full of duplicates, wrong sizes, and things that gather dust.
+            Friends and family mean well. But without coordination, birthdays, leaving-dos and Christmases end up full of duplicates, wrong sizes, and things that gather dust.
           </p>
         </Reveal>
 
@@ -676,6 +676,15 @@ function Problem() {
             </Reveal>
           ))}
         </div>
+
+        {/* The anxiety → overspend beat (qualitative — no invented percentage) */}
+        <Reveal delay={0.2} className="mt-10 text-center">
+          <p className="mx-auto max-w-[560px] text-[15px] leading-relaxed text-stone-600">
+            And not knowing what to buy is how overspending happens — Mintel found the pressure to get
+            the right gift pushes people past what they meant to spend.
+          </p>
+          <p className="mt-2 text-[11px] italic text-stone-400">Source: Mintel, UK Gift Purchasing Journey Report 2025</p>
+        </Reveal>
       </div>
     </section>
   );
@@ -707,7 +716,7 @@ function RevealPreview() {
           The reveal is the bit they remember
         </h2>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-white/50">
-          When the goal is funded, everyone gathers for the reveal — the gift, who chipped in, and a fair few happy tears.
+          The reveal happens on the day you set — birthday, Christmas, the big moment — not just when the pot is full. Everyone gathers for the gift, who chipped in, and a fair few happy tears.
         </p>
 
         <div
@@ -828,7 +837,7 @@ function Features() {
             Built for real families
           </h2>
           <p className="mt-4 text-[16px] text-stone-500 max-w-[500px] mx-auto leading-relaxed">
-            Every feature designed around how families actually give — and how kids actually get excited about gifts.
+            Every feature designed around how friends and families actually give — and how kids actually get excited about gifts.
           </p>
         </Reveal>
 
@@ -1048,6 +1057,66 @@ function Testimonials() {
   );
 }
 
+// ─── Stack — big dreams take more than one birthday (P2.6) ─────────────────────
+
+function StackSection() {
+  const reduce = useReducedMotion();
+  const stages = [
+    { label: "Her birthday", pct: 45, note: "£360 raised" },
+    { label: "Christmas", pct: 82, note: "carried over + topped up" },
+    { label: "Next birthday", pct: 100, note: "fully funded" },
+  ];
+  return (
+    <section className="bg-[#fdf9f5] px-5 py-24">
+      <div className="mx-auto max-w-5xl">
+        <div className="grid items-center gap-10 md:grid-cols-2">
+          <Reveal>
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-600">Stack</p>
+            <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[34px] font-bold leading-[1.1] text-stone-900 md:text-[44px]">
+              Big dreams take more than one birthday
+            </h2>
+            <p className="mt-4 max-w-[460px] text-[16px] leading-relaxed text-stone-500">
+              Stack events and watch the pot grow across the year. A goal that isn&apos;t reached by one
+              occasion simply carries forward to the next — birthday to Christmas to birthday — so
+              nothing is ever wasted and the big things stay in reach.
+            </p>
+            <p className="mt-3 max-w-[460px] text-[14px] leading-relaxed text-stone-500">
+              And if the big day arrives before the goal does, the reveal still happens — take what was
+              raised, keep it stacking, or switch to a goal within reach. Your choice, never smallprint.
+            </p>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
+              <p className="mb-4 text-[12px] font-bold text-stone-700">One pot, stacked across the year</p>
+              <div className="space-y-5">
+                {stages.map((s, i) => (
+                  <div key={s.label}>
+                    <div className="mb-1.5 flex items-baseline justify-between">
+                      <p className="text-[13px] font-semibold text-stone-700">{s.label}</p>
+                      <p className="text-[12px] font-bold text-amber-600">{s.pct}%</p>
+                    </div>
+                    <div className="h-2.5 overflow-hidden rounded-full bg-stone-100">
+                      <motion.div
+                        className={cn("h-full rounded-full bg-gradient-to-r", s.pct === 100 ? "from-[#ff6b6b] to-[#f59e0b]" : "from-amber-400 to-orange-500")}
+                        initial={reduce ? false : { width: 0 }}
+                        whileInView={{ width: `${s.pct}%` }}
+                        viewport={{ once: true }}
+                        transition={reduce ? { duration: 0 } : { duration: 1, delay: 0.2 + i * 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        {...(reduce ? { style: { width: `${s.pct}%` } } : {})}
+                      />
+                    </div>
+                    <p className="mt-1 text-[11px] text-stone-400">{s.note}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── How the money works ──────────────────────────────────────────────────────
 // Trust section. Every claim here must be literally true: Kindled uses Stripe
 // (see CLAUDE.md), never stores full card details, and pots carry over. The
@@ -1070,7 +1139,7 @@ function HowMoneyWorks() {
     {
       icon: RefreshCw,
       title: "Nothing is wasted if it falls short",
-      body: "If a pot isn't fully funded by the big day, the family keeps what was raised — or carries the balance over to the next occasion. No pressure, no lost money.",
+      body: "If a pot isn't fully funded by the big day, the reveal still happens — and the family chooses: take what was raised towards the goal, stack it forward to the next occasion, or switch to a goal within reach. No pressure, no lost money.",
     },
     {
       icon: Lock,
@@ -1241,6 +1310,7 @@ export default function LandingPage() {
       <Problem />
       <RevealPreview />
       <HowItWorks />
+      <StackSection />
       <HowMoneyWorks />
       <AudienceSplit />
       <Features />
