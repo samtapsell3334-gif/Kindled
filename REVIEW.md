@@ -77,3 +77,17 @@ homepage + terms anchor.
   submitted, demo_opened, pot_chip_in_completed, reveal_viewed (both entry paths),
   investor_unlocked (route + demo surfaces). The rest are reserved names for the P3
   features when built.
+
+## Final verification (recorded before merge)
+- Build passes (22 routes; /api/track, robots.txt, sitemap.xml new).
+- Grep: 0 mixed pairings ("light a pot"/"fill a fire"/"stoke pot"); 0 "premium AI
+  reveal/video" revenue mentions; 0 `href="#"`; 0 PIN identifiers in `.next/static`;
+  0 "Booster Draw" in user-facing copy.
+- Counters default to real values (CountUpStat `useState(target)`).
+- Reduced motion honoured: global CSS rule + useReducedMotion on all Framer loops incl.
+  the new StackSection bars.
+- Smoke test on dev server: /pots/demo 200; unknown route → custom 404; robots.txt
+  disallows /investor; sitemap.xml 200. Investor tabs verified by click-through earlier.
+- Deferred to follow-up passes (scoped in PLAN.md + TODO-FOUNDER.md): P3.1 kids' circle
+  mode, P3.2 receiver-DOM restructure + add-gift move, P3.3 explainer replacement,
+  P4.1 full multi-hat sweep, Lighthouse score capture (needs local Chrome run).
