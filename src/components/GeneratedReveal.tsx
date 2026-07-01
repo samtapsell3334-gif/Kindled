@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Eye, Heart, Sparkles, Share2, Trophy } from "lucide-react";
+import { X, Eye, Heart, Sparkles, Share2, Trophy, Mic, Film, Play } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 /**
@@ -36,18 +36,33 @@ export interface RevealContributor {
   image?: string;
 }
 
+/**
+ * A captured video/voice "Memory" tied to a contribution, surfaced in the Reveal.
+ * Structurally a subset of KindleMemory, so a KindleMemory[] can be passed directly.
+ */
+export interface RevealMemory {
+  kind: "video" | "voice";
+  /** Playable URL (CDN in prod, object URL in the demo). */
+  url: string;
+  durationSec?: number;
+  /** Who left it — falls back to a generic "someone who loves you". */
+  from?: string;
+}
+
 interface GeneratedRevealProps {
   recipientName: string;
   occasion: string;
   totalRaised: number;
   gifts: RevealGift[];
   contributors: RevealContributor[];
+  /** Captured Memories to weave in after the wall of love. */
+  memories?: RevealMemory[];
   onComplete: () => void;
 }
 
-type Phase = "hook" | "countdown" | "boom" | "gifts" | "love" | "share";
+type Phase = "hook" | "countdown" | "boom" | "gifts" | "love" | "memories" | "share";
 
-const PHASE_ORDER: Phase[] = ["hook", "countdown", "boom", "gifts", "love", "share"];
+const BASE_PHASE_ORDER: Phase[] = ["hook", "countdown", "boom", "gifts", "love", "memories", "share"];
 
 // Funny, feel-good captions — kept warm, never mean.
 const GIFT_CAPTIONS = ["certified glow-up", "this is NOT a drill", "main-character energy", "absolute scenes"];
@@ -123,28 +138,52 @@ export function GeneratedReveal({
   totalRaised,
   gifts,
   contributors,
+  memories = [],
   onComplete,
 }: GeneratedRevealProps) {
+  const hasMemories = memories.length > 0;
   const [phase, setPhase] = useState<Phase>("hook");
   const [closing, setClosing] = useState(false);
+  const [activeMemory, setActiveMemory] = useState(0);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // The memories phase only exists when Memories were captured.
+  const phaseOrder = useMemo(
+    () => (hasMemories ? BASE_PHASE_ORDER : BASE_PHASE_ORDER.filter((p) => p !== "memories")),
+    [hasMemories],
+  );
 
   const goTo = useCallback((next: Phase, delay: number) => {
     const t = setTimeout(() => setPhase(next), delay);
     timers.current.push(t);
   }, []);
 
+  // Advance to the next phase in the (possibly memory-including) order.
+  const advance = useCallback(
+    (from: Phase, delay: number) => {
+      const idx = phaseOrder.indexOf(from);
+      const next = phaseOrder[idx + 1];
+      if (next) goTo(next, delay);
+    },
+    [phaseOrder, goTo],
+  );
+
   // Drive the auto-advancing sequence.
   useEffect(() => {
     timers.current.forEach(clearTimeout);
     timers.current = [];
-    if (phase === "hook") goTo("countdown", 2600);
-    else if (phase === "countdown") goTo("boom", 1700);
-    else if (phase === "boom") goTo("gifts", 3000);
-    else if (phase === "gifts") goTo("love", 3600);
-    else if (phase === "love") goTo("share", 3000);
+    if (phase === "hook") advance("hook", 2600);
+    else if (phase === "countdown") advance("countdown", 1700);
+    else if (phase === "boom") advance("boom", 3000);
+    else if (phase === "gifts") advance("gifts", 3600);
+    else if (phase === "love") advance("love", 3000);
+    // "memories" advances on playback end (with a generous fallback below).
+    else if (phase === "memories") {
+      const secs = memories.reduce((a, m) => a + Math.min(30, m.durationSec ?? 12) + 1, 0);
+      advance("memories", Math.min(75_000, secs * 1000 + 2000));
+    }
     return () => timers.current.forEach(clearTimeout);
-  }, [phase, goTo]);
+  }, [phase, advance, memories]);
 
   const close = useCallback(() => {
     setClosing(true);
@@ -371,6 +410,88 @@ export function GeneratedReveal({
                 </motion.div>
               )}
 
+              {/* ── MEMORIES ── captured video/voice notes, tied to their contribution */}
+              {phase === "memories" && hasMemories && (() => {
+                const mem = memories[Math.min(activeMemory, memories.length - 1)];
+                if (!mem) return null;
+                const onEnded = () => {
+                  if (activeMemory < memories.length - 1) setActiveMemory((i) => i + 1);
+                  else advance("memories", 900);
+                };
+                return (
+                  <motion.div
+                    key="memories"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex w-full max-w-[15rem] flex-col items-center gap-4"
+                  >
+                    <div className="flex items-center gap-2">
+                      {mem.kind === "video" ? <Film className="h-5 w-5 text-[#ffb800]" /> : <Mic className="h-5 w-5 text-[#ffb800]" />}
+                      <p className="text-[18px] font-black leading-tight text-white">
+                        a memory{" "}
+                        <span className="bg-gradient-to-r from-[#ffd166] to-[#ffb800] bg-clip-text text-transparent">for you</span>
+                      </p>
+                    </div>
+
+                    <motion.div
+                      key={activeMemory}
+                      initial={{ opacity: 0, scale: 0.94 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ type: "spring", stiffness: 280, damping: 24 }}
+                      className="w-full overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] shadow-2xl"
+                    >
+                      {mem.kind === "video" ? (
+                        <video
+                          key={mem.url}
+                          src={mem.url}
+                          autoPlay
+                          playsInline
+                          controls
+                          onEnded={onEnded}
+                          className="w-full bg-black object-contain"
+                          style={{ aspectRatio: "3 / 4" }}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-4 px-5 py-7">
+                          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#ff6b6b] to-[#f59e0b]">
+                            <Play className="h-7 w-7 translate-x-0.5 text-white" fill="currentColor" />
+                          </span>
+                          <div className="flex h-10 items-end justify-center gap-1">
+                            {Array.from({ length: 15 }).map((_, i) => (
+                              <motion.span
+                                key={i}
+                                className="w-1 rounded-full bg-[#ffb800]/70"
+                                animate={{ height: [`${20 + (i % 4) * 12}%`, `${60 + ((i * 7) % 40)}%`, `${20 + (i % 4) * 12}%`] }}
+                                transition={{ duration: 0.9 + (i % 5) * 0.12, repeat: Infinity, ease: "easeInOut" }}
+                                style={{ height: "30%" }}
+                              />
+                            ))}
+                          </div>
+                          <audio key={mem.url} src={mem.url} autoPlay controls onEnded={onEnded} className="w-full" />
+                        </div>
+                      )}
+                    </motion.div>
+
+                    <p className="text-[12px] font-semibold text-white/60">
+                      from {mem.from ?? "someone who loves you"}
+                    </p>
+
+                    {memories.length > 1 && (
+                      <div className="flex items-center gap-1.5">
+                        {memories.map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setActiveMemory(i)}
+                            aria-label={`Memory ${i + 1}`}
+                            className={`h-1.5 rounded-full transition-all ${i === activeMemory ? "w-5 bg-[#ffb800]" : "w-1.5 bg-white/25"}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })()}
+
               {/* ── SHARE CARD ── */}
               {phase === "share" && (
                 <motion.div
@@ -428,11 +549,11 @@ export function GeneratedReveal({
 
           {/* Progress dots */}
           <div className="absolute inset-x-0 z-20 flex justify-center gap-1.5" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 16px)" }}>
-            {PHASE_ORDER.map((p) => (
+            {phaseOrder.map((p) => (
               <div
                 key={p}
                 className={`h-1 rounded-full transition-all duration-300 ${
-                  PHASE_ORDER.indexOf(p) <= PHASE_ORDER.indexOf(phase) ? "w-6 bg-white" : "w-1.5 bg-white/25"
+                  phaseOrder.indexOf(p) <= phaseOrder.indexOf(phase) ? "w-6 bg-white" : "w-1.5 bg-white/25"
                 }`}
               />
             ))}

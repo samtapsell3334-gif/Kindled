@@ -987,12 +987,14 @@ function ContributionPromptModal({
   onConfirm,
   onClose,
   onStartOwn,
+  onMemory,
 }: {
   pot: DemoPot;
   amount: number;
   onConfirm: (id: string, amount: number) => void;
   onClose: () => void;
   onStartOwn: () => void;
+  onMemory: (memory: KindleMemory) => void;
 }) {
   const [tab, setTab] = useState<"card" | "video">("card");
   const [message, setMessage] = useState("");
@@ -1003,6 +1005,8 @@ function ContributionPromptModal({
   function finalize() {
     setSubmitted(true);
     onConfirm(pot.id, amount);
+    // Hand the captured Memory up so it weaves into Billy's Reveal.
+    if (memory) onMemory(memory);
     // Stay open on the CompletionValue prompt — the viral loop's top of funnel.
   }
 
@@ -4356,6 +4360,8 @@ export default function DemoPage() {
   // AI reveal overlay — shown when user clicks into the Reveal tab
   const [showAiReveal, setShowAiReveal] = useState(false);
   const [showPostReveal, setShowPostReveal] = useState(false);
+  // Memories captured on contributions — woven into Billy's Reveal.
+  const [capturedMemories, setCapturedMemories] = useState<KindleMemory[]>([]);
   const [showExplainer, setShowExplainer] = useState(false);
 
   const addLog = useCallback((entry: string) => {
@@ -4410,6 +4416,7 @@ export default function DemoPage() {
           onConfirm={handleKindle}
           onClose={() => setPendingContribution(null)}
           onStartOwn={() => setShowReceiverSignUp(true)}
+          onMemory={(m) => setCapturedMemories((prev) => [...prev, m])}
         />
       )}
 
@@ -4826,6 +4833,7 @@ export default function DemoPage() {
           totalRaised={V2_TOTAL}
           gifts={V2_POTS.map((p) => ({ name: p.name, sub: p.sub, Icon: p.Icon, grad: p.grad, glow: p.glow, image: p.image }))}
           contributors={V2_CONTRIBS.map((c) => ({ name: c.name, initials: c.initials, grad: c.grad, image: c.image }))}
+          memories={capturedMemories.map((m) => ({ kind: m.kind, url: m.url, durationSec: m.durationSec }))}
           onComplete={() => { setShowAiReveal(false); setShowPostReveal(true); }}
         />
       )}
