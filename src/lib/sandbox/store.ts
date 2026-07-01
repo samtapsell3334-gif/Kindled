@@ -89,7 +89,9 @@ export function logEvent(
     ts: Date.now(),
   };
   assertNoCardData(e);
-  db().events.push(e);
+  const evts = db().events;
+  if (evts.length >= MAX_EVENTS) evts.splice(0, 1000); // trim oldest — sandbox only
+  evts.push(e);
   return e;
 }
 
@@ -115,7 +117,12 @@ export interface CreatePotInput {
   seeded?: boolean;
 }
 
+const MAX_POTS = 300;
+const MAX_CONTRIBUTIONS_PER_POT = 200;
+const MAX_EVENTS = 10_000;
+
 export function createPot(input: CreatePotInput): SandboxPot {
+  if (db().pots.size >= MAX_POTS) throw new Error("Sandbox is full — try after the next reset.");
   const pot: SandboxPot = {
     id: newId("spot"),
     slug: newSlug(),
@@ -172,6 +179,7 @@ export function contribute(
   const pot = getPotBySlug(slug);
   if (!pot) throw new Error("Pot not found");
   if (pot.status !== "open") throw new Error("Pot is not open");
+  if (pot.contributions.length >= MAX_CONTRIBUTIONS_PER_POT) throw new Error("This pot has reached the sandbox contribution cap.");
   const amount = Math.max(1, Math.min(500, Math.round(input.amount)));
   const contribution: SandboxContribution = {
     id: newId("con"),
