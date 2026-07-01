@@ -595,5 +595,60 @@
         "sticks": "Rituals repeat — the reveal becomes the moment everyone anticipates"
       }
     ]
+  },
+  "film": {
+    "id": "investor",
+    "title": "The 90-second brief",
+    "scenes": [
+      {
+        "dur": 8,
+        "visual": "ignition",
+        "headline": "Britain wastes £3.2 billion a year on unwanted gifts.",
+        "caption": "£3.2bn a year on gifts nobody wanted.",
+        "note": "Source: OnePoll / Halifax, 2023"
+      },
+      {
+        "dur": 12,
+        "visual": "potfill",
+        "headline": "Create a pot → share one link → sealed until the reveal.",
+        "caption": "Group gifting done properly — one link, everyone in, revealed on the big day."
+      },
+      {
+        "dur": 15,
+        "visual": "split",
+        "headline": "Money on every outcome.",
+        "caption": "Full pot → gift cards → commission. Part-funded → equal joy → gift card or stacked forward. Revenue or retention. Usually both."
+      },
+      {
+        "dur": 15,
+        "visual": "wedge",
+        "headline": "Kids' lists are the wedge.",
+        "caption": "Parents create; grandparents, aunts and friends chip in — every contributor becomes an activated user. The child's pot IS the acquisition channel."
+      },
+      {
+        "dur": 10,
+        "visual": "flywheel",
+        "headline": "Then the loop turns again.",
+        "caption": "Pot → contributors → their pots → repeat. That's the K-factor."
+      },
+      {
+        "dur": 13,
+        "visual": "timeline",
+        "headline": "Two phases. Honest roadmap.",
+        "caption": "Phase 1: gift card commissions, live from launch · Phase 2: retail media on first-party intent · then clean rooms (roadmap)."
+      },
+      {
+        "dur": 12,
+        "visual": "bars",
+        "headline": "Raising £250,000 pre-seed.",
+        "caption": "To build the loop, prove the wedge, and start the flywheel turning.",
+        "note": "Use-of-funds split is a placeholder — founder to confirm"
+      },
+      {
+        "dur": 5,
+        "visual": "endcard",
+        "caption": "Kindled. Gifting, reignited."
+      }
+    ]
   }
 }

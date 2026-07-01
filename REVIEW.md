@@ -91,3 +91,108 @@ homepage + terms anchor.
 - Deferred to follow-up passes (scoped in PLAN.md + TODO-FOUNDER.md): P3.1 kids' circle
   mode, P3.2 receiver-DOM restructure + add-gift move, P3.3 explainer replacement,
   P4.1 full multi-hat sweep, Lighthouse score capture (needs local Chrome run).
+
+---
+
+# Sandbox MVP v4.1 (branch feat/sandbox-mvp-v4)
+
+## Core + WS-A/B/C/D + WS-E/F minimal (this pass)
+- **Entities & store** (`src/lib/sandbox/`): simulated-money model (integer pounds),
+  unguessable share slugs + private manager keys (guest-first, no passwords/emails —
+  guardrail 3), append-only event log, 3 seeded pots (child birthday + star chart,
+  adult joint log-burner, friends leaving gift), exact reset. Persistence adapter:
+  in-memory now; Prisma/Postgres path activates when DATABASE_URL exists (PLAN.md).
+- **Guardrail 1 in code**: no Stripe test keys present → pure-frontend simulation per
+  the decision rule. Payment sheet uses READ-ONLY pre-filled dummy card values that are
+  never read or transmitted; fake Apple Pay button; "Demo — no money moves" badge.
+  Server-side stripCardData + assertNoCardData; verified end-to-end by injecting
+  cardNumber/cvc into a contribution payload — nothing card-like reached the store/log.
+- **Guardrail 6 server-side**: viewFor() builds viewer payloads; receiver-surprise API
+  response verified to contain no amounts, contributors, or message content.
+- **Flows**: /sandbox (create: occasion→date→who→parent/guardian toggle→star chart→
+  list w/ category/retailer/price-band capture→surprise→share+manager links);
+  /p/[slug] (guest view+poll, chip-in, simulated sheet, text/video message via
+  KindleRecord, thank-you conversion moment with "Would you rather?" + ref-chained
+  start-your-own; manager panel with receiver preview + Simulate reveal day →
+  gift card (fake voucher + simulated commission)/product/stack).
+- **WS-F dashboard** (/sandbox/dashboard, shared-secret): 5 panels off the real event
+  log — intent (category/retailer/price band), funnel with rates, K-factor (defined
+  on-screen, honestly labelled sandbox sample), reveal economics (simulated commission),
+  engagement (message types, WYR split). CSV export per panel.
+- **Events (WS-G)**: pot_created, item_added, pot_viewed, contribution_started,
+  payment_sheet_viewed, contribution_completed, message_added, wyr_answered,
+  reveal_triggered, reveal_outcome. No card data, no message content, no child
+  identifiers in events.
+- **Tests**: the 3 mandated tests + loop coverage = 10 new (87 repo-wide), all passing.
+- **E2E verified** (dev server, API level): create → contribute (+card-injection
+  attempt) → receiver redaction → ref-chained second pot → reveal → commission →
+  event spine + dashboard 200s.
+
+## Honestly not done yet (sequenced next, not skipped)
+- v4.1: video persistence beyond object URLs (needs Blob/DB), per-session abuse caps,
+  Stripe test mode path, on-phone iOS/Android script runs, staging deploy decision.
+- v5 (reveal experience) + v6 (films): NOT STARTED — both depend on this branch; each
+  needs its own focused pass. Logged with dependencies in PLAN.md.
+
+---
+
+# Reveal Experience v5 (branch feat/reveal-v5)
+
+## WS-R1/R2/R3a/R4 + R3 (partial)
+- **RevealExperience** (`src/components/RevealExperience.tsx`): explicit beat machine
+  SEALED → TAP → IGNITION → NUMBER → PEOPLE → WORDS → FACES → GIFT → (OPTIONS) →
+  SHARE. Tap-to-advance (words/faces page via their own taps — a region tap cannot
+  skip them; bug found in verification and fixed), Skip + Replay, sr-only aria-live
+  beat announcements, mute persisted to localStorage.
+- **Ignition (WS-R2)**: exported reusable canvas ember system — upward drift, warm
+  palette, hand-drawn wobble; no DOM particles, no stock confetti, no flashes
+  (photosensitivity-safe by construction).
+- **Audio (WS-R3a)**: WebAudio-SYNTHESISED strike/whoosh/swell/tick — original by
+  construction, zero copyright exposure. Starts on the ritual tap only; ducking N/A
+  until an underscore exists. TODO-FOUNDER: commissioned signature sound slots in.
+- **Haptics**: Vibration API, feature-detected (sealed pulse, ignition triple-tick,
+  number thump).
+- **Kid pots**: star celebration in the gift beat, wholesome copy, no countdown.
+- **Options (WS-R4)**: full/partial branch with equal-weight choices; stack
+  projection uses real pot maths (verified: £40/£130 → "starts the next pot at 31%").
+  Partial funding celebrated as what was RAISED.
+- **Share engine (WS-R3, partial)**: canvas-generated 9:16 share card (embers, total,
+  people, recipient, referral link) → native share/download; reaction capture (30s,
+  consent copy, delete/re-record via KindleRecord); thank-you broadcast. Events:
+  reaction_recorded, share_clip_generated, share_completed, thankyou_broadcast_sent.
+  NOT built (honest): auto-stitched video clip (client-side canvas+MediaRecorder
+  stitching is its own project) — TODO-FOUNDER with the share card covering the need.
+- **Security finding fixed during build**: the organiser's live ceremony needs sealed
+  messages unsealed at the moment of reveal — added a manager-key-authorised
+  `?unseal=1` (dashboard stays sealed; guests cannot unseal; verified all three).
+- **Verified in-browser**: all nine beats in order, no-skip on words, gift-card
+  outcome → simulated commission event (£2 = 5% of £40), thank-you event, share beat
+  screenshot on record. Big-screen/QR mode + captions field: TODO-FOUNDER.
+
+---
+
+# Explainer Film System v6 (branch feat/explainer-v6)
+
+- **Pipeline (WS-V1)**: code-played films via a data-driven FilmPlayer (Remotion
+  rejected for this environment — decision + rationale in PLAN.md). Captions-first:
+  the caption bar is always on; both films land fully muted today. Brand-system
+  visuals only; the v5 Ignition opens both films. No TTS, no stock/gen footage, no
+  music of any kind shipped (nothing to licence — REVIEW note: zero audio assets used;
+  the VO + signature underscore are founder TODOs with pre-built slots).
+- **WS-V2 Investor Film**: scripts/investor-film.md (7 scenes, 90s, every figure
+  matches the investor page; use-of-funds bars carry a visible "placeholder — founder
+  to confirm" label). Scenes live INSIDE investor-content.json → served only by
+  /api/investor after PIN. Bundle grep: film data absent from all client chunks (the
+  only hit is the section label string in component code). Rendered as "Watch the
+  90-second brief" directly under the elevator pitch.
+- **WS-V3 Customer Film**: scripts/customer-film.md (60s + two 9:16 vertical-cut
+  scripts). Public /film page: self-hosted player, captions on, transcript below,
+  waitlist + demo CTAs. Verified playing in-browser with the caption bar.
+- **WS-V4 Placement**: homepage footer "Watch the film" link; /film in the sitemap;
+  investor film absent from public routes/sitemap/bundle. Events wired via the
+  consent-gated layer: film_played, film_completed.
+- **VO-RECORDING-GUIDE.md**: exact-timed scripts, pacing marks, phone-mic guidance,
+  drop-in file paths (with a note that gated investor VO should be served via
+  /api/investor if confidentiality requires).
+- **Honest deltas**: MP4/9:16 renders are a mechanical founder step (scripts +
+  player are the source of truth); film_shared event awaits a share affordance.
