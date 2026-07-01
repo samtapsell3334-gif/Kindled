@@ -596,11 +596,11 @@ function Hero() {
 // ─── Marquee ──────────────────────────────────────────────────────────────────
 
 function MarqueeBand() {
+  const reduce = useReducedMotion();
   return (
     <div className="overflow-hidden border-y border-stone-200/70 bg-white py-3.5">
       <motion.div
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 28, ease: "linear", repeat: Infinity }}
+        {...(reduce ? {} : { animate: { x: ["0%", "-50%"] }, transition: { duration: 28, ease: "linear" as const, repeat: Infinity } })}
         className="flex w-max"
       >
         {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((text, i) => (
@@ -996,6 +996,7 @@ function Stats() {
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 
 function Testimonials() {
+  const reduce = useReducedMotion();
   return (
     <section className="bg-[#fdf9f5] py-28 px-5 overflow-hidden">
       <div className="mx-auto max-w-5xl">
@@ -1015,8 +1016,7 @@ function Testimonials() {
         {/* Illustrative scenarios (not reviews) */}
         <div className="relative">
           <motion.div
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ duration: 40, ease: "linear", repeat: Infinity }}
+            {...(reduce ? {} : { animate: { x: ["0%", "-50%"] }, transition: { duration: 40, ease: "linear" as const, repeat: Infinity } })}
             className="flex w-max gap-5"
             aria-label="Illustrative scenarios"
           >
