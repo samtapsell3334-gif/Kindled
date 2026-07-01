@@ -1,21 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
   Users, Flame, Gift, Lock, ChevronRight, BarChart2, Globe,
   Zap, Shield, ShieldCheck, Check, ArrowRight, Target, Database, CreditCard,
   Sparkles, Repeat, Share2, Wallet, Percent, Tag, Cpu, GitBranch, Landmark, Bell,
 } from "lucide-react";
-import content from "@/data/investor-content.json";
-
 /**
  * InvestorWarRoom — a dark, fintech-grade investor dashboard.
  *
- * Five pitch-ready tabs, every word pulled from investor-content.json so the
+ * Five pitch-ready tabs, every word supplied via the InvestorContent context so the
  * narrative stays cohesive. Shared by the /investor route and the PIN-gated
  * "Investor" tab in the demo (`embedded`).
+ *
+ * SECURITY: the content is NEVER imported here (that would bundle the confidential
+ * deck into the public client chunk). It's fetched from /api/investor after the PIN
+ * is validated server-side, then passed in and shared through context. The type-only
+ * `typeof import(...)` below is erased at compile time and ships nothing.
  */
+
+// Type only — `typeof import(...)` is erased at build, so no data is bundled here.
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+export type InvestorContent = typeof import("@/data/investor-content.json");
+
+const InvestorContentCtx = createContext<InvestorContent | null>(null);
+function useContent(): InvestorContent {
+  const c = useContext(InvestorContentCtx);
+  if (!c) throw new Error("InvestorWarRoom must be rendered with content.");
+  return c;
+}
 
 function cn(...c: (string | undefined | false | null)[]) {
   return c.filter(Boolean).join(" ");
@@ -78,6 +92,7 @@ const LOOP_ICONS: Record<string, React.ElementType> = {
 };
 
 function FlywheelDiagram() {
+  const content = useContent();
   const { flywheel } = content;
   const loop = flywheel.loop;
   const [active, setActive] = useState(0);
@@ -168,6 +183,7 @@ function FlywheelDiagram() {
 // ─── TAB: WHY NOW (opportunity) ───────────────────────────────────────────────
 
 function OpportunityTab() {
+  const content = useContent();
   const { opportunity } = content;
   const ICONS = [CreditCard, Sparkles, Globe];
   return (
@@ -219,6 +235,7 @@ function ProjBar({ year, value, pct, delay }: { year: string; value: string; pct
 }
 
 function MechanismTab() {
+  const content = useContent();
   const { mechanism, jointFires: jf } = content;
   const ICONS: Record<string, React.ElementType> = { viral: Users, intent: Database, overhead: Cpu };
   return (
@@ -301,6 +318,7 @@ function MechanismTab() {
 // ─── TAB: THE VALUE ENGINE ────────────────────────────────────────────────────
 
 function CashbackSplit() {
+  const content = useContent();
   const { cashbackMath } = content.valueEngine;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.5 });
@@ -353,6 +371,7 @@ function CashbackSplit() {
 }
 
 function ValueTab() {
+  const content = useContent();
   const { valueEngine } = content;
   const f = valueEngine.fairness;
   return (
@@ -418,6 +437,7 @@ function ValueTab() {
 // ─── TAB: THE EDGE ────────────────────────────────────────────────────────────
 
 function UnitEconomicsTable() {
+  const content = useContent();
   const ue = content.edge.unitEconomics;
   return (
     <Panel className="overflow-hidden p-0">
@@ -448,6 +468,7 @@ function UnitEconomicsTable() {
 }
 
 function EdgeTab() {
+  const content = useContent();
   const { edge } = content;
   return (
     <div className="space-y-9">
@@ -482,6 +503,7 @@ function EdgeTab() {
 // ─── TAB: EXECUTION (risk + operator + roadmap) ───────────────────────────────
 
 function ExecutionTab() {
+  const content = useContent();
   const { risk, operator, roadmap } = content;
   const [open, setOpen] = useState<string | null>(null);
   const opIcons = [Target, GitBranch, Sparkles];
@@ -595,10 +617,11 @@ function ExecutionTab() {
 
 // ─── WAR ROOM SHELL ───────────────────────────────────────────────────────────
 
-export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
+export function InvestorWarRoom({ embedded = false, content }: { embedded?: boolean; content: InvestorContent }) {
   const [tab, setTab] = useState<Tab>("opportunity");
 
   return (
+    <InvestorContentCtx.Provider value={content}>
     <div className={cn("text-white", embedded ? "relative overflow-hidden rounded-3xl" : "min-h-screen")}
       style={{ backgroundColor: "#0a0a0a", backgroundImage: "radial-gradient(ellipse 100% 40% at 50% 0%, rgba(15,23,42,0.8) 0%, transparent 60%)" }}>
       <div className={cn("pointer-events-none opacity-[0.025]", embedded ? "absolute inset-0" : "fixed inset-0")}
@@ -675,5 +698,6 @@ export function InvestorWarRoom({ embedded = false }: { embedded?: boolean }) {
         <p className="text-[11px] text-slate-700">{content.meta.confidential} · {content.meta.company} · {new Date().getFullYear()}</p>
       </footer>
     </div>
+    </InvestorContentCtx.Provider>
   );
 }

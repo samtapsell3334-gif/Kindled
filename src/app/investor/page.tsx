@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Flame, Shield } from "lucide-react";
-import content from "@/data/investor-content.json";
-import { InvestorWarRoom } from "@/components/InvestorWarRoom";
+import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
 
 // ─── Utility ──────────────────────────────────────────────────────────────────
 
@@ -13,28 +12,48 @@ function cn(...classes: (string | undefined | false | null)[]) {
 }
 
 // ─── PIN GATE ─────────────────────────────────────────────────────────────────
+// The PIN is validated server-side (/api/investor). Neither the PIN nor the deck
+// is present in the client bundle; content only arrives after a correct code.
 
-const CORRECT_PIN = "1066";
-
-function PinGate({ onUnlock }: { onUnlock: () => void }) {
+function PinGate({ onUnlock }: { onUnlock: (content: InvestorContent) => void }) {
   const [digits, setDigits]   = useState("");
   const [shake, setShake]     = useState(false);
   const [success, setSuccess] = useState(false);
+  const [busy, setBusy]       = useState(false);
 
-  // Same proven pattern as the demo's gate: validate inline in the handler.
+  const reject = useCallback(() => {
+    setShake(true);
+    setTimeout(() => { setShake(false); setDigits(""); }, 550);
+  }, []);
+
   const handle = useCallback((k: string) => {
+    if (busy || success) return;
     const next = (digits + k).slice(0, 4);
     setDigits(next);
     if (next.length === 4) {
-      if (next === CORRECT_PIN) {
-        setSuccess(true);
-        setTimeout(onUnlock, 600);
-      } else {
-        setShake(true);
-        setTimeout(() => { setShake(false); setDigits(""); }, 550);
-      }
+      setBusy(true);
+      void (async () => {
+        try {
+          const res = await fetch("/api/investor", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pin: next }),
+          });
+          if (res.ok) {
+            const data = (await res.json()) as { content: InvestorContent };
+            setSuccess(true);
+            setTimeout(() => onUnlock(data.content), 600);
+          } else {
+            reject();
+          }
+        } catch {
+          reject();
+        } finally {
+          setBusy(false);
+        }
+      })();
     }
-  }, [digits, onUnlock]);
+  }, [digits, onUnlock, busy, success, reject]);
 
   const del = useCallback(() => setDigits(d => d.slice(0, -1)), []);
 
@@ -73,10 +92,10 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
           </div>
           <div className="text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500">
-              {content.meta.confidential}
+              Strictly Confidential
             </p>
             <h1 className="mt-1 text-[22px] font-bold tracking-tight text-white">
-              {content.meta.company} Investor Access
+              Kindled Investor Access
             </h1>
           </div>
         </div>
@@ -118,7 +137,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
               ))}
             </motion.div>
             <p className="mb-5 text-center text-[11px] text-slate-500">
-              {success ? "Access granted — entering…" : shake ? "Incorrect code — try again" : content.meta.access.hint}
+              {success ? "Access granted — entering…" : shake ? "Incorrect code — try again" : busy ? "Checking…" : "Enter your 4-digit access code"}
             </p>
 
             {/* Keypad */}
@@ -147,7 +166,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
         </div>
 
         <p className="mt-6 text-center text-[11px] text-slate-600">
-          {content.meta.company} · Private War Room · Authorised Access Only
+          Kindled · Private War Room · Authorised Access Only
         </p>
       </motion.div>
     </div>
@@ -157,23 +176,16 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
 // ─── PAGE ENTRY ───────────────────────────────────────────────────────────────
 
 export default function InvestorPage() {
-  const [unlocked, setUnlocked] = useState(false);
+  // Content is held only in memory for this session. On refresh it's gone and the
+  // PIN must be re-entered — we deliberately don't persist access or the content.
+  const [content, setContent] = useState<InvestorContent | null>(null);
 
-  useEffect(() => {
-    if (sessionStorage.getItem("investor_unlocked") === "1") setUnlocked(true);
-  }, []);
+  const handleUnlock = useCallback((c: InvestorContent) => setContent(c), []);
 
-  const handleUnlock = useCallback(() => {
-    sessionStorage.setItem("investor_unlocked", "1");
-    setUnlocked(true);
-  }, []);
-
-  // Plain conditional render (same as the demo gate). An AnimatePresence
-  // "wait" swap here could stall on the gate's exit and never mount the room.
-  if (unlocked) {
+  if (content) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
-        <InvestorWarRoom />
+        <InvestorWarRoom content={content} />
       </motion.div>
     );
   }

@@ -36,7 +36,7 @@ import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
 import { DemoWaitlistPill } from "@/components/DemoWaitlistPill";
 import { GeneratedReveal } from "@/components/GeneratedReveal";
-import { InvestorWarRoom } from "@/components/InvestorWarRoom";
+import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -1313,39 +1313,55 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
 // INVESTOR PIN GATE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const INVESTOR_PIN = "1066";
-const SESSION_KEY  = "kindled_investor_unlocked";
-
-function InvestorPinGate({ children }: { children: React.ReactNode }) {
+// PIN is validated server-side (/api/investor); the deck is never in this bundle.
+// Self-contained: `render` receives the fetched content; `children` just gate.
+function InvestorPinGate({
+  children,
+  render,
+}: {
+  children?: React.ReactNode;
+  render?: (content: InvestorContent) => React.ReactNode;
+}) {
+  const [content, setContent] = useState<InvestorContent | null>(null);
   const [unlocked, setUnlocked] = useState(false);
-  const [digits, setDigits]     = useState("");
-  const [shake, setShake]       = useState(false);
-  const [showGate, setShowGate] = useState(false);
-
-  // Read session on mount (client-only)
-  useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY) === "1") setUnlocked(true);
-    else setShowGate(true);
-  }, []);
+  const [digits, setDigits] = useState("");
+  const [shake, setShake]   = useState(false);
+  const [busy, setBusy]     = useState(false);
 
   const handleDigit = useCallback((d: string) => {
+    if (busy) return;
     const next = (digits + d).slice(0, 4);
     setDigits(next);
     if (next.length === 4) {
-      if (next === INVESTOR_PIN) {
-        sessionStorage.setItem(SESSION_KEY, "1");
-        setUnlocked(true);
-      } else {
-        setShake(true);
-        setTimeout(() => { setShake(false); setDigits(""); }, 650);
-      }
+      setBusy(true);
+      void (async () => {
+        try {
+          const res = await fetch("/api/investor", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pin: next }),
+          });
+          if (res.ok) {
+            const data = (await res.json()) as { content: InvestorContent };
+            setContent(data.content);
+            setUnlocked(true);
+          } else {
+            setShake(true);
+            setTimeout(() => { setShake(false); setDigits(""); }, 650);
+          }
+        } catch {
+          setShake(true);
+          setTimeout(() => { setShake(false); setDigits(""); }, 650);
+        } finally {
+          setBusy(false);
+        }
+      })();
     }
-  }, [digits]);
+  }, [digits, busy]);
 
   const handleBackspace = useCallback(() => setDigits((d) => d.slice(0, -1)), []);
 
-  if (unlocked) return <>{children}</>;
-  if (!showGate) return null;
+  if (unlocked) return <>{render && content ? render(content) : children}</>;
 
   return (
     <div className="mx-4 mb-6 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-lg"
@@ -4488,9 +4504,7 @@ export default function DemoPage() {
       ) : viewMode === "investor" ? (
         <motion.div key="investor" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
           <div className="px-3 py-4">
-            <InvestorPinGate>
-              <InvestorWarRoom embedded />
-            </InvestorPinGate>
+            <InvestorPinGate render={(c) => <InvestorWarRoom embedded content={c} />} />
           </div>
         </motion.div>
       ) : viewMode === "joint" ? (
