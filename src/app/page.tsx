@@ -421,6 +421,61 @@ function Hero() {
                 </div>
               ))}
             </motion.div>
+
+            {/* Mobile product proof — the real board, shown only on small screens */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-10 lg:hidden"
+            >
+              <div
+                className="relative mx-auto w-full max-w-[330px] overflow-hidden rounded-2xl"
+                style={{
+                  background: "linear-gradient(145deg, #1a0800, #0d0400)",
+                  boxShadow: "0 0 0 1px rgba(251,146,60,0.2), 0 24px 60px rgba(251,146,60,0.22), 0 8px 24px rgba(0,0,0,0.7)",
+                }}
+              >
+                <div className="h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500" />
+                <div className="p-5">
+                  <div className="mb-4 flex items-center gap-2.5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/15">
+                      <Flame className="h-5 w-5 text-amber-400" strokeWidth={1.75} />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas Fire</p>
+                      <p className="text-[15px] font-bold leading-tight text-white">PlayStation 5</p>
+                    </div>
+                  </div>
+                  <p className="text-[30px] font-bold text-white">£450</p>
+                  <div className="mt-2.5 h-2 rounded-full bg-white/8">
+                    <motion.div
+                      initial={{ width: "0%" }}
+                      whileInView={{ width: "78%" }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.3, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                      className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
+                    />
+                  </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <p className="text-[11px] text-white/35">£351 raised</p>
+                    <p className="text-[12px] font-bold text-amber-400">78%</p>
+                  </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="flex -space-x-1.5">
+                      {["bg-[#ff6b6b]", "bg-rose-400", "bg-orange-400", "bg-amber-400", "bg-amber-500"].map((c, i) => (
+                        <div key={i} className={`h-5 w-5 rounded-full border-[1.5px] border-[#0d0400] ${c}`} />
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-white/35">+9 chipped in</p>
+                  </div>
+                  <div className="mt-3 flex items-center gap-1.5">
+                    <Lock className="h-3 w-3 shrink-0 text-white/20" />
+                    <p className="text-[9px] italic text-white/25">Progress hidden from Billy until reveal day</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
           {/* Floating product cards */}
@@ -982,6 +1037,20 @@ function FinalCTA() {
                   <span className="text-[12px] text-stone-500">{t}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Payment-security trust strip */}
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 border-t border-amber-100/70 pt-6">
+              <div className="flex items-center gap-1.5">
+                <Shield className="h-4 w-4 text-stone-400" strokeWidth={2} />
+                <span className="text-[12px] text-stone-500">
+                  Payments secured by <span className="font-semibold text-stone-700">Stripe</span>
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Lock className="h-4 w-4 text-stone-400" strokeWidth={2} />
+                <span className="text-[12px] text-stone-500">Your gift stays private until reveal day</span>
+              </div>
             </div>
           </div>
         </div>
