@@ -58,3 +58,22 @@ homepage + terms anchor.
 - **Verified:** build passes; friends/Mintel/Stack all render on the dev server. (One
   incident: running the prod build while the dev server shared .next corrupted the dev
   cache → restart fixed; no code issue.)
+
+## P4 — Polish, SEO & instrumentation
+- **P4.2** Custom 404 (`not-found.tsx`): on-brand ember styling, routes home / to the demo.
+  (Pinch-zoom, reduced-motion, alt text, lazy-loading were done in the prior overhaul.)
+- **P4.3** SEO/shareability: `robots.ts` (disallow /api, /admin, /investor), `sitemap.ts`
+  (5 public pages), per-page metadata + OpenGraph/Twitter for the homepage (root layout,
+  en_GB) and the demo (`pots/demo/layout.tsx`). TODO(founder): real 1200×630 OG image —
+  none generated per the asset guardrail.
+- **P4.4** Analytics: new consent-gated layer (`src/lib/analytics.ts` → sendBeacon →
+  `POST /api/track`, console/Vercel-logs sink for now; durable sink = founder TODO).
+  Fires ONLY when the consent banner choice is "all" (PECR). No third-party SDK — logged
+  as the no-new-heavy-deps justification. **Event schema:**
+  `{ event, props?, ts, path, session }` with canonical names: `waitlist_viewed`,
+  `waitlist_submitted`, `demo_opened`, `pot_chip_in_started`, `pot_chip_in_completed`,
+  `reveal_viewed`, `stack_chosen`, `catalogue_item_circled`, `parent_approval_action`,
+  `would_you_rather_interaction`, `investor_unlocked`. Wired now: waitlist viewed/
+  submitted, demo_opened, pot_chip_in_completed, reveal_viewed (both entry paths),
+  investor_unlocked (route + demo surfaces). The rest are reserved names for the P3
+  features when built.

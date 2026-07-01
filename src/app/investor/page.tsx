@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Flame, Shield } from "lucide-react";
 import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
+import { track } from "@/lib/analytics";
 
 // ─── Utility ──────────────────────────────────────────────────────────────────
 
@@ -180,7 +181,7 @@ export default function InvestorPage() {
   // PIN must be re-entered — we deliberately don't persist access or the content.
   const [content, setContent] = useState<InvestorContent | null>(null);
 
-  const handleUnlock = useCallback((c: InvestorContent) => setContent(c), []);
+  const handleUnlock = useCallback((c: InvestorContent) => { setContent(c); track("investor_unlocked", { surface: "route" }); }, []);
 
   if (content) {
     return (

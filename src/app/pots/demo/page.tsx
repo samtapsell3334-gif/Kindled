@@ -35,6 +35,7 @@ import type { GiftingMode } from "@/types/pots";
 import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
 import { DemoWaitlistPill } from "@/components/DemoWaitlistPill";
+import { track } from "@/lib/analytics";
 import { GeneratedReveal } from "@/components/GeneratedReveal";
 import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
 
@@ -1345,6 +1346,7 @@ function InvestorPinGate({
             const data = (await res.json()) as { content: InvestorContent };
             setContent(data.content);
             setUnlocked(true);
+            track("investor_unlocked", { surface: "demo" });
           } else {
             setShake(true);
             setTimeout(() => { setShake(false); setDigits(""); }, 650);
@@ -3765,6 +3767,8 @@ export default function DemoPage() {
   const [showPostReveal, setShowPostReveal] = useState(false);
   // Memories captured on contributions — woven into Billy's Reveal.
   const [capturedMemories, setCapturedMemories] = useState<KindleMemory[]>([]);
+
+  useEffect(() => { track("demo_opened"); }, []);
   const [showExplainer, setShowExplainer] = useState(false);
 
   const addLog = useCallback((entry: string) => {
@@ -3785,6 +3789,7 @@ export default function DemoPage() {
     ));
     showToast(`£${amount} kindled!`);
     addLog(`Contribution: £${amount} added to pot`);
+    track("pot_chip_in_completed", { amount });
   }, [showToast, addLog]);
 
   const handleBuy = useCallback((id: string) => {
@@ -3890,7 +3895,7 @@ export default function DemoPage() {
             <PostRevealOptions
               recipientName="Billy"
               totalRaised={V2_TOTAL}
-              onReplay={() => { setShowPostReveal(false); setShowAiReveal(true); }}
+              onReplay={() => { setShowPostReveal(false); setShowAiReveal(true); track("reveal_viewed", { replay: true }); }}
             />
           ) : (
           /* AI Reveal trigger card — shown before the overlay fires */
@@ -3910,7 +3915,7 @@ export default function DemoPage() {
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }} whileHover={{ scale: 1.03 }}
-              onClick={() => setShowAiReveal(true)}
+              onClick={() => { setShowAiReveal(true); track("reveal_viewed", { replay: false }); }}
               className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-8 py-4 text-[16px] font-black text-stone-900 shadow-xl shadow-amber-900/40"
             >
               <Play className="h-5 w-5" strokeWidth={3} />
