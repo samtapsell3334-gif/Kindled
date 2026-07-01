@@ -6,6 +6,7 @@ import {
   Users, Flame, Gift, Lock, ChevronRight, BarChart2, Globe,
   Zap, Shield, ShieldCheck, Check, ArrowRight, Target, Database, CreditCard,
   Sparkles, Repeat, Share2, Wallet, Percent, Tag, Cpu, GitBranch, Landmark, Bell,
+  Copy, Baby,
 } from "lucide-react";
 /**
  * InvestorWarRoom — a dark, fintech-grade investor dashboard.
@@ -182,6 +183,176 @@ function FlywheelDiagram() {
 
 // ─── TAB: WHY NOW (opportunity) ───────────────────────────────────────────────
 
+// ─── P1.1 Elevator pitch — the 20-second version, with one-tap copy ────────────
+
+function PitchBlock() {
+  const content = useContent();
+  const pitch = content.pitch;
+  const [copied, setCopied] = useState(false);
+  if (!pitch) return null;
+  const copy = () => {
+    void navigator.clipboard?.writeText(pitch.text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    });
+  };
+  return (
+    <div className="mb-7 rounded-2xl border border-[#ffb800]/25 bg-[#ffb800]/[0.05] p-5">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#ffb800]">{pitch.label}</p>
+        <button
+          onClick={copy}
+          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#ffb800]/30 bg-[#0f0f0f] px-2.5 py-1.5 text-[11px] font-semibold text-[#ffb800] transition-colors hover:bg-[#ffb800]/10"
+        >
+          {copied ? <Check className="h-3 w-3" strokeWidth={2.5} /> : <Copy className="h-3 w-3" />}
+          {copied ? "Copied" : "Copy pitch"}
+        </button>
+      </div>
+      <p className="mt-3 max-w-3xl text-[15px] font-medium leading-relaxed text-slate-200">{pitch.text}</p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {pitch.structure.map((s) => (
+          <span key={s.k} className="rounded-full border border-[#1c1c1c] bg-[#0f0f0f]/70 px-3 py-1 text-[11px] text-slate-400">
+            <span className="font-bold text-[#ffb800]">{s.k}:</span> {s.v}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── P1.5 GTM wedge — kids' lists as the Trojan horse ──────────────────────────
+
+function WedgeSection() {
+  const content = useContent();
+  const w = content.wedge;
+  if (!w) return null;
+  const icons = [Baby, Users, Repeat, Target];
+  return (
+    <div>
+      <SectionLabel>{w.eyebrow}</SectionLabel>
+      <SectionHeadline>{w.headline}</SectionHeadline>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        {w.steps.map((s, i) => {
+          const Icon = icons[i] ?? Target;
+          return (
+            <Reveal key={s.title} delay={i * 0.05}>
+              <Panel className="h-full">
+                <div className="mb-3 flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/10">
+                    <Icon className="h-4 w-4 text-[#ffb800]" strokeWidth={1.75} />
+                  </div>
+                  <p className="text-[14px] font-bold text-white">{s.title}</p>
+                </div>
+                <p className="text-[13px] leading-relaxed text-slate-400">{s.body}</p>
+              </Panel>
+            </Reveal>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── P1.6 Competitive landscape — capabilities, not invented numbers ────────────
+
+function LandscapeSection() {
+  const content = useContent();
+  const l = content.landscape;
+  if (!l) return null;
+  return (
+    <div>
+      <SectionLabel>{l.eyebrow}</SectionLabel>
+      <SectionHeadline>{l.headline}</SectionHeadline>
+      <p className="mt-2 text-[12px] text-slate-500">
+        Axes: <span className="text-slate-300">{l.axes.x}</span> × <span className="text-slate-300">{l.axes.y}</span>
+        {" "}— positions are capability readings, not market-share claims.
+      </p>
+      <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {l.alternatives.map((a, i) => (
+          <Reveal key={a.name} delay={i * 0.04}>
+            <Panel className="h-full">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-[13px] font-bold text-white">{a.name}</p>
+                <span className="shrink-0 rounded-full bg-[#1c1c1c] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">{a.coord}</span>
+              </div>
+              <p className="text-[12px] leading-relaxed text-slate-400">{a.body}</p>
+            </Panel>
+          </Reveal>
+        ))}
+        <Reveal delay={0.2}>
+          <div className="flex h-full flex-col justify-center rounded-2xl border border-[#ffb800]/25 bg-[#ffb800]/[0.07] p-4">
+            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-[#ffb800]">Why we win</p>
+            <p className="text-[12px] leading-relaxed text-slate-300">{l.whyWeWin}</p>
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  );
+}
+
+// ─── P1.7 Behaviour change — current habit → new habit ─────────────────────────
+
+function BehaviourSection() {
+  const content = useContent();
+  const b = content.behaviour;
+  if (!b) return null;
+  return (
+    <div>
+      <SectionLabel>{b.eyebrow}</SectionLabel>
+      <SectionHeadline>{b.headline}</SectionHeadline>
+      <div className="mt-5 space-y-3">
+        {b.rows.map((r, i) => (
+          <Reveal key={r.current} delay={i * 0.04}>
+            <Panel>
+              <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr_1.4fr] md:items-center">
+                <p className="text-[13px] font-semibold text-slate-400">{r.current}</p>
+                <ArrowRight className="hidden h-4 w-4 shrink-0 text-[#ffb800] md:block" />
+                <p className="text-[13px] font-bold text-white">{r.new}</p>
+                <div>
+                  <p className="text-[12px] leading-snug text-slate-400"><span className="font-semibold text-[#ffb800]">Lever:</span> {r.lever}</p>
+                  <p className="mt-1 text-[12px] leading-snug text-slate-500"><span className="font-semibold text-slate-400">Why it sticks:</span> {r.sticks}</p>
+                </div>
+              </div>
+            </Panel>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── P1.4 Data clean rooms — the honest path ────────────────────────────────────
+
+function CleanRoomPanel() {
+  const content = useContent();
+  const c = content.edge.cleanRoom;
+  if (!c) return null;
+  return (
+    <Reveal>
+      <Panel>
+        <div className="mb-3 flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ffb800]/10">
+            <Database className="h-4 w-4 text-[#ffb800]" strokeWidth={1.75} />
+          </div>
+          <p className="text-[15px] font-bold text-white">{c.title}</p>
+        </div>
+        <p className="text-[13px] leading-relaxed text-slate-400">{c.body}</p>
+        <div className="mt-4 flex flex-col gap-2 md:flex-row md:items-stretch md:gap-3">
+          {c.path.map((step, i) => (
+            <div key={step} className="flex flex-1 items-center gap-2">
+              <div className="flex-1 rounded-xl border border-[#1c1c1c] bg-[#0f0f0f]/50 p-3">
+                <p className="text-[11px] leading-snug text-slate-300">{step}</p>
+              </div>
+              {i < c.path.length - 1 && <ChevronRight className="hidden h-4 w-4 shrink-0 text-[#ffb800]/60 md:block" />}
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-[11px] italic text-slate-500">{c.note}</p>
+      </Panel>
+    </Reveal>
+  );
+}
+
 function OpportunityTab() {
   const content = useContent();
   const { opportunity } = content;
@@ -262,6 +433,9 @@ function MechanismTab() {
           );
         })}
       </div>
+      {/* P1.5 — the Trojan-horse wedge story, leading into the flywheel */}
+      <WedgeSection />
+
       <div>
         <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">The loop, visualised</p>
         <FlywheelDiagram />
@@ -411,7 +585,7 @@ function ValueTab() {
 
       {/* Revenue models */}
       <div>
-        <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Phase 1 revenue — three pillars</p>
+        <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Revenue — how it phases</p>
         <div className="grid gap-4 md:grid-cols-3">
           {valueEngine.revenueModels.map((m, i) => {
             const Icon = [Tag, Database, Sparkles][i] ?? Tag;
@@ -496,6 +670,15 @@ function EdgeTab() {
         </Reveal>
       </div>
       <UnitEconomicsTable />
+
+      {/* P1.4 — clean-room path (honest roadmap) */}
+      <CleanRoomPanel />
+
+      {/* P1.6 — competitive landscape */}
+      <LandscapeSection />
+
+      {/* P1.7 — behaviour-change thesis */}
+      <BehaviourSection />
     </div>
   );
 }
@@ -669,7 +852,8 @@ export function InvestorWarRoom({ embedded = false, content }: { embedded?: bool
             <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#ffb800]/70">{content.hero.eyebrow}</p>
             <h1 className="mt-2 max-w-3xl text-[26px] font-bold leading-tight tracking-tight text-white md:text-[38px]">{content.hero.headline}</h1>
             <p className="mt-2 max-w-2xl text-[14px] text-slate-400">{content.hero.subhead}</p>
-            <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3">
+            <div className="mt-6"><PitchBlock /></div>
+            <div className="flex flex-wrap gap-x-7 gap-y-3">
               {content.traction.items.map((item) => (
                 <div key={item.label} className="flex items-baseline gap-2">
                   <span className="text-[22px] font-bold tabular-nums text-white md:text-[26px]">{item.figure}</span>
