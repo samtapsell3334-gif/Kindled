@@ -21,7 +21,7 @@
     "items": [
       { "figure": "£3.2B", "label": "UK unwanted-gift spend, every year", "source": "Halifax/OnePoll 2023" },
       { "figure": "10M+", "label": "UK Open Banking users — rails are mature", "source": "Open Banking Ltd, 2023" },
-      { "figure": "6x", "label": "people pulled in per Fire (target K-loop)", "source": "Internal model" },
+      { "figure": "6x", "label": "people pulled in per pot (target K-loop)", "source": "Internal model" },
       { "figure": "0.5%", "label": "platform take on contributions — card-light", "source": "Kindled" }
     ]
   },
@@ -50,7 +50,7 @@
         "id": "viral",
         "title": "The 1-in-6 Viral Loop",
         "metric": "K > 1 target",
-        "body": "Every Fire is a distribution event. One host invites ~6 contributors; roughly one in six goes on to start their own Fire. Growth is built into the product, not bought with ad spend — so the curve compounds instead of decaying."
+        "body": "Every pot is a distribution event. One host invites ~6 contributors; roughly one in six goes on to start their own pot. Growth is built into the product, not bought with ad spend — so the curve compounds instead of decaying."
       },
       {
         "id": "intent",
@@ -68,7 +68,7 @@
   },
 
   "jointFires": {
-    "label": "Joint Fires · Milestone Engine",
+    "label": "joint pots · Milestone Engine",
     "title": "From Clutter to Life-Milestones",
     "hook": "Stack your birthdays. Combine your Christmases. Accelerate your Expedition.",
     "body": "Two people link accounts and every occasion stacks toward a categorised Major Goal. This moves users from buying clutter to funding life-milestones — and moves Kindled from a one-off utility to a multi-year relationship.",
@@ -78,11 +78,11 @@
       { "year": "Year 2", "value": "£2,079", "pct": 63 },
       { "year": "Year 3", "value": "£3,277", "pct": 100 }
     ],
-    "caption": "Modelled: two partners, three occasions a year, category-weighted momentum. A solo pot never reaches the high-ticket goal — a Joint Fire does.",
+    "caption": "Modelled: two partners, three occasions a year, category-weighted momentum. A solo pot never reaches the high-ticket goal — a joint pot does.",
     "pillars": [
       { "title": "The 3-Year Compound Effect", "body": "Pooling birthdays and Christmases turns scattered, low-value spend into a funded milestone. The same households that would have bought clutter now save toward a holiday, a kitchen, a child's future — and convert on high-ticket items they'd never reach alone." },
       { "title": "3-Year Predictive Intent", "body": "Categorised milestones give us multi-year forward intent. We don't just know a couple wants to spend — we know whether they're Foundation builders (Home & DIY) or Expedition seekers (Travel & Adventure), and roughly when they'll book. That forward window is worth a premium in retail data licensing." },
-      { "title": "Multi-Year Lock-In", "body": "A shared, years-long goal makes leaving costly and staying rewarding. Joint Fires shift Kindled from a one-off gifting utility to a long-term relational tool — the retention engine behind durable lifetime value." }
+      { "title": "Multi-Year Lock-In", "body": "A shared, years-long goal makes leaving costly and staying rewarding. joint pots shift Kindled from a one-off gifting utility to a long-term relational tool — the retention engine behind durable lifetime value." }
     ],
     "categories": [
       { "label": "Expedition",  "segment": "Travel & adventure",  "horizon": "1–2 yr" },
@@ -97,27 +97,27 @@
     "subheadline": "We make money while actively rewarding the user. That alignment is the moat.",
     "fairness": {
       "title": "Trust on Gifts, Lock-In on Rewards",
-      "body": "Cashing a Fire's gift balance out to a bank is always free — no exit fee, no trap. That builds the one thing a money product cannot fake: trust. Earned cashback is treated differently, by design.",
-      "lockedLoop": "Gift money is freely withdrawable; earned cashback is not. The user's 3% lands as Spark Balance credited only to their own Fires — non-withdrawable, redeemable solely against partner gift cards. To spend it, a contributor has to become a host. So the reward itself acquires the next customer, and every redemption loops back into the catalogue as fresh GMV.",
+      "body": "Cashing a pot's gift balance out to a bank is always free — no exit fee, no trap. That builds the one thing a money product cannot fake: trust. Earned cashback is treated differently, by design.",
+      "lockedLoop": "Gift money is freely withdrawable; earned cashback is not. The user's 3% lands as credit credited only to their own pots — non-withdrawable, redeemable solely against partner gift cards. To spend it, a contributor has to become a host. So the reward itself acquires the next customer, and every redemption loops back into the catalogue as fresh GMV.",
       "points": [
         "Gift balance → withdraw to bank: 100%, zero fee, builds trust.",
-        "Earned cashback → Spark Balance: own Fires only, never cashable.",
-        "To spend cashback you start your own board — acquisition, baked in.",
-        "Spark Balance redeems into gift cards, recirculates, and compounds for both sides."
+        "Earned cashback → credit: own pots only, never cashable.",
+        "To spend cashback you start your own pot — acquisition, baked in.",
+        "credit redeems into gift cards, recirculates, and compounds for both sides."
       ]
     },
     "cashbackMath": {
       "title": "The Cashback Math",
-      "intro": "A retailer pays an affiliate commission when a Fire converts into a real purchase. We split it so the user is rewarded and the platform profits — but the user's share is credited as ringfenced Spark Balance, not withdrawable cash.",
+      "intro": "A retailer pays an affiliate commission when a pot converts into a real purchase. We split it so the user is rewarded and the platform profits — but the user's share is credited as ringfenced credit, not withdrawable cash.",
       "exampleLabel": "On a £100 partner purchase",
       "commission": { "label": "Retailer commission", "value": "5%", "amount": "£5.00" },
       "split": [
-        { "label": "User Spark Balance — own Fires only", "value": "3%", "amount": "£3.00", "tone": "user" },
+        { "label": "User credit — own pots only", "value": "3%", "amount": "£3.00", "tone": "user" },
         { "label": "Platform profit", "value": "2%", "amount": "£2.00", "tone": "platform" }
       ],
       "compoundLoop": {
         "title": "Ringfenced & Compounding",
-        "body": "The 3% is never withdrawable. It lands as Spark Balance inside the user's own Fires — so to spend it, a contributor has to start their own board. That's customer acquisition baked into the reward. And because Spark Balance only redeems back into Fires that convert to partner gift cards, every pound recirculates: it earns commission again, credits more Spark Balance, and compounds — GMV that can't leak out of the ecosystem."
+        "body": "The 3% is never withdrawable. It lands as credit inside the user's own pots — so to spend it, a contributor has to start their own pot. That's customer acquisition baked into the reward. And because credit only redeems back into pots that convert to partner gift cards, every pound recirculates: it earns commission again, credits more credit, and compounds — GMV that can't leak out of the ecosystem."
       },
       "takeaway": "The user feels rewarded, the platform profits on the same transaction, and the reward itself recruits the next host and recirculates as GMV — value that compounds instead of cashing out."
     },
@@ -126,7 +126,7 @@
         "id": "affiliate",
         "title": "Affiliate Commissions",
         "tag": "Live in Phase 1",
-        "body": "Every funded Fire that converts into a real purchase earns a retailer commission. The catalogue is curated; sponsored placement is auctioned. Revenue scales directly with happy outcomes."
+        "body": "Every funded pot that converts into a real purchase earns a retailer commission. The catalogue is curated; sponsored placement is auctioned. Revenue scales directly with happy outcomes."
       },
       {
         "id": "intentData",
@@ -148,7 +148,7 @@
     "subheadline": "We don't just hold the data — we hand its value back to the user, and that keeps them coming.",
     "smartShopper": {
       "title": "The 'Smart Shopper' Hook",
-      "body": "We track the live price of every item on a wishlist. When a Ninja air fryer that's been sitting in a Fire drops £20 at a partner retailer, we ping the givers: 'The thing they want just got cheaper — fund it now.'",
+      "body": "We track the live price of every item on a wishlist. When a Ninja air fryer that's been sitting in a pot drops £20 at a partner retailer, we ping the givers: 'The thing they want just got cheaper — fund it now.'",
       "effect": "It converts contributions at the exact moment of best value, and positions Kindled as the family's advocate, not just a checkout."
     },
     "dataBack": {
@@ -158,13 +158,13 @@
     },
     "unitEconomics": {
       "title": "Unit Economics — Why the Rails Matter",
-      "subtitle": "Modelled per £100 contributed to a Fire",
+      "subtitle": "Modelled per £100 contributed to a pot",
       "columns": ["Card processing (Stripe)", "Optimised (Open Banking)"],
       "rows": [
         { "label": "Processing cost", "card": "~£1.70", "openBanking": "~£0.05", "highlight": true },
         { "label": "Settlement time", "card": "2–7 days", "openBanking": "Seconds" },
         { "label": "Chargeback / fraud risk", "card": "Present", "openBanking": "None (push payment)" },
-        { "label": "Net reaching the Fire", "card": "£98.30", "openBanking": "£99.95", "highlight": true }
+        { "label": "Net reaching the pot", "card": "£98.30", "openBanking": "£99.95", "highlight": true }
       ],
       "takeaway": "~97% lower processing cost and instant settlement. At scale, the rail choice alone is the difference between thin and structural margin."
     }
@@ -174,22 +174,22 @@
     "headline": "Why Kindled Compounds",
     "subheadline": "Every reveal is a free advert. Every giver is a future host. The loop turns itself.",
     "loop": [
-      { "id": "light",   "title": "A host lights a Fire", "body": "Someone sets up a pot for a birthday, baby shower or Christmas — in 90 seconds, for free.", "icon": "flame",    "color": "#f59e0b" },
+      { "id": "light",   "title": "A host lights a pot", "body": "Someone sets up a pot for a birthday, baby shower or Christmas — in 90 seconds, for free.", "icon": "flame",    "color": "#f59e0b" },
       { "id": "rally",   "title": "They rally ~6 people",  "body": "One share in the family chat pulls an average of six contributors onto the platform.",        "icon": "share",    "color": "#3b82f6" },
       { "id": "give",    "title": "Givers chip in",        "body": "Each pays via Open Banking in seconds — and quietly declares exactly what they'd love too.",   "icon": "gift",     "color": "#10b981" },
       { "id": "reveal",  "title": "The reveal goes off",   "body": "A cinematic, shareable moment. People screenshot it. It reaches new faces at zero ad spend.",  "icon": "sparkles", "color": "#8b5cf6" },
-      { "id": "convert", "title": "Givers become hosts",   "body": "Around 1 in 6 starts their own Fire — and the loop begins again, bigger each turn.",          "icon": "repeat",   "color": "#f43f5e" }
+      { "id": "convert", "title": "Givers become hosts",   "body": "Around 1 in 6 starts their own pot — and the loop begins again, bigger each turn.",          "icon": "repeat",   "color": "#f43f5e" }
     ],
-    "multiplier": { "value": "6×", "label": "people per Fire — every one a future host" },
+    "multiplier": { "value": "6×", "label": "people per pot — every one a future host" },
     "compounding": {
-      "label": "What one Fire becomes",
+      "label": "What one pot becomes",
       "steps": [
-        { "tier": "1 Fire",          "people": "6 reached" },
-        { "tier": "1-in-6 converts", "people": "6 new Fires" },
+        { "tier": "1 pot",          "people": "6 reached" },
+        { "tier": "1-in-6 converts", "people": "6 new pots" },
         { "tier": "Those reach",     "people": "36 reached" },
         { "tier": "And again",       "people": "216 reached" }
       ],
-      "caption": "Three turns of the loop from a single Fire. No paid acquisition — the product is the marketing."
+      "caption": "Three turns of the loop from a single pot. No paid acquisition — the product is the marketing."
     }
   },
 
@@ -225,7 +225,7 @@
       },
       {
         "title": "Iterative by Default",
-        "body": "Ship small, measure the loop, double down on what compounds and kill what doesn't. The roadmap is a set of bets on K-factor and revenue-per-Fire, not a feature checklist."
+        "body": "Ship small, measure the loop, double down on what compounds and kill what doesn't. The roadmap is a set of bets on K-factor and revenue-per-pot, not a feature checklist."
       },
       {
         "title": "Engineer the Social Moment",
@@ -248,7 +248,7 @@
             "title": "Core Product + Viral Instrumentation",
             "quarter": "Q3 2026",
             "why": "Nothing compounds until the loop works end-to-end and we can measure the 1-in-6 conversion in practice.",
-            "deliverables": ["Fire creation + Open Banking contributions", "Shareable-link infrastructure", "Contributor-to-host funnel tracking", "Cohort + K-factor dashboard"]
+            "deliverables": ["pot creation + Open Banking contributions", "Shareable-link infrastructure", "Contributor-to-host funnel tracking", "Cohort + K-factor dashboard"]
           },
           {
             "title": "Intent Data + Fee Engine",
@@ -280,7 +280,7 @@
             "title": "Reveal-Window Ads + Enterprise API",
             "quarter": "Q4 2027",
             "why": "Monetise the verified-intent window before the reveal, and open a zero-CAC enterprise channel.",
-            "deliverables": ["Reveal-window reverse-auction", "White-label Fires for HR teams", "Brand placement at the reveal", "First 5 enterprise contracts"]
+            "deliverables": ["Reveal-window reverse-auction", "White-label pots for HR teams", "Brand placement at the reveal", "First 5 enterprise contracts"]
           },
           {
             "title": "Financial Services Layer",
