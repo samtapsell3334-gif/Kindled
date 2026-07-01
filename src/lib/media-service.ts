@@ -4,13 +4,19 @@
  * A giver can attach a short video or voice "Memory" to their contribution; it is
  * securely tied to the contribution_id and surfaced in the recipient's Reveal.
  *
- * Storage is abstracted behind `uploadMemory` so the capture UI never knows whether
- * the blob is going to S3, Cloudinary, or (in the demo) a local object URL. In
- * production the flow is: (1) POST /api/media/sign → presigned PUT URL scoped to
- * `kindle/{contributionId}/{id}`; (2) PUT the blob directly to the bucket; (3) the
- * returned CDN URL is persisted on the Contribution row. No blob ever transits our
- * server, and the object key embeds the contribution_id so access is authorisable.
+ * Storage is abstracted behind `uploadMemory` so the capture UI never knows where the
+ * blob lands. Two modes:
+ *
+ *  • Real (Vercel Blob) — when NEXT_PUBLIC_BLOB_ENABLED="1". The browser calls
+ *    `upload(...)`, which brokers a scoped token via /api/media/upload and streams the
+ *    blob browser → Blob store directly (nothing transits our server). The object
+ *    pathname is `kindle/{contributionId}/{id}` so the Memory stays linked + authorisable.
+ *  • Demo — otherwise, or if a real upload fails: a local object URL (device-only,
+ *    lost on refresh) so the capture flow always works without any storage configured.
  */
+
+/** Real durable storage is on once a Vercel Blob store exists and this flag is set. */
+const BLOB_ENABLED = process.env.NEXT_PUBLIC_BLOB_ENABLED === "1";
 
 export type MediaKind = "video" | "voice";
 
@@ -45,39 +51,53 @@ export function mediaConstraints(kind: MediaKind): MediaStreamConstraints {
 
 /**
  * Persist a recorded blob as a Memory tied to a contribution and return its ref.
- * Demo: wraps the blob in an object URL. Production: swap the body for the presigned
- * S3/Cloudinary PUT described above — the signature and return type stay identical.
+ * Routes to Vercel Blob when enabled, else a local object URL (demo). The return
+ * shape is identical either way, so the capture UI and Reveal never change.
  */
 export async function uploadMemory(
   blob: Blob,
   meta: { contributionId: string; kind: MediaKind; durationSec: number },
 ): Promise<KindleMemory> {
   const id = `mem_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-
-  // ── production storage (uncomment once the media API + bucket exist) ──
-  // const key = `kindle/${meta.contributionId}/${id}`;
-  // const { uploadUrl, cdnUrl } = await fetch("/api/media/sign", {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ key, contentType: blob.type }),
-  // }).then((r) => r.json());
-  // await fetch(uploadUrl, { method: "PUT", body: blob, headers: { "Content-Type": blob.type } });
-  // const url = cdnUrl;
-
-  // ── demo storage: local object URL (simulate upload latency) ──
-  await new Promise((resolve) => setTimeout(resolve, 350));
-  const url = URL.createObjectURL(blob);
+  const mimeType = blob.type || (meta.kind === "video" ? "video/webm" : "audio/webm");
+  const url = await storeBlob(blob, `kindle/${meta.contributionId}/${id}`, mimeType);
 
   return {
     id,
     contributionId: meta.contributionId,
     kind: meta.kind,
     url,
-    mimeType: blob.type || (meta.kind === "video" ? "video/webm" : "audio/webm"),
+    mimeType,
     durationSec: Math.round(meta.durationSec),
     sizeBytes: blob.size,
     createdAt: Date.now(),
   };
+}
+
+/**
+ * Store a blob and return its playable URL. Vercel Blob (direct browser upload) when
+ * configured; a local object URL otherwise, or if the real upload fails — so a giver's
+ * Memory is never lost to a storage hiccup mid-capture.
+ */
+async function storeBlob(blob: Blob, pathname: string, contentType: string): Promise<string> {
+  if (BLOB_ENABLED && typeof window !== "undefined") {
+    try {
+      const { upload } = await import("@vercel/blob/client");
+      const result = await upload(pathname, blob, {
+        access: "public",
+        handleUploadUrl: "/api/media/upload",
+        contentType,
+      });
+      return result.url;
+    } catch (err) {
+      // Fall through to the local preview URL rather than breaking the capture flow.
+      console.warn("[media] Blob upload failed — using local preview URL", err);
+    }
+  }
+
+  // Demo storage: local object URL (simulate a little upload latency).
+  await new Promise((resolve) => setTimeout(resolve, 350));
+  return URL.createObjectURL(blob);
 }
 
 /** Max recording length — keeps Memories punchy and uploads small. */

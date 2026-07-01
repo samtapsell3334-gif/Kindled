@@ -78,7 +78,7 @@ See `src/lib/pot-transitions.ts` — `resolveTransition()` is the single source 
 
 ## Security rules
 
-- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `DATABASE_URL`, `RESEND_API_KEY`, `CREATOR_SIGNUP_EMAIL`, `KLING_API_KEY`, `RUNWAY_API_KEY` are **server-side only** — never in client bundles or `NEXT_PUBLIC_` vars.
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `DATABASE_URL`, `RESEND_API_KEY`, `CREATOR_SIGNUP_EMAIL`, `KLING_API_KEY`, `RUNWAY_API_KEY`, `BLOB_READ_WRITE_TOKEN` are **server-side only** — never in client bundles or `NEXT_PUBLIC_` vars.
 - Verify `stripe-signature` on every incoming webhook before processing.
 - Run `db.pot.findUnique` ownership checks before any mutation — never trust client-supplied `creatorId`.
 - Privacy boundary on surprise pots: receivers see zero balance until `eventDate`.
@@ -123,6 +123,14 @@ CREATOR_SIGNUP_EMAIL="sam.tapsell@kindledgift.co.uk"
 KLING_API_KEY=""
 REVEAL_PROVIDER="kling"   # or "runway"
 RUNWAY_API_KEY=""
+
+# Media storage — Kindle Memories (Vercel Blob)
+BLOB_READ_WRITE_TOKEN=""          # server-side only; auto-injected on Vercel once a Blob store exists
+NEXT_PUBLIC_BLOB_ENABLED=""       # set to "1" to route Memory uploads to Blob (else local demo URL)
 ```
+
+Memory upload flow: browser `upload()` → `POST /api/media/upload` mints a scoped Blob
+token → blob streams browser → Blob store (never transits our server). Object pathname
+is `kindle/{contributionId}/{id}`. See `src/lib/media-service.ts` + `src/app/api/media/upload/route.ts`.
 
 <!-- deploy-trigger: 2026-06-28 -->
