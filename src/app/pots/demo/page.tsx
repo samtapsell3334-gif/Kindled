@@ -34,6 +34,7 @@ import { cn } from "@/lib/utils";
 import type { GiftingMode } from "@/types/pots";
 import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
+import { DemoWaitlistPill } from "@/components/DemoWaitlistPill";
 import { GeneratedReveal } from "@/components/GeneratedReveal";
 import { InvestorWarRoom } from "@/components/InvestorWarRoom";
 
@@ -4405,6 +4406,7 @@ export default function DemoPage() {
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showNewGift && <NewGiftSheet onAdd={handleAddNewGift} onClose={() => setShowNewGift(false)} />}
       <InteractiveExplainer isOpen={showExplainer} onClose={() => setShowExplainer(false)} />
+      <DemoWaitlistPill />
       <AnimatePresence>{showCreatorModal && <CreatorSignUpModal onClose={() => setShowCreatorModal(false)} />}</AnimatePresence>
       <AnimatePresence>{showReceiverSignUp && <ReceiverSignUpModal onClose={() => setShowReceiverSignUp(false)} />}</AnimatePresence>
       {pendingContribution && (

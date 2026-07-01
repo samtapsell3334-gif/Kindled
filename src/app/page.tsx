@@ -8,6 +8,7 @@ import {
   Sparkles, Shield, Share2, ArrowRight, Menu, X, Gift,
   Heart, RefreshCw, ChevronRight,
 } from "lucide-react";
+import { WaitlistForm } from "@/components/WaitlistForm";
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -248,10 +249,10 @@ function Nav() {
             <ChevronRight className="h-3.5 w-3.5" />
           </Link>
           <Link
-            href="/pots/demo"
+            href="/#waitlist"
             className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-[13px] font-bold text-stone-900 shadow-lg shadow-amber-500/25 transition-all hover:scale-105 hover:shadow-amber-500/50 active:scale-[0.97]"
           >
-            Start free
+            Reserve your spot
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
           <button
@@ -282,6 +283,13 @@ function Nav() {
                   {l}
                 </a>
               ))}
+              <Link
+                href="/#waitlist"
+                onClick={() => setOpen(false)}
+                className="mt-2 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-3 text-[15px] font-bold text-stone-900"
+              >
+                Reserve your spot <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           </motion.div>
         )}
@@ -392,18 +400,18 @@ function Hero() {
               className="mt-8 flex flex-wrap gap-3"
             >
               <Link
-                href="/pots/demo"
+                href="#waitlist"
                 className="flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-4 text-[15px] font-bold text-stone-900 shadow-2xl transition-all hover:scale-105 hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.45)" }}
               >
                 <Flame className="h-5 w-5" />
-                Start your first pot — it&apos;s free
+                Reserve your spot
               </Link>
               <Link
                 href="/pots/demo"
                 className="flex items-center gap-2 rounded-2xl border border-white/12 bg-white/[0.06] px-6 py-4 text-[15px] font-medium text-white/70 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
               >
-                See live demo
+                See a live pot
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </motion.div>
@@ -984,7 +992,7 @@ function Testimonials() {
 
 function FinalCTA() {
   return (
-    <section className="bg-white py-32 px-5">
+    <section id="waitlist" className="scroll-mt-24 bg-white py-32 px-5">
       <Reveal className="mx-auto max-w-2xl text-center">
         <div className="relative inline-block">
           {/* Glow */}
@@ -1002,33 +1010,28 @@ function FinalCTA() {
               </div>
             </div>
 
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-600">
+              Kindled is launching soon
+            </p>
             <h2
               style={{ fontFamily: "var(--font-display)" }}
               className="text-[36px] md:text-[48px] font-bold text-stone-900 leading-[1.1] mb-4"
             >
-              Ready to kindle something magical?
+              Reserve your spot
             </h2>
-            <p className="text-[16px] text-stone-500 leading-relaxed mb-8 max-w-[400px] mx-auto">
-              Join families already turning wishlists into meaningful moments. Set up your first pot in under 2 minutes.
+            <p className="text-[16px] text-stone-500 leading-relaxed mb-7 max-w-[400px] mx-auto">
+              Be one of our first families. Join the waitlist and we&apos;ll invite you in as soon as your spot opens up.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/pots/demo"
-                className="flex items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-7 py-4 text-[15px] font-bold text-stone-900 shadow-xl transition-all hover:scale-105 hover:-translate-y-0.5 active:scale-[0.97]"
-                style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.45)" }}
-              >
-                <Flame className="h-5 w-5" />
-                Create your pot today
-              </Link>
-              <Link
-                href="/pots/demo"
-                className="flex items-center justify-center gap-2 rounded-2xl border-2 border-stone-200 bg-white px-7 py-4 text-[15px] font-semibold text-stone-700 transition-all hover:border-stone-300 hover:bg-stone-50"
-              >
+            <WaitlistForm variant="light" />
+
+            <p className="mt-6 text-[13px] text-stone-500">
+              Just want a look first?{" "}
+              <Link href="/pots/demo" className="font-semibold text-stone-700 underline underline-offset-2 hover:text-stone-900">
                 See a live pot
-                <ArrowRight className="h-4 w-4" />
               </Link>
-            </div>
+              .
+            </p>
 
             <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
               {["Free forever", "No credit card", "Works on any device"].map((t) => (
