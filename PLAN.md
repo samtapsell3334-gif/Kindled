@@ -99,3 +99,33 @@ Tailwind v4, Framer Motion. Investor route: `/investor`, PIN validated server-si
 - Serverless persistence (above). — Founder DB unblocks fully.
 - Scope: WS-E/F/v5/v6 are large; this pass ships the working consumer loop + evidence
   spine first, honestly logged.
+
+---
+
+# Explainer Film System v6 — Plan (branch feat/explainer-v6)
+
+## Phase 0 dependency audit
+| Dependency | Status |
+|---|---|
+| v5 Ignition component | DONE — reused as the films' opening signature |
+| Brand tokens | DONE (globals.css / font vars) |
+| v3 P1 investor sections (figures to match) | DONE — pitch/£3.2bn/£250k/phases |
+| Analytics events | DONE — film_played/film_completed via consent-gated track() |
+
+## Pipeline decision (recorded per brief)
+**Remotion rejected for this environment**: it is a heavy dependency whose MP4
+renders require headless-Chrome render infrastructure that cannot be run or
+verified here, and generated binaries would violate the repo's no-binary-assets
+guardrail. **Chosen fallback (explicitly permitted by the brief): code-played
+films** — a data-driven FilmPlayer component that plays the scripted, timed
+scenes live in the browser (captions-first by design, brand-system visuals,
+v5 Ignition opener). The films are watchable/embeddable immediately; producing
+MP4/9:16 exports for social is a mechanical step once the founder wants files
+(Remotion or screen-capture from the player — scripts are written to exact
+timings so nothing is re-authored). TODO-FOUNDER holds that step.
+
+## Security
+The investor film's scenes live INSIDE investor-content.json, which is only
+served by /api/investor after PIN validation — the investor film cannot appear
+in the public bundle, sitemap, or any public route. The customer film is public
+data by design.
