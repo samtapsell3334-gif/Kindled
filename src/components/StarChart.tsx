@@ -53,6 +53,8 @@ export function StarChart({
   const [popping, setPopping] = useState<Set<number>>(new Set());
   const [celebrate, setCelebrate] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  const [newTask, setNewTask] = useState("");
+  const [newStars, setNewStars] = useState(1);
   const popTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { bloom, trigger } = useBloom();
 
@@ -85,6 +87,15 @@ export function StarChart({
   const changeGoal = (d: number) => setChart((p) => setGoalValue(p, Math.max(30, p.goalValue + d)));
   const toggleBehavior = (id: string) => setBehaviors((bs) => bs.map((b) => (b.id === id ? { ...b, enabled: !b.enabled } : b)));
   const adjustStars = (id: string, d: number) => setBehaviors((bs) => bs.map((b) => (b.id === id ? { ...b, starsAwarded: Math.max(1, Math.min(5, b.starsAwarded + d)) } : b)));
+  const createBehavior = () => {
+    const name = newTask.trim();
+    if (!name) return;
+    // 1/30th constraint: a single task can never award more than the 30-star chart holds.
+    const stars = Math.max(1, Math.min(STAR_COUNT, newStars));
+    setBehaviors((bs) => [...bs, { id: `custom_${Date.now()}`, description: name, starsAwarded: stars, isRecurring: true, enabled: true }]);
+    setNewTask("");
+    setNewStars(1);
+  };
 
   return (
     <div className="vh vh-paper min-h-screen pb-28">
@@ -217,6 +228,29 @@ export function StarChart({
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* Create your own — bespoke input, 1/30th constrained */}
+                <div className="mt-3 rounded-2xl bg-[#fffdf7] p-4 vh-lift">
+                  <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.15em] text-[#0f172a]/40">Create your own</p>
+                  <div className="flex items-center gap-2 rounded-xl bg-[#fdf6e3] px-3 py-2.5 focus-within:ring-2 focus-within:ring-[#ff6b6b]/40">
+                    <input
+                      value={newTask}
+                      onChange={(e) => setNewTask(e.target.value.slice(0, 40))}
+                      onKeyDown={(e) => { if (e.key === "Enter") createBehavior(); }}
+                      placeholder="e.g. Walked the dog"
+                      className="min-w-0 flex-1 bg-transparent text-[14px] font-medium text-[#0f172a] placeholder:text-[#0f172a]/35 focus:outline-none"
+                    />
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button onClick={() => setNewStars((s) => Math.max(1, s - 1))} className="flex h-6 w-6 items-center justify-center rounded-md bg-[#fffdf7] text-[#0f172a]/50"><Minus className="h-3 w-3" /></button>
+                      <span className="flex w-8 items-center justify-center gap-0.5 text-[13px] font-bold text-[#f59e0b]">{newStars}<Star className="h-3 w-3 fill-[#f59e0b]" /></span>
+                      <button onClick={() => setNewStars((s) => Math.min(5, s + 1))} className="flex h-6 w-6 items-center justify-center rounded-md bg-[#fffdf7] text-[#0f172a]/50"><Plus className="h-3 w-3" /></button>
+                    </div>
+                  </div>
+                  <motion.button whileTap={{ scale: 0.96 }} transition={VH_BOUNCE} onClick={createBehavior} disabled={!newTask.trim()}
+                    className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-full bg-[#0f172a] py-3 text-[13px] font-bold text-[#fdf6e3] disabled:opacity-40">
+                    <Plus className="h-4 w-4 text-[#f59e0b]" strokeWidth={3} /> Add task ({GBP(newStars * starValue)})
+                  </motion.button>
                 </div>
 
                 {/* Audit log */}
