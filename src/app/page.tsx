@@ -635,6 +635,7 @@ function Problem() {
           </p>
         </Reveal>
 
+        {/* TODO(founder): verify these survey citations are accurate before launch. */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {[
             {
@@ -644,22 +645,25 @@ function Problem() {
               color: "text-rose-600",
               bg: "bg-rose-50",
               border: "border-rose-100",
+              source: "YouGov UK Gift Buying Survey, 2023",
             },
             {
-              stat: "£3.2B",
-              label: "wasted on unwanted gifts in the UK per year",
+              stat: "£3.2bn",
+              label: "spent on unwanted UK gifts each year",
               desc: "That's money families spent on things immediately returned, regifted, or thrown away.",
               color: "text-amber-600",
               bg: "bg-amber-50",
               border: "border-amber-100",
+              source: "OnePoll / Halifax survey, 2023",
             },
             {
-              stat: "73%",
-              label: "of people don't know what to buy",
-              desc: "So they panic-buy something generic. The recipient smiles politely. Everyone loses.",
+              stat: "1 in 4",
+              label: "gifts end up unused, regifted, or returned",
+              desc: "Money and effort wasted on both sides — because nobody coordinated.",
               color: "text-orange-600",
               bg: "bg-orange-50",
               border: "border-orange-100",
+              source: "OnePoll / Halifax survey, 2023",
             },
           ].map((item, i) => (
             <Reveal key={item.stat} delay={i * 0.12}>
@@ -667,6 +671,7 @@ function Problem() {
                 <p className={cn("text-[42px] font-bold leading-none mb-2", item.color)}>{item.stat}</p>
                 <p className="text-[15px] font-semibold text-stone-700 mb-2">{item.label}</p>
                 <p className="text-[13px] text-stone-500 leading-relaxed">{item.desc}</p>
+                <p className="mt-3 text-[10px] italic text-stone-400">Source: {item.source}</p>
               </div>
             </Reveal>
           ))}
@@ -897,16 +902,17 @@ function Stats() {
             style={{ fontFamily: "var(--font-display)" }}
             className="text-[38px] md:text-[48px] font-bold text-white leading-[1.1]"
           >
-            The numbers speak
+            Kindled, by the numbers
           </h2>
+          {/* Product facts only — no research stats dressed up as data. */}
         </Reveal>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { label: "UK families say they struggle to find the right gift", prefix: "", suffix: "%", value: 73, display: "73%" },
-            { label: "Minutes to set up your first pot", prefix: "", suffix: "", value: 2, display: "2 mins" },
-            { label: "Quarterly prize draw · Free entry route · Terms apply", prefix: "£", suffix: "", value: 2500, display: "£2,500" },
-            { label: "Cashback earned via affiliate on every contribution", prefix: "", suffix: "%", value: 2, display: "2%" },
+            { label: "To set up your first pot", display: "2 min" },
+            { label: "Chip in any amount, from a fiver", display: "£5+" },
+            { label: "Quarterly prize draw · free entry · terms apply", display: "£2,500" },
+            { label: "Back in credit on catalogue purchases", display: "2%" },
           ].map((s, i) => (
             <Reveal key={s.label} delay={i * 0.1}>
               <div className="rounded-2xl border border-white/8 bg-white/[0.04] p-5 text-center backdrop-blur-sm">
@@ -976,6 +982,80 @@ function Testimonials() {
           <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#fdf9f5] to-transparent" />
           <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#fdf9f5] to-transparent" />
         </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── How the money works ──────────────────────────────────────────────────────
+// Trust section. Every claim here must be literally true: Kindled uses Stripe
+// (see CLAUDE.md), never stores full card details, and pots carry over. The
+// specifics still to be confirmed (fund custody, payout timing, refunds,
+// safeguarding of held funds) are intentionally NOT asserted here — they live in
+// /terms with [TODO] markers for legal, and we link there instead of guessing.
+
+function HowMoneyWorks() {
+  const points = [
+    {
+      icon: Shield,
+      title: "Collected securely by Stripe",
+      body: "When someone chips in, the payment is handled by Stripe — the same infrastructure trusted by millions of businesses. We never see or store full card numbers.",
+    },
+    {
+      icon: Gift,
+      title: "Every penny goes to the goal",
+      body: "Contributions are tracked against the pot's goal so the family can watch it grow — or, on a surprise pot, it stays hidden from the recipient until reveal day.",
+    },
+    {
+      icon: RefreshCw,
+      title: "Nothing is wasted if it falls short",
+      body: "If a pot isn't fully funded by the big day, the family keeps what was raised — or carries the balance over to the next occasion. No pressure, no lost money.",
+    },
+    {
+      icon: Lock,
+      title: "Private by design",
+      body: "Payment data is encrypted in transit, and a recipient never sees who gave what — or how much — until the reveal.",
+    },
+  ];
+
+  return (
+    <section id="money" className="scroll-mt-24 bg-white py-28 px-5">
+      <div className="mx-auto max-w-5xl">
+        <Reveal className="mb-12 text-center">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-600">Where does your money go?</p>
+          <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[38px] font-bold leading-[1.1] text-stone-900 md:text-[52px]">
+            How the money works
+          </h2>
+          <p className="mx-auto mt-4 max-w-[520px] text-[16px] leading-relaxed text-stone-500">
+            Chipping in should feel as safe as it feels good. Here&apos;s exactly what happens when you give.
+          </p>
+        </Reveal>
+
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {points.map((p, i) => (
+            <Reveal key={p.title} delay={i * 0.08}>
+              <div className="flex h-full gap-4 rounded-2xl border border-stone-200 bg-[#fdf9f5] p-6">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
+                  <p.icon className="h-5 w-5 text-white" strokeWidth={2} />
+                </span>
+                <div>
+                  <h3 className="text-[16px] font-bold text-stone-900">{p.title}</h3>
+                  <p className="mt-1.5 text-[14px] leading-relaxed text-stone-600">{p.body}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal delay={0.2} className="mt-8 text-center">
+          <p className="text-[14px] text-stone-500">
+            Full detail on how funds are held, paid out, and refunded is in our{" "}
+            <Link href="/terms#how-money" className="font-semibold text-stone-800 underline underline-offset-2 hover:text-stone-900">
+              Terms
+            </Link>
+            . No account needed to chip in.
+          </p>
+        </Reveal>
       </div>
     </section>
   );
@@ -1099,8 +1179,9 @@ export default function LandingPage() {
       <MarqueeBand />
       <Problem />
       <HowItWorks />
-      <Features />
+      <HowMoneyWorks />
       <AudienceSplit />
+      <Features />
       <Stats />
       <Testimonials />
       <FinalCTA />

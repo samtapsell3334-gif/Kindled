@@ -2046,9 +2046,12 @@ function WouldYouRather() {
 // WHY KINDLED — STATS COLLATERAL
 // ═══════════════════════════════════════════════════════════════════════════════
 
+// TODO(founder): verify these survey citations are accurate and current before launch,
+// or replace with figures we can stand behind. `mechanic: true` marks a product feature
+// (not a cited research stat), so it renders as "How Kindled works", not "Source:".
 const WHY_STATS: {
   stat: string; label: string; body: string; Icon: LucideIcon; iconBg: string; iconColor: string;
-  color: string; accent: string; border: string; source: string;
+  color: string; accent: string; border: string; source: string; mechanic?: boolean;
 }[] = [
   {
     stat: "£3.2bn",
@@ -2079,11 +2082,11 @@ const WHY_STATS: {
     label: "gifts are duplicates or returned",
     body: "Without coordination, duplicates are inevitable. Real-time claim locking means no two people can buy the same thing.",
     Icon: RefreshCw,
-    iconBg: "bg-violet-100",
-    iconColor: "text-violet-500",
-    color: "from-violet-50 to-purple-50",
-    accent: "text-violet-500",
-    border: "border-violet-100",
+    iconBg: "bg-rose-100",
+    iconColor: "text-[#ff6b6b]",
+    color: "from-rose-50 to-orange-50",
+    accent: "text-[#ff6b6b]",
+    border: "border-rose-100",
     source: "YouGov UK Gift Buying Survey, 2023",
   },
   {
@@ -2091,12 +2094,13 @@ const WHY_STATS: {
     label: "duplicates when you guide your buyers",
     body: "Real-time claim locking means no two people can buy the same thing. Everyone contributes with confidence.",
     Icon: ShieldCheck,
-    iconBg: "bg-sky-100",
-    iconColor: "text-sky-500",
-    color: "from-sky-50 to-blue-50",
-    accent: "text-sky-500",
-    border: "border-sky-100",
-    source: "Kindled platform mechanic",
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-600",
+    color: "from-amber-50 to-orange-50",
+    accent: "text-amber-600",
+    border: "border-amber-100",
+    source: "How Kindled works",
+    mechanic: true,
   },
 ];
 
@@ -2132,7 +2136,7 @@ function WhyKindled() {
             </p>
             <p className="text-[11px] font-semibold text-stone-700 mt-0.5 leading-tight">{s.label}</p>
             <p className="text-[10px] text-stone-500 mt-1.5 leading-relaxed">{s.body}</p>
-            <p className="text-[8.5px] text-stone-400/70 mt-2 leading-snug italic">Source: {s.source}</p>
+            <p className="text-[8.5px] text-stone-400/70 mt-2 leading-snug italic">{s.mechanic ? s.source : `Source: ${s.source}`}</p>
           </motion.div>
         ))}
       </div>
@@ -3987,9 +3991,23 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
 
 // ─── Count-up stat for the proof block ───────────────────────────────────────
 function CountUpStat({ target, suffix = "", duration = 1400 }: { target: number; suffix?: string; duration?: number }) {
-  const [val, setVal] = useState(0);
+  // Default to the real figure so it's always correct — even with no JS, no scroll,
+  // or reduced-motion. The count-up is a progressive enhancement for stats that
+  // scroll into view from below (never a flash of "0").
+  const [val, setVal] = useState(target);
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setVal(target);
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    const alreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
+    if (alreadyVisible) return; // keep the real figure, no reset-to-zero flash
+    setVal(0);
     const obs = new IntersectionObserver(([entry]) => {
       if (!entry?.isIntersecting) return;
       obs.disconnect();
@@ -3999,10 +4017,11 @@ function CountUpStat({ target, suffix = "", duration = 1400 }: { target: number;
         const ease = 1 - Math.pow(1 - t, 3);
         setVal(Math.round(ease * target));
         if (t < 1) requestAnimationFrame(tick);
+        else setVal(target);
       };
       requestAnimationFrame(tick);
-    }, { threshold: 0.5 });
-    if (ref.current) obs.observe(ref.current);
+    }, { threshold: 0.3 });
+    obs.observe(el);
     return () => obs.disconnect();
   }, [target, duration]);
   return <span ref={ref}>{val}{suffix}</span>;

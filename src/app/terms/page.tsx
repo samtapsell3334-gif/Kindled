@@ -22,7 +22,7 @@ export default function TermsPage() {
         date. Contributing does not require an account.
       </P>
 
-      <H2>How money works</H2>
+      <H2 id="how-money">How money works</H2>
       <UL>
         <li>Contributions are collected by our payment provider when a giver chooses to chip in.</li>
         <li>Funds are held and paid out to the pot owner (or applied to catalogue purchases) according to the pot&apos;s settings.</li>
