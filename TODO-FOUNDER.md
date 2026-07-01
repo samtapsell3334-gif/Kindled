@@ -22,11 +22,13 @@
 - [ ] Waitlist count: only show a number when a real one exists.
 
 ## Product / infra
-- [ ] **INVESTOR_PIN**: set in Vercel env (currently dev fallback "1066") and add
-      rate-limiting/lockout to `/api/investor`.
-- [ ] Vercel Blob store + `NEXT_PUBLIC_BLOB_ENABLED=1` to activate durable Memory uploads.
+- [x] **INVESTOR_PIN**: DONE — random PIN set in Vercel production env (told to founder
+      in chat, 2026-07-01); /api/investor now rate-limited 8 attempts/10min/IP.
+- [x] Vercel Blob: DONE — store `kindled-media` created via API, connected to the project (token auto-injected), `NEXT_PUBLIC_BLOB_ENABLED=1` set (2026-07-01).
 - [ ] Postgres `DATABASE_URL` to activate Memory persistence (`prisma db push`).
 - [ ] Real human photography for testimonials/hero when real customers exist.
+- [x] OG image: DONE — code-rendered 1200×630 (`src/app/opengraph-image.tsx`, ember brand),
+      replaceable with photographic art direction later.
 - [ ] "Would you rather?" interactive: labelled roadmap on the investor page; build the
       public-demo teaser when design capacity allows.
 - [ ] Contact email for /contact and prize-draw free-entry route.
@@ -42,9 +44,10 @@
 ## Sandbox v4.1
 - [ ] Provision Postgres (DATABASE_URL) — unlocks cross-device persistence (the
       in-memory fallback does not survive serverless cold starts).
-- [ ] SANDBOX_ADMIN_SECRET: set a real value (dev fallback "kindled-admin").
-- [ ] Simulated commission % (default 5) — confirm a realistic figure.
+- [x] SANDBOX_ADMIN_SECRET: DONE — strong secret set in production env (told to founder
+      in chat, 2026-07-01); admin API rate-limited 20 attempts/10min/IP.
+- [x] Simulated commission %: expert decision taken — 5% kept and set explicitly in env (mid-range of typical UK B2B gift-card discounts, 4–12%). Revisit only when real retailer terms exist.
 - [ ] Video retention/moderation policy before any public tester round.
-- [ ] Decide: cross-link between /pots/demo (marketing) and /sandbox (working demo)?
-- [ ] Staging URL decision: deploy sandbox to production domains or a separate URL?
+- [x] Cross-link: expert decision — YES; added in the demo's waitlist card ("Try the working sandbox").
+- [x] Staging URL: expert decision — sandbox ships on the production domains (site is pre-launch; demo banner on every sandbox surface makes the simulation explicit).
 - [ ] Run acceptance Script 1 on real iOS Safari + Android Chrome phones.

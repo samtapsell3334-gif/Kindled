@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { listEvents, resetSandbox } from "@/lib/sandbox/store";
+import { rateLimit } from "@/lib/rate-limit";
 
 /**
  * Sandbox admin (WS-A/WS-F): shared-secret gate (SANDBOX_ADMIN_SECRET, dev fallback).
@@ -10,6 +11,8 @@ import { listEvents, resetSandbox } from "@/lib/sandbox/store";
 const SECRET = process.env.SANDBOX_ADMIN_SECRET ?? "kindled-admin";
 
 export function GET(request: Request): NextResponse {
+  const rl = rateLimit(request, "sandbox-admin", { max: 20, windowMs: 10 * 60_000 });
+  if (!rl.ok) return NextResponse.json({ error: "Too many attempts" }, { status: 429 });
   const url = new URL(request.url);
   if (url.searchParams.get("secret") !== SECRET) {
     return NextResponse.json({ error: "Not authorised" }, { status: 401 });
@@ -18,6 +21,8 @@ export function GET(request: Request): NextResponse {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const rl = rateLimit(request, "sandbox-admin", { max: 20, windowMs: 10 * 60_000 });
+  if (!rl.ok) return NextResponse.json({ error: "Too many attempts" }, { status: 429 });
   let body: { secret?: string; action?: string };
   try {
     body = (await request.json()) as typeof body;

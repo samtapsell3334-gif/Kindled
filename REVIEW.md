@@ -196,3 +196,22 @@ homepage + terms anchor.
   /api/investor if confidentiality requires).
 - **Honest deltas**: MP4/9:16 renders are a mechanical founder step (scripts +
   player are the source of truth); film_shared event awaits a share affordance.
+
+---
+
+# Founder-TODO execution pass (expert decisions, 2026-07-01)
+- **Rate limiting**: /api/investor (8/10min/IP) + /api/sandbox/admin (20/10min/IP) via
+  new src/lib/rate-limit.ts. Serverless caveat documented in-file (per-lambda buckets;
+  hard global ceiling arrives with Postgres).
+- **Production secrets set** (Vercel env): INVESTOR_PIN (random, off the dev fallback),
+  SANDBOX_ADMIN_SECRET (strong random), SANDBOX_COMMISSION_PCT=5 (expert: mid-range of
+  typical UK B2B gift-card discounts), NEXT_PUBLIC_DEMO_MODE=1.
+- **Vercel Blob provisioned via API**: store "kindled-media" created, connected to the
+  kindledkindled project (BLOB_READ_WRITE_TOKEN auto-injected, all envs),
+  NEXT_PUBLIC_BLOB_ENABLED=1 → Memory/video uploads become durable on this deploy.
+- **OG image**: code-rendered opengraph-image.tsx (no binary assets), deterministic
+  ember field, brand palette.
+- **Demo → sandbox cross-link** added in the demo waitlist card.
+- **Still genuinely founder-only**: DATABASE_URL (marketplace terms + billing → not
+  accepted on your behalf), VO recording, commissioned audio, use-of-funds split,
+  gift-card rates, legal [TODO]s, citation verification, on-phone test runs.

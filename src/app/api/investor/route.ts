@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import content from "@/data/investor-content.json";
+import { rateLimit } from "@/lib/rate-limit";
 
 /**
  * Investor content gate (server-side). The confidential deck is imported here, on
@@ -7,12 +8,17 @@ import content from "@/data/investor-content.json";
  * PIN nor the financials ever ship in the public client bundle. Set INVESTOR_PIN in
  * the environment; falls back to a dev default so the gate still works locally.
  *
- * TODO(founder): add basic rate-limiting/lockout on this route before raising, so a
- * 4-digit PIN can't be brute-forced, and rotate the PIN off the dev default.
+ * Rate-limited (8 attempts / 10 min / IP — see src/lib/rate-limit.ts). PIN comes
+ * from INVESTOR_PIN env (set in production; dev fallback below).
  */
 const PIN = process.env.INVESTOR_PIN ?? "1066";
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const rl = rateLimit(request, "investor-pin", { max: 8, windowMs: 10 * 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json({ ok: false, error: "Too many attempts — try again shortly." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } });
+  }
   let pin: unknown;
   try {
     pin = ((await request.json()) as { pin?: unknown }).pin;
