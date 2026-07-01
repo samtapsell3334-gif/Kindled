@@ -124,40 +124,33 @@ const FEATURES = [
   },
 ];
 
-const TESTIMONIALS = [
+// Illustrative scenarios — the everyday moments Kindled is being built for.
+// NOT customer reviews: Kindled is pre-launch, so nothing here is attributed to a
+// real person (avoids presenting invented reviews as genuine — DMCC Act 2024).
+const SCENARIOS = [
   {
-    quote: "We used to get three copies of the same book every birthday. Kindled fixed that overnight — and the reveal made my daughter cry the best kind of tears.",
-    name: "Sarah M.",
-    role: "Mum of two · London",
-    initials: "SM",
+    quote: "No more three copies of the same book at every birthday — everyone chips into the gifts that actually get used, and the reveal is the bit that brings the happy tears.",
+    persona: "The parent done with duplicate gifts",
     color: "bg-[#ff6b6b]",
   },
   {
-    quote: "As the aunt who lives abroad I always felt bad sending cash. Now I chip into real goals and feel genuinely part of the celebration, even from abroad.",
-    name: "Priya K.",
-    role: "Contributor · Manchester",
-    initials: "PK",
+    quote: "Living far away, sending cash always felt impersonal. Chipping into a real goal means being part of the celebration, even from another country.",
+    persona: "The relative who lives abroad",
     color: "bg-amber-500",
   },
   {
-    quote: "My son's star chart actually motivated him to tidy his room without asking. The PlayStation goal was fully funded by Christmas morning.",
-    name: "Tom R.",
-    role: "Dad · Bristol",
-    initials: "TR",
+    quote: "A star chart turns good behaviour into gift momentum — a goal earned along the way and fully funded by the big day.",
+    persona: "The family using star charts",
     color: "bg-orange-500",
   },
   {
-    quote: "The reveal made me tear up watching my niece discover who'd contributed. Most heartwarming thing I've seen at a birthday party.",
-    name: "Claire W.",
-    role: "Auntie · Edinburgh",
-    initials: "CW",
+    quote: "Watching someone discover who came together to make their gift happen — that shared moment is the whole point.",
+    persona: "The friend who wants it to feel special",
     color: "bg-rose-500",
   },
   {
-    quote: "I set it up in literally 3 minutes on a Thursday night. By Sunday morning the whole family had chipped in. Genuinely effortless.",
-    name: "James L.",
-    role: "Dad · Birmingham",
-    initials: "JL",
+    quote: "Set up in a couple of minutes, one link shared, and the family chips in over the week — coordination without the awkward money chat.",
+    persona: "The organiser of the group gift",
     color: "bg-amber-600",
   },
 ];
@@ -940,43 +933,43 @@ function Testimonials() {
     <section className="bg-[#fdf9f5] py-28 px-5 overflow-hidden">
       <div className="mx-auto max-w-5xl">
         <Reveal className="text-center mb-14">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-rose-500 mb-3">What families say</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-rose-500 mb-3">The moments we&apos;re building for</p>
           <h2
             style={{ fontFamily: "var(--font-display)" }}
             className="text-[38px] md:text-[52px] font-bold text-stone-900 leading-[1.1]"
           >
-            Tears at the reveal.<br />Every time.
+            Tears at the reveal.<br />That&apos;s the goal.
           </h2>
+          <p className="mx-auto mt-4 max-w-[460px] text-[15px] leading-relaxed text-stone-500">
+            Kindled is launching soon, so these aren&apos;t customer reviews yet — they&apos;re the everyday moments we&apos;re building Kindled to create.
+          </p>
         </Reveal>
 
-        {/* Scrollable testimonials */}
+        {/* Illustrative scenarios (not reviews) */}
         <div className="relative">
           <motion.div
             animate={{ x: ["0%", "-50%"] }}
             transition={{ duration: 40, ease: "linear", repeat: Infinity }}
             className="flex w-max gap-5"
+            aria-label="Illustrative scenarios"
           >
-            {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
-              <div
+            {[...SCENARIOS, ...SCENARIOS].map((t, i) => (
+              <figure
                 key={i}
+                aria-hidden={i >= SCENARIOS.length}
                 className="w-[300px] shrink-0 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
               >
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <Star key={j} className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-[13px] text-stone-600 leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
-                <div className="flex items-center gap-3">
-                  <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white", t.color)}>
-                    {t.initials}
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-semibold text-stone-800">{t.name}</p>
-                    <p className="text-[11px] text-stone-400">{t.role}</p>
-                  </div>
-                </div>
-              </div>
+                <p className="mb-4 inline-block rounded-full bg-stone-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-stone-400">
+                  Illustrative
+                </p>
+                <blockquote className="text-[13px] leading-relaxed text-stone-600 mb-5">&ldquo;{t.quote}&rdquo;</blockquote>
+                <figcaption className="flex items-center gap-3">
+                  <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full", t.color)}>
+                    <Heart className="h-4 w-4 text-white" fill="currentColor" />
+                  </span>
+                  <span className="text-[13px] font-semibold text-stone-700">{t.persona}</span>
+                </figcaption>
+              </figure>
             ))}
           </motion.div>
           {/* Edge fades */}
