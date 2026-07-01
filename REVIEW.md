@@ -91,3 +91,45 @@ homepage + terms anchor.
 - Deferred to follow-up passes (scoped in PLAN.md + TODO-FOUNDER.md): P3.1 kids' circle
   mode, P3.2 receiver-DOM restructure + add-gift move, P3.3 explainer replacement,
   P4.1 full multi-hat sweep, Lighthouse score capture (needs local Chrome run).
+
+---
+
+# Sandbox MVP v4.1 (branch feat/sandbox-mvp-v4)
+
+## Core + WS-A/B/C/D + WS-E/F minimal (this pass)
+- **Entities & store** (`src/lib/sandbox/`): simulated-money model (integer pounds),
+  unguessable share slugs + private manager keys (guest-first, no passwords/emails —
+  guardrail 3), append-only event log, 3 seeded pots (child birthday + star chart,
+  adult joint log-burner, friends leaving gift), exact reset. Persistence adapter:
+  in-memory now; Prisma/Postgres path activates when DATABASE_URL exists (PLAN.md).
+- **Guardrail 1 in code**: no Stripe test keys present → pure-frontend simulation per
+  the decision rule. Payment sheet uses READ-ONLY pre-filled dummy card values that are
+  never read or transmitted; fake Apple Pay button; "Demo — no money moves" badge.
+  Server-side stripCardData + assertNoCardData; verified end-to-end by injecting
+  cardNumber/cvc into a contribution payload — nothing card-like reached the store/log.
+- **Guardrail 6 server-side**: viewFor() builds viewer payloads; receiver-surprise API
+  response verified to contain no amounts, contributors, or message content.
+- **Flows**: /sandbox (create: occasion→date→who→parent/guardian toggle→star chart→
+  list w/ category/retailer/price-band capture→surprise→share+manager links);
+  /p/[slug] (guest view+poll, chip-in, simulated sheet, text/video message via
+  KindleRecord, thank-you conversion moment with "Would you rather?" + ref-chained
+  start-your-own; manager panel with receiver preview + Simulate reveal day →
+  gift card (fake voucher + simulated commission)/product/stack).
+- **WS-F dashboard** (/sandbox/dashboard, shared-secret): 5 panels off the real event
+  log — intent (category/retailer/price band), funnel with rates, K-factor (defined
+  on-screen, honestly labelled sandbox sample), reveal economics (simulated commission),
+  engagement (message types, WYR split). CSV export per panel.
+- **Events (WS-G)**: pot_created, item_added, pot_viewed, contribution_started,
+  payment_sheet_viewed, contribution_completed, message_added, wyr_answered,
+  reveal_triggered, reveal_outcome. No card data, no message content, no child
+  identifiers in events.
+- **Tests**: the 3 mandated tests + loop coverage = 10 new (87 repo-wide), all passing.
+- **E2E verified** (dev server, API level): create → contribute (+card-injection
+  attempt) → receiver redaction → ref-chained second pot → reveal → commission →
+  event spine + dashboard 200s.
+
+## Honestly not done yet (sequenced next, not skipped)
+- v4.1: video persistence beyond object URLs (needs Blob/DB), per-session abuse caps,
+  Stripe test mode path, on-phone iOS/Android script runs, staging deploy decision.
+- v5 (reveal experience) + v6 (films): NOT STARTED — both depend on this branch; each
+  needs its own focused pass. Logged with dependencies in PLAN.md.

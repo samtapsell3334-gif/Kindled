@@ -47,8 +47,14 @@ export async function PUT(
   const { slug } = await params;
   const pot = getPotBySlug(slug);
   if (pot) {
-    const step = new URL(request.url).searchParams.get("step");
-    logEvent(step === "sheet" ? "payment_sheet_viewed" : "contribution_started", { potId: pot.id });
+    const url = new URL(request.url);
+    const step = url.searchParams.get("step");
+    if (step === "wyr") {
+      const choice = (url.searchParams.get("choice") ?? "").slice(0, 40);
+      logEvent("wyr_answered", { potId: pot.id, props: { choice } });
+    } else {
+      logEvent(step === "sheet" ? "payment_sheet_viewed" : "contribution_started", { potId: pot.id });
+    }
   }
   return new NextResponse(null, { status: 204 });
 }

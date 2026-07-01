@@ -38,3 +38,13 @@
       (verified server/prop-level, not CSS), plus add-gift moving to receiver view.
 - [ ] P2.3 friends-scenario demo pot (mates pooling for a 30th) as part of the adult
       receiver view restructure.
+
+## Sandbox v4.1
+- [ ] Provision Postgres (DATABASE_URL) — unlocks cross-device persistence (the
+      in-memory fallback does not survive serverless cold starts).
+- [ ] SANDBOX_ADMIN_SECRET: set a real value (dev fallback "kindled-admin").
+- [ ] Simulated commission % (default 5) — confirm a realistic figure.
+- [ ] Video retention/moderation policy before any public tester round.
+- [ ] Decide: cross-link between /pots/demo (marketing) and /sandbox (working demo)?
+- [ ] Staging URL decision: deploy sandbox to production domains or a separate URL?
+- [ ] Run acceptance Script 1 on real iOS Safari + Android Chrome phones.
