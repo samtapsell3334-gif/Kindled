@@ -136,19 +136,19 @@ const INITIAL_POTS: DemoPot[] = [
     stackNote: "Next up: Christmas 2026 — stack balance to unlock an even larger milestone",
   },
   {
-    id: "p4", title: "Cosy Log Burner",
-    image: "https://images.unsplash.com/photo-1482881497185-d4a9ddbe4151?w=400&h=400&fit=crop&q=80",
+    id: "p4", title: "Nintendo Switch OLED Bundle",
+    image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400&h=400&fit=crop&q=80",
     goal: 800, raised: 425, mode: "WRAPPED_UP", continuous: false,
     eventLabel: "Birthday", eventDate: "Jun 28", eventIso: "2026-06-28T10:00:00Z",
     contributors: 5, boosterEntries: 3,
-    accentGradient: "from-violet-500 via-fuchsia-400 to-pink-500",
+    accentGradient: "from-amber-500 via-orange-400 to-rose-500",
     tributes: [
-      { id: "b1", name: "The Kids", rot: -3, delay: 0,
-        message: "Mum, you are always cold — this one's for you! Cosy nights ahead.", hasVideo: true },
+      { id: "b1", name: "Grandma & Grandad", rot: -3, delay: 0,
+        message: "Billy, you've asked for this all year — happy birthday, our clever boy!", hasVideo: true },
       { id: "b2", name: "Auntie Claire", rot: 4, delay: 140,
-        message: "You've wanted one of these for years! Enjoy every warm evening." },
-      { id: "b3", name: "Work Crew", rot: -1, delay: 260,
-        message: "From all of us — you deserve every cosy moment!", hasVideo: true },
+        message: "The best birthday surprise! Can't wait to watch you play." },
+      { id: "b3", name: "The Cousins", rot: -1, delay: 260,
+        message: "From all of us — game on, birthday superstar!", hasVideo: true },
     ],
     stackNote: "Next up: Christmas 2026 — stack balance to unlock an even larger milestone",
   },
@@ -616,20 +616,20 @@ function occasionFor(pot: DemoPot): Occasion {
   return nextMajorOccasion();
 }
 
-/** Real countdown target for pots whose own eventIso is just a placeholder ("Ongoing"). */
+/**
+ * Evergreen countdown target: always rolls the pot's occasion forward from today,
+ * so the demo never shows a past/expired date whatever the static eventIso says.
+ */
 function occasionTargetIso(pot: DemoPot): string {
-  if (pot.eventLabel !== "Ongoing") return pot.eventIso;
   const occasion = occasionFor(pot);
   const now = new Date();
   const year = now.getFullYear();
-  if (occasion === "christmas") {
-    let d = new Date(year, 11, 25);
-    if (d.getTime() < now.getTime()) d = new Date(year + 1, 11, 25);
+  const roll = (month: number, day: number) => {
+    let d = new Date(year, month, day);
+    if (d.getTime() < now.getTime()) d = new Date(year + 1, month, day);
     return d.toISOString();
-  }
-  let d = new Date(year, 5, 28);
-  if (d.getTime() < now.getTime()) d = new Date(year + 1, 5, 28);
-  return d.toISOString();
+  };
+  return occasion === "christmas" ? roll(11, 25) : roll(5, 28);
 }
 
 function occasionLabel(occasion: Occasion): string {
@@ -739,7 +739,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
             <FundingBar raised={pot.raised} goal={pot.goal} className="mt-4" tone="light" />
             <div className="mt-3 flex items-center justify-between">
               <span className="flex items-center gap-1 text-[11px] tracking-tight text-[#0f172a]/45"><Users className="h-3 w-3" />{pot.contributors} contributors</span>
-              <CountdownTimer targetIso={pot.eventIso} compact />
+              <CountdownTimer targetIso={occasionTargetIso(pot)} compact />
             </div>
             {hideStackNote && pot.eventLabel !== "Ongoing" && (
               <div className="mt-2 flex items-center gap-1.5">
@@ -4702,7 +4702,7 @@ export default function DemoPage() {
               <div className="relative flex-1 min-w-0">
                 <p className="text-[9px] font-bold uppercase tracking-widest text-red-400/80">Locked for Billy</p>
                 <p style={{ fontFamily: "var(--font-display)" }} className="text-[14px] font-semibold text-white leading-snug">
-                  Countdown: {Math.max(0, Math.ceil((new Date(surprisePots[0]?.eventIso ?? "2026-12-25T00:00:00Z").getTime() - Date.now()) / 86_400_000))} Days
+                  Countdown: {surprisePots[0] ? Math.max(0, Math.ceil((new Date(occasionTargetIso(surprisePots[0])).getTime() - Date.now()) / 86_400_000)) : 0} Days
                 </p>
                 <p className="text-[11px] text-red-200/70 mt-0.5">Givers: Tap to preview the magical reveal</p>
               </div>
