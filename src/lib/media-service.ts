@@ -62,7 +62,7 @@ export async function uploadMemory(
   const mimeType = blob.type || (meta.kind === "video" ? "video/webm" : "audio/webm");
   const url = await storeBlob(blob, `kindle/${meta.contributionId}/${id}`, mimeType);
 
-  return {
+  const memory: KindleMemory = {
     id,
     contributionId: meta.contributionId,
     kind: meta.kind,
@@ -72,6 +72,25 @@ export async function uploadMemory(
     sizeBytes: blob.size,
     createdAt: Date.now(),
   };
+
+  // Persist durable (uploaded) Memories so they re-load across sessions/devices.
+  // Skipped for demo object URLs — those are device-local and would 404 elsewhere.
+  persistRemoteMemory(memory);
+  return memory;
+}
+
+/**
+ * Fire-and-forget persistence of an uploaded Memory. Only durable https URLs are
+ * persisted; local `blob:` preview URLs are skipped. Never blocks or breaks capture.
+ */
+function persistRemoteMemory(memory: KindleMemory): void {
+  if (typeof window === "undefined") return;
+  if (!/^https?:/i.test(memory.url)) return;
+  void fetch("/api/media/memory", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(memory),
+  }).catch((err) => console.warn("[media] memory persist failed", err));
 }
 
 /**

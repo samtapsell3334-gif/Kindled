@@ -30,6 +30,12 @@ enum ContributionStatus {
   REFUNDED
 }
 
+/// Media type of a Kindle "Memory" attached to a contribution.
+enum MemoryKind {
+  VIDEO
+  VOICE
+}
+
 /// Controls both the UX reveal mechanic and the B2B AdTech temporal-window strategy.
 ///
 /// LIVE_FEED      — standard public pot; progress always visible to all viewers.
@@ -310,13 +316,16 @@ model Contribution {
   stripeIntentId String?            @unique
   /// Optional text tribute shown in the reveal ceremony message cards
   message        String?
-  /// Optional video tribute URL shown in the reveal ceremony showreel
+  /// Legacy single video-tribute URL. Superseded by the KindleMemory relation
+  /// (which supports voice + video and stores duration/size); kept for back-compat.
   videoUrl       String?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
 
-  pot   Pot   @relation(fields: [potId], references: [id])
-  giver User? @relation("ContributionGiver", fields: [giverId], references: [id])
+  pot      Pot            @relation(fields: [potId], references: [id])
+  giver    User?          @relation("ContributionGiver", fields: [giverId], references: [id])
+  /// Video/voice Memories attached to this contribution, played in the Reveal.
+  memories KindleMemory[]
 
   @@index([potId])
   @@index([giverId])
@@ -325,6 +334,28 @@ model Contribution {
   @@index([paymentMethod, status])
   @@index([createdAt, status])
   @@map("contributions")
+}
+
+/// A short video or voice "Memory" a giver attaches to their contribution and that
+/// plays in the recipient's Reveal. The media blob lives in object storage (Vercel
+/// Blob); this row is the durable pointer + metadata, tied to the contribution so the
+/// Memory stays authorisable and re-loadable across sessions/devices.
+model KindleMemory {
+  id             String     @id @default(cuid())
+  contributionId String
+  kind           MemoryKind
+  /// Playable CDN URL from the Blob store — object path is kindle/{contributionId}/{id}.
+  url            String
+  mimeType       String
+  /// Clip length in whole seconds (≤ 30). Display metadata, not financial.
+  durationSec    Int
+  sizeBytes      Int
+  createdAt      DateTime   @default(now())
+
+  contribution Contribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+
+  @@index([contributionId])
+  @@map("kindle_memories")
 }
 
 /// Analytical ledger for high-intent purchase signals.
