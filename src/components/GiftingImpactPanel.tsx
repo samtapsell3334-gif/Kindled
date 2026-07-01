@@ -323,7 +323,7 @@ function MilestoneSimulator() {
               className="mb-4 overflow-hidden rounded-2xl border border-white/10">
               <div className="relative h-32">
                 <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=220&fit=crop&q=80"
-                  alt="Velvet Sofa" className="h-full w-full object-cover" />
+                  alt="Velvet Sofa" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/75 to-black/20" />
                 <div className="absolute inset-0 flex items-center px-4">
                   <div>

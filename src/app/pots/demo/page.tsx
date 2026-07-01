@@ -682,7 +682,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
           <div className="flex min-w-0 items-center gap-3.5">
             <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-[#f6ecd2]">
               {pot.image ? (
-                <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
+                <img loading="lazy" decoding="async" src={pot.image} alt={pot.title} className="h-full w-full object-cover"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
@@ -922,7 +922,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           <div className="flex min-w-0 items-center gap-2.5">
             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-black/30">
               {pot.image
-                ? <img src={pot.image} alt={pot.title} className="h-full w-full object-cover"
+                ? <img loading="lazy" decoding="async" src={pot.image} alt={pot.title} className="h-full w-full object-cover"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                 : <div className="flex h-full w-full items-center justify-center"><Gift className="h-5 w-5 text-stone-500" strokeWidth={1.5} /></div>}
               <span className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-tl-lg bg-black/60"><Lock className="h-2.5 w-2.5 text-white/60" /></span>
@@ -1804,7 +1804,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
                 >
                   <div className="flex items-start gap-3">
                     {scrapedImage && (
-                      <img src={scrapedImage} alt="" className="h-16 w-16 rounded-lg object-cover shrink-0 border border-[rgba(15,23,42,0.12)]" />
+                      <img loading="lazy" decoding="async" src={scrapedImage} alt="" className="h-16 w-16 rounded-lg object-cover shrink-0 border border-[rgba(15,23,42,0.12)]" />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
@@ -1997,10 +1997,12 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
     }
   }
 
+  // Same sourced figures used on the homepage — one number, one wording site-wide.
+  // TODO(founder): verify these survey citations before launch.
   const PROBLEMS = [
-    { Icon: AlertCircle, title: "The Guessing Game", stat: "71%", body: "of us feel real anxiety shopping for someone on our list. The well-meant guesses that follow are how 23 million unwanted gifts end up in UK landfill every Christmas." },
-    { Icon: Copy, title: "The Duplicate Disaster", stat: "£700M", body: "wasted yearly on UK gifts nobody actually wanted. Nobody coordinates — so Grandma and Uncle Dave both buy the same LEGO set." },
-    { Icon: CreditCard, title: "The Money Squeeze", stat: "£514", body: "the average UK Christmas costs per head. 36% of us say the cost of living has already shrunk our gifting budget — yet the big stuff feels out of reach alone." },
+    { Icon: Copy, title: "The Duplicate Disaster", stat: "1 in 5", body: "physical gifts is a duplicate — bought twice because nobody coordinated.", source: "YouGov UK Gift Buying Survey, 2023" },
+    { Icon: AlertCircle, title: "The Waste", stat: "£3.2bn", body: "spent on unwanted UK gifts every year — returned, regifted, or thrown away.", source: "OnePoll / Halifax survey, 2023" },
+    { Icon: CreditCard, title: "The Squeeze", stat: "1 in 4", body: "gifts end up unused or returned entirely — effort and money wasted on both sides.", source: "OnePoll / Halifax survey, 2023" },
   ];
 
   const STEPS = [
@@ -2012,7 +2014,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
 
   const BENEFITS = [
     { title: "Free. Forever.", desc: "No listing fees, no withdrawal fees — not even on the small stuff." },
-    { title: "Real cashback", desc: "Earn 1–2% back on every contribution, plus a raffle entry every £10." },
+    { title: "A little back", desc: "Earn credit back on catalogue purchases, plus a free-entry prize draw — a bonus, never the point." },
     { title: "No app needed", desc: "Open a link, pay by FaceID in seconds. Works for grandparents too." },
     { title: "Duplicate-proof", desc: "Contributors see it ticked off instantly, so nobody ever doubles up." },
     { title: "The Reveal", desc: "A genuinely emotional moment with the people who love you — not just a balance update." },
@@ -2058,7 +2060,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
           <h2 className="font-editorial mb-1 text-[22px] font-semibold text-white">We&apos;ve All Been There</h2>
           <p className="mb-5 text-[13px] text-[#f5f5f5]/50">The same gifting headaches, year after year — and the numbers prove it&apos;s not just you.</p>
           <div className="flex flex-col gap-3">
-            {PROBLEMS.map(({ Icon, title, stat, body }) => (
+            {PROBLEMS.map(({ Icon, title, stat, body, source }) => (
               <motion.div
                 key={title}
                 whileHover={{ y: -3 }}
@@ -2073,6 +2075,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
                 <p className="text-[13px] leading-relaxed text-[#f5f5f5]/60">
                   <span className="font-bold text-[#ffb800]">{stat} </span>{body}
                 </p>
+                <p className="mt-1.5 text-[9px] italic text-[#f5f5f5]/30">Source: {source}</p>
               </motion.div>
             ))}
           </div>
@@ -3459,7 +3462,7 @@ function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
         {/* Product image — full-width banner */}
         {pot.image && (
           <div className="relative h-32 w-full overflow-hidden">
-            <img src={pot.image} alt={pot.title} className="h-full w-full object-cover opacity-40" />
+            <img loading="lazy" decoding="async" src={pot.image} alt={pot.title} className="h-full w-full object-cover opacity-40" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
             {/* Lock badge */}
             <div className="absolute right-3 top-3 flex items-center gap-1 bg-black/60 px-2 py-1 backdrop-blur-sm">
@@ -3535,7 +3538,7 @@ function ReceiverProofStats() {
       Icon: Landmark,
       value: 3, suffix: ".2B",
       label: "Wasted Annually",
-      desc: "Over £3.2B is wasted on unwanted gifts each year in the UK and US alone. Kindled is designed to help families redirect their portion of this wasted capital into major milestone assets.",
+      desc: "Around £3.2bn is wasted on unwanted gifts every year in the UK. Kindled helps families redirect their share of that into goals that actually matter.",
       color: "text-violet-500", bg: "bg-violet-50", border: "border-violet-200/60",
     },
   ];
