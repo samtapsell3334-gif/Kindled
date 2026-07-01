@@ -59,10 +59,10 @@ const STEPS = [
     icon: Sparkles,
     title: "The magical reveal",
     desc: "On the big day, an animated ceremony reveals exactly what was funded and who made it happen. Tears are practically guaranteed.",
-    grad: "from-violet-400 to-fuchsia-500",
-    shadow: "rgba(167,139,250,0.35)",
-    bg: "from-violet-50 to-fuchsia-50",
-    border: "border-violet-100",
+    grad: "from-[#ff6b6b] to-[#f59e0b]",
+    shadow: "rgba(255,107,107,0.35)",
+    bg: "from-rose-50 to-amber-50",
+    border: "border-rose-100",
   },
 ];
 
@@ -71,55 +71,55 @@ const FEATURES = [
     icon: Lock,
     title: "Surprise-proof secrets",
     desc: "Billy sees zero progress until reveal day. Contributors can chat, but the gift stays completely hidden.",
-    color: "text-violet-600",
-    bg: "bg-violet-50",
-    border: "border-violet-100",
-    glow: "rgba(124,58,237,0.12)",
+    color: "text-[#ff6b6b]",
+    bg: "bg-rose-50",
+    border: "border-rose-100",
+    glow: "rgba(255,107,107,0.12)",
   },
   {
     icon: Users,
     title: "Unlimited contributors",
     desc: "Anyone with the link can chip in — no app download, no account, no friction whatsoever.",
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    border: "border-blue-100",
-    glow: "rgba(37,99,235,0.12)",
-  },
-  {
-    icon: Star,
-    title: "Star chart for kids",
-    desc: "Turn good behaviour into gift momentum. Stars earned through chores unlock Spark Goals as rewards.",
     color: "text-amber-600",
     bg: "bg-amber-50",
     border: "border-amber-100",
     glow: "rgba(217,119,6,0.12)",
   },
   {
-    icon: Trophy,
-    title: "£2,500 booster draw",
-    desc: "Every contributor is automatically entered into our quarterly Goal Booster Draw. No extra steps.",
+    icon: Star,
+    title: "Star chart for kids",
+    desc: "Turn good behaviour into gift momentum. Stars earned through chores unlock Spark Goals as rewards.",
     color: "text-orange-600",
     bg: "bg-orange-50",
     border: "border-orange-100",
     glow: "rgba(234,88,12,0.12)",
   },
   {
+    icon: Trophy,
+    title: "£2,500 booster draw",
+    desc: "Every contributor is automatically entered into our quarterly Goal Booster Draw. No extra steps.",
+    color: "text-[#ff6b6b]",
+    bg: "bg-rose-50",
+    border: "border-rose-100",
+    glow: "rgba(255,107,107,0.12)",
+  },
+  {
     icon: RefreshCw,
     title: "Carry-over balances",
     desc: "Incomplete birthday goals carry to Christmas seamlessly. Nothing is ever lost or wasted.",
-    color: "text-rose-600",
-    bg: "bg-rose-50",
-    border: "border-rose-100",
-    glow: "rgba(225,29,72,0.12)",
+    color: "text-amber-600",
+    bg: "bg-amber-50",
+    border: "border-amber-100",
+    glow: "rgba(217,119,6,0.12)",
   },
   {
     icon: Shield,
     title: "Parent dashboard",
     desc: "Event dates, catalogue browsing with virtual marker pens, gift approvals — full family control.",
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-    border: "border-emerald-100",
-    glow: "rgba(5,150,105,0.12)",
+    color: "text-orange-600",
+    bg: "bg-orange-50",
+    border: "border-orange-100",
+    glow: "rgba(234,88,12,0.12)",
   },
 ];
 
@@ -129,7 +129,7 @@ const TESTIMONIALS = [
     name: "Sarah M.",
     role: "Mum of two · London",
     initials: "SM",
-    color: "bg-violet-500",
+    color: "bg-[#ff6b6b]",
   },
   {
     quote: "As the aunt who lives abroad I always felt bad sending cash. Now I chip into real goals and feel genuinely part of the celebration, even from abroad.",
@@ -143,7 +143,7 @@ const TESTIMONIALS = [
     name: "Tom R.",
     role: "Dad · Bristol",
     initials: "TR",
-    color: "bg-emerald-500",
+    color: "bg-orange-500",
   },
   {
     quote: "The reveal ceremony made me tear up watching my niece discover who'd contributed. Most heartwarming thing I've seen at a birthday party.",
@@ -157,7 +157,7 @@ const TESTIMONIALS = [
     name: "James L.",
     role: "Dad · Birmingham",
     initials: "JL",
-    color: "bg-blue-500",
+    color: "bg-amber-600",
   },
 ];
 
@@ -433,11 +433,11 @@ function Hero() {
               className="absolute right-4 top-4 w-[190px] rounded-2xl border border-white/8 bg-white/[0.04] p-3.5 backdrop-blur-sm"
               style={{ boxShadow: "0 16px 48px rgba(0,0,0,0.5)" }}
             >
-              <div className="h-1 w-full rounded-full bg-gradient-to-r from-violet-400 to-blue-500 mb-3" />
+              <div className="h-1 w-full rounded-full bg-gradient-to-r from-[#ff6b6b] to-[#f59e0b] mb-3" />
               <p className="text-[10px] font-semibold uppercase tracking-wider text-white/30 mb-1">Holiday Fund</p>
               <p className="text-[22px] font-bold text-white">£800</p>
               <div className="mt-2 h-1.5 rounded-full bg-white/8">
-                <div className="h-full w-[45%] rounded-full bg-gradient-to-r from-violet-400 to-blue-500" />
+                <div className="h-full w-[45%] rounded-full bg-gradient-to-r from-[#ff6b6b] to-[#f59e0b]" />
               </div>
               <p className="mt-1.5 text-[10px] text-white/30">£360 raised · 8 contributors</p>
             </motion.div>
@@ -486,7 +486,7 @@ function Hero() {
                 </div>
                 <div className="mt-3 flex items-center gap-2">
                   <div className="flex -space-x-1.5">
-                    {["bg-violet-400", "bg-rose-400", "bg-emerald-400", "bg-blue-400", "bg-amber-400"].map((c, i) => (
+                    {["bg-[#ff6b6b]", "bg-rose-400", "bg-orange-400", "bg-amber-400", "bg-amber-500"].map((c, i) => (
                       <div key={i} className={`h-5 w-5 rounded-full border-[1.5px] border-[#0d0400] ${c}`} />
                     ))}
                   </div>
@@ -504,14 +504,14 @@ function Hero() {
               initial={{ opacity: 0, x: -40, rotate: -5 }}
               animate={{ opacity: 1, x: 0, rotate: -5 }}
               transition={{ delay: 0.6, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute left-0 bottom-16 w-[180px] rounded-2xl border border-emerald-400/15 bg-emerald-950/40 p-3.5 backdrop-blur-sm"
-              style={{ boxShadow: "0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(52,211,153,0.1)" }}
+              className="absolute left-0 bottom-16 w-[180px] rounded-2xl border border-amber-400/15 bg-amber-950/40 p-3.5 backdrop-blur-sm"
+              style={{ boxShadow: "0 16px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,158,11,0.12)" }}
             >
               <div className="flex items-center gap-2 mb-1.5">
-                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500">
-                  <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500">
+                  <Check className="h-3 w-3 text-stone-900" strokeWidth={3} />
                 </div>
-                <p className="text-[10px] font-bold text-emerald-400">Goal reached!</p>
+                <p className="text-[10px] font-bold text-amber-400">Goal reached!</p>
               </div>
               <p className="text-[12px] font-semibold text-white/80">LEGO Technic Set</p>
               <p className="text-[10px] text-white/30 mt-0.5">£85 · 5 contributors</p>
@@ -601,9 +601,9 @@ function Problem() {
               stat: "73%",
               label: "of people don't know what to buy",
               desc: "So they panic-buy something generic. The recipient smiles politely. Everyone loses.",
-              color: "text-violet-600",
-              bg: "bg-violet-50",
-              border: "border-violet-100",
+              color: "text-orange-600",
+              bg: "bg-orange-50",
+              border: "border-orange-100",
             },
           ].map((item, i) => (
             <Reveal key={item.stat} delay={i * 0.12}>
@@ -649,13 +649,13 @@ function HowItWorks() {
                 {/* Number + icon */}
                 <div className="relative mb-5">
                   <div
-                    className="flex h-24 w-24 items-center justify-center rounded-2xl shadow-xl"
-                    style={{
-                      background: `linear-gradient(135deg, ${step.grad.replace("from-", "").replace(" to-", ", ")})`,
-                      boxShadow: `0 12px 36px ${step.shadow}`,
-                    }}
+                    className={cn(
+                      "flex h-24 w-24 items-center justify-center rounded-2xl shadow-xl bg-gradient-to-br",
+                      step.grad,
+                    )}
+                    style={{ boxShadow: `0 12px 36px ${step.shadow}` }}
                   >
-                    <step.icon className="h-10 w-10 text-white" strokeWidth={1.5} />
+                    <step.icon className="h-10 w-10 text-white" strokeWidth={1.75} />
                   </div>
                   <div className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-stone-900 text-[10px] font-black text-white">
                     {i + 1}
@@ -698,7 +698,7 @@ function Features() {
     <section id="features" className="bg-[#fdf9f5] py-28 px-5">
       <div className="mx-auto max-w-5xl">
         <Reveal className="text-center mb-16">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-violet-600 mb-3">Everything you need</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-3">Everything you need</p>
           <h2
             style={{ fontFamily: "var(--font-display)" }}
             className="text-[38px] md:text-[52px] font-bold text-stone-900 leading-[1.1]"
@@ -743,7 +743,7 @@ function AudienceSplit() {
     <section id="families" className="bg-white py-28 px-5">
       <div className="mx-auto max-w-5xl">
         <Reveal className="text-center mb-16">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-emerald-600 mb-3">Who Kindled is for</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-3">Who Kindled is for</p>
           <h2
             style={{ fontFamily: "var(--font-display)" }}
             className="text-[38px] md:text-[52px] font-bold text-stone-900 leading-[1.1]"
@@ -787,11 +787,11 @@ function AudienceSplit() {
 
           {/* Contributors */}
           <Reveal from="right" delay={0.1}>
-            <div id="contributors" className="rounded-3xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-8 h-full">
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 shadow-lg shadow-violet-300/40">
+            <div id="contributors" className="rounded-3xl border border-rose-100 bg-gradient-to-br from-rose-50 to-orange-50 p-8 h-full">
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#ff6b6b] to-[#f59e0b] shadow-lg shadow-rose-300/40">
                 <Heart className="h-7 w-7 text-white" strokeWidth={1.5} />
               </div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-violet-600 mb-2">For contributors</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-[#ff6b6b] mb-2">For contributors</p>
               <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold text-stone-900 mb-3 leading-tight">
                 Give meaningfully.<br />Get rewarded.
               </h3>
@@ -807,7 +807,7 @@ function AudienceSplit() {
                   "See who else contributed in the reveal ceremony",
                 ].map((t) => (
                   <div key={t} className="flex items-start gap-2.5">
-                    <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-violet-500">
+                    <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#ff6b6b]">
                       <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
                     </div>
                     <p className="text-[13px] text-stone-700">{t}</p>
