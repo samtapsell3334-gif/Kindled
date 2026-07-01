@@ -52,6 +52,14 @@ export async function PUT(
     if (step === "wyr") {
       const choice = (url.searchParams.get("choice") ?? "").slice(0, 40);
       logEvent("wyr_answered", { potId: pot.id, props: { choice } });
+    } else if (step === "reaction") {
+      logEvent("reaction_recorded", { potId: pot.id });
+    } else if (step === "share_card") {
+      logEvent("share_clip_generated", { potId: pot.id });
+    } else if (step === "share_completed") {
+      logEvent("share_completed", { potId: pot.id, props: { channel: "native" } });
+    } else if (step === "thankyou") {
+      logEvent("thankyou_broadcast_sent", { potId: pot.id });
     } else {
       logEvent(step === "sheet" ? "payment_sheet_viewed" : "contribution_started", { potId: pot.id });
     }

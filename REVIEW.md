@@ -133,3 +133,38 @@ homepage + terms anchor.
   Stripe test mode path, on-phone iOS/Android script runs, staging deploy decision.
 - v5 (reveal experience) + v6 (films): NOT STARTED — both depend on this branch; each
   needs its own focused pass. Logged with dependencies in PLAN.md.
+
+---
+
+# Reveal Experience v5 (branch feat/reveal-v5)
+
+## WS-R1/R2/R3a/R4 + R3 (partial)
+- **RevealExperience** (`src/components/RevealExperience.tsx`): explicit beat machine
+  SEALED → TAP → IGNITION → NUMBER → PEOPLE → WORDS → FACES → GIFT → (OPTIONS) →
+  SHARE. Tap-to-advance (words/faces page via their own taps — a region tap cannot
+  skip them; bug found in verification and fixed), Skip + Replay, sr-only aria-live
+  beat announcements, mute persisted to localStorage.
+- **Ignition (WS-R2)**: exported reusable canvas ember system — upward drift, warm
+  palette, hand-drawn wobble; no DOM particles, no stock confetti, no flashes
+  (photosensitivity-safe by construction).
+- **Audio (WS-R3a)**: WebAudio-SYNTHESISED strike/whoosh/swell/tick — original by
+  construction, zero copyright exposure. Starts on the ritual tap only; ducking N/A
+  until an underscore exists. TODO-FOUNDER: commissioned signature sound slots in.
+- **Haptics**: Vibration API, feature-detected (sealed pulse, ignition triple-tick,
+  number thump).
+- **Kid pots**: star celebration in the gift beat, wholesome copy, no countdown.
+- **Options (WS-R4)**: full/partial branch with equal-weight choices; stack
+  projection uses real pot maths (verified: £40/£130 → "starts the next pot at 31%").
+  Partial funding celebrated as what was RAISED.
+- **Share engine (WS-R3, partial)**: canvas-generated 9:16 share card (embers, total,
+  people, recipient, referral link) → native share/download; reaction capture (30s,
+  consent copy, delete/re-record via KindleRecord); thank-you broadcast. Events:
+  reaction_recorded, share_clip_generated, share_completed, thankyou_broadcast_sent.
+  NOT built (honest): auto-stitched video clip (client-side canvas+MediaRecorder
+  stitching is its own project) — TODO-FOUNDER with the share card covering the need.
+- **Security finding fixed during build**: the organiser's live ceremony needs sealed
+  messages unsealed at the moment of reveal — added a manager-key-authorised
+  `?unseal=1` (dashboard stays sealed; guests cannot unseal; verified all three).
+- **Verified in-browser**: all nine beats in order, no-skip on words, gift-card
+  outcome → simulated commission event (£2 = 5% of £40), thank-you event, share beat
+  screenshot on record. Big-screen/QR mode + captions field: TODO-FOUNDER.

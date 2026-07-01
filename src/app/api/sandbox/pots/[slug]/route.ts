@@ -27,5 +27,6 @@ export async function GET(
   if (role !== "manager") {
     logEvent("pot_viewed", { potId: pot.id, ...(ref ? { ref } : {}), props: { role } });
   }
-  return NextResponse.json(viewFor(pot, role));
+  const unseal = role === "manager" && url.searchParams.get("unseal") === "1";
+  return NextResponse.json(viewFor(pot, role, { unseal }));
 }

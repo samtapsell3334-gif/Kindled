@@ -19,6 +19,8 @@ import Link from "next/link";
 import { Flame, Check, Lock, Gift, Sparkles, X } from "lucide-react";
 import { DemoBanner } from "@/components/DemoBanner";
 import { KindleRecord } from "@/components/KindleRecord";
+import { RevealExperience } from "@/components/RevealExperience";
+import type { RevealOutcome } from "@/lib/sandbox/types";
 import type { PotView } from "@/lib/sandbox/redact";
 
 type Step = "idle" | "amount" | "sheet" | "message" | "done";
@@ -40,6 +42,20 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
   const [wyr, setWyr] = useState<string | null>(null);
   const [revealBusy, setRevealBusy] = useState(false);
   const [voucher, setVoucher] = useState<string | null>(null);
+  const [showReveal, setShowReveal] = useState(false);
+  const [revealMsgs, setRevealMsgs] = useState<{ displayName: string; text?: string; videoRef?: string }[] | null>(null);
+
+  async function openReveal() {
+    if (managerKey) {
+      // The ceremony is the reveal moment — unseal via the manager key.
+      const r = await fetch(`/api/sandbox/pots/${slug}?key=${managerKey}&unseal=1`);
+      if (r.ok) {
+        const v = (await r.json()) as { messages?: { displayName: string; text?: string; videoRef?: string }[] };
+        setRevealMsgs(v.messages ?? []);
+      }
+    }
+    setShowReveal(true);
+  }
   const contributionId = useRef(`sbx_${Math.random().toString(36).slice(2, 10)}`).current;
 
   const load = useCallback(async () => {
@@ -136,6 +152,14 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
             </div>
           ))}
         </div>
+
+        {/* Revealed: anyone can watch the reveal (messages are unsealed) */}
+        {view.status !== "open" && (
+          <button onClick={() => setShowReveal(true)}
+            className="mt-4 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
+            <Sparkles className="mr-1.5 inline h-4 w-4" />Watch the reveal
+          </button>
+        )}
 
         {/* Guest CTA */}
         {!isManager && view.status === "open" && step === "idle" && (
@@ -253,20 +277,11 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
 
             {view.status === "open" ? (
               <div className="mt-4 border-t border-stone-200 pt-4">
-                <p className="text-[13px] font-bold">Simulate reveal day</p>
-                <div className="mt-2 grid gap-2">
-                  {([["gift_card", "Convert to gift card"], ["product", "Mark as product purchased"], ["stack", "Stack to the next occasion"]] as const).map(([o, label]) => (
-                    <button key={o} disabled={revealBusy} onClick={() => {
-                      setRevealBusy(true);
-                      void fetch(`/api/sandbox/pots/${slug}/reveal`, { method: "POST", headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ key: managerKey, outcome: o, retailer: o === "gift_card" ? "Smyths" : undefined }) })
-                        .then(async (r) => { if (r.ok && o === "gift_card") setVoucher(`KND-${slug.slice(0, 4).toUpperCase()}-DEMO`); await load(); })
-                        .finally(() => setRevealBusy(false));
-                    }} className="rounded-xl border border-stone-300 py-2.5 text-[13px] font-bold text-stone-700 hover:bg-stone-50">
-                      <Gift className="mr-1.5 inline h-4 w-4" />{label}
-                    </button>
-                  ))}
-                </div>
+                <button disabled={revealBusy} onClick={() => { void openReveal(); }}
+                  className="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
+                  <Gift className="mr-1.5 inline h-4 w-4" />Simulate reveal day
+                </button>
+                <p className="mt-2 text-[11px] text-stone-400">Runs the full reveal experience — you choose the outcome at the end.</p>
               </div>
             ) : (
               <div className="mt-4 rounded-xl bg-emerald-50 p-3 text-[13px] text-emerald-800">
@@ -274,6 +289,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
                 {voucher && <p className="mt-1">Simulated voucher: <span className="font-mono font-bold">{voucher}</span></p>}
                 {view.simulatedCommission !== undefined && <p className="mt-1">Simulated commission recorded: £{view.simulatedCommission} <span className="text-emerald-600/70">(labelled simulated — sandbox only)</span></p>}
                 <p className="mt-2">Messages unsealed: {view.messages.length}</p>
+                <button onClick={() => { void openReveal(); }} className="mt-2 rounded-xl border border-emerald-300 px-3.5 py-2 text-[12px] font-bold text-emerald-800">Watch the reveal again</button>
               </div>
             )}
           </section>
@@ -282,6 +298,34 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         <p className="mt-10 text-center text-[11px] text-stone-400">
           <Flame className="mr-1 inline h-3 w-3 text-amber-500" />Kindled sandbox · simulated money · <Link href="/sandbox" className="underline">start your own pot</Link>
         </p>
+
+        {showReveal && (
+          <RevealExperience
+            slug={slug}
+            recipientName={view.recipientName}
+            eventDate={view.eventDate}
+            raised={view.raised}
+            goal={view.goal}
+            isChild={view.isChildPot}
+            contributors={view.contributors}
+            messages={revealMsgs ?? (view.kind === "manager" ? view.messages : (view.unsealedMessages ?? []))}
+            items={view.items.map((i) => ({ name: i.name, price: i.price }))}
+            canChooseOutcome={isManager && view.status === "open"}
+            {...(isManager && view.status === "open" ? {
+              onOutcome: async (outcome: RevealOutcome, retailer?: string) => {
+                setRevealBusy(true);
+                try {
+                  const r = await fetch(`/api/sandbox/pots/${slug}/reveal`, { method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ key: managerKey, outcome, ...(retailer ? { retailer } : {}) }) });
+                  if (r.ok && outcome === "gift_card") setVoucher(`KND-${slug.slice(0, 4).toUpperCase()}-DEMO`);
+                  await load();
+                } finally { setRevealBusy(false); }
+              },
+            } : {})}
+            {...(view.kind === "manager" && view.revealOutcome ? { existingOutcome: view.revealOutcome } : {})}
+            onClose={() => setShowReveal(false)}
+          />
+        )}
       </main>
     </div>
   );

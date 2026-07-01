@@ -24,6 +24,8 @@ export interface ReceiverSurpriseView {
 
 export interface GuestView {
   kind: "guest";
+  /** Unsealed only once the pot is revealed/stacked — the reveal experience's fuel. */
+  unsealedMessages?: { displayName: string; text?: string; videoRef?: string }[];
   title: string;
   recipientName: string;
   occasion: string;
@@ -56,7 +58,7 @@ const goalOf = (pot: SandboxPot) =>
 const raisedOf = (pot: SandboxPot) =>
   pot.contributions.reduce((a, c) => a + c.amount, 0);
 
-export function viewFor(pot: SandboxPot, role: ViewerRole): PotView {
+export function viewFor(pot: SandboxPot, role: ViewerRole, opts: { unseal?: boolean } = {}): PotView {
   if (role === "receiver" && pot.isSurprise && pot.status === "open") {
     const n = pot.contributions.length;
     return {
@@ -86,6 +88,9 @@ export function viewFor(pot: SandboxPot, role: ViewerRole): PotView {
     goal: goalOf(pot),
     contributors: pot.contributions.map(({ displayName, amount }) => ({ displayName, amount })),
     messageCount: pot.messages.length,
+    ...(pot.status !== "open"
+      ? { unsealedMessages: pot.messages.map(({ displayName, text, videoRef }) => ({ displayName, ...(text ? { text } : {}), ...(videoRef ? { videoRef } : {}) })) }
+      : {}),
   };
 
   if (role === "manager") {
@@ -96,7 +101,8 @@ export function viewFor(pot: SandboxPot, role: ViewerRole): PotView {
       slug: pot.slug,
       organiserName: pot.organiserName,
       // Sealed until reveal on surprise pots — the organiser sees counts, not content.
-      messages: pot.isSurprise && pot.status === "open" ? [] : pot.messages,
+      // `unseal` is set ONLY by the manager-key-authorised reveal ceremony itself.
+      messages: pot.isSurprise && pot.status === "open" && !opts.unseal ? [] : pot.messages,
       ...(pot.revealOutcome ? { revealOutcome: pot.revealOutcome } : {}),
       ...(pot.simulatedCommission !== undefined ? { simulatedCommission: pot.simulatedCommission } : {}),
     };
