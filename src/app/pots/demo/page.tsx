@@ -20,6 +20,7 @@ import { StarChart } from "@/components/StarChart";
 import { MagneticCard } from "@/components/lux/MagneticCard";
 import { Reveal } from "@/components/lux/Reveal";
 import { VibrantCatalogue } from "@/components/vh/VibrantCatalogue";
+import { InteractiveExplainer } from "@/components/InteractiveExplainer";
 import { LUX_EASE, VH_BOUNCE } from "@/lib/motion";
 import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
@@ -2616,7 +2617,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
 // ABOUT PAGE (one-pager)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function AboutPage() {
+function AboutPage({ onWatch }: { onWatch: () => void }) {
   const [email, setEmail] = useState("");
   const [submitState, setSubmitState] = useState<"idle" | "sending" | "done" | "error">("idle");
 
@@ -2678,6 +2679,18 @@ function AboutPage() {
           <p className="mt-4 text-[15px] leading-relaxed tracking-tight text-[#f5f5f5]/60">
             Kindled turns &ldquo;what do you actually want?&rdquo; into one shared goal everyone can chip in on — any amount, no app required, completely free. No more duplicates. No more clutter. Just the thing you really wanted, funded by the people who love you.
           </p>
+          <motion.button
+            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.4, ease: LUX_EASE }}
+            onClick={onWatch}
+            className="mt-6 flex items-center gap-3 rounded-full border border-[#ffb800]/30 bg-[#ffb800]/[0.08] py-3 pl-3 pr-6 text-left transition-colors hover:bg-[#ffb800]/[0.14]"
+          >
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ffb800] text-[#0a0a0a]"><Play className="ml-0.5 h-4 w-4 fill-[#0a0a0a]" /></span>
+            <span>
+              <span className="block text-[14px] font-bold text-[#f5f5f5]">See how Kindling works</span>
+              <span className="block text-[11px] text-[#f5f5f5]/50">Interactive walkthrough · 2 min</span>
+            </span>
+          </motion.button>
         </div>
 
         {/* ── Problem ── */}
@@ -4355,6 +4368,7 @@ export default function DemoPage() {
   // AI reveal overlay — shown when user clicks into the Reveal tab
   const [showAiReveal, setShowAiReveal] = useState(false);
   const [showPostReveal, setShowPostReveal] = useState(false);
+  const [showExplainer, setShowExplainer] = useState(false);
 
   const addLog = useCallback((entry: string) => {
     setLogEntries((prev) => [entry, ...prev].slice(0, 20));
@@ -4398,6 +4412,7 @@ export default function DemoPage() {
     <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showNewGift && <NewGiftSheet onAdd={handleAddNewGift} onClose={() => setShowNewGift(false)} />}
+      <InteractiveExplainer isOpen={showExplainer} onClose={() => setShowExplainer(false)} />
       <AnimatePresence>{showCreatorModal && <CreatorSignUpModal onClose={() => setShowCreatorModal(false)} />}</AnimatePresence>
       <AnimatePresence>{showReceiverSignUp && <ReceiverSignUpModal onClose={() => setShowReceiverSignUp(false)} />}</AnimatePresence>
       {pendingContribution && (
@@ -4453,7 +4468,7 @@ export default function DemoPage() {
       <AnimatePresence mode="wait">
       {viewMode === "about" ? (
         <motion.div key="about" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <AboutPage />
+          <AboutPage onWatch={() => setShowExplainer(true)} />
         </motion.div>
       ) : viewMode === "investor" ? (
         <motion.div key="investor" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
