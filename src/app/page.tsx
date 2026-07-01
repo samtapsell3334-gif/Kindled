@@ -1077,7 +1077,7 @@ function Footer() {
           </span>
         </div>
         <div className="flex flex-wrap justify-center gap-6">
-          {(["How it works|#how-it-works", "Features|#features", "Live demo|/pots/demo", "FAQ|/pots/demo", "Privacy|#", "Terms|#", "Contact|#", "Investors|/investor"] as const).map((item) => {
+          {(["How it works|#how-it-works", "Features|#features", "Live demo|/pots/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-stone-400 hover:text-stone-700 transition-colors">
@@ -1088,6 +1088,10 @@ function Footer() {
         </div>
         <p className="text-[12px] text-stone-400">Made with love in the UK · © 2026 Kindled. All rights reserved.</p>
       </div>
+      <p className="mx-auto mt-6 max-w-5xl text-center text-[11px] leading-relaxed text-stone-400">
+        Prize draw: 18+, UK residents only. No purchase necessary — a free entry route and full{" "}
+        <Link href="/terms#prize-draw" className="underline underline-offset-2 hover:text-stone-600">terms</Link> apply.
+      </p>
     </footer>
   );
 }
