@@ -141,7 +141,9 @@ describe("per-pot OG metadata (v7 Stage 0)", () => {
     contribute(pot.slug, { displayName: "Grandma", amount: 20 });
     const { generateMetadata } = await import("@/app/p/[slug]/layout");
     const meta = await generateMetadata({ params: Promise.resolve({ slug: pot.slug }) });
-    expect(JSON.stringify(meta.title)).toContain("Ava's 8th Birthday");
+    // v11 WS-1: multi-wish occasions title on receiver + wish count (never amounts)
+    const t = JSON.stringify(meta.title);
+    expect(t.includes("Ava's 8th Birthday") || /\d+ wishes for Ava/.test(t)).toBe(true);
     const flat = JSON.stringify(meta);
     expect(flat).not.toContain("20");        // no amounts
     expect(flat).not.toContain("LEGO");      // no item names

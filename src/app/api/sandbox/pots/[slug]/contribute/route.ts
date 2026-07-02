@@ -31,6 +31,7 @@ export async function POST(
     const { pot } = contribute(slug, {
       displayName: str(body.displayName) ?? "Someone",
       amount,
+      ...(str(body.itemId) ? { itemId: str(body.itemId)! } : {}),
       ...(str(body.message) ? { message: str(body.message)! } : {}),
       ...(str(body.videoRef) ? { videoRef: str(body.videoRef)! } : {}),
       consent: !!body.consent,
@@ -62,6 +63,8 @@ export async function PUT(
       logEvent("reaction_recorded", { potId: pot.id });
     } else if (step === "share_card") {
       logEvent("share_clip_generated", { potId: pot.id });
+    } else if (step === "occasion_share") {
+      logEvent("occasion_share", { potId: pot.id });
     } else if (step === "share_completed") {
       logEvent("share_completed", { potId: pot.id, props: { channel: "native" } });
     } else if (step === "thankyou") {

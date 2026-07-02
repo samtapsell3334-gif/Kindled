@@ -49,6 +49,7 @@ function CreatePot() {
   const [items, setItems] = useState<DraftItem[]>(seededGoal ? [{ name: seededGoal, price: 100, category: "Goal", retailer: "TBC" }] : []);
   const [manual, setManual] = useState({ name: "", price: "", category: "Other", retailer: "" });
   const [pasteUrl, setPasteUrl] = useState("");
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
   const [pasteBusy, setPasteBusy] = useState(false);
   const [pasteError, setPasteError] = useState("");
   const [suggestions, setSuggestions] = useState<{ alternatives: DraftItem[]; complement: DraftItem; line: string } | null>(null);
@@ -285,13 +286,42 @@ function CreatePot() {
           </div>
           {items.length > 0 && (
             <ul className="mt-2 space-y-1">
-              {items.map((i) => (
-                <li key={i.name} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-1.5 text-[12px] text-stone-600">
-                  {i.name} · £{i.price}
-                  <button aria-label={`Remove ${i.name}`} onClick={() => setItems((prev) => prev.filter((x) => x.name !== i.name))}><X className="h-3.5 w-3.5" /></button>
+              {items.map((i, idx) => (
+                <li key={i.name} className="flex items-center justify-between gap-2 rounded-lg bg-stone-50 px-3 py-1.5 text-[12px] text-stone-600">
+                  <span className="min-w-0 flex-1 truncate">{i.name} · £{i.price}</span>
+                  <span className="flex shrink-0 items-center gap-1">
+                    <button aria-label={`Move ${i.name} up`} disabled={idx === 0}
+                      onClick={() => setItems((prev) => { const n = [...prev]; [n[idx - 1], n[idx]] = [n[idx]!, n[idx - 1]!]; return n; })}
+                      className="rounded px-1 text-stone-500 disabled:opacity-30">↑</button>
+                    <button aria-label={`Move ${i.name} down`} disabled={idx === items.length - 1}
+                      onClick={() => setItems((prev) => { const n = [...prev]; [n[idx + 1], n[idx]] = [n[idx]!, n[idx + 1]!]; return n; })}
+                      className="rounded px-1 text-stone-500 disabled:opacity-30">↓</button>
+                    <button aria-label={`Remove ${i.name}`}
+                      onClick={() => { if (window.confirm(`Remove "${i.name}" from the list?`)) setItems((prev) => prev.filter((x) => x.name !== i.name)); }}>
+                      <X className="h-3.5 w-3.5" /></button>
+                  </span>
                 </li>
               ))}
             </ul>
+          )}
+          {/* v11 WS-1: the one warm, skippable nudge — appears after the first wish, once per session */}
+          {items.length === 1 && !nudgeDismissed && !isChildPot && (
+            <div className="mt-3 rounded-2xl border border-amber-200 bg-[var(--ember-soft)]/40 p-3.5">
+              <p className="text-[13px] font-semibold text-stone-800">Add another wish? Two or three get funded faster — it gives everyone a way in.</p>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {[{ label: "Small", it: { name: "Art supplies set", price: 22, category: "Craft", retailer: "Hobbycraft" } },
+                  { label: "Medium", it: { name: "Weekend spa voucher", price: 150, category: "Experiences", retailer: "Virgin Experience Days" } },
+                  { label: "Dream", it: { name: "Espresso machine", price: 220, category: "Kitchen", retailer: "John Lewis" } }].map(({ label, it }) => (
+                  <button key={label} onClick={() => { setItems((prev) => prev.some((x) => x.name === it.name) ? prev : [...prev, it]); setNudgeDismissed(true); }}
+                    className="rounded-xl border border-amber-300 bg-white p-2 text-left text-[11px]">
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-amber-700">{label}</span>
+                    <span className="font-semibold text-stone-800">{it.name}</span>
+                    <span className="block text-stone-500">£{it.price}</span>
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setNudgeDismissed(true)} className="mt-2 text-[12px] font-semibold text-stone-500 underline">One wish is plenty</button>
+            </div>
           )}
         </div>
 

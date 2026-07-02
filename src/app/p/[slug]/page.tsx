@@ -40,6 +40,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
   const [missing, setMissing] = useState(false);
   const [step, setStep] = useState<Step>("idle");
   const [amount, setAmount] = useState(20);
+  const [targetItem, setTargetItem] = useState<{ id: string; name: string } | null>(null); // null = wherever it's needed
   const [displayName, setDisplayName] = useState("");
   const [message, setMessage] = useState("");
   const [videoRef, setVideoRef] = useState<string | null>(null);
@@ -100,6 +101,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
       body: JSON.stringify({
         displayName: displayName || "A friend",
         amount,
+        ...(targetItem ? { itemId: targetItem.id } : {}),
         ...(message ? { message } : {}),
         ...(videoRef ? { videoRef, consent: true } : {}),
         ref: slug,
@@ -192,14 +194,34 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
           {view.status === "open" && pct >= 50 && pct < 90 && <p className="mt-1.5 text-[12px] font-semibold text-amber-700">Past halfway. {view.recipientName}&apos;s gift is taking shape.</p>}
         </div>
 
-        {/* List */}
-        <div className="mt-4 space-y-2">
-          {view.items.map((i) => (
-            <div key={i.id} className="flex items-center justify-between rounded-xl border border-stone-200 bg-white px-4 py-3">
-              <div><p className="text-[14px] font-semibold">{i.name}</p><p className="text-[11px] text-stone-500">{i.retailer} · {i.category}</p></div>
-              <p className="text-[14px] font-bold text-stone-700">£{i.price}</p>
-            </div>
-          ))}
+        {/* v11 WS-1: every wish is its own materialising card with its own progress */}
+        <div className="mt-4 space-y-2.5">
+          {view.items.map((i) => {
+            const ipct = i.price > 0 ? Math.min(100, Math.round((i.raised / i.price) * 100)) : 0;
+            return (
+              <div key={i.id} className={`rounded-2xl border p-3.5 ${i.granted ? "border-emerald-200 bg-emerald-50" : "border-stone-200 bg-white"}`}>
+                <div className="flex items-center gap-3">
+                  <MaterialisingGift visual={i.granted ? { mode: "complete" } : { mode: "progress", pct: ipct }} size={56} className="shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[14px] font-semibold">{i.name}</p>
+                    <p className="text-[11px] text-stone-500">{i.retailer} · £{i.raised} of £{i.price}{i.granted ? "" : ` · ${ipct}%`}</p>
+                    {!i.granted && (
+                      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-stone-100">
+                        <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" style={{ width: `${ipct}%` }} />
+                      </div>
+                    )}
+                  </div>
+                  {i.granted ? (
+                    <p className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-emerald-700">Granted</p>
+                  ) : (!isManager && view.status === "open" && (
+                    <button onClick={() => { setTargetItem({ id: i.id, name: i.name }); setStep("amount"); beacon("start"); }}
+                      className="cta-primary shrink-0 rounded-xl px-3.5 py-2 text-[12px] font-bold">Chip in</button>
+                  ))}
+                </div>
+                {i.granted && view.status === "open" && <p className="mt-1.5 text-[12px] font-semibold text-emerald-800">Fully funded — this one celebrates at the reveal while the others keep going.</p>}
+              </div>
+            );
+          })}
         </div>
 
         {/* Granted (WS-2.5): a completed wish is the product's proof */}
@@ -219,12 +241,15 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
           </section>
         )}
 
-        {/* Guest CTA */}
+        {/* Guest CTA — "wherever it's needed" mode (v11 WS-1) */}
         {!isManager && view.status === "open" && step === "idle" && (
-          <button onClick={() => { setStep("amount"); beacon("start"); }}
-            className="mt-6 w-full rounded-2xl cta-primary py-4 text-[15px] font-bold">
-            Chip in for {view.recipientName}
-          </button>
+          <>
+            <button onClick={() => { setTargetItem(null); setStep("amount"); beacon("start"); }}
+              className="mt-6 w-full rounded-2xl cta-primary py-4 text-[15px] font-bold">
+              Chip in wherever it&apos;s needed
+            </button>
+            <p className="mt-1.5 text-center text-[11px] text-stone-500">Goes to whichever wish is closest to complete, so gifts get finished.</p>
+          </>
         )}
 
         {/* ── Contribute flow ── */}
@@ -232,6 +257,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
           <section aria-label="Choose amount" className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
             <p className="text-[10px] font-bold uppercase tracking-widest text-stone-500">Step 1 of 3 · Your amount</p>
             <p className="mt-1 text-[14px] font-bold">How much would you like to chip in?</p>
+            <p className="mt-0.5 text-[12px] text-stone-500">{targetItem ? `Going to: ${targetItem.name}` : "Going wherever it's needed most"}</p>
             <div className="mt-3 flex gap-2">
               {[5, 10, 20, 50].map((a) => (
                 <button key={a} onClick={() => setAmount(a)}
@@ -418,14 +444,14 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
             isChild={view.isChildPot}
             contributors={view.contributors}
             messages={revealMsgs ?? (view.kind === "manager" ? view.messages : (view.unsealedMessages ?? []))}
-            items={view.items.map((i) => ({ name: i.name, price: i.price }))}
+            items={view.items.map((i) => ({ id: i.id, name: i.name, price: i.price, granted: i.granted }))}
             canChooseOutcome={isManager && view.status === "open"}
             {...(isManager && view.status === "open" ? {
-              onOutcome: async (outcome: RevealOutcome, retailer?: string) => {
+              onOutcome: async (outcome: RevealOutcome, retailer?: string, itemOutcomes?: Record<string, RevealOutcome>) => {
                 setRevealBusy(true);
                 try {
                   const r = await fetch(`/api/sandbox/pots/${slug}/reveal`, { method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ key: managerKey, outcome, ...(retailer ? { retailer } : {}) }) });
+                    body: JSON.stringify({ key: managerKey, outcome, ...(retailer ? { retailer } : {}), ...(itemOutcomes ? { itemOutcomes } : {}) }) });
                   if (r.ok && outcome === "gift_card") setVoucher(`KND-${slug.slice(0, 4).toUpperCase()}-DEMO`);
                   await load();
                 } finally { setRevealBusy(false); }

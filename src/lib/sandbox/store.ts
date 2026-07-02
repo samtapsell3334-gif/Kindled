@@ -219,10 +219,26 @@ export function createPot(input: CreatePotInput): SandboxPot {
     ...(input.ref ? { ref: input.ref } : {}),
     props: { is_child: pot.isChildPot, star_chart: pot.starChartEnabled, surprise: pot.isSurprise, items: pot.items.length },
   });
-  for (const it of pot.items) {
+  pot.items.forEach((it, ordinal) => {
     logEvent("item_added", { potId: pot.id, props: { category: it.category, retailer: it.retailer, price_band: it.priceBand, source: it.source } });
-  }
+    logEvent("wish_added_to_occasion", { potId: pot.id, props: { ordinal: ordinal + 1, price_band: it.priceBand, source: it.source } });
+  });
   return pot;
+}
+
+/** Per-wish funding (v11 WS-1): contributions attributed to the item. */
+export function raisedForItem(pot: SandboxPot, itemId: string): number {
+  return pot.contributions.filter((c) => c.itemId === itemId).reduce((a, c) => a + c.amount, 0);
+}
+
+/** "Wherever it's needed": the approved, unfinished wish closest to complete. */
+export function closestToCompleteItem(pot: SandboxPot): SandboxItem | undefined {
+  const open = pot.items
+    .filter((i) => i.approved && i.price > 0)
+    .map((i) => ({ i, pct: raisedForItem(pot, i.id) / i.price }))
+    .filter((x) => x.pct < 1)
+    .sort((a, b) => b.pct - a.pct);
+  return open[0]?.i;
 }
 
 export function getPotBySlug(slug: string): SandboxPot | undefined {
@@ -237,25 +253,30 @@ export function getPotById(id: string): SandboxPot | undefined {
 
 export function contribute(
   slug: string,
-  input: { displayName: string; amount: number; message?: string; videoRef?: string; consent?: boolean; ref?: string },
+  input: { displayName: string; amount: number; itemId?: string; message?: string; videoRef?: string; consent?: boolean; ref?: string },
 ): { pot: SandboxPot; contribution: SandboxContribution } {
   const pot = getPotBySlug(slug);
   if (!pot) throw new Error("Wish not found");
   if (pot.status !== "open") throw new Error("Wish is not open");
   if (pot.contributions.length >= MAX_CONTRIBUTIONS_PER_POT) throw new Error("This wish has reached the sandbox contribution cap.");
   const amount = Math.max(1, Math.min(500, Math.round(input.amount)));
+  // v11 WS-1: attribute to a named wish, or auto-assign to the closest-to-complete one.
+  const target = input.itemId
+    ? pot.items.find((i) => i.id === input.itemId && i.approved)
+    : closestToCompleteItem(pot);
   const contribution: SandboxContribution = {
     id: newId("con"),
     potId: pot.id,
     displayName: input.displayName.slice(0, 40) || "Someone",
     amount,
+    ...(target ? { itemId: target.id } : {}),
     ...(input.ref ? { ref: input.ref } : {}),
     createdAt: Date.now(),
   };
   assertNoCardData(contribution);
   pot.contributions.push(contribution);
   persistSoon();
-  logEvent("contribution_completed", { potId: pot.id, ...(input.ref ? { ref: input.ref } : {}), props: { amount } });
+  logEvent("contribution_completed", { potId: pot.id, ...(input.ref ? { ref: input.ref } : {}), props: { amount, ...(target ? { item_id: target.id, price_band: target.priceBand } : { unattributed: true }) } });
 
   if (input.message || input.videoRef) {
     const msg: SandboxMessage = {
@@ -311,6 +332,7 @@ export function reviewItem(
   if (!it) throw new Error("Item not found");
   if (approve) {
     it.approved = true;
+    logEvent("wish_added_to_occasion", { potId: pot.id, props: { ordinal: pot.items.filter((x) => x.approved).length, price_band: it.priceBand, source: it.source } });
   } else {
     pot.items = pot.items.filter((i) => i.id !== itemId);
   }
@@ -327,13 +349,17 @@ export function simulateReveal(
   slug: string,
   managerKey: string,
   outcome: RevealOutcome,
-  opts: { retailer?: string } = {},
+  opts: { retailer?: string; itemOutcomes?: Record<string, RevealOutcome> } = {},
 ): SandboxPot {
   const pot = getPotBySlug(slug);
   if (!pot || pot.managerKey !== managerKey) throw new Error("Not authorised");
   const raised = pot.contributions.reduce((a, c) => a + c.amount, 0);
   pot.status = outcome === "stack" ? "stacked" : "revealed";
   pot.revealOutcome = outcome;
+  // v11 WS-1: per-wish outcomes — each wish takes its own path independently.
+  for (const it of pot.items) {
+    it.outcome = opts.itemOutcomes?.[it.id] ?? outcome;
+  }
   persistSoon();
   logEvent("reveal_triggered", { potId: pot.id, props: { raised } });
   if (outcome === "gift_card") {

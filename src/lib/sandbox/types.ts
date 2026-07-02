@@ -22,6 +22,9 @@ export interface SandboxItem {
   source: ItemSource;
   /** Child-circled items need parent approval before appearing on the pot. */
   approved: boolean;
+  /** Per-wish reveal outcome (v11 WS-1) — set at the ceremony; stacking one
+   *  wish never disturbs its siblings. */
+  outcome?: RevealOutcome;
 }
 
 export interface SandboxMessage {
@@ -41,6 +44,9 @@ export interface SandboxContribution {
   displayName: string;
   /** Whole pounds — simulated. */
   amount: number;
+  /** The wish this contribution funds (v11 WS-1). Absent = "wherever it's
+   *  needed": the store assigns it to the closest-to-complete open wish. */
+  itemId?: string;
   ref?: string;
   createdAt: number;
 }

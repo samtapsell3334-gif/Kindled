@@ -38,6 +38,20 @@ describe("MaterialisingGift receiver/ambient safety (v9 acceptance)", () => {
     expect(giftVisualFor(viewFor(revealed, "guest"))).toEqual({ mode: "complete" });
   });
 
+  it("multi-wish occasions stay structurally amount-free on the receiver view (v11 WS-1)", () => {
+    const pot = surprisePot(3);
+    pot.items.push(
+      { id: "item_2", name: "Star atlas", price: 18, category: "Books", retailer: "Waterstones", priceBand: "under25", source: "catalogue", approved: true },
+      { id: "item_3", name: "Roller skates", price: 45, category: "Sports", retailer: "Decathlon", priceBand: "25to100", source: "catalogue", approved: true },
+    );
+    const view = viewFor(pot, "receiver");
+    expect(view.kind).toBe("receiver_surprise");
+    const json = JSON.stringify(view);
+    for (const banned of ["raised", "goal", "amount", "price", "items", "granted", "120", "18", "45"]) {
+      expect(json, banned).not.toContain(banned);
+    }
+  });
+
   it("ambient activity reflects contribution volume without exposing counts", () => {
     expect(giftVisualFor(viewFor(surprisePot(0), "receiver"))).toEqual({ mode: "ambient", activity: "quiet" });
     expect(giftVisualFor(viewFor(surprisePot(2), "receiver"))).toEqual({ mode: "ambient", activity: "warming" });
