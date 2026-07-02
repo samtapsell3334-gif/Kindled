@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createPot, stripCardData, type CreatePotInput, ensureHydrated, flushPersist } from "@/lib/sandbox/store";
+import { saveWaitlistSignup } from "@/lib/waitlist";
 
 /** Create a sandbox pot. Returns the share slug + the private manager key. */
 export async function POST(request: Request): Promise<NextResponse> {
@@ -15,6 +16,11 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (!b.title || !b.recipientName || !b.eventDate || !b.organiserName) {
     await flushPersist();
     return NextResponse.json({ error: "Missing required fields" }, { status: 422 });
+  }
+  // "Register for launch" (optional field) doubles as a waitlist signup —
+  // exactly the stated purpose ("we'll tell you when the real Kindled launches").
+  if (typeof b.organiserEmail === "string" && b.organiserEmail.includes("@")) {
+    await saveWaitlistSignup(b.organiserEmail.slice(0, 120), "sandbox");
   }
   const pot = createPot({
     title: String(b.title).slice(0, 80),

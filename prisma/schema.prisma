@@ -399,3 +399,16 @@ model SandboxState {
 
   @@map("sandbox_state")
 }
+
+/// Waitlist signups (v9.2) — the site's primary CTA. Previously these were
+/// only emailed to the founder (and silently dropped when Resend was not
+/// configured); now every signup lands here first, email is the bonus.
+model WaitlistSignup {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  /// Where the signup came from: "homepage" | "sandbox" | "demo".
+  source    String   @default("homepage")
+  createdAt DateTime @default(now())
+
+  @@map("waitlist_signups")
+}

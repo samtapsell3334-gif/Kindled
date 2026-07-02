@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Resend } from "resend";
+import { saveWaitlistSignup } from "@/lib/waitlist";
 
-const BodySchema = z.object({ email: z.string().email() });
+const BodySchema = z.object({ email: z.string().email(), source: z.string().max(20).optional() });
 
 export async function POST(req: Request) {
   let body: unknown;
@@ -18,6 +19,10 @@ export async function POST(req: Request) {
   }
 
   const submitterEmail = parsed.data.email;
+
+  // Persistence FIRST — the signup must never depend on email delivery.
+  await saveWaitlistSignup(submitterEmail, parsed.data.source ?? "homepage");
+
   const recipientEmail = process.env.CREATOR_SIGNUP_EMAIL;
   const resendKey = process.env.RESEND_API_KEY;
 
@@ -43,9 +48,6 @@ export async function POST(req: Request) {
       console.error("Resend error:", err);
       // Don't fail the user-facing request if email delivery fails
     }
-  } else {
-    // Dev / unconfigured: just log
-    console.warn("[signup] RESEND_API_KEY or CREATOR_SIGNUP_EMAIL not set — email not delivered.", submitterEmail);
   }
 
   return NextResponse.json({ ok: true });
