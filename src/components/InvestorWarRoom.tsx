@@ -8,7 +8,6 @@ import {
   Sparkles, Repeat, Share2, Wallet, Percent, Tag, Cpu, GitBranch, Landmark, Bell,
   Copy, Baby,
 } from "lucide-react";
-import { FilmPlayer, type Film } from "@/components/FilmPlayer";
 import { Logo } from "@/components/Logo";
 /**
  * InvestorWarRoom — a dark, fintech-grade investor dashboard.
@@ -357,17 +356,6 @@ function CleanRoomPanel() {
 
 // ─── v6: the 90-second brief (gated — scenes arrive via /api/investor only) ────
 
-function InvestorFilm() {
-  const content = useContent();
-  const film = (content as { film?: Film }).film;
-  if (!film) return null;
-  return (
-    <div>
-      <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">Watch the 90-second brief</p>
-      <FilmPlayer film={film} />
-    </div>
-  );
-}
 
 function OpportunityTab() {
   const content = useContent();
@@ -816,6 +804,36 @@ function ExecutionTab() {
 
 // ─── WAR ROOM SHELL ───────────────────────────────────────────────────────────
 
+/** v11 WS-16 — in-page animated economics diagram (replaces the investor film).
+    Money on every outcome: gift card (commission), product (affiliate), stack
+    (retention). CSS-only motion; neutralised under reduced motion. */
+function EconomicsDiagram() {
+  const outcomes = [
+    { label: "Gift card", note: "retailer commission on the load", x: 30 },
+    { label: "Product", note: "affiliate on the purchase", x: 175 },
+    { label: "Stack", note: "retention to the next occasion", x: 320 },
+  ];
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Money on every outcome</p>
+      <svg viewBox="0 0 440 150" className="mt-2 w-full" role="img" aria-label="Every reveal outcome carries revenue: gift card commission, product affiliate, or stack retention">
+        <circle cx="220" cy="28" r="16" fill="#F0A63C" className="animate-mg-breathe" />
+        <text x="220" y="32" textAnchor="middle" fontSize="10" fontWeight="700" fill="#1c1917">£</text>
+        <text x="220" y="60" textAnchor="middle" fontSize="10" fill="#94a3b8">a funded wish reveals</text>
+        {outcomes.map((o, i) => (
+          <g key={o.label}>
+            <path d={`M220 66 C220 84, ${o.x + 45} 84, ${o.x + 45} 96`} stroke="#334155" strokeWidth="1.5" fill="none" />
+            <rect x={o.x} y={96} width={92} height={40} rx={10} fill="#0f172a" stroke="#334155" />
+            <text x={o.x + 46} y={112} textAnchor="middle" fontSize="11" fontWeight="700" fill="#E1F5EE">{o.label}</text>
+            <text x={o.x + 46} y={126} textAnchor="middle" fontSize="7.5" fill="#94a3b8">{o.note}</text>
+            <circle cx={o.x + 46} cy={90} r="2.5" fill="#F0A63C" className="animate-mg-breathe" style={{ animationDelay: `${i * 0.6}s` }} />
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 export function InvestorWarRoom({ embedded = false, content }: { embedded?: boolean; content: InvestorContent }) {
   const [tab, setTab] = useState<Tab>("opportunity");
 
@@ -867,7 +885,7 @@ export function InvestorWarRoom({ embedded = false, content }: { embedded?: bool
             <h1 className="mt-2 max-w-3xl text-[26px] font-bold leading-tight tracking-tight text-white md:text-[38px]">{content.hero.headline}</h1>
             <p className="mt-2 max-w-2xl text-[14px] text-slate-400">{content.hero.subhead}</p>
             <div className="mt-6"><PitchBlock /></div>
-            <div className="mt-5 max-w-2xl"><InvestorFilm /></div>
+            <div className="mt-5 max-w-2xl"><EconomicsDiagram /></div>
             <div className="flex flex-wrap gap-x-7 gap-y-3">
               {content.traction.items.map((item) => (
                 <div key={item.label} className="flex items-baseline gap-2">
