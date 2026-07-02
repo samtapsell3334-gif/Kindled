@@ -534,7 +534,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
 // PROFILE HEADER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, onStartReceiving }: {
+function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, onStartReceiving: _onStartReceiving }: {
   potCount: number; totalGoal: number; onShare: () => void; isContributor?: boolean; onStartReceiving?: () => void;
 }) {
   return (
@@ -558,19 +558,18 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
             </div>
           </div>
           {isContributor && (
-            <motion.button
-              whileTap={{ scale: 0.92 }}
-              transition={VH_BOUNCE}
-              onClick={onStartReceiving}
-              className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#ff6b6b] px-4 py-2.5 text-[13px] font-bold text-white vh-lift"
+            /* v11 WS-2: the K-CTA — secondary style, never competing with Chip in */
+            <a href="/sandbox?ref=demo-contributor"
+              onClick={() => track("own_wishes_cta_tapped", { surface: "demo-header" })}
+              className="btn-secondary flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2.5 text-[13px] font-bold vh-lift"
             >
               <Flame className="h-3.5 w-3.5" />
-              Create
-            </motion.button>
+              Start my own wishes
+            </a>
           )}
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2.5">
+        <div className={cn("mt-4 grid-cols-3 gap-2.5", isContributor ? "hidden" : "grid")}>
           {[
             { value: potCount, label: "wishes", gold: false },
             { value: `£${totalGoal.toLocaleString()}`, label: "goal", gold: true },
@@ -3027,11 +3026,12 @@ function ReceiverProofStats() {
 // RECEIVER VIEW
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
+function ReceiverView({ pots, onShare, onReveal, onOpenJoint, onAddWish }: {
   pots: ReceiverPot[];
   onShare: () => void;
   onReveal: () => void;
   onOpenJoint: () => void;
+  onAddWish: () => void;
 }) {
   // Checklist ("Parent's pick") items are already stripped by toReceiverPots —
   // this component's prop type structurally cannot carry raised/contributor data.
@@ -3117,6 +3117,11 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
             {sparkGoals.map((pot, i) => (
               <ReceiverPotCard key={pot.id} pot={pot} index={i} />
             ))}
+            {/* v11 WS-2: the list owner adds wishes here, in their own view */}
+            <button onClick={onAddWish}
+              className="btn-secondary flex w-full items-center justify-center gap-2 rounded-[24px] py-3.5 text-[14px] font-bold">
+              + Add a wish
+            </button>
           </div>
         </div>
 
@@ -3212,6 +3217,7 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
 export default function DemoPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("parent");
   const [isContributor, setIsContributor] = useState(false);
+  const [grantedOpen, setGrantedOpen] = useState<string | null>(null);
   useEffect(() => {
     setIsContributor(new URLSearchParams(window.location.search).get("view") === "contributor");
   }, []);
@@ -3399,7 +3405,7 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={toReceiverPots(pots)} onShare={handleShare} onReveal={() => setViewMode("reveal")} onOpenJoint={() => setViewMode("joint")} />
+          <ReceiverView pots={toReceiverPots(pots)} onShare={handleShare} onReveal={() => setViewMode("reveal")} onOpenJoint={() => setViewMode("joint")} onAddWish={() => setShowNewGift(true)} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }} className="vh vh-paper min-h-screen">
@@ -3414,6 +3420,28 @@ export default function DemoPage() {
       />
 
       <main className="space-y-7 pb-36 pt-4">
+
+        {/* v11 WS-8: granted-first social proof — the page is alive */}
+        {isContributor && pots.some((p) => p.isClaimed) && (
+          <section aria-label="Recently granted" className="px-5">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">Recently granted</p>
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 scrollbar-none">
+              {pots.filter((p) => p.isClaimed).map((p) => (
+                <button key={p.id} onClick={() => setGrantedOpen((g) => (g === p.id ? null : p.id))}
+                  className="flex shrink-0 items-center gap-2 rounded-full bg-[var(--card)] py-1.5 pl-1.5 pr-3.5 vh-lift">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500"><Check className="h-3.5 w-3.5 text-white" strokeWidth={3} /></span>
+                  <span className="text-[12px] font-semibold text-[#0f172a]">{p.claimedBy} granted {p.title.toLowerCase()}</span>
+                </button>
+              ))}
+            </div>
+            {grantedOpen && (() => { const g = pots.find((p) => p.id === grantedOpen); return g ? (
+              <div className="mt-2 rounded-2xl bg-[var(--card)] px-4 py-3 vh-lift">
+                <p className="text-[13px] font-bold text-[#0f172a]">{g.title} — granted by {g.claimedBy}</p>
+                {g.claimedNote && <p className="mt-0.5 text-[12px] text-[#0f172a]/55">{g.claimedNote}</p>}
+              </div>
+            ) : null; })()}
+          </section>
+        )}
 
         {/* ── All pots grid (always LivePotCard — no hidden amounts) ── */}
         <section className="px-5">
@@ -3437,6 +3465,18 @@ export default function DemoPage() {
                 {...(!isContributor && { onRemove: (id: string) => setPots((p) => p.filter((x) => x.id !== id)) })}
               />
             ))}
+            {/* v11 WS-2: contributor sees the K-CTA where add-gift used to be */}
+            {isContributor && (
+              <a href="/sandbox?ref=demo-contributor"
+                onClick={() => track("own_wishes_cta_tapped", { surface: "demo-grid" })}
+                className="btn-secondary flex w-full items-center gap-3.5 rounded-[24px] px-5 py-4 text-left vh-lift">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl [background:var(--ember-soft)]"><Flame className="h-5 w-5 text-[var(--cta-ink)]" /></div>
+                <div>
+                  <p className="font-editorial text-[16px] font-semibold text-[#0f172a]">Start my own wishes</p>
+                  <p className="text-[12px] text-[#0f172a]/45">Build your own list in two minutes; the people who love you do the rest</p>
+                </div>
+              </a>
+            )}
             {/* Add new gift — owner only */}
             {!isContributor && (
               <motion.button
