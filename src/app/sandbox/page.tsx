@@ -149,7 +149,7 @@ function CreatePot() {
       </div>
 
       <div className="space-y-4">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600">1 · The occasion</p>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-amber-700">1 · The occasion</p>
         <label className="block">
           <span className="text-[12px] font-semibold text-stone-600">What&apos;s the occasion?</span>
           <div className="mt-1.5 flex flex-wrap gap-2">
@@ -168,9 +168,9 @@ function CreatePot() {
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
         </label>
 
-        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-600">2 · Who it&apos;s for</p>
+        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-700">2 · Who it&apos;s for</p>
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Who&apos;s it for? {isChildPot && <span className="text-stone-400">(first name only)</span>}</span>
+          <span className="text-[12px] font-semibold text-stone-600">Who&apos;s it for? {isChildPot && <span className="text-stone-500">(first name only)</span>}</span>
           <input value={recipientName} onChange={(e) => {
               setRecipientName(e.target.value);
               if (!titleTouched) setTitle(e.target.value ? `${e.target.value}'s ${occasion}` : "");
@@ -192,12 +192,12 @@ function CreatePot() {
         </div>
 
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Wish name <span className="font-normal text-stone-400">(auto-filled, edit if you like)</span></span>
+          <span className="text-[12px] font-semibold text-stone-600">Wish name <span className="font-normal text-stone-500">(auto-filled, edit if you like)</span></span>
           <input value={title} onChange={(e) => { setTitle(e.target.value); setTitleTouched(true); }} placeholder="e.g. Ava's 8th Birthday"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
         </label>
 
-        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-600">3 · Build the list</p>
+        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-700">3 · Build the list</p>
         <div>
           <span className="text-[12px] font-semibold text-stone-600">Tap to add, and prices and shops fill in automatically</span>
           <div className="mt-1.5 grid grid-cols-2 gap-2">
@@ -207,7 +207,7 @@ function CreatePot() {
                 <button key={c.name} onClick={() => setItems((prev) => on ? prev.filter((i) => i.name !== c.name) : [...prev, c])}
                   className={`rounded-xl border p-2.5 text-left text-[12px] ${on ? "border-amber-400 bg-amber-50" : "border-stone-200"}`}>
                   <span className="font-semibold text-stone-800">{c.name}</span>
-                  <span className="block text-stone-400">£{c.price} · {c.retailer}</span>
+                  <span className="block text-stone-500">£{c.price} · {c.retailer}</span>
                 </button>
               );
             })}
@@ -237,7 +237,7 @@ function CreatePot() {
           )}
         </div>
 
-        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-600">4 · Final details</p>
+        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-700">4 · Final details</p>
         <label className="flex items-center justify-between gap-3 rounded-2xl border border-stone-200 p-4">
           <span className="text-[13px] font-semibold text-stone-700">Keep it a surprise until the reveal</span>
           <input type="checkbox" checked={isSurprise} onChange={(e) => setIsSurprise(e.target.checked)} className="h-5 w-5 accent-amber-500" />
@@ -247,14 +247,14 @@ function CreatePot() {
           <span className="text-[12px] font-semibold text-stone-600">Your name</span>
           <input value={organiserName} onChange={(e) => setOrganiserName(e.target.value)} placeholder="e.g. Sarah"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
-          <span className="mt-1 block text-[11px] text-stone-400">Shown on the wish page, so contributors know who&apos;s organising.</span>
+          <span className="mt-1 block text-[11px] text-stone-500">Shown on the wish page, so contributors know who&apos;s organising.</span>
         </label>
 
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Register for launch <span className="font-normal text-stone-400">(optional)</span></span>
+          <span className="text-[12px] font-semibold text-stone-600">Register for launch <span className="font-normal text-stone-500">(optional)</span></span>
           <input type="email" inputMode="email" autoComplete="email" value={organiserEmail} onChange={(e) => setOrganiserEmail(e.target.value)} placeholder="you@email.com"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
-          <span className="mt-1 block text-[11px] leading-snug text-stone-400">
+          <span className="mt-1 block text-[11px] leading-snug text-stone-500">
             We&apos;ll only use this to tell you when the real Kindled launches. Nothing is sent in the sandbox. See our <Link href="/privacy" className="underline">Privacy Policy</Link>.
           </span>
         </label>
@@ -270,7 +270,7 @@ function CreatePot() {
           className="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900 disabled:opacity-60">
           {busy ? "Creating…" : "Create wish & get the link"}
         </button>
-        <p className="text-center text-[11px] text-stone-400">Sandbox: simulated money only. No payments are processed.</p>
+        <p className="text-center text-[11px] text-stone-500">Sandbox: simulated money only. No payments are processed.</p>
 
         <ExampleWishes heading="Where your wish ends up" />
       </div>

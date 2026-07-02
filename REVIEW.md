@@ -301,3 +301,17 @@ payment-sheet trust copy consolidated to one calm line + link; step markers
 receiver copy emoji trimmed.
 
 Gates: build 0 errors, 86/86 tests (4 new), drift guard green. Deployed + aliased ×4.
+
+## 2026-07-02 — v9 acceptance close-out (Lighthouse + evidence)
+
+- Screenshot evidence now in the repo: audit/v9/01-create.png … 05-granted.png,
+  captured from PRODUCTION at 375px via headless Chrome (create, guest wish at
+  54% with bow + milestone line, receiver teaser, My wishes, granted state).
+- Lighthouse (mobile, live site) before fixes: /sandbox perf 94 / a11y 96;
+  homepage perf 81 / a11y 90.
+- Fixed from those runs: amber-600→amber-700 section labels and stone-400→
+  stone-500 helper text on all sandbox surfaces (4.5:1 AA); homepage mobile menu
+  button aria-label + aria-expanded; marquee visible row unified with its clone
+  at the AA-passing tone (was also a clone/visible mismatch).
+- Granted-state polish: "sealed for the big day" now reads "unsealed at the
+  reveal" once a wish is revealed.

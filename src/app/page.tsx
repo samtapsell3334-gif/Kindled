@@ -243,6 +243,8 @@ function Nav() {
           </Link>
           <button
             onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
             className="md:hidden flex h-9 w-9 items-center justify-center rounded-xl bg-white/8 text-white backdrop-blur-sm"
           >
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -604,7 +606,7 @@ function MarqueeBand() {
         ) : (
           <div key={i} className="flex shrink-0 items-center gap-3 px-8">
             <Flame className="h-3 w-3 shrink-0 text-amber-500" />
-            <span className="whitespace-nowrap text-[12px] font-medium text-stone-400">{text}</span>
+            <span className="whitespace-nowrap text-[13px] font-semibold text-stone-500">{text}</span>
           </div>
         ))}
       </motion.div>

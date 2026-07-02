@@ -67,7 +67,7 @@ export default function MyPotsPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="text-[15px] font-bold">{p.title}</p>
-                      <p className="text-[12px] text-stone-400">for {p.recipientName}</p>
+                      <p className="text-[12px] text-stone-500">for {p.recipientName}</p>
                     </div>
                     {revealed && <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase text-emerald-700">Revealed</span>}
                   </div>
@@ -79,7 +79,7 @@ export default function MyPotsPage() {
                       <p className="mt-1.5 text-[12px] text-stone-500">£{v.raised} of £{v.goal} · {v.contributors.length} contributor{v.contributors.length === 1 ? "" : "s"} · {v.messageCount} sealed message{v.messageCount === 1 ? "" : "s"}</p>
                     </>
                   ) : (
-                    <p className="mt-2 text-[12px] text-stone-400">Loading… (the sandbox may have been reset; wishes don&apos;t survive a reset)</p>
+                    <p className="mt-2 text-[12px] text-stone-500">Loading… (the sandbox may have been reset; wishes don&apos;t survive a reset)</p>
                   )}
                   <div className="mt-3 flex gap-2">
                     <Link href={`/p/${p.slug}?key=${p.managerKey}`}
