@@ -215,3 +215,24 @@ homepage + terms anchor.
 - **Still genuinely founder-only**: DATABASE_URL (marketplace terms + billing → not
   accepted on your behalf), VO recording, commissioned audio, use-of-funds split,
   gift-card rates, legal [TODO]s, citation verification, on-phone test runs.
+
+---
+
+# Consistency v8 — One Site, One Truth (merged cae9984)
+
+- Audit-confirmed the external findings first: several were already fixed mid-flight
+  (status labels, dates, personas, counters, draw/credit naming, anchors partly,
+  investor gating, viewport). The REAL leftovers were in GiftingImpactPanel (five
+  unverified stats incl. £3.2B/YouGov/WRAP/MaPS), FirstKindlersCTA copy, a stale demo
+  sources line, investor-JSON traction/opportunity stats, one dead footer anchor, and
+  missing /sandbox metadata — all fixed (see commit 89be669 for the full list).
+- **Single source of truth:** `src/content/claims.ts` — every statistic (+source),
+  draw, credit, noun, status scale, taglines. Future briefs extend this module;
+  hardcoding new claims elsewhere will trip the guard.
+- **Drift guard:** `src/lib/__tests__/claims-drift.test.ts` fails the build on any
+  banned/retired term (lexicon + old figures + viewport rule). PROOF it works: on its
+  first run it failed with 6 genuine hits (demo comment, war-room comment, 4 stale
+  JSON stats) — fixed, now green. 82 tests total.
+- Live acceptance (production bundles): demo chunks contain 0 retired stats and the
+  Finder set; sandbox metadata serves. Lighthouse ≥95 runs remain a founder/local
+  Chrome task (logged).
