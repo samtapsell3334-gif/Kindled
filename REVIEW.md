@@ -376,3 +376,5 @@ row in Postgres → readout returns it (test row then removed).
 Remaining founder step: create a Resend account + set RESEND_API_KEY to turn
 notification emails on — signups are safe in the DB either way.
 Also: last footer contrast stragglers darkened (homepage a11y toward 100).
+
+**Final:** homepage a11y **100** (verified live post-deploy) — both audited pages now perfect: sandbox 100, homepage 100.
