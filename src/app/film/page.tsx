@@ -8,7 +8,7 @@ import { CUSTOMER_FILM, CUSTOMER_TRANSCRIPT } from "@/data/customer-film";
 export const metadata: Metadata = {
   title: "How Kindled works · 60 seconds — Kindled",
   description:
-    "Watch the 60-second film: one pot, one link, everyone chips in — sealed until the reveal on the big day.",
+    "Watch the 60-second film: one wish, one link, everyone chips in — sealed until the reveal on the big day.",
 };
 
 /**
@@ -50,8 +50,8 @@ export default function FilmPage() {
           <Link href="/#waitlist" className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-[14px] font-bold text-stone-900">
             Reserve your spot
           </Link>
-          <Link href="/pots/demo" className="rounded-2xl border border-stone-300 px-6 py-3.5 text-[14px] font-semibold text-stone-700">
-            See a live pot
+          <Link href="/wishes/demo" className="rounded-2xl border border-stone-300 px-6 py-3.5 text-[14px] font-semibold text-stone-700">
+            See a live wish
           </Link>
         </div>
       </main>

@@ -27,7 +27,7 @@ const MARQUEE_ITEMS = [
   "Magical reveals on the big day",
   "Chip in any amount",
   "Gifts stay secret until the big day",
-  "Stack pots across occasions",
+  "Stack wishes across occasions",
   "Star charts for kids",
   "One link. Unlimited contributors.",
   "2 minutes to set up",
@@ -39,7 +39,7 @@ const STEPS = [
   {
     n: "01",
     icon: Flame,
-    title: "Start your pot",
+    title: "Start your wish",
     desc: "Add what you actually want — paste links from any shop, pick from the catalogue, or create custom goals. Takes under 2 minutes.",
     grad: "from-amber-400 to-orange-500",
     shadow: "rgba(251,146,60,0.35)",
@@ -228,7 +228,7 @@ function Nav() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/pots/demo"
+            href="/wishes/demo"
             className="hidden md:flex items-center gap-1 text-[13px] font-medium text-white/50 hover:text-white transition-colors duration-200"
           >
             Live demo
@@ -259,7 +259,7 @@ function Nav() {
             className="overflow-hidden border-t border-white/8 bg-[#070300]/95 backdrop-blur-2xl md:hidden"
           >
             <div className="flex flex-col gap-0.5 px-5 py-4">
-              {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["Live demo", "/pots/demo"]].map(([l, h]) => (
+              {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["Live demo", "/wishes/demo"]].map(([l, h]) => (
                 <a
                   key={l}
                   href={h}
@@ -346,7 +346,7 @@ function Hero() {
             >
               <Sparkles className="h-3.5 w-3.5 text-amber-400" />
               <span className="text-[11px] font-semibold uppercase tracking-widest text-amber-300/90">
-                Group gifting for friends &amp; family — finally
+                Where wishes catch light
               </span>
             </motion.div>
 
@@ -376,7 +376,7 @@ function Hero() {
               transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50"
             >
-              One shared pot, one link to send. Friends, family and everyone in between chip in any amount — no app, no account — and it stays sealed until you reveal it together on the big day.
+              One shared wish, one link to send. Friends, family and everyone in between chip in any amount — no app, no account — and it stays sealed until you reveal it together on the big day.
             </motion.p>
 
             <motion.div
@@ -394,10 +394,10 @@ function Hero() {
                 Reserve your spot
               </Link>
               <Link
-                href="/pots/demo"
+                href="/wishes/demo"
                 className="flex items-center gap-2 rounded-2xl border border-white/12 bg-white/[0.06] px-6 py-4 text-[15px] font-medium text-white/70 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
               >
-                See a live pot
+                See a live wish
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </motion.div>
@@ -437,7 +437,7 @@ function Hero() {
                       <Flame className="h-5 w-5 text-amber-400" strokeWidth={1.75} />
                     </div>
                     <div>
-                      <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas pot</p>
+                      <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas wish</p>
                       <p className="text-[15px] font-bold leading-tight text-white">PlayStation 5</p>
                     </div>
                   </div>
@@ -509,7 +509,7 @@ function Hero() {
                     <Flame className="h-5 w-5 text-amber-400" strokeWidth={1.75} />
                   </div>
                   <div>
-                    <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas pot</p>
+                    <p className="text-[9px] font-semibold uppercase tracking-widest text-amber-400/60">Billy&apos;s Christmas wish</p>
                     <p className="text-[14px] font-bold text-white leading-tight">PlayStation 5</p>
                   </div>
                 </div>
@@ -714,7 +714,7 @@ function RevealPreview() {
           The reveal is the bit they remember
         </h2>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-white/50">
-          The reveal happens on the day you set — birthday, Christmas, the big moment — not just when the pot is full. Everyone gathers for the gift, who chipped in, and a fair few happy tears.
+          The reveal happens on the day you set — birthday, Christmas, the big moment — not just when the wish is full. Everyone gathers for the gift, who chipped in, and a fair few happy tears.
         </p>
 
         <div
@@ -724,7 +724,7 @@ function RevealPreview() {
         >
           <div className="mb-4 flex items-center justify-center gap-2">
             <Gift className="h-5 w-5 text-amber-400" />
-            <span className="text-[13px] font-bold text-white">Billy&apos;s birthday pot</span>
+            <span className="text-[13px] font-bold text-white">Billy&apos;s birthday wish</span>
           </div>
           <p className="mb-2 text-[34px] font-black text-white" style={{ fontFamily: "var(--font-display)" }}>£800</p>
           <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
@@ -740,7 +740,7 @@ function RevealPreview() {
         </div>
 
         <div className="mt-8">
-          <Link href="/pots/demo" className="inline-flex items-center gap-2 text-[14px] font-semibold text-amber-400 hover:text-amber-300">
+          <Link href="/wishes/demo" className="inline-flex items-center gap-2 text-[14px] font-semibold text-amber-400 hover:text-amber-300">
             Watch a full reveal in the demo <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -805,12 +805,12 @@ function HowItWorks() {
         {/* Demo CTA */}
         <Reveal delay={0.3} className="mt-14 text-center">
           <Link
-            href="/pots/demo"
+            href="/wishes/demo"
             className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-7 py-4 text-[15px] font-bold text-stone-900 shadow-xl transition-all hover:scale-105 hover:-translate-y-0.5 active:scale-[0.97]"
             style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.4)" }}
           >
             <Flame className="h-5 w-5" />
-            See a live pot
+            See a live wish
             <ArrowRight className="h-4 w-4" />
           </Link>
           <p className="mt-3 text-[12px] text-stone-400">No sign-up needed to explore the demo</p>
@@ -893,7 +893,7 @@ function AudienceSplit() {
                 Your wishlist.<br />Your rules.
               </h3>
               <p className="text-[14px] text-stone-600 leading-relaxed mb-6">
-                Set up your pot in 2 minutes. Add anything — from any shop. Kids get star charts and parent controls. Every gift stays secret until you trigger the reveal.
+                Set up your wish in 2 minutes. Add anything — from any shop. Kids get star charts and parent controls. Every gift stays secret until you trigger the reveal.
               </p>
               <div className="space-y-2.5">
                 {[
@@ -977,7 +977,7 @@ function Stats() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { label: "To set up your first pot", display: "2 min" },
+            { label: "To set up your first wish", display: "2 min" },
             { label: "Chip in any amount, from a fiver", display: "£5+" },
             { label: "Quarterly prize draw · free entry · terms apply", display: "£2,500" },
             { label: "Back in credit on catalogue purchases", display: "2%" },
@@ -1074,7 +1074,7 @@ function StackSection() {
               Big dreams take more than one birthday
             </h2>
             <p className="mt-4 max-w-[460px] text-[16px] leading-relaxed text-stone-500">
-              Stack events and watch the pot grow across the year. A goal that isn&apos;t reached by one
+              Stack events and watch the wish grow across the year. A goal that isn&apos;t reached by one
               occasion simply carries forward to the next — birthday to Christmas to birthday — so
               nothing is ever wasted and the big things stay in reach.
             </p>
@@ -1085,7 +1085,7 @@ function StackSection() {
           </Reveal>
           <Reveal delay={0.1}>
             <div className="rounded-3xl border border-amber-100 bg-white p-6 shadow-sm">
-              <p className="mb-4 text-[12px] font-bold text-stone-700">One pot, stacked across the year</p>
+              <p className="mb-4 text-[12px] font-bold text-stone-700">One wish, stacked across the year</p>
               <div className="space-y-5">
                 {stages.map((s, i) => (
                   <div key={s.label}>
@@ -1132,12 +1132,12 @@ function HowMoneyWorks() {
     {
       icon: Gift,
       title: "Every penny goes to the goal",
-      body: "Contributions are tracked against the pot's goal so the family can watch it grow — or, on a surprise pot, it stays hidden from the recipient until reveal day.",
+      body: "Contributions are tracked against the wish's goal so the family can watch it grow — or, on a surprise wish, it stays hidden from the recipient until reveal day.",
     },
     {
       icon: RefreshCw,
       title: "Nothing is wasted if it falls short",
-      body: "If a pot isn't fully funded by the big day, the reveal still happens — and the family chooses: take what was raised towards the goal, stack it forward to the next occasion, or switch to a goal within reach. No pressure, no lost money.",
+      body: "If a wish isn't fully funded by the big day, the reveal still happens — and the family chooses: take what was raised towards the goal, stack it forward to the next occasion, or switch to a goal within reach. No pressure, no lost money.",
     },
     {
       icon: Lock,
@@ -1228,8 +1228,8 @@ function FinalCTA() {
 
             <p className="mt-6 text-[13px] text-stone-500">
               Just want a look first?{" "}
-              <Link href="/pots/demo" className="font-semibold text-stone-700 underline underline-offset-2 hover:text-stone-900">
-                See a live pot
+              <Link href="/wishes/demo" className="font-semibold text-stone-700 underline underline-offset-2 hover:text-stone-900">
+                See a live wish
               </Link>
               .
             </p>
@@ -1271,7 +1271,7 @@ function Footer() {
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 md:flex-row">
         <Logo variant="light" size={30} />
         <div className="flex flex-wrap justify-center gap-6">
-          {(["How it works|#how", "Watch the film|/film", "Live demo|/pots/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
+          {(["How it works|#how", "Watch the film|/film", "Live demo|/wishes/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-stone-400 hover:text-stone-700 transition-colors">

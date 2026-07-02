@@ -69,13 +69,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (!pot) throw new AppError("Pot not found.", 404);
+    if (!pot) throw new AppError("Wish not found.", 404);
 
     // Only fully-funded pots get a reveal. Without this gate any caller with a
     // potId could trigger expensive AI video generation on an active/unfunded
     // pot — an abuse and cost vector.
     if (pot.status !== "FUNDED") {
-      throw new AppError("Reveal is only available once the pot is fully funded.", 409);
+      throw new AppError("Reveal is only available once the wish is fully funded.", 409);
     }
 
     // Return the pre-existing URL if already generated.

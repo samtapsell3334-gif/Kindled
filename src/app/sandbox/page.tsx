@@ -35,7 +35,7 @@ function CreatePot() {
   const seededGoal = params.get("goal") ?? "";
   const ref = params.get("ref") ?? "";
 
-  const [title, setTitle] = useState(seededGoal ? `The ${seededGoal} pot` : "");
+  const [title, setTitle] = useState(seededGoal ? `The ${seededGoal} wish` : "");
   const [titleTouched, setTitleTouched] = useState(!!seededGoal);
   const [recipientName, setRecipientName] = useState("");
   const [occasion, setOccasion] = useState("Birthday");
@@ -100,8 +100,8 @@ function CreatePot() {
     return (
       <main className="mx-auto max-w-md px-5 py-12 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500"><Check className="h-7 w-7 text-white" strokeWidth={3} /></div>
-        <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-4 text-[28px] font-bold text-stone-900">Your pot is live</h1>
-        <p className="mt-2 text-[14px] text-stone-500">Share the first link with the people who&apos;ll chip in. Keep the second link private — it&apos;s how you manage the pot and run the reveal.</p>
+        <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-4 text-[28px] font-bold text-stone-900">Your wish is live</h1>
+        <p className="mt-2 text-[14px] text-stone-500">Share the first link with the people who&apos;ll chip in. Keep the second link private — it&apos;s how you manage the wish and run the reveal.</p>
 
         <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left">
           <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Your invite message — edit it, then send</p>
@@ -133,8 +133,8 @@ function CreatePot() {
         </div>
 
         <div className="mt-6 flex flex-col gap-2.5">
-          <Link href="/sandbox/pots" className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-[14px] font-bold text-stone-900">Go to My pots</Link>
-          <Link href={manageUrl} className="rounded-2xl border border-stone-300 px-6 py-3.5 text-[14px] font-semibold text-stone-700">Open this pot</Link>
+          <Link href="/sandbox/wishes" className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-[14px] font-bold text-stone-900">Go to My wishes</Link>
+          <Link href={manageUrl} className="rounded-2xl border border-stone-300 px-6 py-3.5 text-[14px] font-semibold text-stone-700">Open this wish</Link>
         </div>
       </main>
     );
@@ -144,7 +144,7 @@ function CreatePot() {
     <main className="mx-auto max-w-md px-5 py-10">
       <div className="mb-6 flex items-center gap-2.5">
         <LogoMark variant="light" size={38} />
-        <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[26px] font-bold text-stone-900">Start a pot</h1>
+        <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[26px] font-bold text-stone-900">Start a wish</h1>
       </div>
 
       <div className="space-y-4">
@@ -179,7 +179,7 @@ function CreatePot() {
 
         <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
           <label className="flex items-center justify-between gap-3">
-            <span className="text-[13px] font-semibold text-stone-700">I&apos;m a parent or guardian — this pot is for my child</span>
+            <span className="text-[13px] font-semibold text-stone-700">I&apos;m a parent or guardian — this wish is for my child</span>
             <input type="checkbox" checked={isChildPot} onChange={(e) => { setIsChildPot(e.target.checked); if (!e.target.checked) setStarChart(false); }} className="h-5 w-5 accent-amber-500" />
           </label>
           {isChildPot && (
@@ -191,7 +191,7 @@ function CreatePot() {
         </div>
 
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Pot name <span className="font-normal text-stone-400">(auto-filled — edit if you like)</span></span>
+          <span className="text-[12px] font-semibold text-stone-600">Wish name <span className="font-normal text-stone-400">(auto-filled — edit if you like)</span></span>
           <input value={title} onChange={(e) => { setTitle(e.target.value); setTitleTouched(true); }} placeholder="e.g. Ava's 8th Birthday"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
         </label>
@@ -261,7 +261,7 @@ function CreatePot() {
 
         <button onClick={() => { void submit(); }} disabled={busy}
           className="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900 disabled:opacity-60">
-          {busy ? "Creating…" : "Create pot & get the link"}
+          {busy ? "Creating…" : "Create wish & get the link"}
         </button>
         <p className="text-center text-[11px] text-stone-400">Sandbox: simulated money only. No payments are processed.</p>
       </div>

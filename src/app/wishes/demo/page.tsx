@@ -395,7 +395,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
             <div className="space-y-5">
               {/* Header + step dots */}
               <div>
-                <p className="font-editorial text-[20px] font-semibold text-white leading-tight">Create my own pot</p>
+                <p className="font-editorial text-[20px] font-semibold text-white leading-tight">Create my own wish</p>
                 <p className="mt-1 text-[12px] text-white/50">Step {step} of {totalSteps}</p>
                 <div className="mt-3 flex gap-1.5">
                   {Array.from({ length: totalSteps }).map((_, i) => (
@@ -461,7 +461,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                       <motion.button whileTap={{ scale: 0.97 }} onClick={isParent ? handleNext : () => { void handleSubmit(); }}
                         disabled={loading}
                         className="flex-[2] rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
-                        {isParent ? "Next" : loading ? "Creating…" : "Create My First Pot"}
+                        {isParent ? "Next" : loading ? "Creating…" : "Create My First Wish"}
                       </motion.button>
                     </div>
                   </motion.div>
@@ -516,7 +516,7 @@ function ReceiverSignUpModal({ onClose }: { onClose: () => void }) {
                       </motion.button>
                       <motion.button whileTap={{ scale: 0.97 }} onClick={() => { void handleSubmit(); }} disabled={loading}
                         className="flex-[2] rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] py-3 text-[15px] font-semibold text-white shadow-lg disabled:opacity-40">
-                        {loading ? "Creating…" : "Create My First Pot"}
+                        {loading ? "Creating…" : "Create My First Wish"}
                       </motion.button>
                     </div>
                   </motion.div>
@@ -828,7 +828,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                         <div className="flex items-center gap-2.5">
                           <Flame className="h-4 w-4 shrink-0 text-white" strokeWidth={2} />
                           <div>
-                            <p className="text-[13px] font-bold leading-tight text-white">Fund this pot fully</p>
+                            <p className="text-[13px] font-bold leading-tight text-white">Fund this wish fully</p>
                             <p className="text-[10px] leading-tight text-white/80">Cover the remaining balance — make it happen today</p>
                           </div>
                         </div>
@@ -849,7 +849,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                         <ShoppingBag className="h-4 w-4 shrink-0 text-[#0f172a]/55" strokeWidth={2} />
                         <div>
                           <p className="text-[13px] font-bold leading-tight text-[#0f172a]">Buy it outright</p>
-                          <p className="text-[10px] leading-tight text-[#0f172a]/45">Skip the pot — purchase it directly as your gift</p>
+                          <p className="text-[10px] leading-tight text-[#0f172a]/45">Skip the wish — purchase it directly as your gift</p>
                         </div>
                       </div>
                       <span className="shrink-0 rounded-full bg-[#fffdf7] px-3 py-1 text-[13px] font-bold tabular-nums text-[#0f172a]/70">
@@ -1143,7 +1143,7 @@ function ContributionPromptModal({
                 </div>
                 <div>
                   <p className="text-[12px] font-bold text-[#f59e0b]">Kindle Back Rewards</p>
-                  <p className="text-[11px] text-white/55 leading-snug">Earn <span className="text-[#f59e0b] font-semibold">2% back</span> in credit on catalogue purchases — put it toward your own goals when you start your own pot.</p>
+                  <p className="text-[11px] text-white/55 leading-snug">Earn <span className="text-[#f59e0b] font-semibold">2% back</span> in credit on catalogue purchases — put it toward your own goals when you start your own wish.</p>
                 </div>
               </div>
             </div>
@@ -1256,7 +1256,7 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
           </div>
 
           <p className="mb-5 text-[13px] leading-relaxed text-white/70">
-            Loved how easy it was to chip in for Billy? Create your family&apos;s continuous gift pots today. 
+            Loved how easy it was to chip in for Billy? Create your family&apos;s continuous gift wishes today. 
             Gather contributions year-round, stop plastic duplicate waste, and easily fund your family&apos;s
             biggest milestone dreams.
           </p>
@@ -1296,7 +1296,7 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#f59e0b] to-[#f59e0b] py-4 text-[15px] font-bold text-[#0f172a] shadow-xl shadow-[#0f172a]/40 active:scale-95 disabled:opacity-60"
               >
                 <Flame className="h-[18px] w-[18px]" strokeWidth={2.5} />
-                {loading ? "Creating your pot…" : "Create My First Pot"}
+                {loading ? "Creating your wish…" : "Create My First Wish"}
               </motion.button>
             </form>
           )}
@@ -2021,7 +2021,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
     { title: "No app needed", desc: "Open a link, pay by FaceID in seconds. Works for grandparents too." },
     { title: "Duplicate-proof", desc: "Contributors see it ticked off instantly, so nobody ever doubles up." },
     { title: "The Reveal", desc: "A genuinely emotional moment with the people who love you — not just a balance update." },
-    { title: "Nothing expires", desc: "An unfinished pot carries to the next birthday or Christmas — never a \"failure.\"" },
+    { title: "Nothing expires", desc: "An unfinished wish carries to the next birthday or Christmas — never a \"failure.\"" },
   ];
 
 
@@ -2086,7 +2086,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
 
         {/* ── Solution ── */}
         <div className="rounded-2xl border border-[#ffb800]/25 p-5" style={{ background: "rgba(255,184,0,0.05)" }}>
-          <h2 className="font-editorial mb-3 text-[22px] font-semibold text-white">Meet the Pot.</h2>
+          <h2 className="font-editorial mb-3 text-[22px] font-semibold text-white">Meet the Wish.</h2>
           <p className="mb-5 text-[13px] leading-relaxed text-[#f5f5f5]/65">
             Kindled replaces the guesswork with one shared goal. Build a list — from new trainers to a house deposit. Share a single link. Everyone who loves you chips in whatever they can, big or small. Nothing gets duplicated, nothing gets wasted — and the big moment stays a surprise until everyone&apos;s together to share it.
           </p>
@@ -2103,7 +2103,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
 
         {/* ── Real Life Vignettes ── */}
         <div>
-          <h2 className="font-editorial mb-1 text-[22px] font-semibold text-white">Real People. Real Pots.</h2>
+          <h2 className="font-editorial mb-1 text-[22px] font-semibold text-white">Real People. Real Wishes.</h2>
           <p className="mb-5 text-[13px] text-[#f5f5f5]/50">Two ordinary moments, fixed.</p>
           <div className="flex flex-col gap-4">
             {/* Leo's Birthday */}
@@ -2136,7 +2136,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
                 <span className="mt-0.5 shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#ffb800]">Kindled</span>
                 <p className="text-[12px] leading-snug text-[#f5f5f5]/60">8 family members quietly chip in throughout the year. Christmas morning, with everyone gathered round, Dad finds out exactly how far they got.</p>
               </div>
-              <p className="border-t border-white/8 pt-2.5 text-[12px] font-medium italic text-[#ffb800]">Fully funded or not, every pound brings it closer — and an unfinished pot simply rolls on to his birthday, until the log burner&apos;s real.</p>
+              <p className="border-t border-white/8 pt-2.5 text-[12px] font-medium italic text-[#ffb800]">Fully funded or not, every pound brings it closer — and an unfinished wish simply rolls on to his birthday, until the log burner&apos;s real.</p>
             </div>
           </div>
         </div>
@@ -2199,7 +2199,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
           <div>
             <h3 className="font-editorial mb-1.5 text-[16px] font-semibold text-white">Every Penny Goes to the Gift.</h3>
             <p className="text-[13px] leading-relaxed text-[#f5f5f5]/60">
-              No listing fees. No withdrawal fees. No quiet percentage disappearing along the way. Whether you&apos;re chipping in £5 or running the whole pot, every penny goes toward the gift — not one slice is ever taken, by us or anyone else. Free for the people giving. Free for the people receiving. Always.
+              No listing fees. No withdrawal fees. No quiet percentage disappearing along the way. Whether you&apos;re chipping in £5 or running the whole wish, every penny goes toward the gift — not one slice is ever taken, by us or anyone else. Free for the people giving. Free for the people receiving. Always.
             </p>
           </div>
         </div>
@@ -2211,7 +2211,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
             We&apos;re opening Kindled to early users soon. Join the waitlist and we&apos;ll let you know the moment you can build your first list.
           </p>
           <p className="mx-auto mb-5 max-w-sm text-[12px] leading-relaxed text-[#f5f5f5]/45">
-            Can&apos;t wait? <a href="/sandbox" className="font-semibold text-[#ffb800] underline underline-offset-2">Try the working sandbox</a> — create a real pot with simulated money and share it.
+            Can&apos;t wait? <a href="/sandbox" className="font-semibold text-[#ffb800] underline underline-offset-2">Try the working sandbox</a> — create a real wish with simulated money and share it.
           </p>
           {submitState === "done" ? (
             <div className="flex items-center justify-center gap-2 border border-[#ffb800]/40 bg-[#ffb800]/15 py-3.5">
@@ -2842,10 +2842,10 @@ function RevealV2View() {
                 <Share2 className="h-4 w-4" />
                 Share this moment
               </button>
-              <a href="/pots/demo"
+              <a href="/wishes/demo"
                 className="flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] py-4 text-[15px] font-semibold text-white/65 transition-colors hover:border-white/20 hover:text-white/90">
                 <Flame className="h-4 w-4 text-amber-400" />
-                Start my own pot — free
+                Start my own wish — free
               </a>
               <button onClick={reset}
                 className="py-2 text-[12px] text-white/20 transition-colors hover:text-white/45">
@@ -2863,7 +2863,7 @@ function RevealV2View() {
 // ROLE SWITCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// ─── POST-REVEAL: turn the pot into the real gift ─────────────────────────────
+// ─── POST-REVEAL: turn the wish into the real gift ─────────────────────────────
 // This is the affiliate + gift-card revenue moment: buy now (boosted cashback),
 // flexible gift cards, and a top-up for any gift that isn't fully funded.
 function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
@@ -2938,7 +2938,7 @@ function PostRevealOptions({ recipientName, totalRaised, onReplay }: {
       <div className="mt-5 rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-950/60 to-violet-950/40 p-4">
         <p className="text-[14px] font-black text-white">Prefer flexibility?</p>
         <p className="mt-1 text-[12px] leading-relaxed text-stone-400">
-          Turn the pot into gift cards — spend anywhere, and earn cashback into {recipientName}&apos;s wallet for next time.
+          Turn the wish into gift cards — spend anywhere, and earn cashback into {recipientName}&apos;s wallet for next time.
         </p>
         <div className="mt-3 grid grid-cols-3 gap-2">
           {[{ brand: "Amazon", back: 3, color: "#f59e0b" }, { brand: "Currys", back: 4, color: "#a78bfa" }, { brand: "Smyths", back: 5, color: "#34d399" }].map((c) => {
@@ -3153,7 +3153,7 @@ function JointFireView() {
     <div className="font-outfit min-h-screen bg-[#0f172a] px-4 pb-32 pt-6 text-[#fdf6e3]">
       {/* Header */}
       <motion.div {...reveal} className="mb-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#f59e0b]">Joint pot · Milestone engine</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#f59e0b]">Joint wish · Milestone engine</p>
         <h2 className="font-editorial mt-1.5 text-[27px] font-semibold leading-tight text-[#fdf6e3]">Stack your birthdays. Combine your Christmases.</h2>
         <p className="mt-2 max-w-sm text-[13px] leading-relaxed tracking-tight text-[#fdf6e3]/55">Link accounts, pick a milestone, and every occasion stacks toward something neither of you would buy on a single day.</p>
       </motion.div>
@@ -3216,7 +3216,7 @@ function JointFireView() {
           <p className="text-[13px] font-bold text-stone-100">The Legacy Arc</p>
           <span className="flex items-center gap-1 text-[11px] font-semibold text-[#f59e0b]"><TrendingUp className="h-3.5 w-3.5" /> Building</span>
         </div>
-        <p className="mb-2 text-[11px] text-slate-400">Each occasion is an energy booster flowing into the macro-pot.</p>
+        <p className="mb-2 text-[11px] text-slate-400">Each occasion is an energy booster flowing into the macro-wish.</p>
         <MomentumArc progress={progress} milestones={milestones} />
       </motion.div>
 
@@ -3283,7 +3283,7 @@ function JointFireView() {
 
       <motion.button {...reveal} whileTap={{ scale: 0.97 }}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#ff6b6b] py-4 text-[14px] font-bold text-white vh-lift">
-        <UserPlus className="h-4 w-4" /> Invite a partner to your joint pot
+        <UserPlus className="h-4 w-4" /> Invite a partner to your joint wish
       </motion.button>
       <p className="mt-3 text-center text-[10px] leading-relaxed text-slate-500">Free to link · withdraw anytime · funds held on regulated Open Banking rails</p>
     </div>
@@ -3310,7 +3310,7 @@ function JointFireFeature({ onOpen, hideAmounts = false }: { onOpen: () => void;
       <div className="relative h-28 w-full overflow-hidden">
         <img src={goal.image} alt={goal.title} loading="lazy" className="h-full w-full object-cover opacity-55" onError={(e) => { e.currentTarget.style.opacity = "0.2"; }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.92) 100%)" }} />
-        <span className="absolute left-4 top-4 flex items-center gap-1 rounded-full bg-[#ff6b6b] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white"><Link2 className="h-3 w-3" /> Joint pot</span>
+        <span className="absolute left-4 top-4 flex items-center gap-1 rounded-full bg-[#ff6b6b] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white"><Link2 className="h-3 w-3" /> Joint wish</span>
         <div className="absolute right-4 top-4 flex -space-x-3">
           {JOINT_PARTNERS.map((p) => (
             <div key={p.name} className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-[#0f172a] bg-[#1f2937]">
@@ -3613,7 +3613,7 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
               <Sparkles className="h-7 w-7 text-white" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Your gift pots</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Your gift wishes</p>
               <h1 className="font-editorial text-[28px] font-semibold leading-tight text-[#0f172a]">Hey Billy!</h1>
             </div>
           </div>
@@ -3630,7 +3630,7 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
 
         {/* ── Total pot value hero ── */}
         <div className="mt-5 rounded-[28px] bg-[#0f172a] px-6 py-6 vh-lift-lg">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f59e0b]">Total pot value</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#f59e0b]">Total wish value</p>
           <p className="font-editorial mt-1.5 text-[44px] font-semibold leading-none text-[#fdf6e3]">
             £{totalTarget.toLocaleString()}
           </p>
@@ -3660,7 +3660,7 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
         <div className="mt-3 flex items-start gap-2.5 rounded-2xl bg-[#f59e0b]/[0.1] px-3.5 py-3">
           <Flame className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f59e0b]" strokeWidth={2} />
           <p className="text-[11px] leading-snug text-[#0f172a]/70">
-            These pots are continuous. A magical reveal happens on your next big occasion, even if a pot is only partly funded.
+            These wishes are continuous. A magical reveal happens on your next big occasion, even if a wish is only partly funded.
           </p>
         </div>
       </div>
@@ -3668,7 +3668,7 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
       <div className="space-y-6 px-4 pb-20">
         {/* ── Unified pots stream — every pot locked under wraps ── */}
         <div>
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Your gift pots · all under wraps</p>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Your gift wishes · all under wraps</p>
           <div className="flex flex-col gap-3.5">
             {sparkGoals.map((pot, i) => (
               <ReceiverPotCard key={pot.id} pot={pot} index={i} />
@@ -3792,7 +3792,7 @@ export default function DemoPage() {
       p.id === id ? { ...p, raised: Math.min(p.goal, p.raised + amount), contributors: p.contributors + 1 } : p,
     ));
     showToast(`£${amount} chipped in!`);
-    addLog(`Contribution: £${amount} added to pot`);
+    addLog(`Contribution: £${amount} added to wish`);
     track("pot_chip_in_completed", { amount });
   }, [showToast, addLog]);
 
@@ -3850,8 +3850,8 @@ export default function DemoPage() {
             <div className={cn("h-2 w-2 shrink-0 rounded-full", isContributor ? "bg-[#0f172a]/40" : "bg-[#ff6b6b]")} />
             <p className="text-[11px] leading-snug tracking-tight text-[#0f172a]/55">
               {isContributor
-                ? <><span className="font-bold text-[#0f172a]">Contributor view</span> — you&apos;re seeing Billy&apos;s pot as a family member. Tap any gift to chip in.</>
-                : <><span className="font-bold text-[#0f172a]">Parent / owner view</span> — this is how Billy&apos;s family manages and tracks his pot. Switch tabs to explore.</>
+                ? <><span className="font-bold text-[#0f172a]">Contributor view</span> — you&apos;re seeing Billy&apos;s wish as a family member. Tap any gift to chip in.</>
+                : <><span className="font-bold text-[#0f172a]">Parent / owner view</span> — this is how Billy&apos;s family manages and tracks his wish. Switch tabs to explore.</>
               }
             </p>
           </motion.div>
@@ -3925,7 +3925,7 @@ export default function DemoPage() {
               <Play className="h-5 w-5" strokeWidth={3} />
               Play AI Reveal
             </motion.button>
-            <p className="text-[10px] text-stone-500">Tap to experience the full-screen reveal · Generated live from this pot</p>
+            <p className="text-[10px] text-stone-500">Tap to experience the full-screen reveal · Generated live from this wish</p>
             {/* Classic reveal underneath */}
             <div className="mt-4 w-full border-t border-white/10 pt-6">
               <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-stone-500">Or — classic reveal</p>
@@ -3960,10 +3960,10 @@ export default function DemoPage() {
         <section className="px-5">
           <div className="mb-4">
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff6b6b]">
-              {isContributor ? "Active gift pots" : "Gift List"}
+              {isContributor ? "Active gift wishes" : "Gift List"}
             </p>
             <p className="font-editorial mt-1 text-[26px] font-semibold leading-tight text-[#0f172a]">
-              {activePots.filter((p) => !p.isChecklist).length} {isContributor ? "pots to fund" : "gifts to fund or buy"}
+              {activePots.filter((p) => !p.isChecklist).length} {isContributor ? "wishes to fund" : "gifts to fund or buy"}
             </p>
           </div>
           <div className="flex flex-col gap-3.5">
@@ -4051,7 +4051,7 @@ export default function DemoPage() {
                 <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-[#f59e0b]" />
                 <p className="text-[11px] leading-snug text-[#fdf6e3]/80">
                   <span className="font-bold text-[#fdf6e3]">Enter our £2,500 quarterly prize draw</span> with every contribution — free entry route available.{" "}
-                  Plus earn <span className="font-bold text-[#f59e0b]">2% credit back</span> on your own future pots.
+                  Plus earn <span className="font-bold text-[#f59e0b]">2% credit back</span> on your own future wishes.
                 </p>
               </div>
               <motion.button
@@ -4061,7 +4061,7 @@ export default function DemoPage() {
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#ff6b6b] py-4 text-[15px] font-bold text-white vh-lift"
               >
                 <Flame className="h-4 w-4" />
-                Create my own pot — it&apos;s free
+                Create my own wish — it&apos;s free
               </motion.button>
               <p className="mt-2.5 text-center text-[11px] text-[#fdf6e3]/45">No app required · 2 minute setup</p>
             </div>
@@ -4169,7 +4169,7 @@ export default function DemoPage() {
                 <div className="flex flex-col gap-3">
                   {[
                     { Icon: ShieldCheck, stat: "82%", label: "Zero Gift Anxiety", desc: "of contributors report zero gift-buying stress when using Kindled vs traditional shopping." },
-                    { Icon: Wallet, stat: "0%", label: "Payout Fees", desc: "Every penny you kindle goes directly to the pot — no platform fees, no hidden charges." },
+                    { Icon: Wallet, stat: "0%", label: "Payout Fees", desc: "Every penny you kindle goes directly to the wish — no platform fees, no hidden charges." },
                     { Icon: Star, stat: "3×", label: "Emotional ROI", desc: "Group gifting creates 3× stronger memory bonds than solo gifts of the same monetary value." },
                   ].map(({ Icon, stat, label, desc }) => (
                     <div key={label} className="flex items-start gap-3">

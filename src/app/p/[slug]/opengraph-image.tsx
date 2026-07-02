@@ -12,10 +12,10 @@ export const contentType = "image/png";
 export default async function PotOgImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const pot = getPotBySlug(slug);
-  const title = pot ? pot.title : "A Kindled pot";
+  const title = pot ? pot.title : "A Kindled wish";
   const line = pot
     ? `${pot.occasion} · ${new Date(pot.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}`
-    : "One pot, one link, revealed on the big day";
+    : "One wish, one link, revealed on the big day";
   const embers = Array.from({ length: 36 }, (_, i) => ({
     left: (i * 151.7) % 1200, top: 160 + ((i * 97.3) % 440),
     s: 3 + ((i * 7) % 8), o: 0.15 + ((i * 11) % 45) / 100,

@@ -22,13 +22,13 @@ export default function PrivacyPage() {
       <H2>Who we are</H2>
       <P>
         Kindled (&quot;we&quot;, &quot;us&quot;) provides a group-gifting service that lets families and friends contribute
-        towards shared gift pots. For the purposes of UK GDPR, the data controller is the entity to be confirmed above.
+        towards shared gift wishes. For the purposes of UK GDPR, the data controller is the entity to be confirmed above.
       </P>
 
       <H2>What we collect</H2>
       <UL>
         <li>Contact details you give us — e.g. your email address when you join the waitlist or create an account.</li>
-        <li>Pot and contribution details — the pots you create or contribute to, amounts, and any message or media you add.</li>
+        <li>Wish and contribution details — the wishes you create or contribute to, amounts, and any message or media you add.</li>
         <li>Payment data processed by our payment provider (see &quot;Payments&quot;) — we do not store full card numbers.</li>
         <li>Technical data — essential cookies, device/browser information, and aggregated usage analytics (only with your consent).</li>
       </UL>

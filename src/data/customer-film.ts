@@ -12,7 +12,7 @@ export const CUSTOMER_FILM: Film = {
   scenes: [
     { dur: 12, visual: "pain", headline: "Every year. The same four horsemen.",
       caption: "The group chat. The duplicate. The awkward money text. The drawer." },
-    { dur: 12, visual: "potfill", headline: "One pot. One link. Everyone in.",
+    { dur: 12, visual: "potfill", headline: "One wish. One link. Everyone in.",
       caption: "Everyone chips in from anywhere — no app, no account needed." },
     { dur: 11, visual: "split", headline: "No more guessing. No more doubles.",
       caption: "The list means no duplicates — and kids circle their catalogue like we used to." },
@@ -29,7 +29,7 @@ export const CUSTOMER_FILM: Film = {
 /** Full transcript (accessibility + SEO) — the VO lines from the script. */
 export const CUSTOMER_TRANSCRIPT = [
   "Every year, the same four horsemen: the guessing group chat, the duplicate present, the awkward money-collection text — and the drawer where unwanted gifts go to live.",
-  "Kindled replaces all of it. One pot, one link, everyone chips in from anywhere — no app, no account. The list means no more guessing and no more doubles. Kids circle their catalogue like we used to. And every message and video stays sealed until the big day.",
+  "Kindled replaces all of it. One wish, one link, everyone chips in from anywhere — no app, no account. The list means no more guessing and no more doubles. Kids circle their catalogue like we used to. And every message and video stays sealed until the big day.",
   "Then comes the bit nobody forgets. The reveal: the total, the people, the messages — together, on the day.",
   "Organisers never chase. Contributors are done in thirty seconds. And the person you love gets the thing they actually dreamed of.",
   "Kindled. Gifting, reignited.",

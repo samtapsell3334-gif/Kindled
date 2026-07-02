@@ -4,7 +4,7 @@ import { getPotBySlug } from "@/lib/sandbox/store";
 /**
  * v7 Stage-0 P0: pot share links must carry a per-pot preview in WhatsApp/iMessage.
  * Metadata is resolved SERVER-side here (the page itself is a client component),
- * reading the pot directly from the store. Surprise safety: no amounts, no
+ * reading the wish directly from the store. Surprise safety: no amounts, no
  * progress, no item names — ever — in any preview field. The dynamic
  * opengraph-image.tsx sibling supplies the per-pot og:image automatically.
  */
@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const pot = getPotBySlug(slug);
   if (!pot) {
-    return { title: "Kindled — chip in together", description: "One pot, one link, revealed on the big day." };
+    return { title: "Kindled — chip in together", description: "One wish, one link, revealed on the big day." };
   }
   const date = new Date(pot.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
   const title = `Chip in for ${pot.title} 🎉`;

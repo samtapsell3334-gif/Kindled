@@ -37,7 +37,7 @@ const createPotSchema = z.object({
     message: "Target must be at least £1.00.",
   }),
   eventDate: z.string().datetime({ offset: true }).optional(),
-  items: z.array(potItemSchema).max(50, "A pot may have at most 50 items.").default([]),
+  items: z.array(potItemSchema).max(50, "A wish may have at most 50 items.").default([]),
 });
 
 // ─── Handler ────────────────────────────────────────────────────────────────

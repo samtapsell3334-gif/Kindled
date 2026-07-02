@@ -30,11 +30,11 @@ const SCENES: SceneConfig[] = [
   },
   {
     index: 1,
-    title: "Meet Your Continuous Pots",
+    title: "Meet Your Continuous Wishes",
     startSec: 20,
     endSec: 45,
     caption:
-      "Meet Kindling. Instead of temporary wish lists, you maintain lifetime Continuous Pots for the things you actually want — open year-round, steadily collecting contributions.",
+      "Meet Kindling. Instead of temporary wish lists, you maintain lifetime Continuous Wishes for the things you actually want — open year-round, steadily collecting contributions.",
   },
   {
     index: 2,

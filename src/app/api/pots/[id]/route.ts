@@ -22,7 +22,7 @@ const querySchema = z.object({
  * Determines whether a caller should receive the locked (redacted) view.
  *
  * Locking applies to UNDER_THE_TREE and WRAPPED_UP modes when:
- *   - The caller IS the pot owner (receiver of the gift), AND
+ *   - The caller IS the wish owner (receiver of the gift), AND
  *   - The current date is strictly before the eventDate.
  *
  * Contributors (anyone who is not the owner) ALWAYS receive the real balance,
@@ -50,7 +50,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    if (!id) throw new AppError("Missing pot ID.", 400);
+    if (!id) throw new AppError("Missing wish ID.", 400);
 
     const rawQuery = Object.fromEntries(req.nextUrl.searchParams);
     const queryParsed = querySchema.safeParse(rawQuery);
@@ -81,7 +81,7 @@ export async function GET(
       },
     });
 
-    if (!pot) throw new AppError("Pot not found.", 404);
+    if (!pot) throw new AppError("Wish not found.", 404);
 
     const { isLocked, obscure } = resolveLock(
       { creatorId: pot.creatorId, mode: pot.mode, eventDate: pot.eventDate },

@@ -78,9 +78,9 @@ const METRICS: MetricDef[] = [
     bg: "from-yellow-950/80 to-amber-950/50", border: "border-yellow-500/20",
   },
   {
-    stat: 2, displayOverride: "2 min", label: "To set up your first pot",
+    stat: 2, displayOverride: "2 min", label: "To set up your first wish",
     Icon: TrendingUp,
-    copy: "The pressure to get the right gift pushes people past what they meant to spend (Mintel). A two-minute shared pot replaces the guesswork.",
+    copy: "The pressure to get the right gift pushes people past what they meant to spend (Mintel). A two-minute shared wish replaces the guesswork.",
     source: "Mintel UK gift-buying research · product fact",
     accent: "#60a5fa", glow: "rgba(96,165,250,0.4)",
     bg: "from-blue-950/80 to-sky-950/50", border: "border-blue-500/20",
@@ -176,10 +176,10 @@ function MilestoneSimulator() {
         <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-400/70">Simulator</p>
         <h3 style={{ fontFamily: "var(--font-display)" }}
           className="text-[20px] font-semibold leading-tight text-white">
-          Stack pots across events
+          Stack wishes across events
         </h3>
         <p className="mt-1 text-[12px] text-white/40">
-          See how a birthday pot and Christmas pot combine toward a single big goal
+          See how a birthday wish and Christmas wish combine toward a single big goal
         </p>
       </div>
 
@@ -208,7 +208,7 @@ function MilestoneSimulator() {
               className="mb-3 rounded-2xl border p-4">
               <div className="mb-2 flex items-start justify-between">
                 <div>
-                  <p className="text-[13px] font-bold text-white">Clara&apos;s Birthday Pot</p>
+                  <p className="text-[13px] font-bold text-white">Clara&apos;s Birthday Wish</p>
                   <p className="text-[10px] text-white/35">October · Velvet Sofa · £{SOFA_GOAL} goal</p>
                 </div>
                 <span style={{ fontFamily: "var(--font-display)" }}
@@ -229,7 +229,7 @@ function MilestoneSimulator() {
               className="mb-5 rounded-2xl border p-4">
               <div className="mb-2 flex items-start justify-between">
                 <div>
-                  <p className="text-[13px] font-bold text-white">Clara&apos;s Christmas Pot</p>
+                  <p className="text-[13px] font-bold text-white">Clara&apos;s Christmas Wish</p>
                   <p className="text-[10px] text-white/35">December · Velvet Sofa · £{SOFA_GOAL} goal</p>
                 </div>
                 <span style={{ fontFamily: "var(--font-display)" }}
@@ -257,7 +257,7 @@ function MilestoneSimulator() {
                     : "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900",
                 )}
                 style={state === "idle" ? { boxShadow: "0 8px 28px rgba(251,146,60,0.35)" } : {}}>
-                {state === "merging" ? "Combining…" : "Combine Birthday + Christmas Pots"}
+                {state === "merging" ? "Combining…" : "Combine Birthday + Christmas Wishes"}
                 <AnimatePresence>
                   {particles.map(p => {
                     const rad = (p.angle * Math.PI) / 180;
@@ -296,7 +296,7 @@ function MilestoneSimulator() {
                       className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400">
                       <TrendingUp className="h-3 w-3 text-stone-900" />
                     </motion.div>
-                    <p className="text-[14px] font-black text-white">Clara&apos;s Super-Pot</p>
+                    <p className="text-[14px] font-black text-white">Clara&apos;s Super-Wish</p>
                   </div>
                   <p className="text-[10px] text-amber-300/60">Birthday + Christmas combined</p>
                 </div>

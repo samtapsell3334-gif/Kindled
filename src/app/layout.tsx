@@ -44,13 +44,13 @@ const fontOutfit = Outfit({
 export const metadata: Metadata = {
   title: "Kindled — group gifting for friends & family",
   description:
-    "Friends and family chip into shared pots for the gifts that actually matter. No duplicates, no awkward money chat, and a magical reveal on the big day.",
+    "Friends and family chip into shared wishes for the gifts that actually matter. No duplicates, no awkward money chat, and a magical reveal on the big day.",
   metadataBase: new URL("https://www.kindledgift.co.uk"),
   // TODO(founder): add a real 1200×630 OG image for rich link previews.
   openGraph: {
     title: "Kindled — group gifting for friends & family",
     description:
-      "Chip into shared pots for the gifts that actually matter — revealed together on the big day.",
+      "Chip into shared wishes for the gifts that actually matter — revealed together on the big day.",
     type: "website",
     siteName: "Kindled",
     locale: "en_GB",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Kindled — group gifting for friends & family",
-    description: "Chip into shared pots for the gifts that actually matter — revealed on the big day.",
+    description: "Chip into shared wishes for the gifts that actually matter — revealed on the big day.",
   },
   icons: {
     icon: "/favicon.svg?v=2",

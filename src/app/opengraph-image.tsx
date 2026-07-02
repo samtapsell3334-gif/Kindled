@@ -51,7 +51,7 @@ export default function OgImage() {
           The gifts they&apos;ll actually love, funded together.
         </div>
         <div style={{ display: "flex", marginTop: 28, color: "rgba(255,255,255,0.65)", fontSize: 32 }}>
-          One pot · one link · sealed until the reveal
+          One wish · one link · sealed until the reveal
         </div>
       </div>
     ),

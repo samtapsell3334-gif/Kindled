@@ -18,15 +18,15 @@ export default function TermsPage() {
 
       <H2>The service</H2>
       <P>
-        Kindled lets you create shared gift &quot;pots&quot;, invite others to contribute, and reveal the result on a chosen
+        Kindled lets you create shared gift &quot;wishes&quot;, invite others to contribute, and reveal the result on a chosen
         date. Contributing does not require an account.
       </P>
 
       <H2 id="how-money">How money works</H2>
       <UL>
         <li>Contributions are collected by our payment provider when a giver chooses to chip in.</li>
-        <li>Funds are held and paid out to the pot owner (or applied to catalogue purchases) according to the pot&apos;s settings.</li>
-        <li>If a goal isn&apos;t fully funded by the reveal date, the pot owner still receives what was raised, unless they choose to carry the balance over to the next occasion.</li>
+        <li>Funds are held and paid out to the wish owner (or applied to catalogue purchases) according to the wish&apos;s settings.</li>
+        <li>If a goal isn&apos;t fully funded by the reveal date, the wish owner still receives what was raised, unless they choose to carry the balance over to the next occasion.</li>
         <li>Refunds are handled case by case in line with your statutory rights and the payment provider&apos;s rules.</li>
       </UL>
       <Todo>
@@ -36,7 +36,7 @@ export default function TermsPage() {
 
       <H2 id="stored-credit">Stored credit</H2>
       <P>
-        Where you earn credit (e.g. from catalogue purchases), it is held against your account to put towards your own pots.
+        Where you earn credit (e.g. from catalogue purchases), it is held against your account to put towards your own wishes.
       </P>
       <Todo>
         Take regulatory advice on whether stored credit constitutes electronic money or a payment service under the FCA /
@@ -45,7 +45,7 @@ export default function TermsPage() {
 
       <H2 id="prize-draw">Prize draw</H2>
       <P>
-        From time to time we run a prize draw (currently advertised at £2,500). Contributing to a pot earns automatic
+        From time to time we run a prize draw (currently advertised at £2,500). Contributing to a wish earns automatic
         entries, <strong>but no purchase is necessary</strong>: you can obtain the same number of free entries via the
         free-entry route below, so the draw operates as a lawful free prize draw and not a lottery.
       </P>

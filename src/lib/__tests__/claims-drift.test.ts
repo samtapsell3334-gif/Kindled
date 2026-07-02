@@ -14,6 +14,9 @@ const BANNED = [
   "£3.2bn", "£3.2B", "£3.2 billion", "wish board", "Fully Lit", "Mum Knows Best",
   "Campfire", "user-scalable=no", "userScalable: false",
   "OnePoll", "Halifax Bank", "WRAP UK", "YouGov", "Money & Pensions Service",
+  // v8.1: "pot" is retired as the user-facing noun (internal identifiers keep it)
+  "Start a pot", "start a pot", "your pot", "a shared pot", "joint pot", "surprise pot",
+  "My pots", "the pot ", "this pot ", "live pot",
 ];
 // Identifiers/history that legitimately contain banned substrings.
 const ALLOW_RE = /JointFire|useFire|FirstKindlers|kindled!|REVIEW|PLAN|AUDIT|TODO-FOUNDER|claims-drift/;

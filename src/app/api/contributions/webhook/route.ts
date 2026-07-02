@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
           newBalance: newBalance.toFixed(2),
         },
         potStatus: nextStatus,
-        // Emitted when the pot crosses the 50% or 100% threshold —
+        // Emitted when the wish crosses the 50% or 100% threshold —
         // the client can use this to trigger Bridge-the-Gap or Ignite Reveal UI.
         ...(milestoneEvent && { milestoneEvent }),
       },

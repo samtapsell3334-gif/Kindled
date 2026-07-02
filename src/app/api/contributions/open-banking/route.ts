@@ -9,7 +9,7 @@ import { calculateFees } from "@/lib/fees";
 // ─── Validation ─────────────────────────────────────────────────────────────
 
 const openBankingSchema = z.object({
-  potId: z.string().cuid({ message: "Invalid pot ID." }),
+  potId: z.string().cuid({ message: "Invalid wish ID." }),
   /**
    * Gross contribution amount in GBP, as a decimal string.
    * Minimum is £0.15 — enough to cover the 5p processing cost and yield a non-zero net.
@@ -46,9 +46,9 @@ export async function POST(req: NextRequest) {
       select: { id: true, title: true, status: true, targetAmount: true, currentBalance: true },
     });
 
-    if (!pot) throw new AppError("Pot not found.", 404);
+    if (!pot) throw new AppError("Wish not found.", 404);
     if (pot.status === "FUNDED") {
-      throw new AppError("This pot has already been fully funded.", 409);
+      throw new AppError("This wish has already been fully funded.", 409);
     }
 
     // ── Optionally validate giver ────────────────────────────────────────────

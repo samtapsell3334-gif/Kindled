@@ -177,9 +177,9 @@ export function contribute(
   input: { displayName: string; amount: number; message?: string; videoRef?: string; consent?: boolean; ref?: string },
 ): { pot: SandboxPot; contribution: SandboxContribution } {
   const pot = getPotBySlug(slug);
-  if (!pot) throw new Error("Pot not found");
-  if (pot.status !== "open") throw new Error("Pot is not open");
-  if (pot.contributions.length >= MAX_CONTRIBUTIONS_PER_POT) throw new Error("This pot has reached the sandbox contribution cap.");
+  if (!pot) throw new Error("Wish not found");
+  if (pot.status !== "open") throw new Error("Wish is not open");
+  if (pot.contributions.length >= MAX_CONTRIBUTIONS_PER_POT) throw new Error("This wish has reached the sandbox contribution cap.");
   const amount = Math.max(1, Math.min(500, Math.round(input.amount)));
   const contribution: SandboxContribution = {
     id: newId("con"),

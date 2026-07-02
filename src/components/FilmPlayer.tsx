@@ -96,7 +96,7 @@ function Visual({ scene, animate }: { scene: FilmScene; animate: boolean }) {
   if (v === "flywheel") {
     return (
       <div className="flex flex-wrap items-center justify-center gap-1.5 px-6 text-[12px] font-bold text-amber-100">
-        {["Pot", "→", "Contributors", "→", "Their pots", "→", "Repeat"].map((x, i) => (
+        {["Pot", "→", "Contributors", "→", "Their wishes", "→", "Repeat"].map((x, i) => (
           <span key={i} className={x === "→" ? "text-amber-400" : "rounded-full border border-amber-400/40 px-3 py-1.5"}
             style={animate ? { animation: `film-pop 0.35s ${i * 0.18}s both` } : undefined}>{x}</span>
         ))}
@@ -132,6 +132,7 @@ function Visual({ scene, animate }: { scene: FilmScene; animate: boolean }) {
     <div className="text-center">
       <span className="mx-auto flex justify-center"><LogoMark variant="dark" size={64} /></span>
       <p className="mt-3 text-[24px] font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>Gifting, reignited.</p>
+      <p className="mt-1 text-[12px] text-white/60">Kindled — where wishes catch light.</p>
       <p className="mt-1 text-[13px] text-amber-300">kindledgift.co.uk</p>
     </div>
   );

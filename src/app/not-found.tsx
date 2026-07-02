@@ -15,7 +15,7 @@ export default function NotFound() {
         This ember drifted off
       </h1>
       <p className="mt-3 max-w-[380px] text-[15px] leading-relaxed text-white/50">
-        The page you&apos;re after doesn&apos;t exist — but the pots are very much still burning.
+        The page you&apos;re after doesn&apos;t exist — but the wishes are very much still burning.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link
@@ -25,10 +25,10 @@ export default function NotFound() {
           <ArrowLeft className="h-4 w-4" /> Back home
         </Link>
         <Link
-          href="/pots/demo"
+          href="/wishes/demo"
           className="flex items-center gap-2 rounded-2xl border border-white/15 bg-white/[0.06] px-6 py-3.5 text-[14px] font-medium text-white/75 transition-colors hover:bg-white/10"
         >
-          See a live pot
+          See a live wish
         </Link>
       </div>
     </div>

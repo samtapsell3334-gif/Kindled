@@ -18,7 +18,7 @@ interface RevealOverlayProps {
   /** Internal RevealTask ID to poll for video status */
   taskId: string | null;
   /**
-   * Pre-existing video URL — pass when the pot already has revealVideoUrl set.
+   * Pre-existing video URL — pass when the wish already has revealVideoUrl set.
    * Skips polling entirely and goes straight to playback.
    */
   videoUrl?: string | null;
@@ -166,7 +166,7 @@ function ErrorScreen({ potTitle, onContinue }: { potTitle: string; onContinue: (
         </p>
         <h2 className="mt-2 text-[20px] font-black text-white">{potTitle}</h2>
         <p className="mt-1 text-[12px] text-stone-400">
-          The reveal video could not be generated. Your pot is still fully funded!
+          The reveal video could not be generated. Your wish is still fully funded!
         </p>
       </div>
       <button

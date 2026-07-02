@@ -5,9 +5,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Live demo — Kindled",
   description:
-    "Explore a live Kindled pot: chip in to Billy's gifts, browse the catalogue, see the star chart, and preview the reveal. No sign-up needed.",
+    "Explore a live Kindled wish: chip in to Billy's gifts, browse the catalogue, see the star chart, and preview the reveal. No sign-up needed.",
   openGraph: {
-    title: "See a live Kindled pot",
+    title: "See a live Kindled wish",
     description:
       "Friends and family chip into the gifts that actually matter — revealed together on the big day. Explore the live demo.",
     type: "website",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "See a live Kindled pot",
+    title: "See a live Kindled wish",
     description: "Friends and family chip into the gifts that actually matter — revealed on the big day.",
   },
 };

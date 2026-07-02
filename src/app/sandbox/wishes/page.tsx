@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * My pots (sandbox) — the organiser's home after building. Lists the pots created
+ * My wishes (sandbox) — the organiser's home after building. Lists the wishes created
  * on this device (localStorage; the private manager keys never leave the browser),
  * with live progress and one-tap access to run the reveal — surrounded by the
  * marketing/conversion surfaces (waitlist, "Would you rather?", Stack) so the
@@ -42,17 +42,17 @@ export default function MyPotsPage() {
         <div className="mb-6 flex items-center justify-between">
           <Link href="/" aria-label="Kindled home"><Logo variant="light" size={30} /></Link>
           <Link href="/sandbox" className="flex items-center gap-1.5 rounded-full bg-stone-900 px-4 py-2 text-[12px] font-bold text-white">
-            <Plus className="h-3.5 w-3.5" /> New pot
+            <Plus className="h-3.5 w-3.5" /> New wish
           </Link>
         </div>
 
-        <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold">My pots</h1>
-        <p className="mt-1 text-[13px] text-stone-500">Every pot you&apos;ve built on this device — share them, watch them fill, then run the reveal.</p>
+        <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold">My wishes</h1>
+        <p className="mt-1 text-[13px] text-stone-500">Every wish you&apos;ve built on this device — share them, watch them fill, then run the reveal.</p>
 
         {mine.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-stone-300 p-8 text-center">
-            <p className="text-[14px] text-stone-500">No pots yet.</p>
-            <Link href="/sandbox" className="mt-3 inline-block rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-[14px] font-bold text-stone-900">Start your first pot</Link>
+            <p className="text-[14px] text-stone-500">No wishes yet.</p>
+            <Link href="/sandbox" className="mt-3 inline-block rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-[14px] font-bold text-stone-900">Start your first wish</Link>
           </div>
         ) : (
           <div className="mt-5 space-y-3">
@@ -77,7 +77,7 @@ export default function MyPotsPage() {
                       <p className="mt-1.5 text-[12px] text-stone-500">£{v.raised} of £{v.goal} · {v.contributors.length} contributor{v.contributors.length === 1 ? "" : "s"} · {v.messageCount} sealed message{v.messageCount === 1 ? "" : "s"}</p>
                     </>
                   ) : (
-                    <p className="mt-2 text-[12px] text-stone-400">Loading… (the sandbox may have been reset — pots don&apos;t survive a reset)</p>
+                    <p className="mt-2 text-[12px] text-stone-400">Loading… (the sandbox may have been reset — wishes don&apos;t survive a reset)</p>
                   )}
                   <div className="mt-3 flex gap-2">
                     <Link href={`/p/${p.slug}?key=${p.managerKey}`}
@@ -104,7 +104,7 @@ export default function MyPotsPage() {
           {wyr && (
             <Link href={`/sandbox?goal=${encodeURIComponent(wyr.replace(/[^\w ]/g, "").trim())}`}
               className="mt-3 flex items-center justify-center gap-1.5 rounded-2xl bg-stone-900 py-3 text-[13px] font-bold text-white">
-              Start a pot for it <ArrowRight className="h-4 w-4" />
+              Start a wish for it <ArrowRight className="h-4 w-4" />
             </Link>
           )}
         </div>
@@ -112,7 +112,7 @@ export default function MyPotsPage() {
         <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-[13px] font-bold text-stone-800">Big dreams take more than one birthday</p>
           <p className="mt-1 text-[12px] leading-relaxed text-stone-600">
-            A pot that isn&apos;t finished by the big day simply <span className="font-semibold">stacks forward</span> — birthday to Christmas to birthday — so nothing raised is ever wasted.
+            A wish that isn&apos;t finished by the big day simply <span className="font-semibold">stacks forward</span> — birthday to Christmas to birthday — so nothing raised is ever wasted.
           </p>
         </div>
 

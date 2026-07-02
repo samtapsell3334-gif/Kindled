@@ -29,7 +29,7 @@
       },
       {
         "figure": "6x",
-        "label": "people pulled in per pot (target K-loop)",
+        "label": "people pulled in per wish (target K-loop)",
         "source": "Internal model"
       },
       {
@@ -87,7 +87,7 @@
         "id": "viral",
         "title": "The 1-in-6 Viral Loop",
         "metric": "K > 1 target",
-        "body": "Every pot is a distribution event. One host invites ~6 contributors; roughly one in six goes on to start their own pot. Growth is built into the product, not bought with ad spend — so the curve compounds instead of decaying."
+        "body": "Every wish is a distribution event. One host invites ~6 contributors; roughly one in six goes on to start their own wish. Growth is built into the product, not bought with ad spend — so the curve compounds instead of decaying."
       },
       {
         "id": "intent",
@@ -104,7 +104,7 @@
     ]
   },
   "jointFires": {
-    "label": "joint pots · Milestone Engine",
+    "label": "joint wishes · Milestone Engine",
     "title": "From Clutter to Life-Milestones",
     "hook": "Stack your birthdays. Combine your Christmases. Accelerate your Expedition.",
     "body": "Two people link accounts and every occasion stacks toward a categorised Major Goal. This moves users from buying clutter to funding life-milestones — and moves Kindled from a one-off utility to a multi-year relationship.",
@@ -129,7 +129,7 @@
         "pct": 100
       }
     ],
-    "caption": "Modelled: two partners, three occasions a year, category-weighted momentum. A solo pot never reaches the high-ticket goal — a joint pot does.",
+    "caption": "Modelled: two partners, three occasions a year, category-weighted momentum. A solo wish never reaches the high-ticket goal — a joint wish does.",
     "pillars": [
       {
         "title": "The 3-Year Compound Effect",
@@ -141,7 +141,7 @@
       },
       {
         "title": "Multi-Year Lock-In",
-        "body": "A shared, years-long goal makes leaving costly and staying rewarding. joint pots shift Kindled from a one-off gifting utility to a long-term relational tool — the retention engine behind durable lifetime value."
+        "body": "A shared, years-long goal makes leaving costly and staying rewarding. joint wishes shift Kindled from a one-off gifting utility to a long-term relational tool — the retention engine behind durable lifetime value."
       }
     ],
     "categories": [
@@ -172,18 +172,18 @@
     "subheadline": "We make money while actively rewarding the user. That alignment is the moat.",
     "fairness": {
       "title": "Trust on Gifts, Lock-In on Rewards",
-      "body": "Cashing a pot's gift balance out to a bank is always free — no exit fee, no trap. That builds the one thing a money product cannot fake: trust. Earned cashback is treated differently, by design.",
-      "lockedLoop": "Gift money is freely withdrawable; earned cashback is not. The user's 3% lands as credit credited only to their own pots — non-withdrawable, redeemable solely against partner gift cards. To spend it, a contributor has to become a host. So the reward itself acquires the next customer, and every redemption loops back into the catalogue as fresh GMV.",
+      "body": "Cashing a wish's gift balance out to a bank is always free — no exit fee, no trap. That builds the one thing a money product cannot fake: trust. Earned cashback is treated differently, by design.",
+      "lockedLoop": "Gift money is freely withdrawable; earned cashback is not. The user's 3% lands as credit credited only to their own wishes — non-withdrawable, redeemable solely against partner gift cards. To spend it, a contributor has to become a host. So the reward itself acquires the next customer, and every redemption loops back into the catalogue as fresh GMV.",
       "points": [
         "Gift balance → withdraw to bank: 100%, zero fee, builds trust.",
-        "Earned cashback → credit: own pots only, never cashable.",
-        "To spend cashback you start your own pot — acquisition, baked in.",
+        "Earned cashback → credit: own wishes only, never cashable.",
+        "To spend cashback you start your own wish — acquisition, baked in.",
         "credit redeems into gift cards, recirculates, and compounds for both sides."
       ]
     },
     "cashbackMath": {
       "title": "The Cashback Math",
-      "intro": "A retailer pays an affiliate commission when a pot converts into a real purchase. We split it so the user is rewarded and the platform profits — but the user's share is credited as ringfenced credit, not withdrawable cash.",
+      "intro": "A retailer pays an affiliate commission when a wish converts into a real purchase. We split it so the user is rewarded and the platform profits — but the user's share is credited as ringfenced credit, not withdrawable cash.",
       "exampleLabel": "On a £100 partner purchase",
       "commission": {
         "label": "Retailer commission",
@@ -192,7 +192,7 @@
       },
       "split": [
         {
-          "label": "User credit — own pots only",
+          "label": "User credit — own wishes only",
           "value": "3%",
           "amount": "£3.00",
           "tone": "user"
@@ -206,7 +206,7 @@
       ],
       "compoundLoop": {
         "title": "Ringfenced & Compounding",
-        "body": "The 3% is never withdrawable. It lands as credit inside the user's own pots — so to spend it, a contributor has to start their own pot. That's customer acquisition baked into the reward. And because credit only redeems back into pots that convert to partner gift cards, every pound recirculates: it earns commission again, credits more credit, and compounds — GMV that can't leak out of the ecosystem."
+        "body": "The 3% is never withdrawable. It lands as credit inside the user's own wishes — so to spend it, a contributor has to start their own wish. That's customer acquisition baked into the reward. And because credit only redeems back into wishes that convert to partner gift cards, every pound recirculates: it earns commission again, credits more credit, and compounds — GMV that can't leak out of the ecosystem."
       },
       "takeaway": "The user feels rewarded, the platform profits on the same transaction, and the reward itself recruits the next host and recirculates as GMV — value that compounds instead of cashing out."
     },
@@ -215,13 +215,13 @@
         "id": "giftCards",
         "title": "Gift Card Commissions",
         "tag": "Phase 1 · live from launch",
-        "body": "How it works: when a funded pot is redeemed as a retailer gift card, the retailer pays Kindled a commission on the load. Why now: it's immediate and margin-light — retailer-funded, no fee to the family, and it earns from the very first redeemed pot."
+        "body": "How it works: when a funded wish is redeemed as a retailer gift card, the retailer pays Kindled a commission on the load. Why now: it's immediate and margin-light — retailer-funded, no fee to the family, and it earns from the very first redeemed wish."
       },
       {
         "id": "affiliate",
         "title": "Catalogue Commissions",
         "tag": "Phase 1 · live from launch",
-        "body": "How it works: pots redeemed through the curated catalogue earn a retailer commission, and sponsored placement is auctioned. Why now: revenue scales with happy outcomes rather than ad spend."
+        "body": "How it works: wishes redeemed through the curated catalogue earn a retailer commission, and sponsored placement is auctioned. Why now: revenue scales with happy outcomes rather than ad spend."
       },
       {
         "id": "retailMedia",
@@ -236,7 +236,7 @@
     "subheadline": "We don't just hold the data — we hand its value back to the user, and that keeps them coming.",
     "smartShopper": {
       "title": "The 'Smart Shopper' Hook",
-      "body": "We track the live price of every item on a wishlist. When a Ninja air fryer that's been sitting in a pot drops £20 at a partner retailer, we ping the givers: 'The thing they want just got cheaper — fund it now.'",
+      "body": "We track the live price of every item on a wishlist. When a Ninja air fryer that's been sitting in a wish drops £20 at a partner retailer, we ping the givers: 'The thing they want just got cheaper — fund it now.'",
       "effect": "It converts contributions at the exact moment of best value, and positions Kindled as the family's advocate, not just a checkout."
     },
     "dataBack": {
@@ -246,7 +246,7 @@
     },
     "unitEconomics": {
       "title": "Unit Economics — Why the Rails Matter",
-      "subtitle": "Modelled per £100 contributed to a pot",
+      "subtitle": "Modelled per £100 contributed to a wish",
       "columns": [
         "Card processing (Stripe)",
         "Optimised (Open Banking)"
@@ -269,7 +269,7 @@
           "openBanking": "None (push payment)"
         },
         {
-          "label": "Net reaching the pot",
+          "label": "Net reaching the wish",
           "card": "£98.30",
           "openBanking": "£99.95",
           "highlight": true
@@ -294,8 +294,8 @@
     "loop": [
       {
         "id": "light",
-        "title": "A host lights a pot",
-        "body": "Someone sets up a pot for a birthday, baby shower or Christmas — in 90 seconds, for free.",
+        "title": "A host lights a wish",
+        "body": "Someone sets up a wish for a birthday, baby shower or Christmas — in 90 seconds, for free.",
         "icon": "flame",
         "color": "#f59e0b"
       },
@@ -323,25 +323,25 @@
       {
         "id": "convert",
         "title": "Givers become hosts",
-        "body": "Around 1 in 6 starts their own pot — and the loop begins again, bigger each turn.",
+        "body": "Around 1 in 6 starts their own wish — and the loop begins again, bigger each turn.",
         "icon": "repeat",
         "color": "#f43f5e"
       }
     ],
     "multiplier": {
       "value": "6×",
-      "label": "people per pot — every one a future host"
+      "label": "people per wish — every one a future host"
     },
     "compounding": {
-      "label": "What one pot becomes",
+      "label": "What one wish becomes",
       "steps": [
         {
-          "tier": "1 pot",
+          "tier": "1 wish",
           "people": "6 reached"
         },
         {
           "tier": "1-in-6 converts",
-          "people": "6 new pots"
+          "people": "6 new wishes"
         },
         {
           "tier": "Those reach",
@@ -352,7 +352,7 @@
           "people": "216 reached"
         }
       ],
-      "caption": "Three turns of the loop from a single pot. No paid acquisition — the product is the marketing."
+      "caption": "Three turns of the loop from a single wish. No paid acquisition — the product is the marketing."
     }
   },
   "risk": {
@@ -409,7 +409,7 @@
             "quarter": "Q3 2026",
             "why": "Nothing compounds until the loop works end-to-end and we can measure the 1-in-6 conversion in practice.",
             "deliverables": [
-              "pot creation + Open Banking contributions",
+              "wish creation + Open Banking contributions",
               "Shareable-link infrastructure",
               "Contributor-to-host funnel tracking",
               "Cohort + K-factor dashboard"
@@ -462,7 +462,7 @@
             "why": "Monetise the verified-intent window before the reveal, and open a zero-CAC enterprise channel.",
             "deliverables": [
               "Reveal-window reverse-auction",
-              "White-label pots for HR teams",
+              "White-label wishes for HR teams",
               "Brand placement at the reveal",
               "First 5 enterprise contracts"
             ]
@@ -492,7 +492,7 @@
       },
       {
         "k": "Solution",
-        "v": "pooled pots + the reveal"
+        "v": "pooled wishes + the reveal"
       },
       {
         "k": "Wedge",
@@ -510,7 +510,7 @@
   },
   "wedge": {
     "eyebrow": "Go-to-market",
-    "headline": "Kids' lists are the wedge. Every pot recruits adults.",
+    "headline": "Kids' lists are the wedge. Every wish recruits adults.",
     "steps": [
       {
         "title": "The wedge",
@@ -518,15 +518,15 @@
       },
       {
         "title": "The conversion",
-        "body": "Every grandparent, aunt and family friend who chips in experiences the product with zero set-up — and finishes as an activated user with a payment method on file. One child's pot recruits many adults."
+        "body": "Every grandparent, aunt and family friend who chips in experiences the product with zero set-up — and finishes as an activated user with a payment method on file. One child's wish recruits many adults."
       },
       {
         "title": "The snowball",
-        "body": "Converted adults are then shown grown-up goals through playful discovery — \"Would you rather?\" prompts (a log burner, or a Maldives fund?), aspirational pot galleries, stacked-ambition stories — nudging them to start pots of their own. (\"Would you rather?\" is roadmap, not yet built.)"
+        "body": "Converted adults are then shown grown-up goals through playful discovery — \"Would you rather?\" prompts (a log burner, or a Maldives fund?), aspirational wish galleries, stacked-ambition stories — nudging them to start wishes of their own. (\"Would you rather?\" is roadmap, not yet built.)"
       },
       {
         "title": "The CAC logic",
-        "body": "The child's pot is the acquisition channel. In the wedge phase, paid CAC is close to zero by design. This is strategy framing — not a forecast, and no conversion rates are claimed."
+        "body": "The child's wish is the acquisition channel. In the wedge phase, paid CAC is close to zero by design. This is strategy framing — not a forecast, and no conversion rates are claimed."
       }
     ]
   },
@@ -572,7 +572,7 @@
     "rows": [
       {
         "current": "Cash in a card",
-        "new": "Organised pots",
+        "new": "Organised wishes",
         "lever": "One shared link; chip in from a message in seconds",
         "sticks": "Zero contributor effort — it's WhatsApp-native, not another app to adopt"
       },
@@ -585,7 +585,7 @@
       {
         "current": "Single-event gifts",
         "new": "Stacked ambitions",
-        "lever": "Stack carries a pot from birthday to Christmas and beyond",
+        "lever": "Stack carries a wish from birthday to Christmas and beyond",
         "sticks": "Bigger dreams with visible progress beat one-off token gifts"
       },
       {
@@ -610,26 +610,26 @@
       {
         "dur": 12,
         "visual": "potfill",
-        "headline": "Create a pot → share one link → sealed until the reveal.",
+        "headline": "Create a wish → share one link → sealed until the reveal.",
         "caption": "Group gifting done properly — one link, everyone in, revealed on the big day."
       },
       {
         "dur": 15,
         "visual": "split",
         "headline": "Money on every outcome.",
-        "caption": "Full pot → gift cards → commission. Part-funded → equal joy → gift card or stacked forward. Revenue or retention. Usually both."
+        "caption": "Full wish → gift cards → commission. Part-funded → equal joy → gift card or stacked forward. Revenue or retention. Usually both."
       },
       {
         "dur": 15,
         "visual": "wedge",
         "headline": "Kids' lists are the wedge.",
-        "caption": "Parents create; grandparents, aunts and friends chip in — every contributor becomes an activated user. The child's pot IS the acquisition channel."
+        "caption": "Parents create; grandparents, aunts and friends chip in — every contributor becomes an activated user. The child's wish IS the acquisition channel."
       },
       {
         "dur": 10,
         "visual": "flywheel",
         "headline": "Then the loop turns again.",
-        "caption": "Pot → contributors → their pots → repeat. That's the K-factor."
+        "caption": "Wish → contributors → their wishes → repeat. That's the K-factor."
       },
       {
         "dur": 13,

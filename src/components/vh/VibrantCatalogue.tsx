@@ -58,7 +58,7 @@ export function VibrantCatalogue({ items }: { items: VHCatalogItem[] }) {
     else setToast(r.reason ?? null);
   };
   const doRelease = (id: string) => { const r = release(getClaim(id), ME.id); if (r.ok) setClaims((c) => ({ ...c, [id]: r.item })); };
-  const doConfirm = (id: string) => { const r = confirmPurchase(getClaim(id), ME.id); if (r.ok) { setClaims((c) => ({ ...c, [id]: r.item })); setToast("Gifted — it's off the list. The pot updates without spoiling the surprise."); } };
+  const doConfirm = (id: string) => { const r = confirmPurchase(getClaim(id), ME.id); if (r.ok) { setClaims((c) => ({ ...c, [id]: r.item })); setToast("Gifted — it's off the list. The wish updates without spoiling the surprise."); } };
 
   return (
     <div className="vh vh-paper min-h-screen pb-32">

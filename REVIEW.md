@@ -236,3 +236,24 @@ homepage + terms anchor.
 - Live acceptance (production bundles): demo chunks contain 0 retired stats and the
   Finder set; sandbox metadata serves. Lighthouse ≥95 runs remain a founder/local
   Chrome task (logged).
+
+---
+
+# v8.1 — Noun rename: pot → wish (founder-confirmed, incl. brand line)
+
+- String-literal-aware sweep (prose strings with spaces and no /_- + JSX text incl.
+  multi-line) — identifiers, event names, DB fields, URLs untouched (verified:
+  pot.id/potId/pot_created/getPotBySlug intact; dashboards keep history).
+- Routes: /pots/* → /wishes/*, /sandbox/pots → /sandbox/wishes with permanent
+  redirects (Next emits 308, the modern permanent equivalent of 301) — old shared
+  links work forever. Sitemap + internal links updated.
+- claims.ts owns NOUN/"wish", NOUN_PLURAL, and the founder-approved brand line
+  "Kindled — where wishes catch light." (hero badge + film end-card).
+- Money-sense phrasing: "not just when the pot is full" → "not just when the goal is
+  reached" (no forced noun). Read-aloud pass on top sentences: hero sub-head ("One
+  shared wish, one link to send…"), share message ("We're all chipping in for Ava's
+  Birthday — tap to join in"), payment sheet ("Demo — no money moves"), reveal beats
+  ("something's been kept warm for you"), waitlist ("Reserve your spot") — all read
+  naturally.
+- Drift guard extended: user-facing pot phrases now banned; proven by catching 17 real
+  leftovers (multi-line JSX + comments) which were then fixed — guard green.

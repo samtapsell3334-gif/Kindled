@@ -98,7 +98,7 @@ const MOCK_POTS: PotCardData[] = [
 type TabId = "pots" | "explore" | "give" | "profile";
 
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: "pots",    label: "My Pots",  icon: Flame   },
+  { id: "pots",    label: "My Wishes",  icon: Flame   },
   { id: "explore", label: "Explore",  icon: Compass },
   { id: "give",    label: "Give",     icon: Gift    },
   { id: "profile", label: "Profile",  icon: User    },
@@ -163,7 +163,7 @@ function TabBar({ active, onChange }: { active: TabId; onChange: (id: TabId) => 
 function CreatePotFab() {
   return (
     <button
-      aria-label="Create new pot"
+      aria-label="Create new wish"
       className={cn(
         "fixed right-4 bottom-6 z-40",
         "flex h-14 w-14 items-center justify-center rounded-full",
@@ -208,8 +208,8 @@ function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center gap-3 px-8 py-16 text-center">
       <Flame className="h-12 w-12 text-amber-400" strokeWidth={1.5} aria-hidden />
-      <p className="text-[15px] font-semibold text-stone-300">No pots yet</p>
-      <p className="text-[13px] text-stone-500">Create your first Kindling pot to get started.</p>
+      <p className="text-[15px] font-semibold text-stone-300">No wishes yet</p>
+      <p className="text-[13px] text-stone-500">Create your first Kindling wish to get started.</p>
     </div>
   );
 }
@@ -239,7 +239,7 @@ export default function PotsPage() {
         {activeTab === "pots" && (
           <>
             <div className="pt-4 pb-2">
-              <SectionHeader title="Active Pots" count={MOCK_POTS.length} />
+              <SectionHeader title="Active Wishes" count={MOCK_POTS.length} />
             </div>
 
             <ModeLegend />
@@ -256,7 +256,7 @@ export default function PotsPage() {
           </>
         )}
 
-        {activeTab === "explore" && <PlaceholderTab label="Explore pots" />}
+        {activeTab === "explore" && <PlaceholderTab label="Explore wishes" />}
         {activeTab === "give"    && <PlaceholderTab label="Give to a friend" />}
         {activeTab === "profile" && <PlaceholderTab label="Your profile" />}
       </main>

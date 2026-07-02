@@ -64,10 +64,10 @@ export default function DashboardPage() {
   const funnel = useMemo(() => {
     if (!events) return [];
     const steps: [string, string][] = [
-      ["Pot viewed", "pot_viewed"], ["Contribution started", "contribution_started"],
+      ["Wish viewed", "pot_viewed"], ["Contribution started", "contribution_started"],
       ["Payment sheet viewed", "payment_sheet_viewed"], ["Contribution completed", "contribution_completed"],
       ["Message/video added", "message_added"], ["WYR answered", "wyr_answered"],
-      ["Own pot created from a share", "pot_created"],
+      ["Own wish created from a share", "pot_created"],
     ];
     const rows = steps.map(([label, name]) => [label, name === "pot_created" ? events.filter((e) => e.event === name && e.ref).length : count(events, name)] as [string, number]);
     return rows;
@@ -145,11 +145,11 @@ export default function DashboardPage() {
           })}
         </Panel>
 
-        <Panel title="3 · K-factor" csv={() => k ? download("k-factor", [["metric", "value"], ["contributions", k.contributions], ["referred pots", k.referredPots], ["invite views per pot", k.invites.toFixed(2)], ["contributor→creator conversion", k.conv.toFixed(3)], ["K", k.K]]) : undefined}>
+        <Panel title="3 · K-factor" csv={() => k ? download("k-factor", [["metric", "value"], ["contributions", k.contributions], ["referred wishes", k.referredPots], ["invite views per wish", k.invites.toFixed(2)], ["contributor→creator conversion", k.conv.toFixed(3)], ["K", k.K]]) : undefined}>
           {k && (
             <div className="text-[13px] text-stone-600">
-              <p className="mb-2 text-[12px] italic text-stone-400">K = average invites per new user × invite → new-pot conversion. Sandbox sample — small numbers, honestly labelled.</p>
-              <p>Views per pot (invite proxy): <b>{k.invites.toFixed(2)}</b> · Contributor → creator conversion: <b>{(k.conv * 100).toFixed(1)}%</b></p>
+              <p className="mb-2 text-[12px] italic text-stone-400">K = average invites per new user × invite → new-wish conversion. Sandbox sample — small numbers, honestly labelled.</p>
+              <p>Views per wish (invite proxy): <b>{k.invites.toFixed(2)}</b> · Contributor → creator conversion: <b>{(k.conv * 100).toFixed(1)}%</b></p>
               <p className="mt-1 text-[20px] font-bold text-stone-900">K = {k.K}</p>
               <p className="mt-2 text-[12px]">Referral chain: {k.referredPots} pot{k.referredPots === 1 ? "" : "s"} created from shared links ({events.filter((e) => e.event === "pot_created" && e.ref).map((e) => `←${String(e.ref).slice(0, 6)}`).join(" · ") || "none yet"})</p>
             </div>

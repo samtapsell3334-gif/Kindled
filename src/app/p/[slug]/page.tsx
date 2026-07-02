@@ -101,8 +101,8 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
     return (
       <div className="min-h-screen bg-[#fdf9f5]"><DemoBanner />
         <main className="mx-auto max-w-md px-5 py-16 text-center">
-          <p className="text-[15px] text-stone-600">This pot doesn&apos;t exist (the sandbox may have been reset).</p>
-          <Link href="/sandbox" className="mt-4 inline-block rounded-2xl bg-stone-900 px-5 py-3 text-[14px] font-bold text-white">Start a pot</Link>
+          <p className="text-[15px] text-stone-600">This wish doesn&apos;t exist (the sandbox may have been reset).</p>
+          <Link href="/sandbox" className="mt-4 inline-block rounded-2xl bg-stone-900 px-5 py-3 text-[14px] font-bold text-white">Start a wish</Link>
         </main>
       </div>
     );
@@ -261,12 +261,12 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
               {wyr && (
                 <Link href={`/sandbox?goal=${encodeURIComponent(wyr.replace(/[^\w ]/g, "").trim())}&ref=${slug}`}
                   className="mt-3 inline-block w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3 text-[14px] font-bold text-stone-900">
-                  Start your own pot for it
+                  Start your own wish for it
                 </Link>
               )}
             </div>
             <Link href={`/sandbox?ref=${slug}`} className="mt-3 inline-block text-[13px] font-semibold text-stone-600 underline underline-offset-2">
-              Never do the awkward money-collection text again — start your own pot
+              Never do the awkward money-collection text again — start your own wish
             </Link>
           </section>
         )}
@@ -304,7 +304,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         )}
 
         <p className="mt-10 text-center text-[11px] text-stone-400">
-          <LogoMark variant="light" compact size={14} className="mr-1 inline-block align-[-2px]" />Kindled sandbox · simulated money · <Link href="/sandbox" className="underline">start your own pot</Link>
+          <LogoMark variant="light" compact size={14} className="mr-1 inline-block align-[-2px]" />Kindled sandbox · simulated money · <Link href="/sandbox" className="underline">start your own wish</Link>
         </p>
 
         {showReveal && (

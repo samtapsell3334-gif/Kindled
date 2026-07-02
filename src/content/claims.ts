@@ -55,12 +55,18 @@ export const CREDIT = {
   line: "2% back in credit on catalogue purchases",
 } as const;
 
-/** Canonical object noun + the single funding-status scale (v3 WS2.1). */
-export const NOUN = "pot" as const;
+/**
+ * Canonical object noun (v8.1, founder-confirmed): user-facing name is "wish";
+ * internal name stays "pot" (DB tables, event names like pot_created, component
+ * identifiers) so the analytics dashboard's history is untouched.
+ */
+export const NOUN = "wish" as const;
+export const NOUN_PLURAL = "wishes" as const;
 export const STATUS_LABELS = ["Just started", "Warming up", "Almost there", "Fully funded"] as const;
 
 /** Core taglines. */
 export const TAGLINES = {
   signoff: "Gifting, reignited.",
+  brandLine: "Kindled — where wishes catch light.", // founder-approved 2026-07-02
   nostalgia: "Remember circling the catalogue? Now it's their turn — minus the felt-tip on the coffee table.",
 } as const;

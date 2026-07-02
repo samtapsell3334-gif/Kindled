@@ -16,7 +16,7 @@
 
 ## Naming conventions
 
-- **Pot** = a "Fire" in product language. All code uses `Pot` / `pot` to match Prisma models.
+- **Pot** = internal name only (Prisma models, event names like `pot_created`, identifiers). The USER-FACING name is **"wish"** (v8.1) — all rendered copy says wish/wishes; never rename internals.
 - **Contribution** = a "Kindle" or chip-in payment. Code uses `Contribution`.
 - **Host** = the pot creator (receiver of the gift). Code uses `creator` / `creatorId`.
 - **Giver** = a contributor. Code uses `giver` / `giverId`.
