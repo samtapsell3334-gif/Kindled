@@ -2805,7 +2805,7 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
             whileTap={{ scale: 0.96 }}
             onClick={() => onChange(id)}
             className={cn(
-              "relative flex min-w-[52px] flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-[10px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:[outline-color:var(--structure-mid)]",
+              "relative isolate flex min-w-[52px] flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-[10px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:[outline-color:var(--structure-mid)]",
               role === id ? "text-[var(--on-structure)]" : "text-[var(--ink-soft)] hover:text-[var(--ink)]",
             )}
           >

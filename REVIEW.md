@@ -436,3 +436,70 @@ Site chrome now responds to the switch: DemoBanner (--banner-bg), legal pages
 unconverted (renders identically in both registers, logged for a future pass):
 the marketing demo's interior mock (wishes/demo in-app surfaces + About-tab
 Monochrome Luxe sections) and the investor war room. 96 tests green.
+
+## 2026-07-02 — v11 THE SIXTEEN: completion audit
+
+All sixteen workstreams executed. Evidence per audit line:
+1. **Occasions**: 3-wish occasion created; contributions attributed to two
+   different wishes from fresh sessions; Star atlas granted MID-OCCASION
+   (£18/£18) while Telescope/beads stayed open; "wherever it's needed"
+   auto-assigned to the closest-to-complete wish (verified live: £10 → the 33%
+   Telescope, not the 0% beads); multi-wish receiver payload structurally
+   amount-free (unit test + live grep). PASS
+2. **Add-gift relocation**: contributor view has zero add-gift affordances;
+   "Start my own wishes" K-CTA in header + vacated grid spot with ?ref chain +
+   own_wishes_cta_tapped; recipient view gained "Add a wish". PASS
+3. **Link-paste**: SSRF suite green (9 tests: private/loopback/link-local/
+   mapped IPv6/file:/localhost/redirect re-validation, credential strip); live
+   metadata-endpoint probe refused; real page extracted title/price/category;
+   razor→moisturiser complement + 10 pairs; every paste normalised. Read cap
+   truncates at 2MB (bounded memory) instead of failing large retail pages. PASS
+4. **Star chart**: felt-tip ring on earned stars, 25/50/75 milestone lines
+   (never modals), mini-Ignition at goal; grep zero streak/pressure/countdown
+   patterns; global reduced-motion covers all new motion. PASS
+5. **Billy owns his list**: "Managed by Mum (Sarah)"→"Built by Billy himself";
+   context strip rewritten; grep for parent-manages-Billy claims: none. PASS
+6. **Combining simulator**: MilestoneSimulator deleted surgically (panel
+   metrics intact); no dangling refs/anchors. PASS
+7. **Tabs**: solid token surface, active teal pill + cream text (a real
+   stacking bug found and fixed with `isolate` — the pill was rendering behind
+   the bar), inactive ink-soft, focus-visible outline; screenshots in session
+   at 390×844. PASS
+8. **Granted-first**: "Recently granted" strip top of contributor view
+   ("Grandma Linda granted…" chips with expandable notes); owner stats hidden
+   for contributors; first wish + Kindle CTA at y=652 of 844 unscrolled. PASS
+9. **One reveal, no AI**: classic reveal block + RevealV2 machinery deleted;
+   overlay copy de-AI'd; investor copy renamed (Reveal Quality, code-rendered
+   content); grep user-facing "AI": zero. PASS
+10. **Theme flip**: DEFAULT_THEME="ember-teal" (revert = same line, documented
+    in theme.ts); browns-as-backing gone (legacy hero radial now only under
+    the legacy register); AA matrix enforced as a unit test; manifest ground
+    aligned. PASS
+11. **Bubble**: "Where wishes catch light" hero pill removed, spacing healed. PASS
+12. **Logo**: inventory grepped (zero old-asset refs); footer lockup now
+    follows the register (light on legacy cream / dark on ember night-step) via
+    theme-conditional classes; lockup rules exported as LOGO_RULES tokens;
+    favicons already regenerated + cache-busted (?v=3). Re-scrape of WhatsApp
+    previews: founder note (share a link to any chat to force it). PASS
+13. **/beta**: server-gated (BETA_PIN env; wrong PIN → 401; "1066" absent from
+    every client chunk — grepped), rate-limited, noindex; two tabs; CSV
+    exports; waitlist writes confirmed end-to-end (v9.2 + live proof); sandbox
+    reset run LIVE with survey rows intact + structural/behavioural test. PASS
+14. **Survey**: 17 questions, one per screen, progress dots, branching
+    (whip-round follow-up, parents-only WYR) unit-tested, WYR sides randomised
+    per session, objection question present, consent + privacy at start;
+    responses durable (survived a REAL sandbox reset); dashboard: headline
+    stats, sparkline, pain ranking, WYR head-to-heads, appeal vs objections,
+    parent/non-parent segment filter, open-text search, CSV; self-selected
+    footer with n. Thank-you converts (source=survey) + native share. PASS
+15. **K-loop**: formula, cycle-time axis, illustrative example labelled with
+    maths shown (8 × 0.15 = 1.2), founder targets with wedge reasoning, three
+    levers, live-dashboard tie-in; dashboard gained occasions panel (avg
+    wishes/occasion + per-wish velocity). No invented traction. PASS
+16. **Films**: /film archived (308 → home), footer link gone, investor film
+    replaced with the animated economics diagram (money on every outcome);
+    film system archived under /archive/film-system (renamed .txt, excluded
+    from build) with README; deletion = founder decision. Grep "watch the
+    film": zero. PASS
+
+Suite: 111 tests green. Build clean. Live verification after deploy below.
