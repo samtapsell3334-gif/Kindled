@@ -48,6 +48,9 @@ export interface ManagerView extends Omit<GuestView, "kind"> {
   managerKey: string;
   slug: string;
   organiserName: string;
+  starChartEnabled: boolean;
+  /** Kid-circled items awaiting the parent's decision (P3.1). Never on guest/receiver views. */
+  pendingItems: { id: string; name: string; price: number; category: string; retailer: string }[];
   messages: SandboxPot["messages"];
   revealOutcome?: SandboxPot["revealOutcome"];
   simulatedCommission?: number;
@@ -102,6 +105,10 @@ export function viewFor(pot: SandboxPot, role: ViewerRole, opts: { unseal?: bool
       ...base,
       managerKey: pot.managerKey,
       slug: pot.slug,
+      starChartEnabled: pot.starChartEnabled,
+      pendingItems: pot.items
+        .filter((i) => !i.approved)
+        .map(({ id, name, price, category, retailer }) => ({ id, name, price, category, retailer })),
       // Sealed until reveal on surprise pots — the organiser sees counts, not content.
       // `unseal` is set ONLY by the manager-key-authorised reveal ceremony itself.
       messages: pot.isSurprise && pot.status === "open" && !opts.unseal ? [] : pot.messages,

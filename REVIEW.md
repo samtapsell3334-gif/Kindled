@@ -341,3 +341,23 @@ homepage a11y **96** (perf 90, up from 81). Acceptance target a11y ≥ 95 met on
 - Per-wish OG previews now hydrate from Postgres (generateMetadata + OG image call
   ensureHydrated). Verified on a cold deployment: og:title = "Chip in for
   Durability proof 2 🎉" — the original "per-pot OG titles on prod" unlock, done.
+
+## 2026-07-02 — deferred backlog cleared (P3.2, P2.3, P3.1)
+
+- **P3.2 receiver-view redaction, prop-level**: the demo recipient view now
+  accepts only `ReceiverPot` (src/lib/demo/receiver-view.ts) — a shape that
+  structurally cannot carry raised/contributors/tributes/draw entries. Goal
+  figures stay (the recipient wrote their own list); progress cannot reach
+  their DOM. Unit-tested (3 tests).
+- **P2.3 friends scenario**: "Dan's 30th · the group of mates" example card in
+  the recipient view's adult section — receiver-safe, badged Example.
+- **P3.1 kids' circle-it, end-to-end in the sandbox**: child taps catalogue
+  cards on the parent's device (manager-key link; zero child inputs — catalogue
+  data only, per the Children's Code assessment); a felt-tip biro loop draws
+  around picks (reduced-motion safe); items land unapproved; the organiser
+  panel gains an approval queue ("Add it" / "Not this time"); approval makes
+  the item live and grows the goal. Star-chart pots show the stars hookup line.
+  Store functions circleItem/reviewItem unit-tested (3 tests); browser-verified
+  full loop: circle → queue → approve → guest sees item, goal 0→45, and
+  pendingItems never appears on guest/receiver payloads.
+- Suite: 92 tests green (was 86).

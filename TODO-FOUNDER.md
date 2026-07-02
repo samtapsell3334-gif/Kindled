@@ -63,14 +63,13 @@ was completed and is ticked below with evidence; what remains is the short
       step since v4.1 (investor page labels the roadmap). Item closed.
 - [x] Contact email live on /contact; free-entry route uses the same.
 
-## Deferred build items (engineering backlog, not founder blockers — PLAN.md)
-- [ ] P3.1 Kids' Catalogue "circle it" mode (must keep parent approval queue —
-      see childrens-code-assessment residual action 3).
-- [ ] P3.2 demo receiver-view restructure (hidden amounts absent from DOM, not
-      hidden by CSS) + add-gift moving to receiver view. Note: the SANDBOX
-      receiver view is already server-side redacted; this item is the marketing
-      demo only.
-- [ ] P2.3 friends-scenario demo pot (mates pooling for a 30th).
+## Deferred build items — ALL DONE 2026-07-02
+- [x] P3.1 Kids' "circle it": live in the sandbox (felt-tip loop, parent
+      approval queue, star-chart line). Every child action routes through the
+      parent, per the Children's Code assessment.
+- [x] P3.2 demo receiver-view restructure: prop-level redaction via ReceiverPot
+      (amounts structurally absent from the recipient DOM), unit-tested.
+- [x] P2.3 friends-scenario ("Dan's 30th") example card in the recipient view.
 
 ## History (v8.1 / v9 / v9.1) — all resolved
 - v8.1 noun rename: DONE (founder confirmed "wish" + brand line; routes moved

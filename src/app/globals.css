@@ -523,6 +523,17 @@ body {
 }
 .animate-mg-spark-drift { animation: mg-spark-drift 4s ease-in-out infinite; }
 
+/* P3.1 — the felt-tip circle: a child's biro loop drawing itself around a
+   circled catalogue item. Neutralised by the reduced-motion block below. */
+@keyframes felt-draw {
+  to { stroke-dashoffset: 0; }
+}
+.animate-felt-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: felt-draw 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 /* WS11 — respect users who ask for less motion (WCAG 2.3.3 / 2.1 AA).
    Neutralises CSS keyframe loops (embers, marquees, pulses). Framer components
    additionally check useReducedMotion where they drive their own loops. */

@@ -39,6 +39,7 @@ import { track } from "@/lib/analytics";
 import { RevealExperience } from "@/components/RevealExperience";
 import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
 import { LogoMark } from "@/components/Logo";
+import { toReceiverPots, type ReceiverPot } from "@/lib/demo/receiver-view";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -603,7 +604,7 @@ function nextMajorOccasion(): Occasion {
   return xmas.getTime() <= bday.getTime() ? "christmas" : "birthday";
 }
 
-function occasionFor(pot: DemoPot): Occasion {
+function occasionFor(pot: { eventLabel: string }): Occasion {
   const label = pot.eventLabel.toLowerCase();
   if (label.includes("christmas")) return "christmas";
   if (label.includes("birthday")) return "birthday";
@@ -614,7 +615,7 @@ function occasionFor(pot: DemoPot): Occasion {
  * Evergreen countdown target: always rolls the pot's occasion forward from today,
  * so the demo never shows a past/expired date whatever the static eventIso says.
  */
-function occasionTargetIso(pot: DemoPot): string {
+function occasionTargetIso(pot: { eventLabel: string }): string {
   const occasion = occasionFor(pot);
   const now = new Date();
   const year = now.getFullYear();
@@ -3411,7 +3412,7 @@ function CountUpStat({ target, suffix = "", duration = 1400 }: { target: number;
 }
 
 // ─── Single locked pot card used in Receiver's unified stream ─────────────────
-function ReceiverPotCard({ pot, index }: { pot: DemoPot; index: number }) {
+function ReceiverPotCard({ pot, index }: { pot: ReceiverPot; index: number }) {
   const occ = occasionFor(pot);
   const isXmas = occ === "christmas";
   const targetIso = occasionTargetIso(pot);
@@ -3577,14 +3578,15 @@ function ReceiverProofStats() {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
-  pots: DemoPot[];
+  pots: ReceiverPot[];
   onShare: () => void;
   onReveal: () => void;
   onOpenJoint: () => void;
 }) {
-  // Exclude checklist pots entirely — receiver must not see "Parent's pick" items
-  const sparkGoals = pots.filter((p) => !p.isClaimed && !p.isChecklist);
-  const claimed    = pots.filter((p) => p.isClaimed && !p.isChecklist);
+  // Checklist ("Parent's pick") items are already stripped by toReceiverPots —
+  // this component's prop type structurally cannot carry raised/contributor data.
+  const sparkGoals = pots.filter((p) => !p.isClaimed);
+  const claimed    = pots.filter((p) => p.isClaimed);
   const totalTarget = sparkGoals.reduce((s, p) => s + p.goal, 0);
 
   // Dual countdown: always compute both Christmas AND Birthday
@@ -3672,8 +3674,21 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
         <div>
           <p className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Not just for kids</p>
           <JointFireFeature onOpen={onOpenJoint} hideAmounts />
+          {/* P2.3 — the mates scenario, receiver-safe (no amounts, badged example) */}
+          <div className="mt-3 rounded-2xl bg-[#fffdf7] p-4 vh-lift">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[13px] font-bold text-[#0f172a]">Dan&apos;s 30th · the group of mates</p>
+              <span className="shrink-0 rounded-full bg-[#0f172a]/5 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#0f172a]/50">Example</span>
+            </div>
+            <p className="mt-1 text-[11px] leading-snug text-[#0f172a]/60">
+              Nine friends, one link in the group chat, a weekend in the Peak District instead of nine gift cards. Dan sees this card and nothing else until the day.
+            </p>
+            <p className="mt-2 flex items-center gap-1.5 text-[11px] italic text-[#0f172a]/40">
+              <Lock className="h-3 w-3 shrink-0" /> Progress hidden until reveal day
+            </p>
+          </div>
           <p className="mt-2.5 px-1 text-[11px] leading-relaxed text-[#0f172a]/50">
-            Kindled works for any recipient at any age: a child&apos;s first bike, your own birthday, or two people saving for a holiday or a new car together.
+            Kindled works for any recipient at any age: a child&apos;s first bike, your own birthday, a mate&apos;s big one, or two people saving for a holiday together.
           </p>
         </div>
 
@@ -3938,7 +3953,7 @@ export default function DemoPage() {
         </motion.div>
       ) : viewMode === "receiver" ? (
         <motion.div key="receiver" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }}>
-          <ReceiverView pots={pots} onShare={handleShare} onReveal={() => setViewMode("reveal")} onOpenJoint={() => setViewMode("joint")} />
+          <ReceiverView pots={toReceiverPots(pots)} onShare={handleShare} onReveal={() => setViewMode("reveal")} onOpenJoint={() => setViewMode("joint")} />
         </motion.div>
       ) : (
       <motion.div key="parent" initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ type: "spring", stiffness: 340, damping: 32 }} className="vh vh-paper min-h-screen">

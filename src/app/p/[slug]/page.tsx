@@ -33,6 +33,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
   const search = useSearchParams();
   const managerKey = search.get("key");
   const asReceiver = search.get("view") === "receiver";
+  const asKid = search.get("view") === "kid";
 
   const [view, setView] = useState<PotView | null>(null);
   const [missing, setMissing] = useState(false);
@@ -75,6 +76,14 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
     const t = setInterval(() => { void load(); }, 5000);
     return () => clearInterval(t);
   }, [load]);
+
+  async function reviewPending(itemId: string, approve: boolean) {
+    await fetch(`/api/sandbox/pots/${slug}/items`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: managerKey, action: approve ? "approve" : "reject", itemId }),
+    });
+    void load();
+  }
 
   const beacon = (stepName: "start" | "sheet") =>
     void fetch(`/api/sandbox/pots/${slug}/contribute?step=${stepName}`, { method: "PUT" });
@@ -142,6 +151,16 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
 
   const pct = view.goal > 0 ? Math.min(100, Math.round((view.raised / view.goal) * 100)) : 0;
   const isManager = view.kind === "manager";
+
+  // P3.1 — kids' "circle it": rendered on the parent's device via the manager
+  // link. Catalogue taps only; no free text, no data collected from the child.
+  if (asKid && view.kind === "manager" && managerKey) {
+    return (
+      <div className="min-h-screen bg-[#fdf9f5] text-stone-900"><DemoBanner />
+        <KidCircleView view={view} slug={slug} managerKey={managerKey} onChanged={() => { void load(); }} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
@@ -337,6 +356,32 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
               Preview what {view.recipientName} sees (surprise-safe)
             </Link>
 
+            {/* P3.1 — the approval queue: kid-circled items wait here */}
+            {view.isChildPot && view.status === "open" && (
+              <div className="mt-4 border-t border-stone-200 pt-4">
+                {view.pendingItems.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-[12px] font-bold text-stone-700">{view.recipientName} circled these — your call</p>
+                    <ul className="mt-2 space-y-2">
+                      {view.pendingItems.map((i) => (
+                        <li key={i.id} className="flex items-center justify-between gap-2 rounded-xl bg-amber-50 px-3 py-2">
+                          <span className="min-w-0 text-[13px] font-semibold text-stone-800">{i.name} <span className="font-normal text-stone-500">· £{i.price}</span></span>
+                          <span className="flex shrink-0 gap-1.5">
+                            <button onClick={() => { void reviewPending(i.id, true); }} className="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-[11px] font-bold text-white">Add it</button>
+                            <button onClick={() => { void reviewPending(i.id, false); }} className="rounded-lg border border-stone-300 px-2.5 py-1.5 text-[11px] font-bold text-stone-600">Not this time</button>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <Link href={`/p/${slug}?view=kid&key=${managerKey}`} className="inline-block rounded-xl border border-stone-300 px-3.5 py-2 text-[12px] font-bold text-stone-700">
+                  Hand the catalogue to {view.recipientName}
+                </Link>
+                <p className="mt-1.5 text-[11px] text-stone-500">They circle what they&apos;d love on your phone; nothing joins the wish until you approve it here.</p>
+              </div>
+            )}
+
             {view.status === "open" ? (
               <div className="mt-4 border-t border-stone-200 pt-4">
                 <button disabled={revealBusy} onClick={() => { void openReveal(); }}
@@ -390,5 +435,100 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         )}
       </main>
     </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// P3.1 — KIDS' "CIRCLE IT" VIEW
+// Rendered on the parent's device (manager link). The child taps catalogue
+// cards; a felt-tip loop draws around their picks. Catalogue data only —
+// no free text, no inputs, nothing collected from the child.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const KID_CATALOGUE = [
+  { name: "LEGO Friends Treehouse", price: 65, category: "Toys", retailer: "Smyths" },
+  { name: "Roller skates", price: 45, category: "Sports", retailer: "Decathlon" },
+  { name: "Art supplies set", price: 22, category: "Craft", retailer: "Hobbycraft" },
+  { name: "Nintendo Switch game", price: 45, category: "Games", retailer: "Argos" },
+  { name: "Telescope", price: 120, category: "Science", retailer: "John Lewis" },
+  { name: "Football boots", price: 38, category: "Sports", retailer: "Sports Direct" },
+  { name: "Craft beads mega tub", price: 15, category: "Craft", retailer: "Hobbycraft" },
+  { name: "Walkie talkies", price: 28, category: "Toys", retailer: "Argos" },
+] as const;
+
+function FeltTipLoop() {
+  // A wobbly hand-drawn ellipse that draws itself in (reduced-motion safe).
+  return (
+    <svg viewBox="0 0 100 60" className="pointer-events-none absolute -inset-1 h-[calc(100%+8px)] w-[calc(100%+8px)]" aria-hidden="true">
+      <path
+        d="M50 4 C82 2 97 14 96 30 C95 48 74 57 48 56 C22 55 4 46 4 30 C4 13 24 6 54 5"
+        fill="none" stroke="#ff6b6b" strokeWidth="3.5" strokeLinecap="round"
+        pathLength={1} className="animate-felt-draw" style={{ transform: "rotate(-2deg)", transformOrigin: "center" }}
+      />
+    </svg>
+  );
+}
+
+function KidCircleView({ view, slug, managerKey, onChanged }: {
+  view: Extract<PotView, { kind: "manager" }>;
+  slug: string;
+  managerKey: string;
+  onChanged: () => void;
+}) {
+  const [busy, setBusy] = useState<string | null>(null);
+  const circledNames = new Set([
+    ...view.items.map((i) => i.name),
+    ...view.pendingItems.map((i) => i.name),
+  ]);
+
+  async function circle(item: (typeof KID_CATALOGUE)[number]) {
+    if (busy || circledNames.has(item.name)) return;
+    setBusy(item.name);
+    await fetch(`/api/sandbox/pots/${slug}/items`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: managerKey, action: "circle", item }),
+    });
+    if (typeof navigator !== "undefined") navigator.vibrate?.(10);
+    onChanged();
+    setBusy(null);
+  }
+
+  return (
+    <main className="mx-auto max-w-md px-5 py-8 pb-24">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-amber-700">The catalogue</p>
+      <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-1 text-[28px] font-bold leading-tight">
+        Circle what you&apos;d love, {view.recipientName}
+      </h1>
+      <p className="mt-1.5 text-[13px] text-stone-600">Tap anything that makes your eyes go big. A grown-up says yes before it counts.</p>
+      {view.starChartEnabled && (
+        <p className="mt-2 flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-800">
+          <Sparkles className="h-3.5 w-3.5 shrink-0" /> Your stars go toward whatever gets circled.
+        </p>
+      )}
+
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        {KID_CATALOGUE.map((item) => {
+          const on = circledNames.has(item.name);
+          return (
+            <button key={item.name} onClick={() => { void circle(item); }} disabled={!!busy}
+              aria-pressed={on}
+              className={`relative rounded-2xl border-2 p-3.5 text-left transition-transform active:scale-95 ${on ? "border-transparent bg-white" : "border-stone-200 bg-white"}`}>
+              {on && <FeltTipLoop />}
+              <p className="text-[14px] font-bold leading-snug text-stone-800">{item.name}</p>
+              <p className="mt-1 text-[11px] text-stone-500">£{item.price} · {item.retailer}</p>
+              <p className={`mt-2 text-[10px] font-bold uppercase tracking-wide ${on ? "text-[#ff6b6b]" : "text-stone-400"}`}>
+                {on ? "Circled!" : "Tap to circle"}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+
+      <Link href={`/p/${slug}?key=${managerKey}`}
+        className="mt-8 block w-full rounded-2xl bg-stone-900 py-3.5 text-center text-[14px] font-bold text-white">
+        All done — hand back to the grown-up
+      </Link>
+      <p className="mt-2 text-center text-[11px] text-stone-500">Circled things wait for a grown-up&apos;s yes.</p>
+    </main>
   );
 }

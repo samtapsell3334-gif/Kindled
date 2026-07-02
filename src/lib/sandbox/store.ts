@@ -274,6 +274,51 @@ export function contribute(
   return { pot, contribution };
 }
 
+// ─── kids' "circle it" (P3.1) ───────────────────────────────────────────────────
+// The child circles catalogue items on the PARENT'S device (manager-key link);
+// no data is collected from the child — the item payload is the catalogue's own
+// name/price/retailer. Circled items are unapproved until the parent acts.
+
+const MAX_ITEMS_PER_POT = 40;
+
+export function circleItem(
+  slug: string,
+  managerKey: string,
+  item: Omit<SandboxItem, "id" | "approved" | "source">,
+): SandboxPot {
+  const pot = getPotBySlug(slug);
+  if (!pot || pot.managerKey !== managerKey) throw new Error("Not authorised");
+  if (!pot.isChildPot) throw new Error("Circling is for child wishes");
+  if (pot.status !== "open") throw new Error("Wish is not open");
+  if (pot.items.length >= MAX_ITEMS_PER_POT) throw new Error("This wish has reached its item cap.");
+  const it: SandboxItem = { ...item, id: newId("item"), source: "kid_circled", approved: false };
+  assertNoCardData(it);
+  pot.items.push(it);
+  persistSoon();
+  logEvent("kid_item_circled", { potId: pot.id, props: { category: it.category, retailer: it.retailer, price_band: it.priceBand } });
+  return pot;
+}
+
+export function reviewItem(
+  slug: string,
+  managerKey: string,
+  itemId: string,
+  approve: boolean,
+): SandboxPot {
+  const pot = getPotBySlug(slug);
+  if (!pot || pot.managerKey !== managerKey) throw new Error("Not authorised");
+  const it = pot.items.find((i) => i.id === itemId);
+  if (!it) throw new Error("Item not found");
+  if (approve) {
+    it.approved = true;
+  } else {
+    pot.items = pot.items.filter((i) => i.id !== itemId);
+  }
+  persistSoon();
+  logEvent(approve ? "kid_item_approved" : "kid_item_removed", { potId: pot.id, props: { category: it.category } });
+  return pot;
+}
+
 // ─── reveal + outcomes (WS-E minimal) ───────────────────────────────────────────
 
 const SIMULATED_COMMISSION_PCT = Number(process.env.SANDBOX_COMMISSION_PCT ?? "5");
