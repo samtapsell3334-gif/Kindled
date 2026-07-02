@@ -318,3 +318,18 @@ Gates: build 0 errors, 86/86 tests (4 new), drift guard green. Deployed + aliase
 
 **Final live Lighthouse (mobile), post-fixes:** /sandbox a11y **100** (perf 94);
 homepage a11y **96** (perf 90, up from 81). Acceptance target a11y ≥ 95 met on both.
+
+## 2026-07-02 — v9.1 durable sandbox LIVE (founder-approved provisioning)
+
+- Neon Postgres provisioned via Vercel Marketplace (store `neon-cerulean-car`,
+  founder accepted terms interactively), connected to kindledkindled, all env
+  vars injected. Three Prisma migrations applied (init, kindle_memories,
+  sandbox_state).
+- Serverless lesson: the debounced post-response write never ran — Vercel
+  freezes the function once the response is sent. Rewrote as dirty-flag +
+  `flushPersist()` awaited before every mutating route response; failed flushes
+  re-mark dirty for the next request.
+- END-TO-END PROOF on production: wish `qk8pk7qctb` created → JSONB row
+  confirmed in Postgres (4 pots) → fresh deployment forced (new instances,
+  cold start) → wish loaded back through `ensureHydrated()` — PASS. The sandbox
+  is now durable and cross-device.

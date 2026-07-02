@@ -87,7 +87,7 @@
 - Code side is DONE and deployed: SandboxState JSONB model in prisma/schema.prisma,
   lazy hydration + debounced write-through in src/lib/sandbox/store.ts, all five
   sandbox API routes hydrate per-request. Without DATABASE_URL it is a no-op.
-- FOUNDER, one action: accept Neon's marketplace terms (their EULA/privacy — a
+- [DONE 2026-07-02 — provisioned, migrated, cold-start proof PASS] accept Neon's marketplace terms (their EULA/privacy — a
   legal agreement only you can accept) at
   https://vercel.com/kindled/~/integrations/accept-terms/neon?source=cli
   Then tell Claude "terms accepted" and the rest is automated: create the Neon
