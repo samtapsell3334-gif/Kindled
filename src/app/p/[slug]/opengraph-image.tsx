@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getPotBySlug } from "@/lib/sandbox/store";
+import { getPotBySlug, ensureHydrated } from "@/lib/sandbox/store";
 
 /**
  * v7 Stage-0 P0: dynamic per-pot og:image in the ember brand. Surprise-safe by
@@ -11,6 +11,7 @@ export const contentType = "image/png";
 
 export default async function PotOgImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  await ensureHydrated();
   const pot = getPotBySlug(slug);
   const title = pot ? pot.title : "A Kindled wish";
   const line = pot

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getPotBySlug } from "@/lib/sandbox/store";
+import { getPotBySlug, ensureHydrated } from "@/lib/sandbox/store";
 
 /**
  * v7 Stage-0 P0: pot share links must carry a per-pot preview in WhatsApp/iMessage.
@@ -10,6 +10,7 @@ import { getPotBySlug } from "@/lib/sandbox/store";
  */
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  await ensureHydrated();
   const pot = getPotBySlug(slug);
   if (!pot) {
     return { title: "Kindled — chip in together", description: "One wish, one link, revealed on the big day." };
