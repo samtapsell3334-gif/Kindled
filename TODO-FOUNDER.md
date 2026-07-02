@@ -11,22 +11,22 @@ was completed and is ticked below with evidence; what remains is the short
    name/number/address drop into /privacy, /terms, /contact and the prize-draw
    rules. Everything else legal is drafted and waiting in **docs/legal-brief.md**
    — engaging a solicitor is now one email with that file attached.
-2. **Send docs/legal-brief.md to a solicitor.** It contains every open question
-   (money custody, stored-credit FCA perimeter, prize-draw ratification,
-   Children's Code sign-off, UGC moderation) with the product facts they need.
+2. **Send docs/legal-brief.md to a solicitor.** The email is pre-written at
+   docs/solicitor-email.md — copy, paste, attach the brief, send.
 3. **Real-phone acceptance run.** Open kindledgift.co.uk/sandbox on your iPhone
    (Safari) and any Android (Chrome): create a wish → share to a second phone →
    chip in → receiver view → reveal. ~5 minutes per phone. Everything is
    verified in emulation; only real hardware can catch the rest.
-4. **Gift-card commercial terms.** Confirmed unobtainable without BD outreach:
-   GCVA/Tillo rate data is membership-gated (checked 2026-07-02); the investor
-   page correctly states the mechanism with no rates. When you open retailer
-   conversations, replace the sandbox's simulated 5% with contracted terms.
+4. **Gift-card commercial terms.** Outreach email pre-written at
+   docs/retailer-outreach-email.md (aggregator route first: Tillo/Runa). Rates
+   are membership-gated, so this needs your send button; the investor page
+   correctly stays mechanism-only until contracts exist.
 5. **Real photography** when real customers exist (DMCC: no staged
    "customers"). Until then the code-rendered art direction stands.
-6. **Neon branch split** before real customer data: in the Neon console, give
-   development its own branch so dev and production stop sharing one database
-   (fine for the sandbox today, not for launch).
+6. **Neon branch split** before real customer data (checked 2026-07-02: no API
+   path — console only): Vercel dashboard → Storage → neon-cerulean-car →
+   Open in Neon → Branches → create a "development" branch, then point the
+   development env DATABASE_URL at it. Two minutes.
 
 ## Legal & compliance — drafted, awaiting the two founder actions above
 - [x] Privacy + terms templates complete and published; entity details are the
