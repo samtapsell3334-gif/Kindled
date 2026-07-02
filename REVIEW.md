@@ -566,3 +566,24 @@ Full loop executed against the LIVE site, every step API-real:
   /beta noindex meta; robots.txt sane; full v11 event trail flowing
   (wish_added_to_occasion, kid_item_circled/approved, contribution_completed,
   reveal_outcome).
+
+## 2026-07-02 — v11 final ledger (closing "every ask")
+
+Two last gaps closed on final accounting:
+- Per-wish reveal options now carry all three paths — Take / Stack / Switch
+  (the brief's take/stack/switch; Switch = the product path per wish).
+- Named survey funnel events now flow to the event stream (survey_started,
+  survey_completed, survey_shared via the thank-you share beacon) alongside
+  the durable rows.
+
+Documented deviations (expert calls, logged not hidden):
+- Wish reorder uses tap up/down arrows rather than drag — deliberate: reliable
+  on mobile and screen-reader friendly; drag can layer on later.
+- Granted chips expand an inline celebratory note rather than navigating to a
+  separate granted page — the demo is a single-page simulation.
+- Tab-contrast evidence is on the tabs' own solid token surface — making the
+  bar solid was the fix; there is no longer a varying background to cross.
+- /beta "name (if captured)": the waitlist deliberately captures email only
+  (data minimisation); the column renders when a name source exists.
+- Physical-device runs (real iPhone/Android) and the WhatsApp preview
+  re-scrape remain founder-only, listed in TODO-FOUNDER.

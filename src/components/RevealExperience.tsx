@@ -438,10 +438,10 @@ export function RevealExperience(p: RevealExperienceProps) {
                     <div key={it.id} className="mt-2 flex items-center justify-between gap-2">
                       <span className="min-w-0 flex-1 truncate text-[12px] font-semibold">{it.name}</span>
                       <span className="flex shrink-0 gap-1">
-                        {(["gift_card", "stack"] as const).map((o) => (
+                        {(["gift_card", "stack", "product"] as const).map((o) => (
                           <button key={o} onClick={() => setWishChoices((w) => ({ ...w, [it.id!]: o }))}
                             className={`rounded-lg px-2 py-1 text-[10px] font-bold ${wishChoices[it.id!] === o ? "bg-amber-400 text-stone-900" : "border border-white/20 text-white/70"}`}>
-                            {o === "gift_card" ? "Take" : "Stack"}
+                            {o === "gift_card" ? "Take" : o === "stack" ? "Stack" : "Switch"}
                           </button>
                         ))}
                       </span>

@@ -160,7 +160,7 @@ export default function SurveyPage() {
             ) : (
               <p className="mt-5 rounded-2xl bg-emerald-50 px-4 py-3 text-[14px] font-semibold text-emerald-800">You&apos;re on the list.</p>
             )}
-            <button onClick={() => { void navigator.share?.({ title: "Two minutes on gift-giving", text: "A quick survey about how we all actually buy gifts:", url: `${window.location.origin}/survey` }).catch(() => {}); }}
+            <button onClick={() => { void fetch("/api/survey?event=shared").catch(() => {}); void navigator.share?.({ title: "Two minutes on gift-giving", text: "A quick survey about how we all actually buy gifts:", url: `${window.location.origin}/survey` }).catch(() => {}); }}
               className="btn-secondary mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[14px] font-bold">
               <Share2 className="h-4 w-4" /> Share this survey
             </button>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
+import { logEvent, ensureHydrated, flushPersist } from "@/lib/sandbox/store";
 
 /**
  * Survey ingestion (v11 WS-14). Append-only per session: the client upserts
@@ -22,6 +23,14 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (!sessionId || typeof body.answers !== "object" || body.answers === null) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 422 });
   }
+  // Named funnel events (v11 WS-14): rows are the durable record; the event
+  // stream feeds the same dashboard as the rest of the loop.
+  await ensureHydrated();
+  const answerCount = Object.keys(body.answers as object).length;
+  if (body.completed === true) logEvent("survey_completed", {});
+  else if (answerCount <= 1) logEvent("survey_started", {});
+  await flushPersist();
+
   if (!process.env.DATABASE_URL) return NextResponse.json({ ok: true, note: "no store" });
   try {
     const { db } = await import("@/lib/db");
@@ -45,4 +54,15 @@ export async function POST(request: Request): Promise<NextResponse> {
     console.error("[survey] persist failed:", e);
     return NextResponse.json({ error: "Store failed" }, { status: 500 });
   }
+}
+
+/** Share beacon: GET /api/survey?event=shared (fired by the thank-you share button). */
+export async function GET(request: Request): Promise<NextResponse> {
+  const url = new URL(request.url);
+  if (url.searchParams.get("event") === "shared") {
+    await ensureHydrated();
+    logEvent("survey_shared", {});
+    await flushPersist();
+  }
+  return new NextResponse(null, { status: 204 });
 }
