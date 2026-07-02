@@ -315,3 +315,6 @@ Gates: build 0 errors, 86/86 tests (4 new), drift guard green. Deployed + aliase
   at the AA-passing tone (was also a clone/visible mismatch).
 - Granted-state polish: "sealed for the big day" now reads "unsealed at the
   reveal" once a wish is revealed.
+
+**Final live Lighthouse (mobile), post-fixes:** /sandbox a11y **100** (perf 94);
+homepage a11y **96** (perf 90, up from 81). Acceptance target a11y ≥ 95 met on both.
