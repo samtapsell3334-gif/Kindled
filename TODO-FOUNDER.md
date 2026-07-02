@@ -60,3 +60,16 @@
 - [x] Cross-link: expert decision — YES; added in the demo's waitlist card ("Try the working sandbox").
 - [x] Staging URL: expert decision — sandbox ships on the production domains (site is pre-launch; demo banner on every sandbox surface makes the simulation explicit).
 - [ ] Run acceptance Script 1 on real iOS Safari + Android Chrome phones.
+
+## v8.1 noun rename ("pot" → "wish") — PAUSED, needs one founder confirmation
+- Status: first attempt (2026-07-02) was safely aborted and fully reverted before any
+  commit or deploy — a naive phrase sweep corrupted code identifiers (pot.id → wish.id),
+  proving the brief's warning right. The live site is untouched and green.
+- What's ready to go: route migration plan (/pots/* → /wishes/* with permanent 301s so
+  old WhatsApp links work forever), claims.ts noun block, CI banned-list update.
+- Needed from you (one message): (1) confirm the noun — "wish" (the brief's
+  recommendation) or another; (2) approve or amend the brand line "Kindled — where
+  wishes catch light" (the brief requires your sign-off on the exact line).
+- Then the rename runs as a string-literal-aware sweep (quoted copy and JSX text only,
+  never identifiers), with the read-aloud pass on the top-20 sentences and the
+  sum-of-money rephrasings ("pooled together", never a forced noun).
