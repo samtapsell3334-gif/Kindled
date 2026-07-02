@@ -265,3 +265,39 @@ homepage + terms anchor.
 - **Sandbox link in demo**: persistent strip under the context bar, all views: "Like what you see? Build one of these yourself. → Open the sandbox".
 - **De-AI editorial pass**: ~170 rendered em-dash constructions rewritten as full sentences across homepage, demo, sandbox, /p/[slug], reveal, films, legal and investor content; "not just X, it's Y" and "seamlessly" removed. Kept deliberately: brand line, quote-attribution dashes, retail product names, page-title separators, date ranges. Verified 0 rendered em dashes on homepage/demo via DOM walk.
 - **Deploy note**: commits d615ca6 + 944a8f0 are on main but blocked by the Vercel free-tier 100-deploys/day cap; deploy + alias x4 once the window resets.
+
+## 2026-07-02 — v9 Sandbox Elevation (feat/sandbox-elevation-v9)
+
+**WS-1 crit**: full loop walked at 375×812 as organiser/contributor/receiver;
+graded findings in audit/v9/CRIT.md (8 P0s, 8 P1s, 1 P2 deferred). All P0/P1 fixed.
+
+**WS-2 Finished Wish layer, live at all five points:**
+1. MaterialisingGift (src/components/sandbox/MaterialisingGift.tsx): sketched gift
+   fills with ember glow by funded %; ribbon at 25, bow at 50, rising embers at 75,
+   kit spark at 100. Ambient mode (receiver) carries no fill level — driven only by
+   giftVisualFor() over the server-redacted view; unit-tested (gift-visual.test.ts,
+   4 tests: ambient carries structurally no amount/percentage data).
+2. Impact framing: amount step shows "£20 moves Ava's gift 14% closer"; the done
+   beat shows "You just lit up N% of Ava's gift" with the gift visibly warmer.
+3. Big-day teaser on the receiver view: sealed card, gift silhouette breathing over
+   a soft halo, "Revealed on {date}". No numbers anywhere (server-enforced).
+4. ExampleWishes gallery, badged "Example wishes · seeded demo data" (DMCC-safe),
+   incl. one stacked-then-granted example; on the create page + My-wishes empty state.
+5. Granted state: revealed/stacked wishes now open with a night-ground celebration
+   panel (complete gift + spark, contributor count, reveal CTA).
+
+**WS-3 animation inventory (all CSS, all neutralised by the global
+prefers-reduced-motion block):**
+- mg-breathe (3.2s) — "this wish is alive": progress-bar fill + gift ember fill + ambient halo.
+- mg-ember-pop (0.6s, 6 staggered dots) — "your contribution just landed": done beat only.
+- mg-spark-drift (4s) — anticipation: the kit spark over completed gifts.
+- navigator.vibrate(10) on contribution success where supported.
+- Milestone one-liners at ≥50% and ≥90% (copy, not modals).
+
+**WS-4 copy/trust:** provenance line on every wish page ("Created by Sarah · for
+Ava's birthday"); every ask now carries a persistent reason (not placeholder-only);
+payment-sheet trust copy consolidated to one calm line + link; step markers
+(Step 1/2/3 of 3) across the contribute flow; empty-list nudge on create;
+receiver copy emoji trimmed.
+
+Gates: build 0 errors, 86/86 tests (4 new), drift guard green. Deployed + aliased ×4.
