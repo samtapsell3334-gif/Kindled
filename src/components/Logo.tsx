@@ -12,7 +12,7 @@
  * Lockup geometry mirrors /public/logo/kindled-lockup.svg: gap 10/64, text 34/64.
  */
 
-const SPARK = "M32 6l5 21 21 5-21 5-5 21-5-21-21-5 21-5Z";
+export const SPARK = "M32 6l5 21 21 5-21 5-5 21-5-21-21-5 21-5Z";
 
 export function LogoMark({
   variant = "light",

@@ -501,6 +501,28 @@ body {
 }
 .animate-chime-pulse { animation: chime-pulse 0.7s ease-out forwards; }
 
+/* v9 WS-3 — the Finished Wish motion set. Each animation carries meaning:
+   mg-breathe = the wish is alive and being funded; mg-ember-pop = your
+   contribution just landed; mg-spark-drift = anticipation on the sealed
+   receiver teaser. All are neutralised by the reduced-motion block below. */
+@keyframes mg-breathe {
+  0%, 100% { opacity: 0.75; }
+  50%      { opacity: 1; }
+}
+.animate-mg-breathe { animation: mg-breathe 3.2s ease-in-out infinite; }
+
+@keyframes mg-ember-pop {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--ember-x, 0), var(--ember-y, -34px)) scale(0.3); opacity: 0; }
+}
+.animate-mg-ember-pop { animation: mg-ember-pop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@keyframes mg-spark-drift {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+  50%      { transform: translateY(-5px) rotate(8deg); opacity: 1; }
+}
+.animate-mg-spark-drift { animation: mg-spark-drift 4s ease-in-out infinite; }
+
 /* WS11 — respect users who ask for less motion (WCAG 2.3.3 / 2.1 AA).
    Neutralises CSS keyframe loops (embers, marquees, pulses). Framer components
    additionally check useReducedMotion where they drive their own loops. */

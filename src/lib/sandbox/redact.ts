@@ -24,6 +24,8 @@ export interface ReceiverSurpriseView {
 
 export interface GuestView {
   kind: "guest";
+  /** Provenance (A1): contributors see who made the wish. First name only. */
+  organiserName: string;
   /** Unsealed only once the pot is revealed/stacked — the reveal experience's fuel. */
   unsealedMessages?: { displayName: string; text?: string; videoRef?: string }[];
   title: string;
@@ -75,6 +77,7 @@ export function viewFor(pot: SandboxPot, role: ViewerRole, opts: { unseal?: bool
 
   const base = {
     title: pot.title,
+    organiserName: pot.organiserName,
     recipientName: pot.recipientName,
     occasion: pot.occasion,
     eventDate: pot.eventDate,
@@ -99,7 +102,6 @@ export function viewFor(pot: SandboxPot, role: ViewerRole, opts: { unseal?: bool
       ...base,
       managerKey: pot.managerKey,
       slug: pot.slug,
-      organiserName: pot.organiserName,
       // Sealed until reveal on surprise pots — the organiser sees counts, not content.
       // `unseal` is set ONLY by the manager-key-authorised reveal ceremony itself.
       messages: pot.isSurprise && pot.status === "open" && !opts.unseal ? [] : pot.messages,

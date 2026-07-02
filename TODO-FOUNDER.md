@@ -73,3 +73,12 @@
 - Then the rename runs as a string-literal-aware sweep (quoted copy and JSX text only,
   never identifiers), with the read-aloud pass on the top-20 sentences and the
   sum-of-money rephrasings ("pooled together", never a forced noun).
+
+## v9 (2026-07-02)
+- audit/v9/CRIT.md contains the graded crit. The harness cannot save binary
+  screenshots into the repo, so evidence is written findings + live-verified
+  fixes; re-run the walk on a real phone for the before/after gallery if wanted.
+- Lighthouse mobile runs (a11y ≥95 target, perf before/after) still need a local
+  Chrome run: `npx lighthouse https://www.kindledgift.co.uk/sandbox --form-factor=mobile`.
+- A4 (P2, deferred): every primary CTA shares the same amber→orange gradient.
+  Deliberate brand ramp for now; revisit in a design-tokens pass.
