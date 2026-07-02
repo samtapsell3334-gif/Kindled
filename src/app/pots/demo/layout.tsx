@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     siteName: "Kindled",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "See a live Kindled pot",
     description: "Friends and family chip into the gifts that actually matter — revealed on the big day.",
   },
