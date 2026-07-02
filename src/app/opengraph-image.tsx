@@ -34,13 +34,15 @@ export default function OgImage() {
           }} />
         ))}
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: 18, display: "flex",
-            alignItems: "center", justifyContent: "center",
-            background: "linear-gradient(135deg, #fbbf24, #f97316)",
-            color: "#1c1917", fontSize: 34, fontWeight: 800,
-          }}>K</div>
-          <div style={{ display: "flex", color: "#fbbf24", fontSize: 34, fontWeight: 700 }}>Kindled</div>
+          {/* the "Catching On" mark — rising dots into a spark */}
+          <div style={{ display: "flex", position: "relative", width: 72, height: 72 }}>
+            <div style={{ position: "absolute", left: 8, top: 58, width: 7, height: 7, borderRadius: 99, background: "#FAF5EE", display: "flex" }} />
+            <div style={{ position: "absolute", left: 20, top: 50, width: 10, height: 10, borderRadius: 99, background: "#FAF5EE", display: "flex" }} />
+            <div style={{ position: "absolute", left: 33, top: 40, width: 13, height: 13, borderRadius: 99, background: "#F0A63C", display: "flex" }} />
+            <div style={{ position: "absolute", left: 46, top: 27, width: 16, height: 16, borderRadius: 99, background: "#EE7A3A", display: "flex" }} />
+            <div style={{ position: "absolute", left: 54, top: 6, width: 22, height: 22, background: "#F0A63C", clipPath: "polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%)", display: "flex" }} />
+          </div>
+          <div style={{ display: "flex", color: "#FAF5EE", fontSize: 38, fontWeight: 800, letterSpacing: -0.5 }}>Kindled</div>
         </div>
         <div style={{
           display: "flex", marginTop: 40, color: "white", fontSize: 76,

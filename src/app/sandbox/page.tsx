@@ -11,7 +11,8 @@
 import { useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Flame, Check, Copy, Share2, Plus, X, Star, Lock } from "lucide-react";
+import { Check, Copy, Share2, Plus, X, Star, Lock } from "lucide-react";
+import { LogoMark } from "@/components/Logo";
 import { DemoBanner } from "@/components/DemoBanner";
 
 interface DraftItem { name: string; price: number; category: string; retailer: string }
@@ -42,6 +43,7 @@ function CreatePot() {
   const [starChart, setStarChart] = useState(false);
   const [isSurprise, setIsSurprise] = useState(true);
   const [organiserName, setOrganiserName] = useState("");
+  const [organiserEmail, setOrganiserEmail] = useState("");
   const [items, setItems] = useState<DraftItem[]>(seededGoal ? [{ name: seededGoal, price: 100, category: "Goal", retailer: "TBC" }] : []);
   const [manual, setManual] = useState({ name: "", price: "", category: "Other", retailer: "" });
   const [busy, setBusy] = useState(false);
@@ -65,12 +67,19 @@ function CreatePot() {
         body: JSON.stringify({
           title, recipientName, occasion, eventDate, isSurprise, isChildPot,
           starChartEnabled: starChart, organiserName,
+          ...(organiserEmail ? { organiserEmail } : {}),
           items: items.map((i) => ({ ...i, priceBand: band(i.price), source: "catalogue" as const })),
           ...(ref ? { ref } : {}),
         }),
       });
       if (!res.ok) throw new Error((await res.json() as { error?: string }).error ?? "Failed");
-      setCreated(await res.json() as { slug: string; managerKey: string });
+      const made = await res.json() as { slug: string; managerKey: string };
+      try {
+        const mine = JSON.parse(localStorage.getItem("kindled-my-pots") ?? "[]") as unknown[];
+        mine.unshift({ slug: made.slug, managerKey: made.managerKey, title, recipientName, createdAt: Date.now() });
+        localStorage.setItem("kindled-my-pots", JSON.stringify(mine.slice(0, 20)));
+      } catch { /* private mode etc. */ }
+      setCreated(made);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
@@ -115,7 +124,10 @@ function CreatePot() {
           </button>
         </div>
 
-        <Link href={manageUrl} className="mt-6 inline-block rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-[14px] font-bold text-stone-900">Open my pot</Link>
+        <div className="mt-6 flex flex-col gap-2.5">
+          <Link href="/sandbox/pots" className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-[14px] font-bold text-stone-900">Go to My pots</Link>
+          <Link href={manageUrl} className="rounded-2xl border border-stone-300 px-6 py-3.5 text-[14px] font-semibold text-stone-700">Open this pot</Link>
+        </div>
       </main>
     );
   }
@@ -123,7 +135,7 @@ function CreatePot() {
   return (
     <main className="mx-auto max-w-md px-5 py-10">
       <div className="mb-6 flex items-center gap-2.5">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500"><Flame className="h-4.5 w-4.5 text-stone-900" /></span>
+        <LogoMark variant="light" size={38} />
         <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[26px] font-bold text-stone-900">Start a pot</h1>
       </div>
 
@@ -219,6 +231,15 @@ function CreatePot() {
           <span className="text-[12px] font-semibold text-stone-600">Your name</span>
           <input value={organiserName} onChange={(e) => setOrganiserName(e.target.value)} placeholder="So contributors know who's organising"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
+        </label>
+
+        <label className="block">
+          <span className="text-[12px] font-semibold text-stone-600">Register for launch <span className="font-normal text-stone-400">(optional)</span></span>
+          <input type="email" inputMode="email" autoComplete="email" value={organiserEmail} onChange={(e) => setOrganiserEmail(e.target.value)} placeholder="you@email.com"
+            className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
+          <span className="mt-1 block text-[11px] leading-snug text-stone-400">
+            We&apos;ll only use this to tell you when the real Kindled launches — nothing is sent in the sandbox. See our <Link href="/privacy" className="underline">Privacy Policy</Link>.
+          </span>
         </label>
 
         {error && <p role="alert" className="text-[13px] font-medium text-rose-600">{error}</p>}

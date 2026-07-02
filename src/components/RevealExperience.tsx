@@ -166,9 +166,18 @@ function drawShareCard(opts: { raised: number; people: number; recipientName: st
   ctx.fillStyle = "rgba(255,255,255,0.85)";
   ctx.fillText(`${opts.people} people`, 540, 880);
   ctx.fillText(`one very happy ${opts.recipientName}`, 540, 990);
-  ctx.fillStyle = "#fbbf24";
-  ctx.font = "bold 56px system-ui";
-  ctx.fillText("Kindled", 540, 1700);
+  // the "Catching On" mark (reversed variant) above the wordmark
+  ctx.textAlign = "left";
+  const dots: [number, number, number, string][] = [
+    [455, 1655, 7, "#FAF5EE"], [485, 1641, 10, "#FAF5EE"], [516, 1620, 13, "#F0A63C"], [547, 1594, 16, "#EE7A3A"],
+  ];
+  for (const [x, y, r, fill] of dots) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = fill; ctx.fill(); }
+  const spark = new Path2D("M32 6l5 21 21 5-21 5-5 21-5-21-21-5 21-5Z");
+  ctx.save(); ctx.translate(560, 1500); ctx.scale(1.1, 1.1); ctx.fillStyle = "#F0A63C"; ctx.fill(spark); ctx.restore();
+  ctx.fillStyle = "#FAF5EE";
+  ctx.font = "800 56px Gabarito, system-ui";
+  ctx.fillText("Kindled", 690, 1660);
+  ctx.textAlign = "center";
   ctx.fillStyle = "rgba(255,255,255,0.6)";
   ctx.font = "44px system-ui";
   ctx.fillText(`kindledgift.co.uk/p/${opts.slug}?ref=${opts.slug}`, 540, 1780);

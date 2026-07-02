@@ -16,7 +16,8 @@
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Flame, Check, Lock, Gift, Sparkles, X } from "lucide-react";
+import { Check, Lock, Gift, Sparkles, X } from "lucide-react";
+import { LogoMark } from "@/components/Logo";
 import { DemoBanner } from "@/components/DemoBanner";
 import { KindleRecord } from "@/components/KindleRecord";
 import { RevealExperience } from "@/components/RevealExperience";
@@ -296,7 +297,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         )}
 
         <p className="mt-10 text-center text-[11px] text-stone-400">
-          <Flame className="mr-1 inline h-3 w-3 text-amber-500" />Kindled sandbox · simulated money · <Link href="/sandbox" className="underline">start your own pot</Link>
+          <LogoMark variant="light" compact size={14} className="mr-1 inline-block align-[-2px]" />Kindled sandbox · simulated money · <Link href="/sandbox" className="underline">start your own pot</Link>
         </p>
 
         {showReveal && (

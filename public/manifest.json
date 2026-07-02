@@ -1,20 +1,20 @@
 {
-  "name": "Kindling",
-  "short_name": "Kindling",
-  "description": "Kindling MVP",
+  "name": "Kindled",
+  "short_name": "Kindled",
+  "description": "Group gifting for friends & family \u2014 one pot, one link, revealed on the big day.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#FAF3EA",
+  "theme_color": "#0C4E4C",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

@@ -9,6 +9,7 @@ import {
   Copy, Baby,
 } from "lucide-react";
 import { FilmPlayer, type Film } from "@/components/FilmPlayer";
+import { Logo } from "@/components/Logo";
 /**
  * InvestorWarRoom — a dark, fintech-grade investor dashboard.
  *
@@ -830,10 +831,8 @@ export function InvestorWarRoom({ embedded = false, content }: { embedded?: bool
         <div className="mx-auto max-w-6xl px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex shrink-0 items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ffb800]/15"><Flame className="h-4 w-4 text-[#ffb800]" strokeWidth={1.5} /></div>
-              <span className="text-[14px] font-bold tracking-tight text-white">{content.meta.company}
-                <span className="ml-1.5 text-[10px] font-normal uppercase tracking-widest text-slate-600">Investor</span>
-              </span>
+              <Logo variant="dark" size={26} />
+              <span className="text-[10px] font-normal uppercase tracking-widest text-slate-600">Investor</span>
             </div>
             <nav className="hidden items-center gap-1 md:flex">
               {TABS.map((t) => (

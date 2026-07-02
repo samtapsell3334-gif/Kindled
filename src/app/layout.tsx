@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Fredoka, Fraunces, Outfit } from "next/font/google";
+import { Geist, Geist_Mono, Fredoka, Fraunces, Outfit, Gabarito } from "next/font/google";
 import "./globals.css";
 import { ConsentBanner } from "@/components/ConsentBanner";
 
@@ -25,6 +25,13 @@ const fontSerif = Fraunces({
   weight: ["400", "500", "600", "700", "900"],
   style: ["normal", "italic"],
   variable: "--font-serif",
+});
+
+// Brand wordmark font (2026 logo kit — "Kindled" lockups only).
+const fontLogo = Gabarito({
+  subsets: ["latin"],
+  weight: ["800"],
+  variable: "--font-logo",
 });
 
 // Vibrant-Heritage UI sans — playful, confident, clean.
@@ -55,7 +62,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/favicon.svg",
-    apple: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
   },
   appleWebApp: {
     capable: true,
@@ -68,13 +75,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#0C4E4C",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" suppressHydrationWarning>
-      <body className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontSerif.variable} ${fontOutfit.variable} font-sans antialiased`}>
+      <body className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontSerif.variable} ${fontOutfit.variable} ${fontLogo.variable} font-sans antialiased`}>
         {children}
         <ConsentBanner />
       </body>

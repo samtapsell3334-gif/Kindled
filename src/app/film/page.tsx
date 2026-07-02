@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Flame, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { FilmPlayer } from "@/components/FilmPlayer";
 import { CUSTOMER_FILM, CUSTOMER_TRANSCRIPT } from "@/data/customer-film";
 
@@ -19,11 +20,8 @@ export default function FilmPage() {
     <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
       <header className="border-b border-stone-100 bg-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
-              <Flame className="h-3.5 w-3.5 text-stone-900" strokeWidth={2.5} />
-            </span>
-            <span style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-bold">Kindled</span>
+          <Link href="/" aria-label="Kindled home">
+            <Logo variant="light" size={30} />
           </Link>
           <Link href="/" className="flex items-center gap-1.5 text-[13px] font-medium text-stone-500 hover:text-stone-800">
             <ArrowLeft className="h-3.5 w-3.5" /> Back home

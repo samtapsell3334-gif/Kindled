@@ -38,6 +38,7 @@ import { DemoWaitlistPill } from "@/components/DemoWaitlistPill";
 import { track } from "@/lib/analytics";
 import { GeneratedReveal } from "@/components/GeneratedReveal";
 import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
+import { Logo } from "@/components/Logo";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -553,7 +554,7 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
             </svg>
             <div>
               <div className="flex items-baseline gap-1.5">
-                <h1 className="font-editorial text-[23px] font-semibold tracking-tight text-[#0f172a]">Kindled</h1>
+                <h1 aria-label="Kindled"><Logo variant="light" size={30} /></h1>
                 <span className="text-[11px] font-medium tracking-tight text-[#0f172a]/40">· Billy&apos;s List</span>
               </div>
               <p className="text-[11px] tracking-tight text-[#0f172a]/50">

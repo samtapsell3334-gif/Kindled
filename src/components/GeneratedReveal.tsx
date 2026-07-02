@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Eye, Heart, Sparkles, Share2, Trophy, Mic, Film, Play } from "lucide-react";
+import { X, Eye, Heart, Share2, Trophy, Mic, Film, Play } from "lucide-react";
+import { LogoMark } from "@/components/Logo";
 import type { LucideIcon } from "lucide-react";
 
 /**
@@ -529,8 +530,8 @@ export function GeneratedReveal({
                       ))}
                     </div>
                     <div className="mt-5 flex items-center justify-center gap-1.5">
-                      <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-                      <span className="text-[12px] font-black tracking-tight text-white">Kindled</span>
+                      <LogoMark variant="dark" compact size={16} />
+                      <span style={{ fontFamily: "var(--font-logo), sans-serif", fontWeight: 800 }} className="text-[12px] tracking-tight text-white">Kindled</span>
                     </div>
                   </div>
 

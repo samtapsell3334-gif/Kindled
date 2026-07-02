@@ -9,6 +9,7 @@ import {
   Heart, RefreshCw, ChevronRight,
 } from "lucide-react";
 import { WaitlistForm } from "@/components/WaitlistForm";
+import { Logo } from "@/components/Logo";
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -213,16 +214,8 @@ function Nav() {
       )}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/30">
-            <Flame className="h-4 w-4 text-stone-900" strokeWidth={2.5} />
-          </div>
-          <span
-            style={{ fontFamily: "var(--font-display)" }}
-            className="text-[20px] font-bold tracking-tight text-white"
-          >
-            Kindled
-          </span>
+        <Link href="/" className="flex items-center shrink-0" aria-label="Kindled home">
+          <Logo variant="dark" size={34} />
         </Link>
 
         <nav className="hidden md:flex items-center gap-7">
@@ -1271,14 +1264,7 @@ function Footer() {
   return (
     <footer className="border-t border-stone-200 bg-white px-5 py-10">
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 md:flex-row">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
-            <Flame className="h-3.5 w-3.5 text-stone-900" strokeWidth={2.5} />
-          </div>
-          <span style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-bold text-stone-900">
-            Kindled
-          </span>
-        </div>
+        <Logo variant="light" size={30} />
         <div className="flex flex-wrap justify-center gap-6">
           {(["How it works|#how-it-works", "Watch the film|/film", "Live demo|/pots/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");

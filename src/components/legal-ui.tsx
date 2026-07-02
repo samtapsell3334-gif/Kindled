@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Flame, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 /** Shared chrome + typography for the legal/policy pages. British English throughout. */
 export function LegalShell({
@@ -17,13 +18,8 @@ export function LegalShell({
     <div className="min-h-screen bg-white text-stone-800">
       <header className="border-b border-stone-100">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500">
-              <Flame className="h-3.5 w-3.5 text-stone-900" strokeWidth={2.5} />
-            </span>
-            <span style={{ fontFamily: "var(--font-display)" }} className="text-[18px] font-bold text-stone-900">
-              Kindled
-            </span>
+          <Link href="/" aria-label="Kindled home">
+            <Logo variant="light" size={30} />
           </Link>
           <Link href="/" className="flex items-center gap-1.5 text-[13px] font-medium text-stone-500 hover:text-stone-800">
             <ArrowLeft className="h-3.5 w-3.5" /> Back home

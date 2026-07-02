@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Flame, Shield } from "lucide-react";
+import { Shield } from "lucide-react";
+import { LogoMark } from "@/components/Logo";
 import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
 import { track } from "@/lib/analytics";
 
@@ -88,9 +89,7 @@ function PinGate({ onUnlock }: { onUnlock: (content: InvestorContent) => void })
 
         {/* Logo */}
         <div className="mb-10 flex flex-col items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-500/10">
-            <Flame className="h-7 w-7 text-blue-400" strokeWidth={1.5} />
-          </div>
+          <LogoMark variant="dark" size={56} />
           <div className="text-center">
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-500">
               Strictly Confidential

@@ -13,7 +13,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { Play, Pause, RotateCcw, Volume2, VolumeX, ChevronRight, Flame } from "lucide-react";
+import { Play, Pause, RotateCcw, Volume2, VolumeX, ChevronRight } from "lucide-react";
+import { LogoMark } from "@/components/Logo";
 import { Ignition } from "@/components/RevealExperience";
 import { track } from "@/lib/analytics";
 
@@ -129,7 +130,7 @@ function Visual({ scene, animate }: { scene: FilmScene; animate: boolean }) {
   // endcard
   return (
     <div className="text-center">
-      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500"><Flame className="h-7 w-7 text-stone-900" /></span>
+      <span className="mx-auto flex justify-center"><LogoMark variant="dark" size={64} /></span>
       <p className="mt-3 text-[24px] font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>Gifting, reignited.</p>
       <p className="mt-1 text-[13px] text-amber-300">kindledgift.co.uk</p>
     </div>
