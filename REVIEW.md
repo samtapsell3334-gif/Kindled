@@ -333,3 +333,11 @@ homepage a11y **96** (perf 90, up from 81). Acceptance target a11y ≥ 95 met on
   confirmed in Postgres (4 pots) → fresh deployment forced (new instances,
   cold start) → wish loaded back through `ensureHydrated()` — PASS. The sandbox
   is now durable and cross-device.
+
+## 2026-07-02 — post-DB loose ends closed
+
+- /pots → /wishes had been 308-ing into a 404 since the v8.1 route move; /wishes
+  now permanently redirects to /wishes/demo. Verified live: /pots resolves 200.
+- Per-wish OG previews now hydrate from Postgres (generateMetadata + OG image call
+  ensureHydrated). Verified on a cold deployment: og:title = "Chip in for
+  Durability proof 2 🎉" — the original "per-pot OG titles on prod" unlock, done.
