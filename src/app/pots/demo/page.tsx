@@ -36,7 +36,7 @@ import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
 import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
 import { DemoWaitlistPill } from "@/components/DemoWaitlistPill";
 import { track } from "@/lib/analytics";
-import { GeneratedReveal } from "@/components/GeneratedReveal";
+import { RevealExperience } from "@/components/RevealExperience";
 import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
 import { Logo } from "@/components/Logo";
 
@@ -4233,14 +4233,18 @@ export default function DemoPage() {
 
       {/* Personalised generated reveal — built live from this pot's own data */}
       {showAiReveal && (
-        <GeneratedReveal
+        <RevealExperience
+          slug="demo"
           recipientName="Billy"
-          occasion="Birthday"
-          totalRaised={V2_TOTAL}
-          gifts={V2_POTS.map((p) => ({ name: p.name, sub: p.sub, Icon: p.Icon, grad: p.grad, glow: p.glow, image: p.image }))}
-          contributors={V2_CONTRIBS.map((c) => ({ name: c.name, initials: c.initials, grad: c.grad, image: c.image }))}
-          memories={capturedMemories.map((m) => ({ kind: m.kind, url: m.url, durationSec: m.durationSec }))}
-          onComplete={() => { setShowAiReveal(false); setShowPostReveal(true); }}
+          eventDate={new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10)}
+          raised={V2_TOTAL}
+          goal={V2_TOTAL}
+          isChild
+          contributors={V2_CONTRIBS.map((c) => ({ displayName: c.name, amount: 0 }))}
+          messages={capturedMemories.map((m) => ({ displayName: "A Memory for Billy", videoRef: m.url }))}
+          items={V2_POTS.map((p) => ({ name: p.name, price: p.goal }))}
+          canChooseOutcome={false}
+          onClose={() => { setShowAiReveal(false); setShowPostReveal(true); }}
         />
       )}
     </div>

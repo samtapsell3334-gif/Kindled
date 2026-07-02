@@ -55,11 +55,11 @@ export function Logo({
   wordmark?: boolean;
 }) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
+    <span className={`inline-flex items-center ${className}`} style={{ gap: Math.round(size * 0.3) }}>
       <LogoMark variant={variant} size={size} compact={size < 32} />
       {wordmark && (
         <span
-          style={{ fontFamily: "var(--font-logo), 'Avenir Next', 'Trebuchet MS', sans-serif", fontWeight: 800, letterSpacing: "-0.015em", fontSize: size * 0.72 }}
+          style={{ fontFamily: "var(--font-logo), 'Avenir Next', 'Trebuchet MS', sans-serif", fontWeight: 800, letterSpacing: "-0.01em", fontSize: Math.round(size * 0.66) }}
           className={variant === "dark" ? "text-[#FAF5EE]" : "text-[#23201C]"}
         >
           Kindled

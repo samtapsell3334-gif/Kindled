@@ -36,6 +36,7 @@ function CreatePot() {
   const ref = params.get("ref") ?? "";
 
   const [title, setTitle] = useState(seededGoal ? `The ${seededGoal} pot` : "");
+  const [titleTouched, setTitleTouched] = useState(!!seededGoal);
   const [recipientName, setRecipientName] = useState("");
   const [occasion, setOccasion] = useState("Birthday");
   const [eventDate, setEventDate] = useState(() => new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10));
@@ -147,6 +148,7 @@ function CreatePot() {
       </div>
 
       <div className="space-y-4">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600">1 · The occasion</p>
         <label className="block">
           <span className="text-[12px] font-semibold text-stone-600">What&apos;s the occasion?</span>
           <div className="mt-1.5 flex flex-wrap gap-2">
@@ -165,9 +167,13 @@ function CreatePot() {
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
         </label>
 
+        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-600">2 · Who it&apos;s for</p>
         <label className="block">
           <span className="text-[12px] font-semibold text-stone-600">Who&apos;s it for? {isChildPot && <span className="text-stone-400">(first name only)</span>}</span>
-          <input value={recipientName} onChange={(e) => setRecipientName(e.target.value)} placeholder={isChildPot ? "e.g. Ava" : "e.g. Priya"}
+          <input value={recipientName} onChange={(e) => {
+              setRecipientName(e.target.value);
+              if (!titleTouched) setTitle(e.target.value ? `${e.target.value}'s ${occasion}` : "");
+            }} placeholder={isChildPot ? "e.g. Ava" : "e.g. Priya"}
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
         </label>
 
@@ -185,13 +191,14 @@ function CreatePot() {
         </div>
 
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Pot name</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Ava's 8th Birthday"
+          <span className="text-[12px] font-semibold text-stone-600">Pot name <span className="font-normal text-stone-400">(auto-filled — edit if you like)</span></span>
+          <input value={title} onChange={(e) => { setTitle(e.target.value); setTitleTouched(true); }} placeholder="e.g. Ava's 8th Birthday"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
         </label>
 
+        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-600">3 · Build the list</p>
         <div>
-          <span className="text-[12px] font-semibold text-stone-600">Build the list</span>
+          <span className="text-[12px] font-semibold text-stone-600">Tap to add — prices and shops fill in automatically</span>
           <div className="mt-1.5 grid grid-cols-2 gap-2">
             {catalogue.map((c) => {
               const on = items.some((i) => i.name === c.name);
@@ -229,6 +236,7 @@ function CreatePot() {
           )}
         </div>
 
+        <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-600">4 · Final details</p>
         <label className="flex items-center justify-between gap-3 rounded-2xl border border-stone-200 p-4">
           <span className="text-[13px] font-semibold text-stone-700">Keep it a surprise until the reveal</span>
           <input type="checkbox" checked={isSurprise} onChange={(e) => setIsSurprise(e.target.checked)} className="h-5 w-5 accent-amber-500" />
