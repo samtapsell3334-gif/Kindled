@@ -23,7 +23,12 @@ was completed and is ticked below with evidence; what remains is the short
    correctly stays mechanism-only until contracts exist.
 5. **Real photography** when real customers exist (DMCC: no staged
    "customers"). Until then the code-rendered art direction stands.
-6. **Neon branch split** before real customer data (checked 2026-07-02: no API
+6. **Resend account + RESEND_API_KEY** (optional but nice): signups now persist
+   to Postgres regardless (v9.2 — they were previously LOST without this key),
+   so email notification is a convenience. resend.com → free tier → create API
+   key → `npx vercel env add RESEND_API_KEY production`. Your waitlist is
+   readable any time at /api/admin/waitlist?secret=<your sandbox admin secret>.
+7. **Neon branch split** before real customer data (checked 2026-07-02: no API
    path — console only): Vercel dashboard → Storage → neon-cerulean-car →
    Open in Neon → Branches → create a "development" branch, then point the
    development env DATABASE_URL at it. Two minutes.

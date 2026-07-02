@@ -361,3 +361,18 @@ homepage a11y **96** (perf 90, up from 81). Acceptance target a11y ≥ 95 met on
   full loop: circle → queue → approve → guest sees item, goal 0→45, and
   pendingItems never appears on guest/receiver payloads.
 - Suite: 92 tests green (was 86).
+
+## 2026-07-02 — v9.2: the waitlist was leaking (P0) — fixed and proven
+
+Live-path audit found the site's PRIMARY CTA losing every signup: /api/signup
+only forwarded to Resend, which was never configured in production, so
+"Reserve your spot" emails vanished into a server log. Fix: signups now upsert
+into Postgres (waitlist_signups) BEFORE any email attempt (lowercased, deduped,
+silent-success on repeats); the sandbox "Register for launch" field lands in
+the same table (source: sandbox); founder readout at
+GET /api/admin/waitlist?secret=<SANDBOX_ADMIN_SECRET> (rate-limited).
+CREATOR_SIGNUP_EMAIL set in production. Proven live end-to-end: POST signup →
+row in Postgres → readout returns it (test row then removed).
+Remaining founder step: create a Resend account + set RESEND_API_KEY to turn
+notification emails on — signups are safe in the DB either way.
+Also: last footer contrast stragglers darkened (homepage a11y toward 100).

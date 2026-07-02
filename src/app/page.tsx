@@ -1282,9 +1282,9 @@ function Footer() {
             );
           })}
         </div>
-        <p className="text-[12px] text-stone-400">Made with love in the UK · © 2026 Kindled. All rights reserved.</p>
+        <p className="text-[12px] text-stone-500">Made with love in the UK · © 2026 Kindled. All rights reserved.</p>
       </div>
-      <p className="mx-auto mt-6 max-w-5xl text-center text-[11px] leading-relaxed text-stone-400">
+      <p className="mx-auto mt-6 max-w-5xl text-center text-[11px] leading-relaxed text-stone-500">
         Prize draw: 18+, UK residents only. No purchase necessary; a free entry route and full{" "}
         <Link href="/terms#prize-draw" className="underline underline-offset-2 hover:text-stone-600">terms</Link> apply.
       </p>
