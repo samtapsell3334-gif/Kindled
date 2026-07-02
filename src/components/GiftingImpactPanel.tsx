@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import {
   Brain, Leaf, RotateCcw, Banknote, TrendingUp,
-  Sparkles, Users, Check, Sofa,
 } from "lucide-react";
 
 // ─── Count-up hook ─────────────────────────────────────────────────────────────
@@ -137,227 +136,7 @@ function MetricTile({ metric, delay = 0 }: { metric: MetricDef; delay?: number }
 }
 
 // ─── Milestone Simulator ────────────────────────────────────────────────────────
-const BURST_COLORS = ["#f59e0b", "#fb923c", "#fbbf24", "#f97316", "#fde68a", "#fed7aa"];
-interface Particle { id: number; angle: number; dist: number; color: string }
-type SimState = "idle" | "merging" | "merged";
 
-function MilestoneSimulator() {
-  const [state, setState] = useState<SimState>("idle");
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const SOFA_GOAL = 900;
-  const birthdayRaised = 225;
-  const christmasRaised = 180;
-  const combined = birthdayRaised + christmasRaised;
-  const pct = Math.round((combined / SOFA_GOAL) * 100);
-  const stillNeeded = SOFA_GOAL - combined;
-
-  const merge = useCallback(() => {
-    if (state !== "idle") return;
-    setState("merging");
-    setParticles(Array.from({ length: 18 }, (_, i) => ({
-      id: i, angle: (i / 18) * 360,
-      dist: 40 + (i % 5) * 14,
-      color: BURST_COLORS[i % BURST_COLORS.length]!,
-    })));
-    timerRef.current = setTimeout(() => { setState("merged"); setParticles([]); }, 650);
-  }, [state]);
-
-  const reset = useCallback(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setState("idle");
-    setParticles([]);
-  }, []);
-
-  return (
-    <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-5">
-      <div className="mb-4">
-        <p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-400/70">Simulator</p>
-        <h3 style={{ fontFamily: "var(--font-display)" }}
-          className="text-[20px] font-semibold leading-tight text-white">
-          Stack wishes across events
-        </h3>
-        <p className="mt-1 text-[12px] text-white/40">
-          See how a birthday wish and Christmas wish combine toward a single big goal
-        </p>
-      </div>
-
-      <AnimatePresence mode="wait">
-        {state !== "merged" ? (
-          <motion.div key="pots" exit={{ opacity: 0, scale: 0.92, y: -8 }} transition={{ duration: 0.22 }}>
-
-            {/* Three info pills */}
-            <div className="mb-4 grid grid-cols-3 gap-2">
-              {[
-                { Icon: Users, label: "8 contributors", color: "text-amber-400" },
-                { Icon: Check, label: "£45 each event", color: "text-amber-400" },
-                { Icon: Sparkles, label: "Stacks silently", color: "text-amber-400" },
-              ].map(({ Icon, label, color }) => (
-                <div key={label} className="flex flex-col items-center gap-1 rounded-xl bg-white/5 py-2.5">
-                  <Icon className={cn("h-3.5 w-3.5", color)} strokeWidth={2} />
-                  <span className="text-center text-[9px] font-semibold text-white/45 leading-tight">{label}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Birthday Pot */}
-            <motion.div
-              animate={{ borderColor: state === "merging" ? "rgba(251,191,36,0.55)" : "rgba(255,255,255,0.08)" }}
-              transition={{ duration: 0.4 }}
-              className="mb-3 rounded-2xl border p-4">
-              <div className="mb-2 flex items-start justify-between">
-                <div>
-                  <p className="text-[13px] font-bold text-white">Clara&apos;s Birthday Wish</p>
-                  <p className="text-[10px] text-white/35">October · Velvet Sofa · £{SOFA_GOAL} goal</p>
-                </div>
-                <span style={{ fontFamily: "var(--font-display)" }}
-                  className="text-[18px] font-black text-amber-400">25%</span>
-              </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-white/8">
-                <motion.div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
-                  animate={{ width: state === "merging" ? `${pct}%` : "25%" }}
-                  transition={{ duration: 0.45 }} />
-              </div>
-              <p className="mt-1.5 text-[10px] text-white/30">£{birthdayRaised} raised by 6 people</p>
-            </motion.div>
-
-            {/* Christmas Pot */}
-            <motion.div
-              animate={{ borderColor: state === "merging" ? "rgba(251,191,36,0.55)" : "rgba(255,255,255,0.08)" }}
-              transition={{ duration: 0.4, delay: 0.07 }}
-              className="mb-5 rounded-2xl border p-4">
-              <div className="mb-2 flex items-start justify-between">
-                <div>
-                  <p className="text-[13px] font-bold text-white">Clara&apos;s Christmas Wish</p>
-                  <p className="text-[10px] text-white/35">December · Velvet Sofa · £{SOFA_GOAL} goal</p>
-                </div>
-                <span style={{ fontFamily: "var(--font-display)" }}
-                  className="text-[18px] font-black text-violet-400">20%</span>
-              </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-white/8">
-                <motion.div className="h-full rounded-full bg-gradient-to-r from-violet-400 to-fuchsia-500"
-                  animate={{ width: state === "merging" ? `${pct}%` : "20%" }}
-                  transition={{ duration: 0.45, delay: 0.1 }} />
-              </div>
-              <p className="mt-1.5 text-[10px] text-white/30">£{christmasRaised} raised by 8 people</p>
-            </motion.div>
-
-            {/* Merge button */}
-            <div className="relative">
-              <motion.button
-                whileHover={state === "idle" ? { scale: 1.02, y: -1 } : {}}
-                whileTap={state === "idle" ? { scale: 0.96 } : {}}
-                onClick={merge}
-                disabled={state === "merging"}
-                className={cn(
-                  "relative w-full overflow-visible rounded-2xl py-4 text-[15px] font-bold transition-all duration-300",
-                  state === "merging"
-                    ? "bg-amber-400/25 text-amber-300/50 cursor-not-allowed"
-                    : "bg-gradient-to-r from-amber-400 to-orange-500 text-stone-900",
-                )}
-                style={state === "idle" ? { boxShadow: "0 8px 28px rgba(251,146,60,0.35)" } : {}}>
-                {state === "merging" ? "Combining…" : "Combine Birthday + Christmas Wishes"}
-                <AnimatePresence>
-                  {particles.map(p => {
-                    const rad = (p.angle * Math.PI) / 180;
-                    const tx = Math.cos(rad) * p.dist;
-                    const ty = Math.sin(rad) * p.dist - 18;
-                    return (
-                      <motion.div key={p.id}
-                        className="pointer-events-none absolute left-1/2 top-1/2 rounded-full"
-                        style={{ width: 6 + (p.id % 3) * 3, height: 6 + (p.id % 3) * 3, background: p.color }}
-                        initial={{ x: "-50%", y: "-50%", scale: 1, opacity: 1 }}
-                        animate={{ x: `calc(-50% + ${tx}px)`, y: `calc(-50% + ${ty}px)`, scale: 0, opacity: 0 }}
-                        transition={{ duration: 0.55, ease: "easeOut" }} />
-                    );
-                  })}
-                </AnimatePresence>
-              </motion.button>
-              <p className="mt-2 text-center text-[10px] text-white/30">
-                £{birthdayRaised} + £{christmasRaised} = £{combined} · £{stillNeeded} more to reach the sofa
-              </p>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div key="merged"
-            initial={{ opacity: 0, scale: 0.88, y: 18 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 380, damping: 24 }}>
-
-            {/* Super pot */}
-            <div className="mb-4 rounded-2xl border border-amber-400/50 bg-amber-950/40 p-4"
-              style={{ boxShadow: "0 0 32px rgba(251,191,36,0.2)" }}>
-              <div className="mb-3 flex items-start justify-between">
-                <div>
-                  <div className="mb-0.5 flex items-center gap-2">
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 14, delay: 0.15 }}
-                      className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400">
-                      <TrendingUp className="h-3 w-3 text-stone-900" />
-                    </motion.div>
-                    <p className="text-[14px] font-black text-white">Clara&apos;s Super-Wish</p>
-                  </div>
-                  <p className="text-[10px] text-amber-300/60">Birthday + Christmas combined</p>
-                </div>
-                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 14, delay: 0.25 }}
-                  style={{ fontFamily: "var(--font-display)" }}
-                  className="text-[24px] font-black text-amber-400">{pct}%</motion.span>
-              </div>
-              <div className="h-4 w-full overflow-hidden rounded-full bg-white/8">
-                <motion.div className="h-full rounded-full bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400"
-                  initial={{ width: "0%" }} animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.75, ease: "easeOut", delay: 0.15 }}
-                  style={{ boxShadow: "0 0 12px rgba(251,191,36,0.55)" }} />
-              </div>
-              <div className="mt-2 flex items-center justify-between">
-                <p className="text-[11px] font-bold text-amber-300">£{combined} raised</p>
-                <p className="text-[10px] text-white/35">£{stillNeeded} still needed</p>
-              </div>
-            </div>
-
-            {/* Sofa visual */}
-            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35, type: "spring", stiffness: 320, damping: 28 }}
-              className="mb-4 overflow-hidden rounded-2xl border border-white/10">
-              <div className="relative h-32">
-                <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=220&fit=crop&q=80"
-                  alt="Velvet Sofa" loading="lazy" decoding="async" className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/75 to-black/20" />
-                <div className="absolute inset-0 flex items-center px-4">
-                  <div>
-                    <div className="mb-0.5 flex items-center gap-2">
-                      <Sofa className="h-4 w-4 text-amber-300" strokeWidth={2} />
-                      <p className="text-[14px] font-bold text-white">Velvet Sofa</p>
-                    </div>
-                    <p className="text-[12px] font-semibold text-amber-400">£{SOFA_GOAL} goal · £{stillNeeded} to go</p>
-                    <div className="mt-2 h-2 w-40 overflow-hidden rounded-full bg-white/15">
-                      <motion.div className="h-full rounded-full bg-amber-400"
-                        initial={{ width: "0%" }} animate={{ width: `${pct}%` }}
-                        transition={{ duration: 0.8, delay: 0.5 }} />
-                    </div>
-                    <p className="mt-1 text-[10px] text-white/45">One more event to go</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-              className="mb-4 text-center text-[12px] leading-relaxed text-white/40 px-2">
-              One more Christmas: just £{Math.ceil(stillNeeded / 8)} each from those 8 people and the sofa is Clara&apos;s.
-            </motion.p>
-
-            <button onClick={reset}
-              className="w-full rounded-2xl border border-white/10 py-3 text-[12px] font-semibold text-white/40 transition-colors hover:text-white/70">
-              Reset demo
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
 
 // ─── Main export ────────────────────────────────────────────────────────────────
 export function GiftingImpactPanel() {
@@ -409,13 +188,7 @@ export function GiftingImpactPanel() {
             </p>
           </div>
 
-          {/* Section 4: Simulator */}
-          <motion.div initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ type: "spring", stiffness: 280, damping: 26 }}>
-            <MilestoneSimulator />
-          </motion.div>
+
         </div>
       </div>
     </section>

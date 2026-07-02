@@ -553,7 +553,7 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
               <p className="text-[11px] tracking-tight text-[#0f172a]/50">
                 {isContributor
                   ? <>Contributing to <span className="font-semibold text-[#0f172a]/75">Billy&apos;s List</span></>
-                  : <>Managed by <span className="font-semibold text-[#0f172a]/75">Mum (Sarah)</span></>}
+                  : <>Built by <span className="font-semibold text-[#0f172a]/75">Billy himself</span></>}
               </p>
             </div>
           </div>
@@ -3307,7 +3307,7 @@ export default function DemoPage() {
             <p className="text-[11px] leading-snug tracking-tight text-[#0f172a]/55">
               {isContributor
                 ? <><span className="font-bold text-[#0f172a]">Contributor view</span>. You&apos;re seeing Billy&apos;s wish as a family member. Tap any gift to chip in.</>
-                : <><span className="font-bold text-[#0f172a]">Parent / owner view</span>. This is how Billy&apos;s family manages and tracks his wish. Switch tabs to explore.</>
+                : <><span className="font-bold text-[#0f172a]">Billy&apos;s list</span>. He built it himself; friends and family chip in and track it here. Switch tabs to explore.</>
               }
             </p>
           </motion.div>
