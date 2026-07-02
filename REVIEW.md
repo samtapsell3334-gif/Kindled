@@ -508,3 +508,22 @@ Suite: 111 tests green. Build clean. Live verification after deploy below.
 /film 308→home; /beta 200 with wrong-PIN 401 + PIN absent from bundle; /survey
 live. Lighthouse mobile a11y: homepage 100, /survey 100, /sandbox 100 (helper
 text darkened for the new cream ground). Deployment 54b5448 aliased ×4.
+
+## 2026-07-02 — v11 second-pass verification (highest-standard sweep)
+
+Re-walked every workstream in a rendered browser hunting for gaps:
+- **3 gaps found and closed**: occasion_share was server-wired but no client
+  fired it (now fired from WhatsApp/native-share/copy on the created screen);
+  granted chips lowercased proper nouns (fixed); the sandbox own-wishes link
+  now logs own_wishes_cta_tapped via beacon.
+- **Rendered proof added for everything previously code-only**: creation nudge
+  with Small/Medium/Dream one-taps; paste-a-link populating a real product;
+  star chart felt-tip ring + "Three quarters!" milestone caught live at 23/30
+  + full-chart Ignition celebration; reveal per-wish rows exercised end-to-end
+  with MIXED outcomes (Fountain pen → gift_card, Notebook set → stack,
+  verified in the store post-ceremony); investor Mechanism tab shows the
+  K-loop panel complete (formula, cycle time, 8 × 0.15 = 1.2 example, founder
+  targets, three levers, evidence-engine line) and Why-Now shows the
+  economics diagram.
+- One environment note: the investor dev-fallback PIN is 1066; production
+  uses INVESTOR_PIN (4448) — gate API confirmed 200/401 both environments.

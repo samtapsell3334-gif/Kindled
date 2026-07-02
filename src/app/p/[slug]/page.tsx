@@ -366,7 +366,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
                 </Link>
               )}
             </div>
-            <Link href={`/sandbox?ref=${slug}`} className="mt-3 inline-block text-[13px] font-semibold text-stone-600 underline underline-offset-2">
+            <Link href={`/sandbox?ref=${slug}`} onClick={() => { void fetch(`/api/sandbox/pots/${slug}/contribute?step=own_wishes_cta`, { method: "PUT" }); }} className="mt-3 inline-block text-[13px] font-semibold text-stone-600 underline underline-offset-2">
               Never send the awkward money-collection text again. Start your own wish
             </Link>
           </section>

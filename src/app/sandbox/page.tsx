@@ -118,7 +118,9 @@ function CreatePot() {
 
   const copy = (text: string, which: "share" | "manage") => {
     void navigator.clipboard?.writeText(text).then(() => { setCopied(which); setTimeout(() => setCopied(null), 1500); });
+    if (which === "share" && created) void fetch(`/api/sandbox/pots/${created.slug}/contribute?step=occasion_share`, { method: "PUT" });
   };
+  const shareBeacon = () => { if (created) void fetch(`/api/sandbox/pots/${created.slug}/contribute?step=occasion_share`, { method: "PUT" }); };
 
   if (created) {
     const shareUrl = `${window.location.origin}/p/${created.slug}`;
@@ -135,12 +137,12 @@ function CreatePot() {
           <textarea value={msg} onChange={(e) => setShareMsg(e.target.value)} rows={3} aria-label="Invite message"
             className="mt-2 w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-[13px] text-stone-700" />
           <div className="mt-2 flex flex-wrap gap-2">
-            <a href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"
+            <a href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer" onClick={shareBeacon}
               className="flex items-center gap-1.5 rounded-xl bg-[#25D366] px-3.5 py-2 text-[12px] font-bold text-white">
               <Share2 className="h-3.5 w-3.5" /> WhatsApp
             </a>
             {typeof navigator !== "undefined" && !!navigator.share && (
-              <button onClick={() => { void navigator.share({ text: msg }).catch(() => {}); }}
+              <button onClick={() => { shareBeacon(); void navigator.share({ text: msg }).catch(() => {}); }}
                 className="flex items-center gap-1.5 rounded-xl border border-stone-300 px-3.5 py-2 text-[12px] font-bold text-stone-700">
                 <Share2 className="h-3.5 w-3.5" /> Share
               </button>

@@ -3430,7 +3430,7 @@ export default function DemoPage() {
                 <button key={p.id} onClick={() => setGrantedOpen((g) => (g === p.id ? null : p.id))}
                   className="flex shrink-0 items-center gap-2 rounded-full bg-[var(--card)] py-1.5 pl-1.5 pr-3.5 vh-lift">
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500"><Check className="h-3.5 w-3.5 text-white" strokeWidth={3} /></span>
-                  <span className="text-[12px] font-semibold text-[#0f172a]">{p.claimedBy} granted {p.title.toLowerCase()}</span>
+                  <span className="text-[12px] font-semibold text-[#0f172a]">{p.claimedBy} granted {p.title}</span>
                 </button>
               ))}
             </div>

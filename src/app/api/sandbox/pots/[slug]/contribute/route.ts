@@ -63,6 +63,8 @@ export async function PUT(
       logEvent("reaction_recorded", { potId: pot.id });
     } else if (step === "share_card") {
       logEvent("share_clip_generated", { potId: pot.id });
+    } else if (step === "own_wishes_cta") {
+      logEvent("own_wishes_cta_tapped", { potId: pot.id });
     } else if (step === "occasion_share") {
       logEvent("occasion_share", { potId: pot.id });
     } else if (step === "share_completed") {
