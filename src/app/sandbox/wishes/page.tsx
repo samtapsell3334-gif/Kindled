@@ -48,11 +48,11 @@ export default function MyPotsPage() {
         </div>
 
         <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold">My wishes</h1>
-        <p className="mt-1 text-[13px] text-stone-500">Every wish you&apos;ve built on this device. Share them, watch them fill, then run the reveal.</p>
+        <p className="mt-1 text-[13px] text-stone-600">Every wish you&apos;ve built on this device. Share them, watch them fill, then run the reveal.</p>
 
         {mine.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-stone-300 p-8 text-center">
-            <p className="text-[14px] text-stone-500">No wishes yet.</p>
+            <p className="text-[14px] text-stone-600">No wishes yet.</p>
             <Link href="/sandbox" className="mt-3 inline-block rounded-2xl cta-primary px-6 py-3 text-[14px] font-bold">Start your first wish</Link>
             <div className="mt-6 text-left"><ExampleWishes /></div>
           </div>
@@ -67,7 +67,7 @@ export default function MyPotsPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="text-[15px] font-bold">{p.title}</p>
-                      <p className="text-[12px] text-stone-500">for {p.recipientName}</p>
+                      <p className="text-[12px] text-stone-600">for {p.recipientName}</p>
                     </div>
                     {revealed && <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase text-emerald-700">Revealed</span>}
                   </div>
@@ -76,10 +76,10 @@ export default function MyPotsPage() {
                       <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-100">
                         <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" style={{ width: `${pct}%` }} />
                       </div>
-                      <p className="mt-1.5 text-[12px] text-stone-500">£{v.raised} of £{v.goal} · {v.contributors.length} contributor{v.contributors.length === 1 ? "" : "s"} · {v.messageCount} sealed message{v.messageCount === 1 ? "" : "s"}</p>
+                      <p className="mt-1.5 text-[12px] text-stone-600">£{v.raised} of £{v.goal} · {v.contributors.length} contributor{v.contributors.length === 1 ? "" : "s"} · {v.messageCount} sealed message{v.messageCount === 1 ? "" : "s"}</p>
                     </>
                   ) : (
-                    <p className="mt-2 text-[12px] text-stone-500">Loading… (the sandbox may have been reset; wishes don&apos;t survive a reset)</p>
+                    <p className="mt-2 text-[12px] text-stone-600">Loading… (the sandbox may have been reset; wishes don&apos;t survive a reset)</p>
                   )}
                   <div className="mt-3 flex gap-2">
                     <Link href={`/p/${p.slug}?key=${p.managerKey}`}

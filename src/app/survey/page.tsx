@@ -69,7 +69,7 @@ export default function SurveyPage() {
             <LogoMark variant="light" size={44} className="mx-auto" />
             <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-4 text-[26px] font-bold leading-tight">Two minutes on gift-giving?</h1>
             <p className="mt-2 text-[14px] text-stone-600">A short survey about how you really buy gifts. Quick taps, no typing (one optional line at the end).</p>
-            <p className="mt-4 text-[11px] leading-snug text-stone-500">
+            <p className="mt-4 text-[11px] leading-snug text-stone-600">
               Anonymous; answers are stored so we can publish honest totals. No email needed unless you ask for early access at the end. <Link href="/privacy" className="underline">Privacy</Link>.
             </p>
             <button onClick={() => { setStage("screener"); persist({}, false); }}
@@ -155,7 +155,7 @@ export default function SurveyPage() {
                   className="w-full rounded-2xl border border-stone-200 bg-[var(--card)] px-4 py-3.5 text-[15px]" />
                 <button onClick={() => { if (email.includes("@")) { void fetch("/api/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, source: "survey" }) }); setEmailState("sent"); } }}
                   className="cta-primary mt-2.5 w-full rounded-2xl py-4 text-[15px] font-bold">Reserve your spot</button>
-                <p className="mt-1.5 text-[11px] text-stone-500">Early-access updates only. <Link href="/privacy" className="underline">Privacy</Link>.</p>
+                <p className="mt-1.5 text-[11px] text-stone-600">Early-access updates only. <Link href="/privacy" className="underline">Privacy</Link>.</p>
               </div>
             ) : (
               <p className="mt-5 rounded-2xl bg-emerald-50 px-4 py-3 text-[14px] font-semibold text-emerald-800">You&apos;re on the list.</p>

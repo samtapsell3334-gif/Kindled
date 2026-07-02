@@ -128,7 +128,7 @@ function CreatePot() {
       <main className="mx-auto max-w-md px-5 py-12 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500"><Check className="h-7 w-7 text-white" strokeWidth={3} /></div>
         <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-4 text-[28px] font-bold text-stone-900">Your wish is live</h1>
-        <p className="mt-2 text-[14px] text-stone-500">Share the first link with the people who&apos;ll chip in. Keep the second link private; it&apos;s how you manage the wish and run the reveal.</p>
+        <p className="mt-2 text-[14px] text-stone-600">Share the first link with the people who&apos;ll chip in. Keep the second link private; it&apos;s how you manage the wish and run the reveal.</p>
 
         <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left">
           <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Your invite message (edit it, then send)</p>
@@ -152,7 +152,7 @@ function CreatePot() {
         </div>
 
         <div className="mt-3 rounded-2xl border border-stone-200 bg-white p-4 text-left">
-          <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-stone-500"><Lock className="h-3 w-3" /> Private manager link</p>
+          <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-stone-600"><Lock className="h-3 w-3" /> Private manager link</p>
           <p className="mt-1 break-all text-[13px] text-stone-600">{manageUrl}</p>
           <button onClick={() => copy(manageUrl, "manage")} className="mt-2 flex items-center gap-1.5 rounded-xl border border-stone-300 px-3.5 py-2 text-[12px] font-bold text-stone-700">
             {copied === "manage" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied === "manage" ? "Copied" : "Copy"}
@@ -196,7 +196,7 @@ function CreatePot() {
 
         <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-700">2 · Who it&apos;s for</p>
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Who&apos;s it for? {isChildPot && <span className="text-stone-500">(first name only)</span>}</span>
+          <span className="text-[12px] font-semibold text-stone-600">Who&apos;s it for? {isChildPot && <span className="text-stone-600">(first name only)</span>}</span>
           <input value={recipientName} onChange={(e) => {
               setRecipientName(e.target.value);
               if (!titleTouched) setTitle(e.target.value ? `${e.target.value}'s ${occasion}` : "");
@@ -218,7 +218,7 @@ function CreatePot() {
         </div>
 
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Wish name <span className="font-normal text-stone-500">(auto-filled, edit if you like)</span></span>
+          <span className="text-[12px] font-semibold text-stone-600">Wish name <span className="font-normal text-stone-600">(auto-filled, edit if you like)</span></span>
           <input value={title} onChange={(e) => { setTitle(e.target.value); setTitleTouched(true); }} placeholder="e.g. Ava's 8th Birthday"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
         </label>
@@ -227,7 +227,7 @@ function CreatePot() {
         {!isChildPot && (
           <div>
             <span className="text-[12px] font-semibold text-stone-600">Paste a product link from any website</span>
-            <span className="mt-0.5 block text-[11px] text-stone-500">Title, photo and price fill in automatically.</span>
+            <span className="mt-0.5 block text-[11px] text-stone-600">Title, photo and price fill in automatically.</span>
             <div className="mt-1.5 flex gap-2">
               <input value={pasteUrl} onChange={(e) => setPasteUrl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void pasteLink()}
                 placeholder="https://…" inputMode="url" aria-label="Product link"
@@ -238,13 +238,13 @@ function CreatePot() {
             {pasteError && <p role="alert" className="mt-1 text-[12px] font-medium text-rose-600">{pasteError} You can add it manually below.</p>}
             {suggestions && (
               <div className="mt-2 rounded-2xl border border-stone-200 bg-[var(--card)] p-3">
-                <p className="text-[11px] font-bold uppercase tracking-wide text-stone-500">Other price points</p>
+                <p className="text-[11px] font-bold uppercase tracking-wide text-stone-600">Other price points</p>
                 <div className="mt-1.5 grid grid-cols-2 gap-2">
                   {suggestions.alternatives.map((a) => (
                     <button key={a.name} onClick={() => setItems((prev) => prev.some((x) => x.name === a.name) ? prev : [...prev, a])}
                       className="rounded-xl border border-stone-200 p-2.5 text-left text-[12px]">
                       <span className="font-semibold text-stone-800">{a.name}</span>
-                      <span className="block text-stone-500">£{a.price} · {a.retailer}</span>
+                      <span className="block text-stone-600">£{a.price} · {a.retailer}</span>
                     </button>
                   ))}
                 </div>
@@ -266,7 +266,7 @@ function CreatePot() {
                 <button key={c.name} onClick={() => setItems((prev) => on ? prev.filter((i) => i.name !== c.name) : [...prev, c])}
                   className={`rounded-xl border p-2.5 text-left text-[12px] ${on ? "border-amber-400 bg-amber-50" : "border-stone-200"}`}>
                   <span className="font-semibold text-stone-800">{c.name}</span>
-                  <span className="block text-stone-500">£{c.price} · {c.retailer}</span>
+                  <span className="block text-stone-600">£{c.price} · {c.retailer}</span>
                 </button>
               );
             })}
@@ -292,10 +292,10 @@ function CreatePot() {
                   <span className="flex shrink-0 items-center gap-1">
                     <button aria-label={`Move ${i.name} up`} disabled={idx === 0}
                       onClick={() => setItems((prev) => { const n = [...prev]; [n[idx - 1], n[idx]] = [n[idx]!, n[idx - 1]!]; return n; })}
-                      className="rounded px-1 text-stone-500 disabled:opacity-30">↑</button>
+                      className="rounded px-1 text-stone-600 disabled:opacity-30">↑</button>
                     <button aria-label={`Move ${i.name} down`} disabled={idx === items.length - 1}
                       onClick={() => setItems((prev) => { const n = [...prev]; [n[idx + 1], n[idx]] = [n[idx]!, n[idx + 1]!]; return n; })}
-                      className="rounded px-1 text-stone-500 disabled:opacity-30">↓</button>
+                      className="rounded px-1 text-stone-600 disabled:opacity-30">↓</button>
                     <button aria-label={`Remove ${i.name}`}
                       onClick={() => { if (window.confirm(`Remove "${i.name}" from the list?`)) setItems((prev) => prev.filter((x) => x.name !== i.name)); }}>
                       <X className="h-3.5 w-3.5" /></button>
@@ -316,11 +316,11 @@ function CreatePot() {
                     className="rounded-xl border border-amber-300 bg-white p-2 text-left text-[11px]">
                     <span className="block text-[10px] font-bold uppercase tracking-wide text-amber-700">{label}</span>
                     <span className="font-semibold text-stone-800">{it.name}</span>
-                    <span className="block text-stone-500">£{it.price}</span>
+                    <span className="block text-stone-600">£{it.price}</span>
                   </button>
                 ))}
               </div>
-              <button onClick={() => setNudgeDismissed(true)} className="mt-2 text-[12px] font-semibold text-stone-500 underline">One wish is plenty</button>
+              <button onClick={() => setNudgeDismissed(true)} className="mt-2 text-[12px] font-semibold text-stone-600 underline">One wish is plenty</button>
             </div>
           )}
         </div>
@@ -335,14 +335,14 @@ function CreatePot() {
           <span className="text-[12px] font-semibold text-stone-600">Your name</span>
           <input value={organiserName} onChange={(e) => setOrganiserName(e.target.value)} placeholder="e.g. Sarah"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
-          <span className="mt-1 block text-[11px] text-stone-500">Shown on the wish page, so contributors know who&apos;s organising.</span>
+          <span className="mt-1 block text-[11px] text-stone-600">Shown on the wish page, so contributors know who&apos;s organising.</span>
         </label>
 
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Register for launch <span className="font-normal text-stone-500">(optional)</span></span>
+          <span className="text-[12px] font-semibold text-stone-600">Register for launch <span className="font-normal text-stone-600">(optional)</span></span>
           <input type="email" inputMode="email" autoComplete="email" value={organiserEmail} onChange={(e) => setOrganiserEmail(e.target.value)} placeholder="you@email.com"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
-          <span className="mt-1 block text-[11px] leading-snug text-stone-500">
+          <span className="mt-1 block text-[11px] leading-snug text-stone-600">
             We&apos;ll only use this to tell you when the real Kindled launches. Nothing is sent in the sandbox. See our <Link href="/privacy" className="underline">Privacy Policy</Link>.
           </span>
         </label>
@@ -358,7 +358,7 @@ function CreatePot() {
           className="w-full rounded-2xl cta-primary py-4 text-[15px] font-bold disabled:opacity-60">
           {busy ? "Creating…" : "Create wish & get the link"}
         </button>
-        <p className="text-center text-[11px] text-stone-500">Sandbox: simulated money only. No payments are processed.</p>
+        <p className="text-center text-[11px] text-stone-600">Sandbox: simulated money only. No payments are processed.</p>
 
         <ExampleWishes heading="Where your wish ends up" />
       </div>

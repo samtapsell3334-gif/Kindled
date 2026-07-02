@@ -153,10 +153,10 @@ export default function BetaPage() {
               {data.signups.map((s) => (
                 <div key={s.email} className="flex items-center justify-between px-4 py-2.5 text-[13px]">
                   <span className="font-semibold">{s.email}</span>
-                  <span className="text-stone-500">{s.source} · {new Date(s.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>
+                  <span className="text-stone-600">{s.source} · {new Date(s.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>
                 </div>
               ))}
-              {data.signups.length === 0 && <p className="px-4 py-6 text-center text-[13px] text-stone-500">No sign-ups yet.</p>}
+              {data.signups.length === 0 && <p className="px-4 py-6 text-center text-[13px] text-stone-600">No sign-ups yet.</p>}
             </div>
           </section>
         )}
@@ -177,14 +177,14 @@ export default function BetaPage() {
               {[["Responses", String(responses.length)], ["Completion", responses.length ? `${Math.round((completed.length / responses.length) * 100)}%` : "—"],
                 ["Concept intent", `${intentPct}%`], ["Median chip-in", chipMedian]].map(([l, v]) => (
                 <div key={l} className="rounded-2xl border border-stone-200 bg-[var(--card)] p-3 text-center">
-                  <p className="text-[20px] font-bold">{v}</p><p className="text-[10px] font-semibold uppercase tracking-wide text-stone-500">{l}</p>
+                  <p className="text-[20px] font-bold">{v}</p><p className="text-[10px] font-semibold uppercase tracking-wide text-stone-600">{l}</p>
                 </div>
               ))}
             </div>
 
             {spark.entries.length > 1 && (
               <div className="rounded-2xl border border-stone-200 bg-[var(--card)] p-3">
-                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-stone-500">Responses over time</p>
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-stone-600">Responses over time</p>
                 <svg viewBox={`0 0 ${spark.entries.length * 10} 30`} className="h-8 w-full" preserveAspectRatio="none" aria-hidden>
                   {spark.entries.map(([, n], i) => (
                     <rect key={i} x={i * 10 + 1} y={30 - (n / spark.max) * 28} width={8} height={(n / spark.max) * 28} rx={1.5} fill="var(--ember)" />
@@ -194,7 +194,7 @@ export default function BetaPage() {
             )}
 
             <div className="rounded-2xl border border-stone-200 bg-[var(--card)] p-4">
-              <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-stone-500">Pain ranking (share reporting high pain)</p>
+              <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-stone-600">Pain ranking (share reporting high pain)</p>
               {painRank.map((p) => <Bar key={p.label} label={p.label} count={p.pct} total={100} />)}
             </div>
 
@@ -218,7 +218,7 @@ export default function BetaPage() {
                 const m = multi(id, def.options);
                 return (
                   <div key={id} className="rounded-2xl border border-stone-200 bg-[var(--card)] p-4">
-                    <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-stone-500">{title}</p>
+                    <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-stone-600">{title}</p>
                     {m.counts.map((c) => <Bar key={c.o} label={c.o} count={c.n} total={m.total} />)}
                   </div>
                 );
@@ -237,7 +237,7 @@ export default function BetaPage() {
             })}
 
             <div className="rounded-2xl border border-stone-200 bg-[var(--card)] p-4">
-              <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-stone-500">Worst gift-buying moments ({texts.length})</p>
+              <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-stone-600">Worst gift-buying moments ({texts.length})</p>
               <div className="mb-2 flex items-center gap-2 rounded-xl border border-stone-200 px-3 py-2">
                 <Search className="h-3.5 w-3.5 text-stone-400" />
                 <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search responses" className="w-full text-[13px] outline-none" />
@@ -247,7 +247,7 @@ export default function BetaPage() {
               </ul>
             </div>
 
-            <p className="text-center text-[11px] text-stone-500">
+            <p className="text-center text-[11px] text-stone-600">
               Self-selected sample — treat as directional, not representative. n = {completed.length} completed of {responses.length} started ({seg}).
             </p>
           </section>
