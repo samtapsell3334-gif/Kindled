@@ -134,7 +134,7 @@ function CreatePot() {
         </div>
 
         <div className="mt-6 flex flex-col gap-2.5">
-          <Link href="/sandbox/wishes" className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-[14px] font-bold text-stone-900">Go to My wishes</Link>
+          <Link href="/sandbox/wishes" className="rounded-2xl cta-primary px-6 py-3.5 text-[14px] font-bold">Go to My wishes</Link>
           <Link href={manageUrl} className="rounded-2xl border border-stone-300 px-6 py-3.5 text-[14px] font-semibold text-stone-700">Open this wish</Link>
         </div>
       </main>
@@ -267,7 +267,7 @@ function CreatePot() {
         {error && <p role="alert" className="text-[13px] font-medium text-rose-600">{error}</p>}
 
         <button onClick={() => { void submit(); }} disabled={busy}
-          className="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900 disabled:opacity-60">
+          className="w-full rounded-2xl cta-primary py-4 text-[15px] font-bold disabled:opacity-60">
           {busy ? "Creating…" : "Create wish & get the link"}
         </button>
         <p className="text-center text-[11px] text-stone-500">Sandbox: simulated money only. No payments are processed.</p>
@@ -280,7 +280,7 @@ function CreatePot() {
 
 export default function SandboxPage() {
   return (
-    <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
+    <div className="min-h-screen bg-ground text-stone-900">
       <DemoBanner />
       <Suspense fallback={null}>
         <CreatePot />

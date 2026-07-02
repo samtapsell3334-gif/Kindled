@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { Logo } from "@/components/Logo";
+import { TrustStrip } from "@/components/TrustStrip";
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -209,7 +210,7 @@ function Nav() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-[#070300]/90 backdrop-blur-2xl border-b border-white/[0.06] shadow-2xl shadow-black/40"
+          ? "backdrop-blur-2xl border-b border-white/[0.06] shadow-2xl shadow-black/40 [background:var(--nav-bg)]"
           : "bg-transparent"
       )}
     >
@@ -236,7 +237,7 @@ function Nav() {
           </Link>
           <Link
             href="/#waitlist"
-            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-[13px] font-bold text-stone-900 shadow-lg shadow-amber-500/25 transition-all hover:scale-105 hover:shadow-amber-500/50 active:scale-[0.97]"
+            className="flex items-center gap-1.5 rounded-xl cta-primary px-4 py-2 text-[13px] font-bold shadow-lg shadow-amber-500/25 transition-all hover:scale-105 hover:shadow-amber-500/50 active:scale-[0.97]"
           >
             Reserve your spot
             <ArrowRight className="h-3.5 w-3.5" />
@@ -258,7 +259,7 @@ function Nav() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-t border-white/8 bg-[#070300]/95 backdrop-blur-2xl md:hidden"
+            className="overflow-hidden border-t border-white/8 backdrop-blur-2xl md:hidden [background:var(--nav-bg-solid)]"
           >
             <div className="flex flex-col gap-0.5 px-5 py-4">
               {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["Live demo", "/wishes/demo"]].map(([l, h]) => (
@@ -274,7 +275,7 @@ function Nav() {
               <Link
                 href="/#waitlist"
                 onClick={() => setOpen(false)}
-                className="mt-2 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-3 py-3 text-[15px] font-bold text-stone-900"
+                className="mt-2 flex items-center justify-center gap-1.5 rounded-xl cta-primary px-3 py-3 text-[15px] font-bold"
               >
                 Reserve your spot <ArrowRight className="h-4 w-4" />
               </Link>
@@ -299,10 +300,7 @@ function Hero() {
     <section
       ref={ref}
       className="relative flex min-h-screen items-center overflow-hidden"
-      style={{
-        background:
-          "radial-gradient(ellipse 100% 70% at 50% 80%, #1a0800 0%, #0a0400 45%, #000 100%)",
-      }}
+      style={{ background: "var(--hero-bg)" }}
     >
       {/* Ambient glow blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -389,7 +387,7 @@ function Hero() {
             >
               <Link
                 href="#waitlist"
-                className="flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-4 text-[15px] font-bold text-stone-900 shadow-2xl transition-all hover:scale-105 hover:-translate-y-0.5 active:scale-[0.97]"
+                className="flex items-center gap-2.5 rounded-2xl cta-primary px-6 py-4 text-[15px] font-bold shadow-2xl transition-all hover:scale-105 hover:-translate-y-0.5 active:scale-[0.97]"
                 style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.45)" }}
               >
                 <Flame className="h-5 w-5" />
@@ -417,6 +415,9 @@ function Hero() {
                 </div>
               ))}
             </motion.div>
+
+            {/* v8.2b pattern 2 — trust worn under the hero */}
+            <TrustStrip className="mt-6 max-w-md" />
 
             {/* Mobile product proof — the real pot, shown only on small screens */}
             <motion.div
@@ -735,7 +736,7 @@ function RevealPreview() {
           <motion.div
             animate={popLoop}
             transition={popTransition}
-            className="mt-5 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-[13px] font-black text-stone-900"
+            className="mt-5 inline-flex items-center gap-2 rounded-full cta-primary px-4 py-2 text-[13px] font-black"
           >
             <Sparkles className="h-4 w-4" /> Fully funded!
           </motion.div>
@@ -808,7 +809,7 @@ function HowItWorks() {
         <Reveal delay={0.3} className="mt-14 text-center">
           <Link
             href="/wishes/demo"
-            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-7 py-4 text-[15px] font-bold text-stone-900 shadow-xl transition-all hover:scale-105 hover:-translate-y-0.5 active:scale-[0.97]"
+            className="inline-flex items-center gap-2 rounded-2xl cta-primary px-7 py-4 text-[15px] font-bold shadow-xl transition-all hover:scale-105 hover:-translate-y-0.5 active:scale-[0.97]"
             style={{ boxShadow: "0 8px 32px rgba(251,146,60,0.4)" }}
           >
             <Flame className="h-5 w-5" />
@@ -1269,22 +1270,22 @@ function FinalCTA() {
 
 function Footer() {
   return (
-    <footer className="border-t border-stone-200 bg-white px-5 py-10">
+    <footer className="border-t border-stone-200 bg-footer px-5 py-10">
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 md:flex-row">
         <Logo variant="light" size={30} />
         <div className="flex flex-wrap justify-center gap-6">
           {(["How it works|#how", "Watch the film|/film", "Live demo|/wishes/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
-              <Link key={l} href={h!} className="text-[13px] text-stone-500 hover:text-stone-700 transition-colors">
+              <Link key={l} href={h!} className="text-[13px] text-footer-soft hover:text-footer-ink transition-colors">
                 {l}
               </Link>
             );
           })}
         </div>
-        <p className="text-[12px] text-stone-500">Made with love in the UK · © 2026 Kindled. All rights reserved.</p>
+        <p className="text-[12px] text-footer-soft">Made with love in the UK · © 2026 Kindled. All rights reserved.</p>
       </div>
-      <p className="mx-auto mt-6 max-w-5xl text-center text-[11px] leading-relaxed text-stone-500">
+      <p className="mx-auto mt-6 max-w-5xl text-center text-[11px] leading-relaxed text-footer-soft">
         Prize draw: 18+, UK residents only. No purchase necessary; a free entry route and full{" "}
         <Link href="/terms#prize-draw" className="underline underline-offset-2 hover:text-stone-600">terms</Link> apply.
       </p>
