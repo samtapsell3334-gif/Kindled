@@ -10,7 +10,7 @@ export async function POST(
 ): Promise<NextResponse> {
   await ensureHydrated();
   const { slug } = await params;
-  let body: { key?: string; outcome?: RevealOutcome; retailer?: string };
+  let body: { key?: string; outcome?: RevealOutcome; retailer?: string; itemOutcomes?: Record<string, RevealOutcome> };
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -24,6 +24,7 @@ export async function POST(
   try {
     const pot = simulateReveal(slug, body.key, body.outcome!, {
       ...(body.retailer ? { retailer: body.retailer } : {}),
+      ...(body.itemOutcomes && typeof body.itemOutcomes === "object" ? { itemOutcomes: body.itemOutcomes } : {}),
     });
     await flushPersist();
     return NextResponse.json({ ok: true, view: viewFor(pot, "manager") });

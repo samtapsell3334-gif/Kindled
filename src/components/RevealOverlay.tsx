@@ -137,7 +137,7 @@ function LoadingScreen({
 
       <div className="mt-2 max-w-[260px] rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
         <p className="text-[11px] leading-relaxed text-stone-400">
-          Our AI is generating a personalised reveal video just for you.
+          A personalised reveal video is being made just for you.
           This takes about 30–60 seconds.
         </p>
       </div>

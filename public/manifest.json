@@ -4,7 +4,7 @@
   "description": "Group gifting for friends & family \u2014 one wish, one link, revealed on the big day.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FAF3EA",
+  "background_color": "#FAF5EB",
   "theme_color": "#0C4E4C",
   "orientation": "portrait",
   "icons": [

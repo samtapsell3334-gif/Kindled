@@ -8,6 +8,7 @@ const config: NextConfig = {
       { source: "/pots", destination: "/wishes", permanent: true },
       { source: "/pots/:path*", destination: "/wishes/:path*", permanent: true },
       { source: "/sandbox/pots", destination: "/sandbox/wishes", permanent: true },
+      { source: "/film", destination: "/", permanent: true },
     ];
   },
   images: {

@@ -129,3 +129,28 @@ The investor film's scenes live INSIDE investor-content.json, which is only
 served by /api/investor after PIN validation — the investor film cannot appear
 in the public bundle, sitemap, or any public route. The customer film is public
 data by design.
+
+# v11 — The Sixteen (2026-07-02)
+
+Execution order (dependency-sorted): WS-10/11 theme flip + bubble → WS-5/6/7/8/9/2
+demo corrections cluster → WS-16 films + WS-15 investor K-loop → WS-13 /beta →
+WS-14 survey → WS-3 paste-a-link → WS-1 occasions → WS-4 star chart → WS-12 logo
+audit → completion audit.
+
+## WS-1 occasion mapping (least-disruption design)
+Occasion = the existing SandboxPot (internal name unchanged; slug/links unchanged).
+Wishes = the pot's items[] (price = per-wish goal). Per-wish progress = new
+optional `itemId` on SandboxContribution; contributions without itemId
+("wherever it's needed") are auto-assigned server-side to the closest-to-complete
+open wish at contribution time. Per-wish granted = attributed sum >= price.
+Receiver redaction unchanged (structurally amount-free across all wishes).
+Reveal walks items with per-wish outcomes. No schema migration needed (sandbox
+state is JSONB); dashboard derives wishes-per-occasion + per-wish velocity from
+existing + new events.
+
+## WS-13/14 storage
+WaitlistSignup table exists (v9.2). Add SurveyResponse (id, answers Json,
+segment, createdAt) via Prisma migration. /beta = client page + POST /api/beta
+(BETA_PIN env, server-gated, rate-limited, same pattern as /api/investor);
+noindex + robots excluded. Sandbox reset physically cannot touch Postgres tables
+(it clears the in-memory store + sandbox_state row only) — asserted by test.

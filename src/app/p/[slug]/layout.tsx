@@ -16,7 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return { title: "Kindled — chip in together", description: "One wish, one link, revealed on the big day." };
   }
   const date = new Date(pot.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
-  const title = `Chip in for ${pot.title} 🎉`;
+  const wishCount = pot.items.filter((i) => i.approved).length;
+  const title = wishCount > 1 ? `${wishCount} wishes for ${pot.recipientName} — chip in 🎉` : `Chip in for ${pot.title} 🎉`;
   const description = `${pot.occasion} on ${date} — everyone's chipping in together. No app, no account, takes 30 seconds.`;
   return {
     title,

@@ -199,10 +199,10 @@ export interface RevealExperienceProps {
   isChild: boolean;
   contributors: { displayName: string; amount: number }[];
   messages: RevealMsg[];
-  items: { name: string; price: number }[];
+  items: { name: string; price: number; id?: string; granted?: boolean }[];
   /** Organiser choosing the outcome live (pot still open). */
   canChooseOutcome: boolean;
-  onOutcome?: (outcome: RevealOutcome, retailer?: string) => Promise<void>;
+  onOutcome?: (outcome: RevealOutcome, retailer?: string, itemOutcomes?: Record<string, RevealOutcome>) => Promise<void>;
   existingOutcome?: RevealOutcome;
   onClose: () => void;
 }
@@ -218,6 +218,7 @@ export function RevealExperience(p: RevealExperienceProps) {
   const [count, setCount] = useState(0);
   const [outcomeBusy, setOutcomeBusy] = useState(false);
   const [chosen, setChosen] = useState<RevealOutcome | null>(p.existingOutcome ?? null);
+  const [wishChoices, setWishChoices] = useState<Record<string, RevealOutcome>>({});
   const [shared, setShared] = useState(false);
   const [thanked, setThanked] = useState(false);
   const [reacting, setReacting] = useState(false);
@@ -284,7 +285,10 @@ export function RevealExperience(p: RevealExperienceProps) {
   async function choose(outcome: RevealOutcome, retailer?: string) {
     if (!p.onOutcome) return;
     setOutcomeBusy(true);
-    try { await p.onOutcome(outcome, retailer); setChosen(outcome); next(); }
+    try {
+      await p.onOutcome(outcome, retailer, Object.keys(wishChoices).length > 0 ? wishChoices : undefined);
+      setChosen(outcome); next();
+    }
     finally { setOutcomeBusy(false); }
   }
 
@@ -427,6 +431,24 @@ export function RevealExperience(p: RevealExperienceProps) {
                 className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
                 Take it now: convert to a gift card
               </button>
+              {p.items.length > 1 && p.items.some((i) => i.id) && (
+                <div className="rounded-2xl border border-white/15 bg-white/[0.04] p-3 text-left">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-white/50">Or decide per wish — stacking one never disturbs the others</p>
+                  {p.items.map((it) => it.id && (
+                    <div key={it.id} className="mt-2 flex items-center justify-between gap-2">
+                      <span className="min-w-0 flex-1 truncate text-[12px] font-semibold">{it.name}</span>
+                      <span className="flex shrink-0 gap-1">
+                        {(["gift_card", "stack"] as const).map((o) => (
+                          <button key={o} onClick={() => setWishChoices((w) => ({ ...w, [it.id!]: o }))}
+                            className={`rounded-lg px-2 py-1 text-[10px] font-bold ${wishChoices[it.id!] === o ? "bg-amber-400 text-stone-900" : "border border-white/20 text-white/70"}`}>
+                            {o === "gift_card" ? "Take" : "Stack"}
+                          </button>
+                        ))}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
               <button disabled={outcomeBusy} onClick={() => { void choose("stack"); }}
                 className="rounded-2xl border border-amber-400/40 bg-white/[0.06] py-3.5 text-[14px] font-bold">
                 Keep it building: stack to the next occasion

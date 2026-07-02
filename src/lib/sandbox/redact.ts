@@ -8,6 +8,7 @@
  */
 
 import type { SandboxPot, ViewerRole } from "./types";
+import { raisedForItem } from "./store";
 
 /** What a receiver may see of a surprise pot: warmth, never numbers. */
 export interface ReceiverSurpriseView {
@@ -35,7 +36,7 @@ export interface GuestView {
   status: SandboxPot["status"];
   isSurprise: boolean;
   isChildPot: boolean;
-  items: { id: string; name: string; image?: string; price: number; category: string; retailer: string }[];
+  items: { id: string; name: string; image?: string; price: number; category: string; retailer: string; raised: number; granted: boolean; outcome?: SandboxPot["items"][number]["outcome"] }[];
   raised: number;
   goal: number;
   contributors: { displayName: string; amount: number }[];
@@ -89,7 +90,10 @@ export function viewFor(pot: SandboxPot, role: ViewerRole, opts: { unseal?: bool
     isChildPot: pot.isChildPot,
     items: pot.items
       .filter((i) => i.approved)
-      .map(({ id, name, image, price, category, retailer }) => ({ id, name, ...(image ? { image } : {}), price, category, retailer })),
+      .map(({ id, name, image, price, category, retailer, outcome }) => {
+        const raised = raisedForItem(pot, id);
+        return { id, name, ...(image ? { image } : {}), price, category, retailer, raised: Math.min(raised, price), granted: price > 0 && raised >= price, ...(outcome ? { outcome } : {}) };
+      }),
     raised: raisedOf(pot),
     goal: goalOf(pot),
     contributors: pot.contributions.map(({ displayName, amount }) => ({ displayName, amount })),

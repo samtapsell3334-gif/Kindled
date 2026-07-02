@@ -14,6 +14,18 @@
 
 export const SPARK = "M32 6l5 21 21 5-21 5-5 21-5-21-21-5 21-5Z";
 
+/** Lockup rules (v11 WS-12) — the kit geometry as named tokens. */
+export const LOGO_RULES = {
+  /** Clear space around the lockup: half the mark height on every side. */
+  clearSpaceRatio: 0.5,
+  /** Below this rendered px size use the compact 2-dot mark. */
+  compactBelowPx: 20,
+  /** Never render the full lockup below this size. */
+  minLockupPx: 16,
+  gapRatio: 10 / 64,
+  wordmarkRatio: 34 / 64,
+} as const;
+
 export function LogoMark({
   variant = "light",
   compact = false,

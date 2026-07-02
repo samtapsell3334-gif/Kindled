@@ -70,7 +70,7 @@
         "body": "Account-to-account payments are now fast, trusted, and a fraction of card cost. We are built on these rails from day one, a structural margin advantage over anyone still routing through Visa and Mastercard."
       },
       {
-        "title": "AI Unlocked a New Emotion",
+        "title": "A New Emotion, Unlocked",
         "body": "A personalised reveal moment cost a fortune two years ago. Today it costs pennies and creates something people genuinely share. That shareability is our distribution."
       },
       {
@@ -99,7 +99,7 @@
         "id": "overhead",
         "title": "Low-Overhead Architecture",
         "metric": "Card-light, server-light",
-        "body": "Open Banking rails, serverless infrastructure, and AI-generated content mean the cost to serve each user is tiny and falls with scale. The business is engineered to reach profitability without a heavy operational footprint."
+        "body": "Open Banking rails, serverless infrastructure, and code-rendered content mean the cost to serve each user is tiny and falls with scale. The business is engineered to reach profitability without a heavy operational footprint."
       }
     ]
   },
@@ -353,6 +353,33 @@
         }
       ],
       "caption": "Three turns of the loop from a single wish. No paid acquisition; the product is the marketing."
+    },
+    "kloop": {
+      "title": "The K-loop, measured",
+      "formula": "K = invites per new user × invite-to-creator conversion",
+      "axes": "K tells you whether it spreads; cycle time (occasion created → contributor's own occasion created) tells you how fast.",
+      "example": {
+        "label": "Illustrative only — not traction",
+        "steps": [
+          "1 occasion invites 8 contributors",
+          "at 15% contributor-to-creator conversion",
+          "8 × 0.15 = 1.2 new occasions per occasion (K = 1.2)"
+        ]
+      },
+      "targets": {
+        "label": "Founder targets, with the reasoning",
+        "items": [
+          "Wedge phase: K at or above 1 INSIDE parent cohorts — a child's occasion structurally recruits 5–15 adults, which is the whole point of the wedge",
+          "Blended K below the parent-cohort figure and rising with each lever",
+          "Cycle time compressed toward the natural occasion calendar (birthdays and Christmas set the beat)"
+        ]
+      },
+      "levers": [
+        "The share moment: a pre-written, editable WhatsApp message at creation",
+        "The post-contribution moment: would-you-rather into the own-wishes CTA",
+        "The thank-you broadcast: re-touches every contributor with a share asset"
+      ],
+      "instrumentation": "The sandbox dashboard already measures K and cycle time live from real loop events (occasion_share, contribution attribution, own_wishes_cta_tapped) — an evidence engine, not a projection."
     }
   },
   "risk": {
@@ -365,7 +392,7 @@
         "mitigation": "No app and no account for givers: a link opens, Open Banking confirms in seconds, no card details typed. The host onboards once. Every step that could lose a user has been removed."
       },
       {
-        "title": "AI Quality: No Uncanny Valley",
+        "title": "Reveal Quality: No Uncanny Valley",
         "risk": "A cheap or creepy reveal would poison the emotional core.",
         "mitigation": "Reveals run on curated, brand-controlled templates with quality gates, and always fall back to a polished generated motion experience. We ship 'tasteful and shareable', never 'almost human'."
       },
@@ -390,7 +417,7 @@
       },
       {
         "title": "Engineer the Social Moment",
-        "body": "The AI reveal is deliberately built as a high-dopamine peak, the screenshot-worthy second that makes someone want this for someone they love. That single moment is our cheapest, highest-converting channel."
+        "body": "The reveal is deliberately built as a high-dopamine peak, the screenshot-worthy second that makes someone want this for someone they love. That single moment is our cheapest, highest-converting channel."
       }
     ]
   },
@@ -427,7 +454,7 @@
             ]
           },
           {
-            "title": "AI Reveal GA + Cashback Catalogue",
+            "title": "Reveal GA + Cashback Catalogue",
             "quarter": "Q1–Q2 2027",
             "why": "Turn on the distribution engine and close the cashback loop, so contributors earn, spend, and generate more data.",
             "deliverables": [
@@ -593,61 +620,6 @@
         "new": "Shared family rituals",
         "lever": "Kids' catalogue circling, star charts, and the reveal",
         "sticks": "Rituals repeat; the reveal becomes the moment everyone anticipates"
-      }
-    ]
-  },
-  "film": {
-    "id": "investor",
-    "title": "The 90-second brief",
-    "scenes": [
-      {
-        "dur": 8,
-        "visual": "ignition",
-        "headline": "Britain wastes £1.27 billion every Christmas on unwanted gifts.",
-        "caption": "£1.27bn every Christmas on gifts nobody wanted.",
-        "note": "Source: Finder UK research, 2025"
-      },
-      {
-        "dur": 12,
-        "visual": "potfill",
-        "headline": "Create a wish → share one link → sealed until the reveal.",
-        "caption": "Group gifting done properly: one link, everyone in, revealed on the big day."
-      },
-      {
-        "dur": 15,
-        "visual": "split",
-        "headline": "Money on every outcome.",
-        "caption": "Full wish → gift cards → commission. Part-funded → equal joy → gift card or stacked forward. Revenue or retention. Usually both."
-      },
-      {
-        "dur": 15,
-        "visual": "wedge",
-        "headline": "Kids' lists are the wedge.",
-        "caption": "Parents create; grandparents, aunts and friends chip in, and every contributor becomes an activated user. The child's wish IS the acquisition channel."
-      },
-      {
-        "dur": 10,
-        "visual": "flywheel",
-        "headline": "Then the loop turns again.",
-        "caption": "Wish → contributors → their wishes → repeat. That's the K-factor."
-      },
-      {
-        "dur": 13,
-        "visual": "timeline",
-        "headline": "Two phases. Honest roadmap.",
-        "caption": "Phase 1: gift card commissions, live from launch · Phase 2: retail media on first-party intent · then clean rooms (roadmap)."
-      },
-      {
-        "dur": 12,
-        "visual": "bars",
-        "headline": "Raising £250,000 pre-seed.",
-        "caption": "To build the loop, prove the wedge, and start the flywheel turning.",
-        "note": "Planned allocation — Build 60% · Growth 25% · Compliance & ops 15%"
-      },
-      {
-        "dur": 5,
-        "visual": "endcard",
-        "caption": "Kindled. Gifting, reignited."
       }
     ]
   }

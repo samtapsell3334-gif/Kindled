@@ -338,18 +338,6 @@ function Hero() {
 
           {/* Copy */}
           <div>
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/25 bg-amber-400/8 px-4 py-1.5"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-amber-300/90">
-                Where wishes catch light
-              </span>
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1272,9 +1260,10 @@ function Footer() {
   return (
     <footer className="border-t border-stone-200 bg-footer px-5 py-10">
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 md:flex-row">
-        <Logo variant="light" size={30} />
+        <span className="theme-legacy-only"><Logo variant="light" size={30} /></span>
+        <span className="theme-ember-only"><Logo variant="dark" size={30} /></span>
         <div className="flex flex-wrap justify-center gap-6">
-          {(["How it works|#how", "Watch the film|/film", "Live demo|/wishes/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
+          {(["How it works|#how", "Live demo|/wishes/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-footer-soft hover:text-footer-ink transition-colors">

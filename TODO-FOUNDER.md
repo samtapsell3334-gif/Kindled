@@ -89,3 +89,15 @@ was completed and is ticked below with evidence; what remains is the short
 - v9: crit + Finished Wish layer + Lighthouse (sandbox a11y 100, homepage 96)
   + production screenshot evidence in audit/v9/.
 - v9.1: durable sandbox proven live; flushPersist-before-response pattern.
+
+## v11 (2026-07-02)
+- /beta console PIN is 1066 (BETA_PIN env var — change it there any time).
+  GDPR: set a retention period for the waitlist + survey tables (suggest:
+  review at launch; delete-on-request already applies).
+- WhatsApp link previews cache aggressively: after this deploy, share any
+  wish link into a chat once to force a re-scrape of the new OG cards.
+- The archived film system (/archive/film-system) — permanent deletion is
+  your call; it costs nothing where it is.
+- Survey test row (sessionId svy_audit_test1) left in the table so the
+  dashboard demos with data; delete from /beta CSV workflows when real
+  responses arrive.

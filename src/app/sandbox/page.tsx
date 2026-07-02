@@ -48,6 +48,32 @@ function CreatePot() {
   const [organiserEmail, setOrganiserEmail] = useState("");
   const [items, setItems] = useState<DraftItem[]>(seededGoal ? [{ name: seededGoal, price: 100, category: "Goal", retailer: "TBC" }] : []);
   const [manual, setManual] = useState({ name: "", price: "", category: "Other", retailer: "" });
+  const [pasteUrl, setPasteUrl] = useState("");
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
+  const [pasteBusy, setPasteBusy] = useState(false);
+  const [pasteError, setPasteError] = useState("");
+  const [suggestions, setSuggestions] = useState<{ alternatives: DraftItem[]; complement: DraftItem; line: string } | null>(null);
+
+  async function pasteLink() {
+    if (!pasteUrl || pasteBusy) return;
+    setPasteBusy(true); setPasteError(""); setSuggestions(null);
+    try {
+      const r = await fetch("/api/sandbox/link-preview", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: pasteUrl }),
+      });
+      const d = (await r.json()) as { preview?: { title: string; price?: number; category: string; retailer: string }; suggestions?: { alternatives: DraftItem[]; complement: DraftItem; line: string } | null; error?: string };
+      if (!r.ok || !d.preview) throw new Error(d.error ?? "Couldn't read that link");
+      const it: DraftItem = { name: d.preview.title, price: d.preview.price ?? 0, category: d.preview.category, retailer: d.preview.retailer };
+      setItems((prev) => prev.some((x) => x.name === it.name) ? prev : [...prev, it]);
+      setSuggestions(d.suggestions ?? null);
+      setPasteUrl("");
+    } catch (e) {
+      setPasteError(e instanceof Error ? e.message : "Couldn't read that link. Add it manually below.");
+    } finally {
+      setPasteBusy(false);
+    }
+  }
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [created, setCreated] = useState<{ slug: string; managerKey: string } | null>(null);
@@ -198,8 +224,41 @@ function CreatePot() {
         </label>
 
         <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-700">3 · Build the list</p>
+        {!isChildPot && (
+          <div>
+            <span className="text-[12px] font-semibold text-stone-600">Paste a product link from any website</span>
+            <span className="mt-0.5 block text-[11px] text-stone-500">Title, photo and price fill in automatically.</span>
+            <div className="mt-1.5 flex gap-2">
+              <input value={pasteUrl} onChange={(e) => setPasteUrl(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void pasteLink()}
+                placeholder="https://…" inputMode="url" aria-label="Product link"
+                className="flex-1 rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
+              <button onClick={() => void pasteLink()} disabled={pasteBusy}
+                className="cta-primary rounded-xl px-4 text-[13px] font-bold disabled:opacity-60">{pasteBusy ? "Reading…" : "Add"}</button>
+            </div>
+            {pasteError && <p role="alert" className="mt-1 text-[12px] font-medium text-rose-600">{pasteError} You can add it manually below.</p>}
+            {suggestions && (
+              <div className="mt-2 rounded-2xl border border-stone-200 bg-[var(--card)] p-3">
+                <p className="text-[11px] font-bold uppercase tracking-wide text-stone-500">Other price points</p>
+                <div className="mt-1.5 grid grid-cols-2 gap-2">
+                  {suggestions.alternatives.map((a) => (
+                    <button key={a.name} onClick={() => setItems((prev) => prev.some((x) => x.name === a.name) ? prev : [...prev, a])}
+                      className="rounded-xl border border-stone-200 p-2.5 text-left text-[12px]">
+                      <span className="font-semibold text-stone-800">{a.name}</span>
+                      <span className="block text-stone-500">£{a.price} · {a.retailer}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2.5 text-[12px] font-semibold text-amber-800">{suggestions.line}</p>
+                <button onClick={() => setItems((prev) => prev.some((x) => x.name === suggestions.complement.name) ? prev : [...prev, suggestions.complement])}
+                  className="btn-secondary mt-1.5 rounded-xl px-3 py-2 text-[12px] font-bold">
+                  Add {suggestions.complement.name} · £{suggestions.complement.price}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
         <div>
-          <span className="text-[12px] font-semibold text-stone-600">Tap to add, and prices and shops fill in automatically</span>
+          <span className="text-[12px] font-semibold text-stone-600">{isChildPot ? "Tap to add, and prices and shops fill in automatically" : "Or pick from the catalogue"}</span>
           <div className="mt-1.5 grid grid-cols-2 gap-2">
             {catalogue.map((c) => {
               const on = items.some((i) => i.name === c.name);
@@ -227,13 +286,42 @@ function CreatePot() {
           </div>
           {items.length > 0 && (
             <ul className="mt-2 space-y-1">
-              {items.map((i) => (
-                <li key={i.name} className="flex items-center justify-between rounded-lg bg-stone-50 px-3 py-1.5 text-[12px] text-stone-600">
-                  {i.name} · £{i.price}
-                  <button aria-label={`Remove ${i.name}`} onClick={() => setItems((prev) => prev.filter((x) => x.name !== i.name))}><X className="h-3.5 w-3.5" /></button>
+              {items.map((i, idx) => (
+                <li key={i.name} className="flex items-center justify-between gap-2 rounded-lg bg-stone-50 px-3 py-1.5 text-[12px] text-stone-600">
+                  <span className="min-w-0 flex-1 truncate">{i.name} · £{i.price}</span>
+                  <span className="flex shrink-0 items-center gap-1">
+                    <button aria-label={`Move ${i.name} up`} disabled={idx === 0}
+                      onClick={() => setItems((prev) => { const n = [...prev]; [n[idx - 1], n[idx]] = [n[idx]!, n[idx - 1]!]; return n; })}
+                      className="rounded px-1 text-stone-500 disabled:opacity-30">↑</button>
+                    <button aria-label={`Move ${i.name} down`} disabled={idx === items.length - 1}
+                      onClick={() => setItems((prev) => { const n = [...prev]; [n[idx + 1], n[idx]] = [n[idx]!, n[idx + 1]!]; return n; })}
+                      className="rounded px-1 text-stone-500 disabled:opacity-30">↓</button>
+                    <button aria-label={`Remove ${i.name}`}
+                      onClick={() => { if (window.confirm(`Remove "${i.name}" from the list?`)) setItems((prev) => prev.filter((x) => x.name !== i.name)); }}>
+                      <X className="h-3.5 w-3.5" /></button>
+                  </span>
                 </li>
               ))}
             </ul>
+          )}
+          {/* v11 WS-1: the one warm, skippable nudge — appears after the first wish, once per session */}
+          {items.length === 1 && !nudgeDismissed && !isChildPot && (
+            <div className="mt-3 rounded-2xl border border-amber-200 bg-[var(--ember-soft)]/40 p-3.5">
+              <p className="text-[13px] font-semibold text-stone-800">Add another wish? Two or three get funded faster — it gives everyone a way in.</p>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {[{ label: "Small", it: { name: "Art supplies set", price: 22, category: "Craft", retailer: "Hobbycraft" } },
+                  { label: "Medium", it: { name: "Weekend spa voucher", price: 150, category: "Experiences", retailer: "Virgin Experience Days" } },
+                  { label: "Dream", it: { name: "Espresso machine", price: 220, category: "Kitchen", retailer: "John Lewis" } }].map(({ label, it }) => (
+                  <button key={label} onClick={() => { setItems((prev) => prev.some((x) => x.name === it.name) ? prev : [...prev, it]); setNudgeDismissed(true); }}
+                    className="rounded-xl border border-amber-300 bg-white p-2 text-left text-[11px]">
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-amber-700">{label}</span>
+                    <span className="font-semibold text-stone-800">{it.name}</span>
+                    <span className="block text-stone-500">£{it.price}</span>
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setNudgeDismissed(true)} className="mt-2 text-[12px] font-semibold text-stone-500 underline">One wish is plenty</button>
+            </div>
           )}
         </div>
 

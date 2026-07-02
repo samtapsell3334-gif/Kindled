@@ -412,3 +412,18 @@ model WaitlistSignup {
 
   @@map("waitlist_signups")
 }
+
+/// Market-research survey responses (v11 WS-14). Append-only, durable,
+/// NEVER touched by the sandbox reset (which only clears sandbox_state).
+model SurveyResponse {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  /// Q1 segment: "parent" | "buyer" | "both" | "neither"
+  segment   String?
+  answers   Json
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("survey_responses")
+}

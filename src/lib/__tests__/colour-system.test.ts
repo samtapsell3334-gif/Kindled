@@ -63,7 +63,6 @@ describe("v8.2 colour system", () => {
       "src/components/RevealExperience.tsx",
       "src/components/RevealOverlay.tsx",
       "src/components/GeneratedReveal.tsx",
-      "src/components/FilmPlayer.tsx",
       "src/app/p/[slug]/page.tsx", // receiver teaser + granted celebration panels
       "src/app/globals.css",
       "src/lib/theme.ts",

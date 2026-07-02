@@ -73,6 +73,12 @@
 }
 
 /* v8.2 reusable token classes — components carry roles, not hexes. */
+/* Theme-conditional visibility: for spots whose LOGO VARIANT must follow the
+   register (e.g. the footer flips light→night between themes). */
+[data-theme="ember-teal"] .theme-legacy-only { display: none; }
+:root:not([data-theme="ember-teal"]) .theme-ember-only,
+[data-theme="legacy"] .theme-ember-only { display: none; }
+
 .cta-primary { background: var(--cta-bg); color: var(--cta-ink); }
 .btn-secondary { border: 1px solid var(--btn2-border); color: var(--btn2-ink); }
 .bg-ground { background-color: var(--ground); }
