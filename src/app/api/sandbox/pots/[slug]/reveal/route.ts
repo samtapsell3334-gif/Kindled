@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { simulateReveal } from "@/lib/sandbox/store";
+import { simulateReveal, ensureHydrated } from "@/lib/sandbox/store";
 import { viewFor } from "@/lib/sandbox/redact";
 import type { RevealOutcome } from "@/lib/sandbox/types";
 
@@ -8,6 +8,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ): Promise<NextResponse> {
+  await ensureHydrated();
   const { slug } = await params;
   let body: { key?: string; outcome?: RevealOutcome; retailer?: string };
   try {

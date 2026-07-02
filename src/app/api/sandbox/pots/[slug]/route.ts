@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPotBySlug, logEvent } from "@/lib/sandbox/store";
+import { getPotBySlug, logEvent, ensureHydrated } from "@/lib/sandbox/store";
 import { viewFor } from "@/lib/sandbox/redact";
 
 /**
@@ -12,6 +12,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ): Promise<NextResponse> {
+  await ensureHydrated();
   const { slug } = await params;
   const pot = getPotBySlug(slug);
   if (!pot) return NextResponse.json({ error: "Not found" }, { status: 404 });

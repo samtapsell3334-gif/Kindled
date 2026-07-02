@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { createPot, stripCardData, type CreatePotInput } from "@/lib/sandbox/store";
+import { createPot, stripCardData, type CreatePotInput, ensureHydrated } from "@/lib/sandbox/store";
 
 /** Create a sandbox pot. Returns the share slug + the private manager key. */
 export async function POST(request: Request): Promise<NextResponse> {
+  await ensureHydrated();
   let body: Record<string, unknown>;
   try {
     body = stripCardData((await request.json()) as Record<string, unknown>);

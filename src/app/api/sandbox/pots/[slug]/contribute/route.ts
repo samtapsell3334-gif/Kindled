@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { contribute, stripCardData, logEvent, getPotBySlug } from "@/lib/sandbox/store";
+import { contribute, stripCardData, logEvent, getPotBySlug, ensureHydrated } from "@/lib/sandbox/store";
 import { viewFor } from "@/lib/sandbox/redact";
 
 /**
@@ -12,6 +12,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ): Promise<NextResponse> {
+  await ensureHydrated();
   const { slug } = await params;
   let body: Record<string, unknown>;
   try {
@@ -44,6 +45,7 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ): Promise<NextResponse> {
+  await ensureHydrated();
   const { slug } = await params;
   const pot = getPotBySlug(slug);
   if (pot) {

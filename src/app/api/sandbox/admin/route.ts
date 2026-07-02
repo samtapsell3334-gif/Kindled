@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listEvents, resetSandbox } from "@/lib/sandbox/store";
+import { listEvents, resetSandbox, ensureHydrated } from "@/lib/sandbox/store";
 import { rateLimit } from "@/lib/rate-limit";
 
 /**
@@ -21,6 +21,7 @@ export function GET(request: Request): NextResponse {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  await ensureHydrated();
   const rl = rateLimit(request, "sandbox-admin", { max: 20, windowMs: 10 * 60_000 });
   if (!rl.ok) return NextResponse.json({ error: "Too many attempts" }, { status: 429 });
   let body: { secret?: string; action?: string };

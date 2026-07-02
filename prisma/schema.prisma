@@ -387,3 +387,15 @@ model IntentDataNode {
   @@index([category, priceAtCapture])
   @@map("intent_data_nodes")
 }
+
+/// v9.1 — durable sandbox persistence. The sandbox's in-memory store is
+/// write-through cached into this single JSONB row (capped data: ≤300 pots,
+/// ≤10k events) so wishes survive serverless cold starts and work
+/// cross-device. Real launch models above are unaffected.
+model SandboxState {
+  id        String   @id @default("singleton")
+  data      Json
+  updatedAt DateTime @updatedAt
+
+  @@map("sandbox_state")
+}

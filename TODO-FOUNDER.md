@@ -82,3 +82,14 @@
   Chrome run: `npx lighthouse https://www.kindledgift.co.uk/sandbox --form-factor=mobile`.
 - A4 (P2, deferred): every primary CTA shares the same amber→orange gradient.
   Deliberate brand ramp for now; revisit in a design-tokens pass.
+
+## v9.1 Durable sandbox (2026-07-02) — one click left
+- Code side is DONE and deployed: SandboxState JSONB model in prisma/schema.prisma,
+  lazy hydration + debounced write-through in src/lib/sandbox/store.ts, all five
+  sandbox API routes hydrate per-request. Without DATABASE_URL it is a no-op.
+- FOUNDER, one action: accept Neon's marketplace terms (their EULA/privacy — a
+  legal agreement only you can accept) at
+  https://vercel.com/kindled/~/integrations/accept-terms/neon?source=cli
+  Then tell Claude "terms accepted" and the rest is automated: create the Neon
+  resource, connect it to kindledkindled, set DATABASE_URL, run the migration,
+  redeploy, and verify wishes survive a cold start.

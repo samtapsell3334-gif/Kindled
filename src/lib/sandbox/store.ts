@@ -1,17 +1,19 @@
 /**
- * Sandbox store (v4.1 WS-A) — the persistence adapter.
+ * Sandbox store (v4.1 WS-A, persistence v9.1) — the persistence adapter.
  *
- * When DATABASE_URL exists the intended backend is Prisma/Postgres (models to be
- * wired when the founder provisions a database — TODO-FOUNDER). Until then, a
- * process-global in-memory store keeps the entire loop working locally and on a
- * single long-lived server. Limitation (logged in PLAN.md): on serverless the
- * fallback does not survive cold starts — cross-device guarantees need the DB.
+ * The process-global in-memory store stays the synchronous source of truth for
+ * every read and all pure logic (unit tests run against it with no DB). When
+ * DATABASE_URL exists, the whole state (≤300 pots, ≤10k events) is additionally
+ * write-through cached into one Postgres JSONB row: API routes call
+ * `ensureHydrated()` once per request to lazy-load after a cold start, and every
+ * mutation schedules a debounced `persistSoon()`. No DB → both are no-ops.
  *
  * GUARDRAIL 1 ENFORCEMENT: `stripCardData` removes any card-like keys from every
  * inbound payload before it can reach the store or the event log, and
  * `assertNoCardData` throws in dev/tests if one slips through. Unit-tested.
  */
 
+import type { Prisma } from "@prisma/client";
 import type {
   SandboxPot, SandboxItem, SandboxContribution, SandboxMessage, SandboxEvent,
   RevealOutcome,
@@ -65,13 +67,67 @@ interface Db {
   events: SandboxEvent[];
 }
 
-const g = globalThis as unknown as { __kindledSandbox?: Db };
+const g = globalThis as unknown as { __kindledSandbox?: Db; __kindledHydrated?: Promise<void> };
 function db(): Db {
   if (!g.__kindledSandbox) {
     g.__kindledSandbox = { pots: new Map(), events: [] };
     seed(g.__kindledSandbox);
   }
   return g.__kindledSandbox;
+}
+
+// ─── durable write-through (v9.1) ───────────────────────────────────────────────
+// One JSONB row (SandboxState "singleton") mirrors the whole capped store so the
+// sandbox survives serverless cold starts. Prisma is imported lazily so tests and
+// DB-less environments never touch it.
+
+const hasDb = () => !!process.env.DATABASE_URL;
+
+interface Snapshot { pots: SandboxPot[]; events: SandboxEvent[] }
+
+/** Routes call this once per request; loads the snapshot after a cold start. */
+export function ensureHydrated(): Promise<void> {
+  if (!hasDb()) return Promise.resolve();
+  if (!g.__kindledHydrated) {
+    g.__kindledHydrated = (async () => {
+      try {
+        const { db: prisma } = await import("@/lib/db");
+        const row = await prisma.sandboxState.findUnique({ where: { id: "singleton" } });
+        if (row) {
+          const snap = row.data as unknown as Snapshot;
+          const d = db();
+          d.pots = new Map(snap.pots.map((p) => [p.id, p]));
+          d.events = snap.events;
+        }
+      } catch (e) {
+        console.error("sandbox hydrate failed (continuing in-memory):", e);
+      }
+    })();
+  }
+  return g.__kindledHydrated;
+}
+
+let persistTimer: ReturnType<typeof setTimeout> | undefined;
+/** Debounced fire-and-forget snapshot write; called by every mutation. */
+function persistSoon(): void {
+  if (!hasDb()) return;
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(() => {
+    void (async () => {
+      try {
+        const { db: prisma } = await import("@/lib/db");
+        const d = db();
+        const data = JSON.parse(JSON.stringify({ pots: [...d.pots.values()], events: d.events })) as Prisma.InputJsonValue;
+        await prisma.sandboxState.upsert({
+          where: { id: "singleton" },
+          create: { id: "singleton", data },
+          update: { data },
+        });
+      } catch (e) {
+        console.error("sandbox persist failed:", e);
+      }
+    })();
+  }, 400);
 }
 
 // ─── events (WS-G — append-only) ────────────────────────────────────────────────
@@ -92,6 +148,7 @@ export function logEvent(
   const evts = db().events;
   if (evts.length >= MAX_EVENTS) evts.splice(0, 1000); // trim oldest — sandbox only
   evts.push(e);
+  persistSoon();
   return e;
 }
 
@@ -151,6 +208,7 @@ export function createPot(input: CreatePotInput): SandboxPot {
   };
   assertNoCardData(pot);
   db().pots.set(pot.id, pot);
+  persistSoon();
   logEvent("pot_created", {
     potId: pot.id,
     ...(input.ref ? { ref: input.ref } : {}),
@@ -191,6 +249,7 @@ export function contribute(
   };
   assertNoCardData(contribution);
   pot.contributions.push(contribution);
+  persistSoon();
   logEvent("contribution_completed", { potId: pot.id, ...(input.ref ? { ref: input.ref } : {}), props: { amount } });
 
   if (input.message || input.videoRef) {
@@ -225,6 +284,7 @@ export function simulateReveal(
   const raised = pot.contributions.reduce((a, c) => a + c.amount, 0);
   pot.status = outcome === "stack" ? "stacked" : "revealed";
   pot.revealOutcome = outcome;
+  persistSoon();
   logEvent("reveal_triggered", { potId: pot.id, props: { raised } });
   if (outcome === "gift_card") {
     pot.simulatedCommission = Math.round(raised * SIMULATED_COMMISSION_PCT) / 100;
@@ -286,4 +346,5 @@ export function resetSandbox(): void {
   d.pots.clear();
   d.events = [];
   seed(d);
+  persistSoon();
 }
