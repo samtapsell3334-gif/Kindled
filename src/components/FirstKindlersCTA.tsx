@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Rocket, Gift, Trophy, Flame, ArrowRight } from "lucide-react";
+import { LogoMark } from "@/components/Logo";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // AMBIENT RISING DOTS (replaces emoji ember chars)
@@ -74,32 +75,6 @@ function BurstRing({ active }: { active: boolean }) {
 // SVG FLAME MARK (replaces emoji)
 // ──────────────────────────────────────────────────────────────────────────────
 
-function FlameMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <path
-        d="M14 1C10 9 4 11 6.5 18.5C8 23 11 26 14 28C17 26 20 23 21.5 18.5C24 11 18 9 14 1Z"
-        fill="url(#fm-grad-outer)"
-      />
-      <path
-        d="M14 15C12 19 12.5 24 14 27C15.5 24 16 19 14 15Z"
-        fill="url(#fm-grad-inner)"
-        opacity="0.85"
-      />
-      <defs>
-        <linearGradient id="fm-grad-outer" x1="14" y1="1" x2="14" y2="28" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#fbbf24" />
-          <stop offset="0.6" stopColor="#f97316" />
-          <stop offset="1" stopColor="#dc2626" />
-        </linearGradient>
-        <linearGradient id="fm-grad-inner" x1="14" y1="15" x2="14" y2="27" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#fef3c7" />
-          <stop offset="1" stopColor="#fbbf24" />
-        </linearGradient>
-      </defs>
-    </svg>
-  );
-}
 
 // ──────────────────────────────────────────────────────────────────────────────
 // 3-D TILT TICKET
@@ -172,7 +147,7 @@ function TiltTicket({ ticketNumber }: { ticketNumber: string }) {
           >
             <div className="mb-3 flex justify-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/15 border border-amber-400/25">
-                <FlameMark className="h-7 w-7" />
+                <LogoMark variant="dark" size={28} />
               </div>
             </div>
 
@@ -347,7 +322,7 @@ export function FirstKindlersCTA() {
                       className="mb-4 flex justify-center"
                     >
                       <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-400/12 border border-amber-400/20">
-                        <FlameMark className="h-10 w-8" />
+                        <LogoMark variant="dark" size={36} />
                         {/* Glow ring */}
                         <div className="absolute inset-0 rounded-2xl" style={{ boxShadow: "0 0 28px rgba(251,191,36,0.25)" }} />
                       </div>

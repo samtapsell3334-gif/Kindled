@@ -1,7 +1,7 @@
 {
   "name": "Kindled",
   "short_name": "Kindled",
-  "description": "Group gifting for friends & family \u2014 one pot, one link, revealed on the big day.",
+  "description": "Group gifting for friends & family \u2014 one wish, one link, revealed on the big day.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FAF3EA",

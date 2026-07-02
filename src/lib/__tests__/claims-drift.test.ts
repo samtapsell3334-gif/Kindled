@@ -31,7 +31,7 @@ function walk(dir: string, out: string[] = []): string[] {
 }
 
 describe("claims drift guard", () => {
-  const files = [...walk("src/app"), ...walk("src/components"), ...walk("src/data"), ...walk("src/content")];
+  const files = [...walk("src/app"), ...walk("src/components"), ...walk("src/data"), ...walk("src/content"), "public/manifest.json"];
 
   it("no banned or retired terms in user-facing source", () => {
     const hits: string[] = [];

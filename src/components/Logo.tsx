@@ -7,7 +7,9 @@
  * it renders identically with or without page fonts. Colour variants:
  *  - "light"  → full-colour mark + ink wordmark (light backgrounds)
  *  - "dark"   → reversed mark (cream/gold dots) + cream wordmark (dark backgrounds)
- * Below 32px rendered size use `compact` (2-dot simplified mark, per kit rules).
+ * The compact 2-dot mark is for genuinely tiny sizes (favicons, inline badges);
+ * at header sizes the full 4-dot mark must be used or the lockup reads squashed.
+ * Lockup geometry mirrors /public/logo/kindled-lockup.svg: gap 10/64, text 34/64.
  */
 
 const SPARK = "M32 6l5 21 21 5-21 5-5 21-5-21-21-5 21-5Z";
@@ -55,11 +57,11 @@ export function Logo({
   wordmark?: boolean;
 }) {
   return (
-    <span className={`inline-flex items-center ${className}`} style={{ gap: Math.round(size * 0.3) }}>
-      <LogoMark variant={variant} size={size} compact={size < 32} />
+    <span className={`inline-flex items-center ${className}`} style={{ gap: Math.round(size * (10 / 64)) }}>
+      <LogoMark variant={variant} size={size} compact={size < 20} />
       {wordmark && (
         <span
-          style={{ fontFamily: "var(--font-logo), 'Avenir Next', 'Trebuchet MS', sans-serif", fontWeight: 800, letterSpacing: "-0.01em", fontSize: Math.round(size * 0.66) }}
+          style={{ fontFamily: "var(--font-logo), 'Avenir Next', 'Trebuchet MS', sans-serif", fontWeight: 800, letterSpacing: "-0.015em", fontSize: Math.round(size * (34 / 64)), lineHeight: 1 }}
           className={variant === "dark" ? "text-[#FAF5EE]" : "text-[#23201C]"}
         >
           Kindled
