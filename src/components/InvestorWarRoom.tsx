@@ -457,7 +457,7 @@ function MechanismTab() {
         <FlywheelDiagram />
       </div>
 
-      {/* Joint Fires — pitch-ready marketing preview (the Milestone Engine) */}
+      {/* Joint pots — pitch-ready marketing preview (the Milestone Engine) */}
       <Reveal>
         <div className="rounded-2xl border border-[#ffb800]/20 bg-gradient-to-br from-[#0f0f0f] to-[#1c1c1c]/10 p-6">
           <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-[#ffb800]/80">{jf.label}</p>

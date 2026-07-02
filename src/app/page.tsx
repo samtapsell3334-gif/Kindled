@@ -27,7 +27,7 @@ const MARQUEE_ITEMS = [
   "Magical reveals on the big day",
   "Chip in any amount",
   "Gifts stay secret until the big day",
-  "£2,500 quarterly draw",
+  "Stack pots across occasions",
   "Star charts for kids",
   "One link. Unlimited contributors.",
   "2 minutes to set up",
@@ -90,7 +90,7 @@ const FEATURES = [
   {
     icon: Star,
     title: "Star chart for kids",
-    desc: "Turn good behaviour into gift momentum. Stars earned through chores unlock reward goals.",
+    desc: "Remember circling the catalogue? Now it's their turn — stars earned through chores unlock the goals they circled.",
     color: "text-orange-600",
     bg: "bg-orange-50",
     border: "border-orange-100",
@@ -219,7 +219,7 @@ function Nav() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-7">
-          {[["How it works", "#how"], ["Features", "#features"], ["For families", "#families"]].map(([l, h]) => (
+          {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"]].map(([l, h]) => (
             <a key={l} href={h} className="text-[13px] font-medium text-white/50 hover:text-white transition-colors duration-200">
               {l}
             </a>
@@ -259,7 +259,7 @@ function Nav() {
             className="overflow-hidden border-t border-white/8 bg-[#070300]/95 backdrop-blur-2xl md:hidden"
           >
             <div className="flex flex-col gap-0.5 px-5 py-4">
-              {[["How it works", "#how"], ["Features", "#features"], ["For families", "#families"], ["Live demo", "/pots/demo"]].map(([l, h]) => (
+              {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["Live demo", "/pots/demo"]].map(([l, h]) => (
                 <a
                   key={l}
                   href={h}
@@ -376,7 +376,7 @@ function Hero() {
               transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50"
             >
-              The gifts they&apos;ll actually love, funded by the people who love them. Share one link — friends, family and everyone in between chip in any amount — and reveal it all together on the big day.
+              One shared pot, one link to send. Friends, family and everyone in between chip in any amount — no app, no account — and it stays sealed until you reveal it together on the big day.
             </motion.p>
 
             <motion.div
@@ -539,7 +539,7 @@ function Hero() {
                       <div key={i} className={`h-5 w-5 rounded-full border-[1.5px] border-[#0d0400] ${c}`} />
                     ))}
                   </div>
-                  <p className="text-[10px] text-white/35">+9 contributors</p>
+                  <p className="text-[10px] text-white/35">+9 chipped in</p>
                 </div>
                 <div className="mt-3 flex items-center gap-1.5">
                   <Lock className="h-3 w-3 text-white/20 shrink-0" />
@@ -596,7 +596,12 @@ function MarqueeBand() {
         {...(reduce ? {} : { animate: { x: ["0%", "-50%"] }, transition: { duration: 28, ease: "linear" as const, repeat: Infinity } })}
         className="flex w-max"
       >
-        {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((text, i) => (
+        {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((text, i) => i >= MARQUEE_ITEMS.length ? (
+          <div key={i} aria-hidden="true" className="flex shrink-0 items-center gap-3 px-8">
+            <Flame className="h-3 w-3 shrink-0 text-amber-500" />
+            <span className="whitespace-nowrap text-[13px] font-semibold text-stone-500">{text}</span>
+          </div>
+        ) : (
           <div key={i} className="flex shrink-0 items-center gap-3 px-8">
             <Flame className="h-3 w-3 shrink-0 text-amber-500" />
             <span className="whitespace-nowrap text-[12px] font-medium text-stone-400">{text}</span>
@@ -920,12 +925,12 @@ function AudienceSplit() {
                 Give meaningfully.<br />Get rewarded.
               </h3>
               <p className="text-[14px] text-stone-600 leading-relaxed mb-6">
-                Chip in any amount you like — from £5 to £500. No account needed. Every contribution enters you into our £2,500 quarterly draw, plus earns 2% back in credit.
+                Chip in any amount you like — from £5 to £500. No account needed, no app, done in thirty seconds.
               </p>
               <div className="space-y-2.5">
                 {[
                   "Chip in any amount — no minimum, no account required",
-                  "Automatic entry to the £2,500 prize draw (free entry route available)",
+                  "See exactly what's funded, live",
                   "Earn 2% back in credit on catalogue purchases",
                   "Buy smaller items outright if you prefer",
                   "See who else contributed in the reveal",
@@ -1266,7 +1271,7 @@ function Footer() {
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 md:flex-row">
         <Logo variant="light" size={30} />
         <div className="flex flex-wrap justify-center gap-6">
-          {(["How it works|#how-it-works", "Watch the film|/film", "Live demo|/pots/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
+          {(["How it works|#how", "Watch the film|/film", "Live demo|/pots/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-stone-400 hover:text-stone-700 transition-colors">

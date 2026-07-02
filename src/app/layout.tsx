@@ -71,7 +71,7 @@ export const metadata: Metadata = {
   },
 };
 
-// WCAG 2.1 AA: never disable pinch-zoom (no maximumScale / userScalable).
+// WCAG 2.1 AA: never disable pinch-zoom.
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,

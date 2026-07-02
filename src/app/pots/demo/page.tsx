@@ -2206,7 +2206,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
 
         {/* ── Waitlist CTA ── */}
         <div className="rounded-2xl border border-[#ffb800] p-6 text-center" style={{ background: "rgba(255,184,0,0.08)", boxShadow: "0 0 30px rgba(255,184,0,0.18)" }}>
-          <h2 className="font-editorial mb-2 text-[22px] font-semibold text-white">Be Among the First to Start a Pot</h2>
+          <h2 className="font-editorial mb-2 text-[22px] font-semibold text-white">Reserve your spot</h2>
           <p className="mx-auto mb-2 max-w-sm text-[13px] leading-relaxed text-[#f5f5f5]/65">
             We&apos;re opening Kindled to early users soon. Join the waitlist and we&apos;ll let you know the moment you can build your first list.
           </p>
@@ -2246,7 +2246,7 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
         {/* ── Footer ── */}
         <div className="flex items-center justify-between border-t border-white/8 pt-4">
           <span className="text-[12px] text-[#f5f5f5]/45"><span className="font-bold text-[#ffb800]">Kindled</span> — gifting, the way it should feel.</span>
-          <span className="text-right text-[10px] leading-snug text-[#f5f5f5]/30">Sources: GiftAFeeling 2025 · GlobalData UK Gifting 2024 · YouGov/MoneySuperMarket 2025</span>
+          <span className="text-right text-[10px] leading-snug text-[#f5f5f5]/30">Sources: Finder UK unwanted-gifts research (2025) · Mintel UK gift-buying research</span>
         </div>
 
       </div>
@@ -3791,7 +3791,7 @@ export default function DemoPage() {
     setPots((prev) => prev.map((p) =>
       p.id === id ? { ...p, raised: Math.min(p.goal, p.raised + amount), contributors: p.contributors + 1 } : p,
     ));
-    showToast(`£${amount} kindled!`);
+    showToast(`£${amount} chipped in!`);
     addLog(`Contribution: £${amount} added to pot`);
     track("pot_chip_in_completed", { amount });
   }, [showToast, addLog]);
@@ -4217,7 +4217,7 @@ export default function DemoPage() {
         {/* ── Gifting Impact Panel (budget chart + metrics + simulator) ── */}
         <GiftingImpactPanel />
 
-        {/* ── First Kindlers Creator Sign-up ── */}
+        {/* ── Early-access sign-up ── */}
         <FirstKindlersCTA />
       </main>
 
