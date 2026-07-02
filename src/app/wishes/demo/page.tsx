@@ -2796,23 +2796,24 @@ function RoleSwitcher({ role, onChange }: { role: ViewMode; onChange: (r: ViewMo
     { id: "investor", label: "Investor", Icon: Lock },
   ];
   return (
-    <div className="sticky top-0 z-30 border-b border-[rgba(10,10,10,0.1)] bg-[#f5f5f5]/90 px-4 pb-2 pt-3 backdrop-blur-md">
+    <div className="sticky top-0 z-30 border-b border-[rgba(10,10,10,0.1)] px-4 pb-2 pt-3 [background:var(--ground)]">
+      {/* v11 WS-7: tabs sit on a solid token surface — AA on every background they cross */}
       <div className="-mx-1 overflow-x-auto px-1 scrollbar-none">
-      <div className="flex w-full min-w-max gap-1 border border-[rgba(10,10,10,0.08)] bg-[#fafafa] p-1">
+      <div className="flex w-full min-w-max gap-1 border border-[rgba(10,10,10,0.08)] bg-[var(--card)] p-1">
         {tabs.map(({ id, label, Icon }) => (
           <motion.button
             key={id}
             whileTap={{ scale: 0.96 }}
             onClick={() => onChange(id)}
             className={cn(
-              "relative flex min-w-[52px] flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-[10px] font-semibold transition-colors",
-              role === id ? "text-[#f5f5f5]" : "text-[#0a0a0a]/45 hover:text-[#0a0a0a]/70",
+              "relative flex min-w-[52px] flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-[10px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:[outline-color:var(--structure-mid)]",
+              role === id ? "text-[var(--on-structure)]" : "text-[var(--ink-soft)] hover:text-[var(--ink)]",
             )}
           >
             {role === id && (
-              <motion.div layoutId="role-pill" className="absolute inset-0 bg-[#0a0a0a]" style={{ zIndex: -1 }} transition={{ duration: 0.4, ease: LUX_EASE }} />
+              <motion.div layoutId="role-pill" className="absolute inset-0 [background:var(--structure)]" style={{ zIndex: -1 }} transition={{ duration: 0.4, ease: LUX_EASE }} />
             )}
-            <Icon className={cn("h-3.5 w-3.5", role === id && "text-[#ffb800]")} strokeWidth={role === id ? 2.5 : 1.75} />
+            <Icon className={cn("h-3.5 w-3.5", role === id && "text-[var(--ember)]")} strokeWidth={role === id ? 2.5 : 1.75} />
             <span>{label}</span>
           </motion.button>
         ))}
