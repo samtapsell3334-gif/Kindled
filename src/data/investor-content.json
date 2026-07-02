@@ -70,7 +70,7 @@
         "body": "Account-to-account payments are now fast, trusted, and a fraction of card cost. We are built on these rails from day one, a structural margin advantage over anyone still routing through Visa and Mastercard."
       },
       {
-        "title": "AI Unlocked a New Emotion",
+        "title": "A New Emotion, Unlocked",
         "body": "A personalised reveal moment cost a fortune two years ago. Today it costs pennies and creates something people genuinely share. That shareability is our distribution."
       },
       {
@@ -99,7 +99,7 @@
         "id": "overhead",
         "title": "Low-Overhead Architecture",
         "metric": "Card-light, server-light",
-        "body": "Open Banking rails, serverless infrastructure, and AI-generated content mean the cost to serve each user is tiny and falls with scale. The business is engineered to reach profitability without a heavy operational footprint."
+        "body": "Open Banking rails, serverless infrastructure, and code-rendered content mean the cost to serve each user is tiny and falls with scale. The business is engineered to reach profitability without a heavy operational footprint."
       }
     ]
   },
@@ -365,7 +365,7 @@
         "mitigation": "No app and no account for givers: a link opens, Open Banking confirms in seconds, no card details typed. The host onboards once. Every step that could lose a user has been removed."
       },
       {
-        "title": "AI Quality: No Uncanny Valley",
+        "title": "Reveal Quality: No Uncanny Valley",
         "risk": "A cheap or creepy reveal would poison the emotional core.",
         "mitigation": "Reveals run on curated, brand-controlled templates with quality gates, and always fall back to a polished generated motion experience. We ship 'tasteful and shareable', never 'almost human'."
       },
@@ -390,7 +390,7 @@
       },
       {
         "title": "Engineer the Social Moment",
-        "body": "The AI reveal is deliberately built as a high-dopamine peak, the screenshot-worthy second that makes someone want this for someone they love. That single moment is our cheapest, highest-converting channel."
+        "body": "The reveal is deliberately built as a high-dopamine peak, the screenshot-worthy second that makes someone want this for someone they love. That single moment is our cheapest, highest-converting channel."
       }
     ]
   },
@@ -427,7 +427,7 @@
             ]
           },
           {
-            "title": "AI Reveal GA + Cashback Catalogue",
+            "title": "Reveal GA + Cashback Catalogue",
             "quarter": "Q1–Q2 2027",
             "why": "Turn on the distribution engine and close the cashback loop, so contributors earn, spend, and generate more data.",
             "deliverables": [
