@@ -168,6 +168,17 @@ export default function DashboardPage() {
                 <p>Average wishes per occasion: <b>{occasions ? (wishesAdded / occasions).toFixed(1) : "—"}</b></p>
                 <p>Attributed chip-ins: <b>{attributed.length}</b></p>
                 <p>Per-wish funding velocity: <b>{wishesAdded ? (attributed.length / wishesAdded / days).toFixed(2) : "—"}</b> <span className="text-stone-400">chip-ins/wish/day</span></p>
+                {(() => {
+                  // Cycle time (v11 WS-15 tie-in): the store stamps referred occasions
+                  // with source_created_at at creation, so this is a direct read.
+                  const deltas = events
+                    .filter((e) => e.event === "pot_created" && e.props && typeof (e.props as Record<string, unknown>).source_created_at === "number")
+                    .map((e) => (e.ts - ((e.props as Record<string, unknown>).source_created_at as number)) / 3_600_000)
+                    .filter((h) => h >= 0)
+                    .sort((a, b) => a - b);
+                  const median = deltas.length ? deltas[Math.floor(deltas.length / 2)]! : null;
+                  return <p>Cycle time (occasion → referred occasion): <b>{median !== null ? `${median.toFixed(1)}h median` : "—"}</b> <span className="text-stone-400">n={deltas.length}</span></p>;
+                })()}
               </div>
             );
           })()}

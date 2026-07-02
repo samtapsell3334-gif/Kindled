@@ -214,10 +214,16 @@ export function createPot(input: CreatePotInput): SandboxPot {
   assertNoCardData(pot);
   db().pots.set(pot.id, pot);
   persistSoon();
+  // v11: resolve the referral source NOW so the dashboard can measure cycle
+  // time (source occasion created → this occasion created) without slug↔id joins.
+  const sourcePot = input.ref ? getPotBySlug(input.ref) : undefined;
   logEvent("pot_created", {
     potId: pot.id,
     ...(input.ref ? { ref: input.ref } : {}),
-    props: { is_child: pot.isChildPot, star_chart: pot.starChartEnabled, surprise: pot.isSurprise, items: pot.items.length },
+    props: {
+      is_child: pot.isChildPot, star_chart: pot.starChartEnabled, surprise: pot.isSurprise, items: pot.items.length,
+      ...(sourcePot ? { source_created_at: sourcePot.createdAt } : {}),
+    },
   });
   pot.items.forEach((it, ordinal) => {
     logEvent("item_added", { potId: pot.id, props: { category: it.category, retailer: it.retailer, price_band: it.priceBand, source: it.source } });

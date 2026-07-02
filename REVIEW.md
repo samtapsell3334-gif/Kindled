@@ -527,3 +527,21 @@ Re-walked every workstream in a rendered browser hunting for gaps:
   economics diagram.
 - One environment note: the investor dev-fallback PIN is 1066; production
   uses INVESTOR_PIN (4448) — gate API confirmed 200/401 both environments.
+
+## 2026-07-02 — v11 third-pass refinements
+
+- **Demo joins Direction 2**: the Vibrant Heritage paper tokens now remap under
+  ember-teal (`:root[data-theme="ember-teal"]`, cascade-tested after the token
+  parity guard caught the first attempt twice — the guard works); the demo's
+  interior renders on the warm-cream register with coral/gold accents intact.
+  Verified: --vh-sand resolves to #FAF5EB live.
+- **Cycle time is now measured, not just claimed**: createPot stamps referred
+  occasions with source_created_at at creation (no slug↔id joins), and the
+  dashboard occasions panel shows the median hours from source occasion to
+  referred occasion — making the investor K-loop panel's instrumentation line
+  literally true.
+- **Survey OG card**: dedicated night-set card at /survey/opengraph-image
+  (kit dots, "Two minutes on gift-giving?", mint sub-line) — rendered and
+  eyeballed at thumbnail proportions.
+- Demo header subtitle truncates instead of wrapping at 390px; header ground
+  tokenised (colour-mix over --vh-sand).

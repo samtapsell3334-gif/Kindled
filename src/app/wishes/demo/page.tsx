@@ -538,7 +538,7 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
   potCount: number; totalGoal: number; onShare: () => void; isContributor?: boolean; onStartReceiving?: () => void;
 }) {
   return (
-    <header className="font-outfit sticky top-0 z-30 bg-[#fdf6e3]/92 backdrop-blur-lg">
+    <header className="font-outfit sticky top-0 z-30 backdrop-blur-lg [background:color-mix(in_srgb,var(--vh-sand)_92%,transparent)]">
       <div className="px-5 pb-4 pt-5">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -546,9 +546,9 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
               <LogoMark variant="dark" size={30} />
             </div>
             <div>
-              <h1 className="flex items-baseline gap-2">
-                <span style={{ fontFamily: "var(--font-logo), 'Avenir Next', sans-serif", fontWeight: 800, letterSpacing: "-0.015em" }} className="text-[17px] text-[#23201C]">Kindled</span>
-                <span className="text-[11px] font-medium tracking-tight text-[#0f172a]/40">Billy&apos;s List</span>
+              <h1 className="flex min-w-0 items-baseline gap-2">
+                <span style={{ fontFamily: "var(--font-logo), 'Avenir Next', sans-serif", fontWeight: 800, letterSpacing: "-0.015em" }} className="shrink-0 text-[17px] text-[#23201C]">Kindled</span>
+                <span className="truncate text-[11px] font-medium tracking-tight text-[#0f172a]/40">Billy&apos;s List</span>
               </h1>
               <p className="text-[11px] tracking-tight text-[#0f172a]/50">
                 {isContributor

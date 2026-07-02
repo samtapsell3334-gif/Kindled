@@ -121,6 +121,15 @@
   --vh-cream: #fffdf7;      /* lifted card surface */
 }
 
+/* Vibrant Heritage remap (v11 follow-up): under ember-teal the demo's paper
+   family joins the warm-cream register; coral/gold accents and midnight ink
+   stay. Placed after (and more specific than) the :root definitions above. */
+:root[data-theme="ember-teal"] {
+  --vh-sand: #FAF5EB;
+  --vh-sand-deep: #F3EAD8;
+  --vh-cream: #FFFDF9;
+}
+
 /* Outfit UI font only — safe on dark/Midnight surfaces (no bg/colour override). */
 .font-outfit {
   font-family: var(--font-outfit), 'Outfit', ui-sans-serif, sans-serif;
