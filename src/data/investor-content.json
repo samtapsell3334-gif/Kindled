@@ -353,6 +353,33 @@
         }
       ],
       "caption": "Three turns of the loop from a single wish. No paid acquisition; the product is the marketing."
+    },
+    "kloop": {
+      "title": "The K-loop, measured",
+      "formula": "K = invites per new user × invite-to-creator conversion",
+      "axes": "K tells you whether it spreads; cycle time (occasion created → contributor's own occasion created) tells you how fast.",
+      "example": {
+        "label": "Illustrative only — not traction",
+        "steps": [
+          "1 occasion invites 8 contributors",
+          "at 15% contributor-to-creator conversion",
+          "8 × 0.15 = 1.2 new occasions per occasion (K = 1.2)"
+        ]
+      },
+      "targets": {
+        "label": "Founder targets, with the reasoning",
+        "items": [
+          "Wedge phase: K at or above 1 INSIDE parent cohorts — a child's occasion structurally recruits 5–15 adults, which is the whole point of the wedge",
+          "Blended K below the parent-cohort figure and rising with each lever",
+          "Cycle time compressed toward the natural occasion calendar (birthdays and Christmas set the beat)"
+        ]
+      },
+      "levers": [
+        "The share moment: a pre-written, editable WhatsApp message at creation",
+        "The post-contribution moment: would-you-rather into the own-wishes CTA",
+        "The thank-you broadcast: re-touches every contributor with a share asset"
+      ],
+      "instrumentation": "The sandbox dashboard already measures K and cycle time live from real loop events (occasion_share, contribution attribution, own_wishes_cta_tapped) — an evidence engine, not a projection."
     }
   },
   "risk": {

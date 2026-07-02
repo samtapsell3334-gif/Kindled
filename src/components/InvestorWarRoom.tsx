@@ -443,6 +443,7 @@ function MechanismTab() {
       <div>
         <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">The loop, visualised</p>
         <FlywheelDiagram />
+        <KLoopPanel />
       </div>
 
       {/* Joint pots — pitch-ready marketing preview (the Milestone Engine) */}
@@ -830,6 +831,43 @@ function EconomicsDiagram() {
           </g>
         ))}
       </svg>
+    </div>
+  );
+}
+
+/** v11 WS-15 — the K-loop stated properly: formula, cycle time, labelled
+    illustrative maths, founder targets + levers, dashboard tie-in. */
+function KLoopPanel() {
+  const content = useContent();
+  const k = (content.flywheel as unknown as { kloop?: {
+    title: string; formula: string; axes: string;
+    example: { label: string; steps: string[] };
+    targets: { label: string; items: string[] };
+    levers: string[]; instrumentation: string;
+  } }).kloop;
+  if (!k) return null;
+  return (
+    <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{k.title}</p>
+      <p className="mt-2 rounded-xl bg-white/[0.05] px-3 py-2 font-mono text-[12px] text-[#ffb800]">{k.formula}</p>
+      <p className="mt-2 text-[12px] leading-relaxed text-slate-300">{k.axes}</p>
+      <div className="mt-3 rounded-xl border border-white/10 p-3">
+        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">{k.example.label}</p>
+        {k.example.steps.map((st) => <p key={st} className="mt-1 text-[12px] text-slate-200">{st}</p>)}
+      </div>
+      <div className="mt-3">
+        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">{k.targets.label}</p>
+        <ul className="mt-1 space-y-1">
+          {k.targets.items.map((t) => <li key={t} className="text-[12px] leading-snug text-slate-300">· {t}</li>)}
+        </ul>
+      </div>
+      <div className="mt-3">
+        <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500">The three levers being engineered</p>
+        <ul className="mt-1 space-y-1">
+          {k.levers.map((l) => <li key={l} className="text-[12px] leading-snug text-slate-300">· {l}</li>)}
+        </ul>
+      </div>
+      <p className="mt-3 text-[11px] italic text-slate-400">{k.instrumentation}</p>
     </div>
   );
 }
