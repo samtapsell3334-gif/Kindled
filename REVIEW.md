@@ -257,3 +257,11 @@ homepage + terms anchor.
   naturally.
 - Drift guard extended: user-facing pot phrases now banned; proven by catching 17 real
   leftovers (multi-line JSX + comments) which were then fixed — guard green.
+
+## 2026-07-02 — Logo audit round 2, sandbox link, de-AI copy pass
+
+- **Squashed logos, root cause**: `Logo` swapped to the compact 2-dot mark below 32px, and every header/footer renders at 30px, so nearly all lockups showed the cramped 2-dot blob. Threshold moved to 20px; lockup geometry now mirrors `public/logo/kindled-lockup.svg` (gap 10/64, wordmark 34/64, letter-spacing -0.015em). Verified by screenshot on homepage header/footer.
+- **Last old logos found and removed**: hand-drawn K-flame app-icon SVG in the demo header (replaced with teal tile + kit mark) and two `FlameMark` flame SVGs in FirstKindlersCTA (replaced with `LogoMark`).
+- **Sandbox link in demo**: persistent strip under the context bar, all views: "Like what you see? Build one of these yourself. → Open the sandbox".
+- **De-AI editorial pass**: ~170 rendered em-dash constructions rewritten as full sentences across homepage, demo, sandbox, /p/[slug], reveal, films, legal and investor content; "not just X, it's Y" and "seamlessly" removed. Kept deliberately: brand line, quote-attribution dashes, retail product names, page-title separators, date ranges. Verified 0 rendered em dashes on homepage/demo via DOM walk.
+- **Deploy note**: commits d615ca6 + 944a8f0 are on main but blocked by the Vercel free-tier 100-deploys/day cap; deploy + alias x4 once the window resets.
