@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { contribute, stripCardData, logEvent, getPotBySlug, ensureHydrated } from "@/lib/sandbox/store";
+import { contribute, stripCardData, logEvent, getPotBySlug, ensureHydrated, flushPersist } from "@/lib/sandbox/store";
 import { viewFor } from "@/lib/sandbox/redact";
 
 /**
@@ -18,10 +18,12 @@ export async function POST(
   try {
     body = stripCardData((await request.json()) as Record<string, unknown>);
   } catch {
+    await flushPersist();
     return NextResponse.json({ error: "Malformed JSON" }, { status: 400 });
   }
   const amount = Number(body.amount);
   if (!Number.isFinite(amount) || amount < 1) {
+    await flushPersist();
     return NextResponse.json({ error: "Amount must be at least £1" }, { status: 422 });
   }
   try {
@@ -34,8 +36,10 @@ export async function POST(
       consent: !!body.consent,
       ...(str(body.ref) ? { ref: str(body.ref)! } : {}),
     });
+    await flushPersist();
     return NextResponse.json({ ok: true, view: viewFor(pot, "guest") });
   } catch (e) {
+    await flushPersist();
     return NextResponse.json({ error: e instanceof Error ? e.message : "Failed" }, { status: 400 });
   }
 }
@@ -66,5 +70,6 @@ export async function PUT(
       logEvent(step === "sheet" ? "payment_sheet_viewed" : "contribution_started", { potId: pot.id });
     }
   }
+  await flushPersist();
   return new NextResponse(null, { status: 204 });
 }

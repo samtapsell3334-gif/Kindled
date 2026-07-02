@@ -107,27 +107,32 @@ export function ensureHydrated(): Promise<void> {
   return g.__kindledHydrated;
 }
 
-let persistTimer: ReturnType<typeof setTimeout> | undefined;
-/** Debounced fire-and-forget snapshot write; called by every mutation. */
+let dirty = false;
+/** Mutations mark the store dirty; the route flushes before responding. A
+ *  fire-and-forget timer would never run on serverless — Vercel freezes the
+ *  function as soon as the response is sent, so the write must be awaited. */
 function persistSoon(): void {
   if (!hasDb()) return;
-  clearTimeout(persistTimer);
-  persistTimer = setTimeout(() => {
-    void (async () => {
-      try {
-        const { db: prisma } = await import("@/lib/db");
-        const d = db();
-        const data = JSON.parse(JSON.stringify({ pots: [...d.pots.values()], events: d.events })) as Prisma.InputJsonValue;
-        await prisma.sandboxState.upsert({
-          where: { id: "singleton" },
-          create: { id: "singleton", data },
-          update: { data },
-        });
-      } catch (e) {
-        console.error("sandbox persist failed:", e);
-      }
-    })();
-  }, 400);
+  dirty = true;
+}
+
+/** Awaited by mutating routes before they respond. No DB or clean → no-op. */
+export async function flushPersist(): Promise<void> {
+  if (!hasDb() || !dirty) return;
+  dirty = false;
+  try {
+    const { db: prisma } = await import("@/lib/db");
+    const d = db();
+    const data = JSON.parse(JSON.stringify({ pots: [...d.pots.values()], events: d.events })) as Prisma.InputJsonValue;
+    await prisma.sandboxState.upsert({
+      where: { id: "singleton" },
+      create: { id: "singleton", data },
+      update: { data },
+    });
+  } catch (e) {
+    dirty = true; // retry on the next flush
+    console.error("sandbox persist failed:", e);
+  }
 }
 
 // ─── events (WS-G — append-only) ────────────────────────────────────────────────

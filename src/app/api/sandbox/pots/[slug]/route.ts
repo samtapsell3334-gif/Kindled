@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPotBySlug, logEvent, ensureHydrated } from "@/lib/sandbox/store";
+import { getPotBySlug, logEvent, ensureHydrated, flushPersist } from "@/lib/sandbox/store";
 import { viewFor } from "@/lib/sandbox/redact";
 
 /**
@@ -29,5 +29,6 @@ export async function GET(
     logEvent("pot_viewed", { potId: pot.id, ...(ref ? { ref } : {}), props: { role } });
   }
   const unseal = role === "manager" && url.searchParams.get("unseal") === "1";
+  await flushPersist();
   return NextResponse.json(viewFor(pot, role, { unseal }));
 }

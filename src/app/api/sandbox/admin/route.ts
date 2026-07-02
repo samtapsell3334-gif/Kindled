@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listEvents, resetSandbox, ensureHydrated } from "@/lib/sandbox/store";
+import { listEvents, resetSandbox, ensureHydrated, flushPersist } from "@/lib/sandbox/store";
 import { rateLimit } from "@/lib/rate-limit";
 
 /**
@@ -10,7 +10,8 @@ import { rateLimit } from "@/lib/rate-limit";
  */
 const SECRET = process.env.SANDBOX_ADMIN_SECRET ?? "kindled-admin";
 
-export function GET(request: Request): NextResponse {
+export async function GET(request: Request): Promise<NextResponse> {
+  await ensureHydrated();
   const rl = rateLimit(request, "sandbox-admin", { max: 20, windowMs: 10 * 60_000 });
   if (!rl.ok) return NextResponse.json({ error: "Too many attempts" }, { status: 429 });
   const url = new URL(request.url);
@@ -28,12 +29,15 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     body = (await request.json()) as typeof body;
   } catch {
+    await flushPersist();
     return NextResponse.json({ error: "Malformed JSON" }, { status: 400 });
   }
   if (body.secret !== SECRET) return NextResponse.json({ error: "Not authorised" }, { status: 401 });
   if (body.action === "reset") {
     resetSandbox();
+    await flushPersist();
     return NextResponse.json({ ok: true, reset: true });
   }
+  await flushPersist();
   return NextResponse.json({ error: "Unknown action" }, { status: 422 });
 }

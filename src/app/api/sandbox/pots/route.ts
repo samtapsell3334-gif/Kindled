@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createPot, stripCardData, type CreatePotInput, ensureHydrated } from "@/lib/sandbox/store";
+import { createPot, stripCardData, type CreatePotInput, ensureHydrated, flushPersist } from "@/lib/sandbox/store";
 
 /** Create a sandbox pot. Returns the share slug + the private manager key. */
 export async function POST(request: Request): Promise<NextResponse> {
@@ -8,10 +8,12 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     body = stripCardData((await request.json()) as Record<string, unknown>);
   } catch {
+    await flushPersist();
     return NextResponse.json({ error: "Malformed JSON" }, { status: 400 });
   }
   const b = body as Partial<CreatePotInput>;
   if (!b.title || !b.recipientName || !b.eventDate || !b.organiserName) {
+    await flushPersist();
     return NextResponse.json({ error: "Missing required fields" }, { status: 422 });
   }
   const pot = createPot({
@@ -27,5 +29,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     items: Array.isArray(b.items) ? b.items.slice(0, 12) : [],
     ...(b.ref ? { ref: String(b.ref) } : {}),
   });
+  await flushPersist();
   return NextResponse.json({ slug: pot.slug, managerKey: pot.managerKey });
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { simulateReveal, ensureHydrated } from "@/lib/sandbox/store";
+import { simulateReveal, ensureHydrated, flushPersist } from "@/lib/sandbox/store";
 import { viewFor } from "@/lib/sandbox/redact";
 import type { RevealOutcome } from "@/lib/sandbox/types";
 
@@ -14,17 +14,21 @@ export async function POST(
   try {
     body = (await request.json()) as typeof body;
   } catch {
+    await flushPersist();
     return NextResponse.json({ error: "Malformed JSON" }, { status: 400 });
   }
   if (!body.key || !["gift_card", "product", "stack"].includes(body.outcome ?? "")) {
+    await flushPersist();
     return NextResponse.json({ error: "key and a valid outcome are required" }, { status: 422 });
   }
   try {
     const pot = simulateReveal(slug, body.key, body.outcome!, {
       ...(body.retailer ? { retailer: body.retailer } : {}),
     });
+    await flushPersist();
     return NextResponse.json({ ok: true, view: viewFor(pot, "manager") });
   } catch {
+    await flushPersist();
     return NextResponse.json({ error: "Not authorised" }, { status: 401 });
   }
 }
