@@ -363,8 +363,12 @@ export function simulateReveal(
   pot.status = outcome === "stack" ? "stacked" : "revealed";
   pot.revealOutcome = outcome;
   // v11 WS-1: per-wish outcomes — each wish takes its own path independently.
+  // Unchosen wishes inherit the occasion outcome ONLY if funded; unfunded and
+  // part-funded wishes stack forward by default (nothing raised is ever lost,
+  // and an empty wish "taken as a gift card" would be meaningless).
   for (const it of pot.items) {
-    it.outcome = opts.itemOutcomes?.[it.id] ?? outcome;
+    const funded = it.price > 0 && raisedForItem(pot, it.id) >= it.price;
+    it.outcome = opts.itemOutcomes?.[it.id] ?? (funded ? outcome : "stack");
   }
   persistSoon();
   logEvent("reveal_triggered", { potId: pot.id, props: { raised } });

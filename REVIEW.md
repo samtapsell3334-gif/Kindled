@@ -545,3 +545,24 @@ Re-walked every workstream in a rendered browser hunting for gaps:
   eyeballed at thumbnail proportions.
 - Demo header subtitle truncates instead of wrapping at 390px; header ground
   tokenised (colour-mix over --vh-sand).
+
+## 2026-07-02 — v11 PRODUCTION acceptance run (fourth pass)
+
+Full loop executed against the LIVE site, every step API-real:
+- Paste-a-link extracted a real product on prod (£52, Books); the AWS metadata
+  SSRF probe refused on prod.
+- 3-wish occasion created → kid circled a wish → parent approved → attributed
+  contribution granted the atlas MID-OCCASION → "wherever it's needed" routed
+  to the closest-to-complete wish → receiver payload amount-free → OG title
+  "3 wishes for Ava — chip in 🎉".
+- Reveal with mixed per-wish outcomes persisted (atlas taken, telescope
+  stacked). **Finding fixed**: unfunded wishes previously inherited the
+  occasion outcome (a £0 wish "taken as gift card"); they now stack by default
+  — funded-only inherit. Unit test added (112 green).
+- Survey completed on prod → row durable → thank-you waitlist capture
+  (source=survey) → /beta showed BOTH; test email then removed from the live
+  waitlist (survey demo rows retained, flagged in TODO).
+- Spot checks: ?theme=legacy escape hatch shipped; 404/contact healthy;
+  /beta noindex meta; robots.txt sane; full v11 event trail flowing
+  (wish_added_to_occasion, kid_item_circled/approved, contribution_completed,
+  reveal_outcome).

@@ -52,3 +52,20 @@ describe("kids' circle-it + parent approval queue (P3.1)", () => {
     expect(() => circleItem(adult.slug, adult.managerKey, CRAYONS)).toThrow("Circling is for child wishes");
   });
 });
+
+describe("per-wish reveal defaults (v11 acceptance finding)", () => {
+  it("unfunded wishes stack by default; funded wishes inherit the occasion outcome", async () => {
+    const { simulateReveal, contribute } = await import("../sandbox/store");
+    const pot = makeChildPot(); // Telescope £120, approved
+    circleItem(pot.slug, pot.managerKey, CRAYONS); // £18, pending
+    const mgrView = viewFor(pot, "manager");
+    if (mgrView.kind !== "manager") throw new Error("expected manager");
+    reviewItem(pot.slug, pot.managerKey, mgrView.pendingItems[0]!.id, true);
+    // fully fund ONLY the crayons
+    const crayonId = pot.items.find((i) => i.name === "Crayon mega set")!.id;
+    contribute(pot.slug, { displayName: "Jean", amount: 18, itemId: crayonId });
+    simulateReveal(pot.slug, pot.managerKey, "gift_card", { retailer: "Hobbycraft" });
+    expect(pot.items.find((i) => i.name === "Crayon mega set")!.outcome).toBe("gift_card");
+    expect(pot.items.find((i) => i.name === "Telescope")!.outcome).toBe("stack");
+  });
+});
