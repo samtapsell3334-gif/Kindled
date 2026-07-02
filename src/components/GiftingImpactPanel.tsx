@@ -46,42 +46,42 @@ interface MetricDef {
 
 const METRICS: MetricDef[] = [
   {
-    stat: 78, label: "Feel gift anxiety",
+    stat: 58, label: "Have received an unwanted gift",
     Icon: Brain,
-    copy: "78% of UK adults feel stressed buying gifts — worried about getting it wrong, duplicating, or overspending. An approved list removes all of that.",
-    source: "YouGov UK, 2023",
+    copy: "3 in 5 Brits (58%) have received an unwanted gift — around 31 million adults. An approved list removes the guesswork.",
+    source: "Finder UK unwanted-gifts research, 2025",
     accent: "#fb923c", glow: "rgba(251,146,60,0.4)",
     bg: "from-orange-950/80 to-amber-950/50", border: "border-amber-500/20",
   },
   {
-    stat: 30, label: "Seasonal waste spike",
+    stat: 41, displayOverride: "£41", label: "Wasted per person on missed gifts",
     Icon: Leaf,
-    copy: "UK household waste rises 30% in December from packaging and unwanted returns. Coordinated gifting cuts this significantly.",
-    source: "WRAP UK, 2022",
+    copy: "£41 — the average each of us wastes on gifts that miss the mark. Coordinated gifting puts it back into the goal.",
+    source: "Finder UK unwanted-gifts research, 2025",
     accent: "#34d399", glow: "rgba(52,211,153,0.4)",
     bg: "from-emerald-950/80 to-teal-950/50", border: "border-emerald-500/20",
   },
   {
-    stat: 20, label: "Gifts duplicated or returned",
+    stat: 0, displayOverride: "0", label: "Duplicates when you guide your buyers",
     Icon: RotateCcw,
-    copy: "1 in 5 gifts are duplicates or wrong size. Real-time claim locking on Kindled means every contribution is unique.",
-    source: "YouGov UK, 2023",
+    copy: "Real-time claim locking means no two people can buy the same thing — a product feature, not a survey.",
+    source: "How Kindled works",
     accent: "#a78bfa", glow: "rgba(167,139,250,0.4)",
     bg: "from-violet-950/80 to-purple-950/50", border: "border-violet-500/20",
   },
   {
-    stat: 32, displayOverride: "£3.2B", label: "Spent on unwanted UK gifts",
+    stat: 127, displayOverride: "£1.27bn", label: "Spent on unwanted gifts each Christmas",
     Icon: Banknote,
-    copy: "£3.2 billion wasted on unwanted gifts in the UK each year. Kindled helps redirect this toward meaningful, receiver-approved milestones.",
-    source: "OnePoll / Halifax Bank, 2023",
+    copy: "£1.27 billion is spent on unwanted gifts every UK Christmas. Kindled helps redirect it toward goals people actually want.",
+    source: "Finder UK unwanted-gifts research, 2025",
     accent: "#fbbf24", glow: "rgba(251,191,36,0.4)",
     bg: "from-yellow-950/80 to-amber-950/50", border: "border-yellow-500/20",
   },
   {
-    stat: 65, label: "Overspend at Christmas",
+    stat: 2, displayOverride: "2 min", label: "To set up your first pot",
     Icon: TrendingUp,
-    copy: "65% of UK shoppers spend more than planned over the holidays. Kindled normalises comfortable £15–£20 contributions that add up meaningfully.",
-    source: "Money & Pensions Service, 2022",
+    copy: "The pressure to get the right gift pushes people past what they meant to spend (Mintel). A two-minute shared pot replaces the guesswork.",
+    source: "Mintel UK gift-buying research · product fact",
     accent: "#60a5fa", glow: "rgba(96,165,250,0.4)",
     bg: "from-blue-950/80 to-sky-950/50", border: "border-blue-500/20",
   },
@@ -405,7 +405,7 @@ export function GiftingImpactPanel() {
               ))}
             </div>
             <p className="mx-2 mt-3 text-center text-[8.5px] leading-relaxed text-white/18">
-              Sources: YouGov UK · WRAP UK Waste Studies · Money &amp; Pensions Service · OnePoll / Halifax Bank. Approximate figures from third-party consumer research.
+              Sources: Finder UK unwanted-gifts research (2025) · Mintel UK gift-buying research. Product mechanics labelled as such.
             </p>
           </div>
 

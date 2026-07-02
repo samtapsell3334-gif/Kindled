@@ -189,7 +189,7 @@ function TiltTicket({ ticketNumber }: { ticketNumber: string }) {
 
             <div className="mb-5 rounded-2xl border border-amber-400/18 bg-amber-400/6 px-4 py-3">
               <p className="text-[11px] text-amber-300/65 leading-relaxed">
-                You&apos;re on the exclusive First Kindlers list.<br />
+                You&apos;re on the early-access list.<br />
                 Expect early access, founder perks, and launch rewards.
               </p>
             </div>
@@ -357,10 +357,10 @@ export function FirstKindlersCTA() {
                       className="text-[24px] font-semibold text-white leading-tight"
                       style={{ fontFamily: "var(--font-display)" }}
                     >
-                      Become One of Our First Kindlers
+                      Reserve your spot
                     </h2>
                     <p className="mt-2 max-w-[300px] mx-auto text-[13px] text-white/45 leading-relaxed">
-                      Join our exclusive First Creators list. Secure your spot to shape the future of collaborative family gifting and unlock launch rewards.
+                      Be one of our first families. We&apos;ll invite you in as soon as your spot opens up — and you&apos;ll help shape how Kindled works.
                     </p>
                   </div>
 
