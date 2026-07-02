@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useCallback, useRef, type MouseEvent } from "react";
+import { useState, useCallback, useRef, type MouseEvent, useEffect } from "react";
+import { Ignition } from "@/components/RevealExperience";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Star, Repeat, Plus, Minus, Check, Lock, Unlock,
-  ScrollText, Trophy, ChevronUp, ChevronDown, ListChecks, X,
+  ScrollText, Trophy, ChevronUp, ChevronDown, ListChecks, X, Flame,
 } from "lucide-react";
 import {
   STAR_COUNT, calculateStarValue, createChart, setGoalValue, awardBehavior,
@@ -58,8 +59,26 @@ export function StarChart({
   const popTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { bloom, trigger } = useBloom();
 
+  const [milestoneLine, setMilestoneLine] = useState<string | null>(null);
+  const lastMilestone = useRef(0);
   const starValue = calculateStarValue(chart.goalValue);
   const unlocked = isGoalUnlocked(chart);
+  // v11 WS-4: milestone beats at 25/50/75% — one warm line, never a modal.
+  useEffect(() => {
+    const pctNow = Math.floor((chart.starsFilled / STAR_COUNT) * 4) * 25;
+    if (pctNow > lastMilestone.current && pctNow < 100) {
+      lastMilestone.current = pctNow;
+      if (pctNow >= 25) {
+        setMilestoneLine(
+          pctNow === 25 ? "A quarter of the sky lit — brilliant start!" :
+          pctNow === 50 ? "Halfway there — the constellation is really taking shape." :
+          "Three quarters! The big one is getting close.");
+        const t = setTimeout(() => setMilestoneLine(null), 3000);
+        return () => clearTimeout(t);
+      }
+    }
+    return undefined;
+  }, [chart.starsFilled]);
   const progress = chart.starsFilled / STAR_COUNT;
   const now = Date.now();
 
@@ -158,11 +177,26 @@ export function StarChart({
                   ? <Star className="h-3.5 w-3.5 fill-white text-white" />
                   : isNext ? <span className="h-1.5 w-1.5 rounded-full bg-[#f59e0b]" />
                   : <span className="h-1.5 w-1.5 rounded-full bg-[#0f172a]/15" />}
+                {/* v11 WS-4: the felt-tip ring — a child's biro loop around a freshly earned star */}
+                {pop && (
+                  <svg viewBox="0 0 100 60" className="pointer-events-none absolute -inset-2" aria-hidden="true">
+                    <path d="M50 4 C82 2 97 14 96 30 C95 48 74 57 48 56 C22 55 4 46 4 30 C4 13 24 6 54 5"
+                      fill="none" stroke="#ff6b6b" strokeWidth="6" strokeLinecap="round" pathLength={1} className="animate-felt-draw" />
+                  </svg>
+                )}
               </motion.button>
             );
           })}
         </div>
       </div>
+
+      {/* v11 WS-4: milestone beat line */}
+      {milestoneLine && (
+        <motion.p initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+          className="relative z-[1] mt-1 flex items-center justify-center gap-1.5 px-6 text-center text-[13px] font-bold text-amber-700">
+          <Flame className="h-3.5 w-3.5 shrink-0" aria-hidden /> {milestoneLine}
+        </motion.p>
+      )}
 
       {/* ── Floating "Behaviours" trigger ── */}
       <div className="relative z-[1] mt-2 flex justify-center px-6">
@@ -280,6 +314,8 @@ export function StarChart({
         {celebrate && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[80] flex items-center justify-center bg-[#0f172a]/35 backdrop-blur-[2px] px-6" onClick={() => setCelebrate(false)}>
+            {/* v11 WS-4: mini-Ignition — the reveal's ember system, small */}
+            <Ignition intensity={0.5} className="pointer-events-none absolute inset-0 opacity-70" />
             {/* elegant golden shapes */}
             {Array.from({ length: 28 }, (_, i) => {
               const ang = (i / 28) * Math.PI * 2;
