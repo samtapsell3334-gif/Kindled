@@ -10,7 +10,8 @@
 
 export type ThemeName = "legacy" | "ember-teal";
 
-export const DEFAULT_THEME: ThemeName = "legacy";
+// v11 WS-10 (2026-07-02): Direction 2 goes live. Revert = change back to "legacy".
+export const DEFAULT_THEME: ThemeName = "ember-teal";
 
 const NIGHT: Record<ThemeName, { canvas: string; ink: string }> = {
   legacy: { canvas: "#0f172a", ink: "#FAF5EE" },

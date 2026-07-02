@@ -338,18 +338,6 @@ function Hero() {
 
           {/* Copy */}
           <div>
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/25 bg-amber-400/8 px-4 py-1.5"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-amber-300/90">
-                Where wishes catch light
-              </span>
-            </motion.div>
-
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
