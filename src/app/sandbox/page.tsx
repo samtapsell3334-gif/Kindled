@@ -260,7 +260,7 @@ function CreatePot() {
         </label>
 
         {items.length === 0 && (
-          <p className="rounded-xl bg-stone-100 px-3.5 py-2.5 text-[12px] text-stone-500">
+          <p className="rounded-xl bg-stone-100 px-3.5 py-2.5 text-[12px] text-stone-600">
             No items yet. Add at least one so contributors can see what they&apos;re funding — or carry on for a simple cash goal.
           </p>
         )}

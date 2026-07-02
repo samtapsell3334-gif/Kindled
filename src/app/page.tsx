@@ -1035,7 +1035,7 @@ function Testimonials() {
                 aria-hidden={i >= SCENARIOS.length}
                 className="w-[300px] shrink-0 rounded-2xl border border-stone-200 bg-white p-6 shadow-sm"
               >
-                <p className="mb-4 inline-block rounded-full bg-stone-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-stone-400">
+                <p className="mb-4 inline-block rounded-full bg-stone-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-stone-600">
                   Illustrative
                 </p>
                 <blockquote className="text-[13px] leading-relaxed text-stone-600 mb-5">&ldquo;{t.quote}&rdquo;</blockquote>
@@ -1276,7 +1276,7 @@ function Footer() {
           {(["How it works|#how", "Watch the film|/film", "Live demo|/wishes/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
-              <Link key={l} href={h!} className="text-[13px] text-stone-400 hover:text-stone-700 transition-colors">
+              <Link key={l} href={h!} className="text-[13px] text-stone-500 hover:text-stone-700 transition-colors">
                 {l}
               </Link>
             );
