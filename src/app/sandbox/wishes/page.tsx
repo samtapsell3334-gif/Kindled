@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Gift, Sparkles, ArrowRight, Plus } from "lucide-react";
 import { DemoBanner } from "@/components/DemoBanner";
+import { ExampleWishes } from "@/components/sandbox/ExampleWishes";
 import { Logo } from "@/components/Logo";
 import { WaitlistForm } from "@/components/WaitlistForm";
 
@@ -53,6 +54,7 @@ export default function MyPotsPage() {
           <div className="mt-8 rounded-2xl border border-dashed border-stone-300 p-8 text-center">
             <p className="text-[14px] text-stone-500">No wishes yet.</p>
             <Link href="/sandbox" className="mt-3 inline-block rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-[14px] font-bold text-stone-900">Start your first wish</Link>
+            <div className="mt-6 text-left"><ExampleWishes /></div>
           </div>
         ) : (
           <div className="mt-5 space-y-3">

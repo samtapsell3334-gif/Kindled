@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Check, Copy, Share2, Plus, X, Star, Lock } from "lucide-react";
 import { LogoMark } from "@/components/Logo";
 import { DemoBanner } from "@/components/DemoBanner";
+import { ExampleWishes } from "@/components/sandbox/ExampleWishes";
 
 interface DraftItem { name: string; price: number; category: string; retailer: string }
 
@@ -244,8 +245,9 @@ function CreatePot() {
 
         <label className="block">
           <span className="text-[12px] font-semibold text-stone-600">Your name</span>
-          <input value={organiserName} onChange={(e) => setOrganiserName(e.target.value)} placeholder="So contributors know who's organising"
+          <input value={organiserName} onChange={(e) => setOrganiserName(e.target.value)} placeholder="e.g. Sarah"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
+          <span className="mt-1 block text-[11px] text-stone-400">Shown on the wish page, so contributors know who&apos;s organising.</span>
         </label>
 
         <label className="block">
@@ -257,6 +259,11 @@ function CreatePot() {
           </span>
         </label>
 
+        {items.length === 0 && (
+          <p className="rounded-xl bg-stone-100 px-3.5 py-2.5 text-[12px] text-stone-500">
+            No items yet. Add at least one so contributors can see what they&apos;re funding — or carry on for a simple cash goal.
+          </p>
+        )}
         {error && <p role="alert" className="text-[13px] font-medium text-rose-600">{error}</p>}
 
         <button onClick={() => { void submit(); }} disabled={busy}
@@ -264,6 +271,8 @@ function CreatePot() {
           {busy ? "Creating…" : "Create wish & get the link"}
         </button>
         <p className="text-center text-[11px] text-stone-400">Sandbox: simulated money only. No payments are processed.</p>
+
+        <ExampleWishes heading="Where your wish ends up" />
       </div>
     </main>
   );

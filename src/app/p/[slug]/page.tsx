@@ -16,8 +16,10 @@
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Check, Lock, Gift, Sparkles, X } from "lucide-react";
+import { Lock, Gift, Sparkles, X } from "lucide-react";
 import { LogoMark } from "@/components/Logo";
+import { MaterialisingGift } from "@/components/sandbox/MaterialisingGift";
+import { giftVisualFor } from "@/lib/sandbox/gift-visual";
 import { DemoBanner } from "@/components/DemoBanner";
 import { KindleRecord } from "@/components/KindleRecord";
 import { RevealExperience } from "@/components/RevealExperience";
@@ -93,7 +95,11 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         ref: slug,
       }),
     });
-    if (res.ok) { setStep("done"); void load(); }
+    if (res.ok) {
+      setStep("done");
+      if (typeof navigator !== "undefined") navigator.vibrate?.(10);
+      void load();
+    }
     setSubmitting(false);
   }
 
@@ -113,12 +119,20 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
   if (view.kind === "receiver_surprise") {
     return (
       <div className="min-h-screen bg-[#0f172a] text-[#fdf6e3]"><DemoBanner />
-        <main className="mx-auto max-w-md px-5 py-20 text-center">
-          <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/15"><Lock className="h-7 w-7 text-amber-400" /></span>
-          <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-5 text-[28px] font-bold">Something&apos;s being kept warm for you, {view.recipientName}</h1>
-          <p className="mt-3 text-[14px] text-[#fdf6e3]/60">
-            {view.activity === "quiet" ? "The embers are lit." : view.activity === "warming" ? "People are chipping in ✨" : "It's glowing in here ✨"}
-            {" "}Everything stays a surprise until {new Date(view.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.
+        <main className="mx-auto max-w-md px-5 py-16 text-center">
+          <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold">Something&apos;s being kept warm for you, {view.recipientName}</h1>
+          {/* WS-2.3: the big-day teaser — anticipation without information */}
+          <div className="mx-auto mt-6 max-w-[260px] rounded-3xl border border-amber-400/20 bg-white/[0.04] px-6 pb-5 pt-6">
+            <MaterialisingGift visual={giftVisualFor(view)} size={140} className="mx-auto" />
+            <p className="mt-2 flex items-center justify-center gap-1.5 text-[12px] font-bold uppercase tracking-widest text-amber-300">
+              <Lock className="h-3.5 w-3.5" /> Sealed
+            </p>
+            <p className="mt-1 text-[13px] text-[#fdf6e3]/70">
+              Revealed on {new Date(view.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}
+            </p>
+          </div>
+          <p className="mt-5 text-[14px] text-[#fdf6e3]/60">
+            {view.activity === "quiet" ? "The embers are lit." : view.activity === "warming" ? "People are chipping in." : "It's glowing in here."}
           </p>
           <p className="mt-8 text-[11px] text-[#fdf6e3]/30">Hidden from you, because it&apos;s a surprise. That&apos;s the whole point.</p>
         </main>
@@ -135,17 +149,27 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
       <main className="mx-auto max-w-md px-5 py-8 pb-24">
         <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600">{view.occasion} · {new Date(view.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</p>
         <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-1 text-[28px] font-bold leading-tight">{view.title}</h1>
+        {/* Provenance (crit A1): who made this, for whom */}
+        <p className="mt-1.5 text-[13px] text-stone-500">Created by {view.organiserName} · for {view.recipientName}&apos;s {view.occasion.toLowerCase()}</p>
 
-        {/* Progress */}
+        {/* Progress — the gift materialises as funding rises (WS-2.1) */}
         <div className="mt-4 rounded-2xl border border-stone-200 bg-white p-4">
-          <div className="flex items-baseline justify-between">
-            <p className="text-[24px] font-bold">£{view.raised}<span className="text-[13px] font-medium text-stone-400"> of £{view.goal}</span></p>
-            <p className="text-[13px] font-bold text-amber-600">{pct}%</p>
-          </div>
-          <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-stone-100">
-            <div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700" style={{ width: `${pct}%` }} />
+          <div className="flex items-center gap-4">
+            <MaterialisingGift visual={giftVisualFor(view)} size={84} className="shrink-0" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-baseline justify-between">
+                <p className="text-[24px] font-bold">£{view.raised}<span className="text-[13px] font-medium text-stone-400"> of £{view.goal}</span></p>
+                <p className="text-[13px] font-bold text-amber-600">{pct}%</p>
+              </div>
+              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-stone-100">
+                <div className={`h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700 ${pct > 0 && pct < 100 ? "animate-mg-breathe" : ""}`} style={{ width: `${pct}%` }} />
+              </div>
+            </div>
           </div>
           <p className="mt-2 text-[12px] text-stone-500">{view.contributors.length} contributor{view.contributors.length === 1 ? "" : "s"} · {view.messageCount} message{view.messageCount === 1 ? "" : "s"} sealed for the big day</p>
+          {/* WS-3: milestone beats — one line, never a modal */}
+          {view.status === "open" && pct >= 90 && pct < 100 && <p className="mt-1.5 text-[12px] font-semibold text-amber-700">Almost there. One more chip-in could finish it.</p>}
+          {view.status === "open" && pct >= 50 && pct < 90 && <p className="mt-1.5 text-[12px] font-semibold text-amber-700">Past halfway. {view.recipientName}&apos;s gift is taking shape.</p>}
         </div>
 
         {/* List */}
@@ -158,12 +182,21 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
           ))}
         </div>
 
-        {/* Revealed: anyone can watch the reveal (messages are unsealed) */}
+        {/* Granted (WS-2.5): a completed wish is the product's proof */}
         {view.status !== "open" && (
-          <button onClick={() => setShowReveal(true)}
-            className="mt-4 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
-            <Sparkles className="mr-1.5 inline h-4 w-4" />Watch the reveal
-          </button>
+          <section aria-label="Wish granted" className="mt-4 rounded-3xl bg-[#0f172a] p-6 text-center text-[#fdf6e3]">
+            <MaterialisingGift visual={{ mode: "complete" }} size={110} className="mx-auto" />
+            <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-amber-300">{view.status === "stacked" ? "Stacked forward" : "Granted"}</p>
+            <p className="mt-2 text-[15px] font-semibold">
+              {view.status === "stacked"
+                ? `Every pound carries on to ${view.recipientName}'s next occasion. Nothing raised is lost.`
+                : `${view.contributors.length} ${view.contributors.length === 1 ? "person" : "people"} made this happen for ${view.recipientName}.`}
+            </p>
+            <button onClick={() => setShowReveal(true)}
+              className="mt-4 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
+              <Sparkles className="mr-1.5 inline h-4 w-4" />Watch the reveal
+            </button>
+          </section>
         )}
 
         {/* Guest CTA */}
@@ -177,7 +210,8 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         {/* ── Contribute flow ── */}
         {step === "amount" && (
           <section aria-label="Choose amount" className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
-            <p className="text-[14px] font-bold">How much would you like to chip in?</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Step 1 of 3 · Your amount</p>
+            <p className="mt-1 text-[14px] font-bold">How much would you like to chip in?</p>
             <div className="mt-3 flex gap-2">
               {[5, 10, 20, 50].map((a) => (
                 <button key={a} onClick={() => setAmount(a)}
@@ -187,8 +221,15 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
             <input aria-label="Custom amount" type="number" min={1} max={500} value={amount}
               onChange={(e) => setAmount(Math.max(1, Math.min(500, Number(e.target.value) || 1)))}
               className="mt-2 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
-            <input aria-label="Your name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name (shown at the reveal)"
-              className="mt-2 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
+            {/* WS-2.2: the money becomes the thing, before they pay */}
+            {view.goal > 0 && (
+              <p className="mt-2 text-[12px] font-semibold text-amber-700">
+                £{amount} moves {view.recipientName}&apos;s gift {Math.min(100 - pct, Math.max(1, Math.round((amount / view.goal) * 100)))}% closer.
+              </p>
+            )}
+            <input aria-label="Your name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your name"
+              className="mt-3 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
+            <p className="mt-1 text-[11px] text-stone-400">So {view.recipientName} knows who this came from at the reveal.</p>
             <button onClick={() => { setStep("sheet"); beacon("sheet"); }}
               className="mt-4 w-full rounded-2xl bg-stone-900 py-3.5 text-[14px] font-bold text-white">Continue to payment</button>
           </section>
@@ -196,7 +237,8 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
 
         {step === "sheet" && (
           <section aria-label="Payment" className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
-            <div className="mb-3 flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Step 2 of 3 · Payment</p>
+            <div className="mb-3 mt-1 flex items-center justify-between">
               <p className="text-[14px] font-bold">Pay £{amount}</p>
               <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-700">Demo: no money moves</span>
             </div>
@@ -211,7 +253,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
                 <input readOnly value="12/29" aria-label="Expiry (demo)" className="flex-1 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-[14px] text-stone-500" />
                 <input readOnly value="123" aria-label="Security code (demo)" className="w-20 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-[14px] text-stone-500" />
               </div>
-              <p className="text-[11px] text-stone-400">Demo card, pre-filled so you never type a real card number. These fields are never sent anywhere. <Link href="/#money" className="underline">How the money works</Link></p>
+              <p className="text-[11px] text-stone-400">This demo card is never read or sent; your £{amount} goes straight into the wish. <Link href="/#money" className="underline">How the money works</Link></p>
             </div>
             <button onClick={() => setStep("message")}
               className="mt-3 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">Pay £{amount} (simulated)</button>
@@ -220,7 +262,8 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
 
         {step === "message" && (
           <section aria-label="Add a message" className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
-            <p className="text-[14px] font-bold">Add a message they&apos;ll see on the big day</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Step 3 of 3 · Your message</p>
+            <p className="mt-1 text-[14px] font-bold">Add a message they&apos;ll see on the big day</p>
             <p className="mt-1 text-[12px] text-stone-500">{view.recipientName} will see this at the reveal, not before.</p>
             <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} maxLength={500}
               placeholder="Write something they'll treasure…" className="mt-3 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
@@ -245,8 +288,19 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
 
         {step === "done" && (
           <section aria-label="Thank you" className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-center">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500"><Check className="h-6 w-6 text-white" strokeWidth={3} /></span>
-            <p className="mt-3 text-[16px] font-bold">You just made {view.recipientName}&apos;s big day bigger.</p>
+            {/* WS-3: coins-to-embers — the contribution lands in the gift (600ms, reduced-motion safe) */}
+            <div className="relative mx-auto w-fit">
+              <MaterialisingGift visual={giftVisualFor(view)} size={96} />
+              {[[-26, -30], [0, -40], [26, -30], [-14, -38], [14, -38], [0, -26]].map(([x, y], i) => (
+                <span key={i} aria-hidden className="animate-mg-ember-pop absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-orange-500"
+                  style={{ "--ember-x": `${x}px`, "--ember-y": `${y}px`, animationDelay: `${i * 60}ms` } as React.CSSProperties} />
+              ))}
+            </div>
+            <p className="mt-2 text-[16px] font-bold">
+              {view.goal > 0
+                ? <>You just lit up {Math.max(1, Math.round((amount / view.goal) * 100))}% of {view.recipientName}&apos;s gift.</>
+                : <>You just made {view.recipientName}&apos;s big day bigger.</>}
+            </p>
             <p className="mt-1 text-[13px] text-stone-600">They&apos;ll see your message when it&apos;s revealed on {new Date(view.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</p>
 
             {/* WS-D: the conversion moment — after the dopamine, never before */}
