@@ -9,8 +9,8 @@ Format: `[start–end] SCENE | ON-SCREEN TEXT | VO line`
 ---
 
 [00–08] **Cold open — the Ignition signature.** Match-spark, embers rise, warm bloom.
-ON-SCREEN: "Britain wastes £3.2 billion a year on unwanted gifts." *(Source: OnePoll/Halifax, 2023)*
-VO: "Britain wastes three point two billion pounds a year on gifts nobody wanted."
+ON-SCREEN: "Britain wastes £1.27 billion every Christmas on unwanted gifts." *(Source: Finder UK research, 2025)*
+VO: "Britain wastes one point two seven billion pounds every Christmas on gifts nobody wanted."
 
 [08–20] **The product in one breath.** A pot fills as contributor chips land; a sealed
 flame; a face lighting up (illustrated in brand style, not stock).

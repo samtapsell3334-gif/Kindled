@@ -72,6 +72,15 @@ export default function PrivacyPage() {
       </P>
       <Todo>List all sub-processors (hosting, email, payments, analytics) and the safeguards for any transfers outside the UK.</Todo>
 
+      <H2>Video and voice messages</H2>
+      <P>
+        Messages recorded for a reveal are stored privately (never publicly listable) and exist to be
+        seen once, by the recipient, at the reveal. Draft retention policy: sandbox recordings are
+        deleted whenever the sandbox resets; in the live product we plan to delete reveal media 90
+        days after the reveal date, and you can ask us to delete yours at any time.
+      </P>
+      <Todo>Legal to confirm the 90-day retention window and the moderation process before launch.</Todo>
+
       <H2>How long we keep it</H2>
       <P>We keep personal data only as long as needed for the purposes above and to meet legal/financial-record requirements.</P>
       <Todo>Set concrete retention periods per data category.</Todo>

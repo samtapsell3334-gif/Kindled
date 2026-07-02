@@ -13,12 +13,20 @@
       refund policy — /terms "How money works" must match reality precisely.
 
 ## Claims & figures
-- [ ] Verify survey citations used site-wide: YouGov UK Gift Buying Survey 2023 (1 in 5
-      duplicates), OnePoll/Halifax 2023 (£3.2bn, 1 in 4 unused). Replace if unverifiable.
+- [x] Citations VERIFIED & CORRECTED (2026-07-02): the £3.2bn "OnePoll/Halifax" and
+      1-in-5 "YouGov" figures could not be verified by web search — replaced site-wide
+      (homepage, demo, investor page, pitch, film) with Finder UK research, 2025:
+      £1.27bn unwanted-gift spend each Christmas · 3 in 5 Brits (58%) · £41/person.
 - [ ] **Gift card commission rates** (P1.2): rates and retailer terms unconfirmed — investor
       page states the mechanism only, no rates.
-- [ ] Mintel UK Gift Purchasing Journey Report 2025 is cited qualitatively (overspend
-      pressure). Confirm access/licence to cite it publicly.
+- [x] Use-of-funds split: expert decision (delegated 2026-07-02) — Build 60% · Growth 25% ·
+      Compliance & ops 15%, shown as "planned allocation" in the investor film. Override any time.
+- [x] Video retention: draft policy added to /privacy (sandbox: deleted on reset; live plan:
+      90 days post-reveal + delete-on-request) — legal to confirm.
+- [ ] Postgres: provisioning attempt was blocked (billable marketplace transaction needs your
+      explicit approval). Two clicks in Vercel → Storage → Postgres/Neon, then I wire it.
+- [x] Mintel: report-name claim softened to "Mintel's UK gift-buying research" (Mintel's
+      UK gift-buying reports verified to exist via Mintel Store); licence check remains yours.
 - [ ] Waitlist count: only show a number when a real one exists.
 
 ## Product / infra
@@ -31,7 +39,8 @@
       replaceable with photographic art direction later.
 - [ ] "Would you rather?" interactive: labelled roadmap on the investor page; build the
       public-demo teaser when design capacity allows.
-- [ ] Contact email for /contact and prize-draw free-entry route.
+- [x] Contact email: decision taken — sam.tapsell@kindledgift.co.uk (already the repo's
+      configured founder address) now live on /contact. Free-entry route uses the same.
 
 ## Deferred build items (scoped, not guessed — see PLAN.md)
 - [ ] P3.1 Kids' Catalogue "circle it" mode (felt-tip SVG animation, parent approval queue,

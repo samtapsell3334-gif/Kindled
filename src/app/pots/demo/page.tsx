@@ -2003,9 +2003,9 @@ function AboutPage({ onWatch }: { onWatch: () => void }) {
   // Same sourced figures used on the homepage — one number, one wording site-wide.
   // TODO(founder): verify these survey citations before launch.
   const PROBLEMS = [
-    { Icon: Copy, title: "The Duplicate Disaster", stat: "1 in 5", body: "physical gifts is a duplicate — bought twice because nobody coordinated.", source: "YouGov UK Gift Buying Survey, 2023" },
-    { Icon: AlertCircle, title: "The Waste", stat: "£3.2bn", body: "spent on unwanted UK gifts every year — returned, regifted, or thrown away.", source: "OnePoll / Halifax survey, 2023" },
-    { Icon: CreditCard, title: "The Squeeze", stat: "1 in 4", body: "gifts end up unused or returned entirely — effort and money wasted on both sides.", source: "OnePoll / Halifax survey, 2023" },
+    { Icon: Copy, title: "The Missed Mark", stat: "3 in 5", body: "Brits have received an unwanted gift — around 31 million of us.", source: "Finder UK unwanted-gifts research, 2025" },
+    { Icon: AlertCircle, title: "The Waste", stat: "£1.27bn", body: "spent on unwanted gifts every Christmas — returned, regifted, or drawer-bound.", source: "Finder UK unwanted-gifts research, 2025" },
+    { Icon: CreditCard, title: "The Squeeze", stat: "£41", body: "wasted per person on gifts that missed the mark — effort and money on both sides.", source: "Finder UK unwanted-gifts research, 2025" },
   ];
 
   const STEPS = [
@@ -3537,14 +3537,14 @@ function ReceiverProofStats() {
       Icon: ShieldCheck,
       value: 100, suffix: "%",
       label: "Duplicate Free",
-      desc: "1 in 5 physical gifts are duplicates. Our real-time checklists eliminate duplicate buying entirely.",
+      desc: "3 in 5 Brits have received a gift that missed. Our real-time checklists eliminate duplicates entirely.",
       color: "text-amber-500", bg: "bg-amber-50", border: "border-amber-200/60",
     },
     {
       Icon: Landmark,
       value: 3, suffix: ".2B",
       label: "Wasted Annually",
-      desc: "Around £3.2bn is wasted on unwanted gifts every year in the UK. Kindled helps families redirect their share of that into goals that actually matter.",
+      desc: "Around £1.27bn is spent on unwanted gifts every UK Christmas. Kindled helps families redirect their share of that into goals that actually matter.",
       color: "text-violet-500", bg: "bg-violet-50", border: "border-violet-200/60",
     },
   ];

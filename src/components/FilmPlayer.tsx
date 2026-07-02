@@ -118,9 +118,9 @@ function Visual({ scene, animate }: { scene: FilmScene; animate: boolean }) {
   if (v === "bars") {
     return (
       <div className="w-full space-y-2.5 px-10">
-        {[["Build", 55], ["Growth", 30], ["Compliance & ops", 15]].map(([label, pct], i) => (
+        {[["Build", 60], ["Growth", 25], ["Compliance & ops", 15]].map(([label, pct], i) => (
           <div key={String(label)}>
-            <p className="mb-1 text-[11px] font-semibold text-white/70">{label} <span className="text-white/40">(placeholder split — founder to confirm)</span></p>
+            <p className="mb-1 text-[11px] font-semibold text-white/70">{label} <span className="text-white/40">(planned allocation)</span></p>
             <div className="h-2 rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500" style={{ width: animate ? undefined : `${pct}%`, ...(animate ? { animation: `film-fill 1s ${i * 0.3}s both`, maxWidth: `${pct}%` } : {}) }} /></div>
           </div>
         ))}

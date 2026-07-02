@@ -18,10 +18,11 @@ export default function ContactPage() {
         For anything at all — support, questions, press, or partnerships — email us and we&apos;ll get back to you as soon
         as we can.
       </P>
-      <Todo>
-        Confirm the public contact email(s) and expected response time, and the registered company name and address for
-        the footer and legal pages.
-      </Todo>
+      <P>
+        Email <a href="mailto:sam.tapsell@kindledgift.co.uk" className="font-semibold text-stone-800 underline underline-offset-2">sam.tapsell@kindledgift.co.uk</a>{" "}
+        — it goes straight to the founder. We aim to reply within two working days.
+      </P>
+      <Todo>Confirm the registered company name and address for the footer and legal pages.</Todo>
 
       <H2>Privacy &amp; data requests</H2>
       <P>

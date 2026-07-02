@@ -619,7 +619,7 @@ function Problem() {
             style={{ fontFamily: "var(--font-display)" }}
             className="text-[38px] md:text-[52px] font-bold text-stone-900 leading-[1.1]"
           >
-            £3.2 billion wasted every year
+            £1.27 billion wasted every Christmas
             <br />
             <span className="text-stone-400">on gifts nobody wanted.</span>
           </h2>
@@ -632,31 +632,31 @@ function Problem() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {[
             {
-              stat: "1 in 5",
-              label: "physical gifts is a duplicate",
-              desc: "Someone already bought the same thing — and nobody knows until it's too late.",
+              stat: "3 in 5",
+              label: "Brits have received an unwanted gift",
+              desc: "58% of us — around 31 million adults — have unwrapped something that missed the mark.",
               color: "text-rose-600",
               bg: "bg-rose-50",
               border: "border-rose-100",
-              source: "YouGov UK Gift Buying Survey, 2023",
+              source: "Finder UK unwanted-gifts research, 2025",
             },
             {
-              stat: "£3.2bn",
-              label: "spent on unwanted UK gifts each year",
-              desc: "That's money families spent on things immediately returned, regifted, or thrown away.",
+              stat: "£1.27bn",
+              label: "spent on unwanted gifts every Christmas",
+              desc: "That's money families spent on things returned, regifted, or shoved in a drawer.",
               color: "text-amber-600",
               bg: "bg-amber-50",
               border: "border-amber-100",
-              source: "OnePoll / Halifax survey, 2023",
+              source: "Finder UK unwanted-gifts research, 2025",
             },
             {
-              stat: "1 in 4",
-              label: "gifts end up unused, regifted, or returned",
-              desc: "Money and effort wasted on both sides — because nobody coordinated.",
+              stat: "£41",
+              label: "wasted per person on gifts that missed",
+              desc: "The average value of unwanted gifts each of us receives — because nobody coordinated.",
               color: "text-orange-600",
               bg: "bg-orange-50",
               border: "border-orange-100",
-              source: "OnePoll / Halifax survey, 2023",
+              source: "Finder UK unwanted-gifts research, 2025",
             },
           ].map((item, i) => (
             <Reveal key={item.stat} delay={i * 0.12}>
@@ -676,7 +676,7 @@ function Problem() {
             And not knowing what to buy is how overspending happens — Mintel found the pressure to get
             the right gift pushes people past what they meant to spend.
           </p>
-          <p className="mt-2 text-[11px] italic text-stone-400">Source: Mintel, UK Gift Purchasing Journey Report 2025</p>
+          <p className="mt-2 text-[11px] italic text-stone-400">Source: Mintel UK gift-buying research</p>
         </Reveal>
       </div>
     </section>

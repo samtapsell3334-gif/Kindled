@@ -18,8 +18,8 @@
   "traction": {
     "items": [
       {
-        "figure": "£3.2B",
-        "label": "UK unwanted-gift spend, every year",
+        "figure": "£1.27bn",
+        "label": "UK unwanted-gift spend, every Christmas (Finder, 2025)",
         "source": "Halifax/OnePoll 2023"
       },
       {
@@ -44,9 +44,9 @@
     "subheadline": "Billions are spent on gifts nobody wanted, by people who felt obliged to guess.",
     "stats": [
       {
-        "figure": "£3.2B",
-        "caption": "spent on unwanted gifts in the UK each year",
-        "source": "Halifax/OnePoll 2023"
+        "figure": "£1.27bn",
+        "caption": "spent on unwanted gifts every UK Christmas",
+        "source": "Finder UK research, 2025"
       },
       {
         "figure": "78%",
@@ -484,11 +484,11 @@
   },
   "pitch": {
     "label": "The 20-second version",
-    "text": "Britain wastes £3.2 billion a year on unwanted gifts. Kindled is the group-gifting platform where friends and family pool into meaningful goals — kept secret, then revealed together on the big day. We land with parents and kids' gift lists, the most habitual gifting occasion there is, where every contributor experiences the product just by chipping in. From there we expand into the household's biggest goals. Revenue starts on day one with gift card commissions and scales into retail media built on first-party gifting intent. We're raising £250,000 pre-seed.",
+    "text": "Britain wastes £1.27 billion every Christmas on unwanted gifts. Kindled is the group-gifting platform where friends and family pool into meaningful goals — kept secret, then revealed together on the big day. We land with parents and kids' gift lists, the most habitual gifting occasion there is, where every contributor experiences the product just by chipping in. From there we expand into the household's biggest goals. Revenue starts on day one with gift card commissions and scales into retail media built on first-party gifting intent. We're raising £250,000 pre-seed.",
     "structure": [
       {
         "k": "Problem",
-        "v": "£3.2bn wasted a year — group gifting is uncoordinated"
+        "v": "£1.27bn wasted every Christmas — group gifting is uncoordinated"
       },
       {
         "k": "Solution",
@@ -580,7 +580,7 @@
         "current": "Guess-buying",
         "new": "Wishlist-led gifting",
         "lever": "Receiver-curated lists with real-time claim locking",
-        "sticks": "Removes the anxiety that drives overspend — Mintel's UK Gift Purchasing Journey Report 2025 found the pressure to get the right gift pushes people past what they meant to spend"
+        "sticks": "Removes the anxiety that drives overspend — Mintel's UK gift-buying research finds the pressure to get the right gift pushes people past what they meant to spend"
       },
       {
         "current": "Single-event gifts",
@@ -603,9 +603,9 @@
       {
         "dur": 8,
         "visual": "ignition",
-        "headline": "Britain wastes £3.2 billion a year on unwanted gifts.",
-        "caption": "£3.2bn a year on gifts nobody wanted.",
-        "note": "Source: OnePoll / Halifax, 2023"
+        "headline": "Britain wastes £1.27 billion every Christmas on unwanted gifts.",
+        "caption": "£1.27bn every Christmas on gifts nobody wanted.",
+        "note": "Source: Finder UK research, 2025"
       },
       {
         "dur": 12,
@@ -642,7 +642,7 @@
         "visual": "bars",
         "headline": "Raising £250,000 pre-seed.",
         "caption": "To build the loop, prove the wedge, and start the flywheel turning.",
-        "note": "Use-of-funds split is a placeholder — founder to confirm"
+        "note": "Planned allocation — Build 60% · Growth 25% · Compliance & ops 15%"
       },
       {
         "dur": 5,
