@@ -256,7 +256,7 @@ export function StarChart({
                 {/* Audit log */}
                 <p className="mb-2 mt-6 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-[#0f172a]/40"><ScrollText className="h-3.5 w-3.5" /> Star history</p>
                 {chart.auditLog.length === 0 ? (
-                  <p className="text-[12px] text-[#0f172a]/40">No stars lit yet — every one is logged here.</p>
+                  <p className="text-[12px] text-[#0f172a]/40">No stars lit yet. Every one is logged here.</p>
                 ) : (
                   <ul className="space-y-1.5">
                     {chart.auditLog.map((a) => (
@@ -302,7 +302,7 @@ export function StarChart({
               className="relative w-full max-w-xs overflow-hidden rounded-[28px] bg-[#fffdf7] p-8 text-center vh-lift-lg">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#ffb800]"><Trophy className="h-8 w-8 text-white" /></div>
               <p className="font-editorial mt-4 text-[26px] font-semibold text-[#0f172a]">Quest complete!</p>
-              <p className="mt-2 text-[13px] leading-relaxed text-[#0f172a]/60">All 30 stars lit — {goalLabel} is fully funded at <span className="font-bold text-[#f59e0b]">{GBP(chart.potValue)}</span>.</p>
+              <p className="mt-2 text-[13px] leading-relaxed text-[#0f172a]/60">All 30 stars lit! {goalLabel} is fully funded at <span className="font-bold text-[#f59e0b]">{GBP(chart.potValue)}</span>.</p>
               <button onClick={() => setCelebrate(false)} className="mt-6 w-full rounded-2xl bg-[#ff6b6b] py-3.5 text-[14px] font-bold text-white vh-lift">Wonderful</button>
             </motion.div>
           </motion.div>

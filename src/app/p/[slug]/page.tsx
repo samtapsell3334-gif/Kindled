@@ -120,7 +120,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
             {view.activity === "quiet" ? "The embers are lit." : view.activity === "warming" ? "People are chipping in ✨" : "It's glowing in here ✨"}
             {" "}Everything stays a surprise until {new Date(view.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.
           </p>
-          <p className="mt-8 text-[11px] text-[#fdf6e3]/30">Hidden from you — it&apos;s a surprise. That&apos;s the whole point.</p>
+          <p className="mt-8 text-[11px] text-[#fdf6e3]/30">Hidden from you, because it&apos;s a surprise. That&apos;s the whole point.</p>
         </main>
       </div>
     );
@@ -198,7 +198,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
           <section aria-label="Payment" className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-[14px] font-bold">Pay £{amount}</p>
-              <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-700">Demo — no money moves</span>
+              <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-700">Demo: no money moves</span>
             </div>
             {/* Fake Apple Pay (guardrail 1: never the real wallet API) */}
             <button onClick={() => setStep("message")}
@@ -211,7 +211,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
                 <input readOnly value="12/29" aria-label="Expiry (demo)" className="flex-1 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-[14px] text-stone-500" />
                 <input readOnly value="123" aria-label="Security code (demo)" className="w-20 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-[14px] text-stone-500" />
               </div>
-              <p className="text-[11px] text-stone-400">Demo card — pre-filled so you never type a real card number. These fields are never sent anywhere. <Link href="/#money" className="underline">How the money works</Link></p>
+              <p className="text-[11px] text-stone-400">Demo card, pre-filled so you never type a real card number. These fields are never sent anywhere. <Link href="/#money" className="underline">How the money works</Link></p>
             </div>
             <button onClick={() => setStep("message")}
               className="mt-3 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">Pay £{amount} (simulated)</button>
@@ -221,7 +221,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         {step === "message" && (
           <section aria-label="Add a message" className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
             <p className="text-[14px] font-bold">Add a message they&apos;ll see on the big day</p>
-            <p className="mt-1 text-[12px] text-stone-500">{view.recipientName} will see this at the reveal — not before.</p>
+            <p className="mt-1 text-[12px] text-stone-500">{view.recipientName} will see this at the reveal, not before.</p>
             <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} maxLength={500}
               placeholder="Write something they'll treasure…" className="mt-3 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
             {videoRef ? (
@@ -233,7 +233,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
             ) : (
               <div className="mt-2">
                 <button onClick={() => setRecording(true)} className="w-full rounded-xl border border-stone-300 py-2.5 text-[13px] font-bold text-stone-700">Record a video instead</button>
-                <p className="mt-1 text-[11px] text-stone-400">Your phone will ask for camera access — only {view.recipientName} sees the video, at the reveal. Delete or re-record any time.</p>
+                <p className="mt-1 text-[11px] text-stone-400">Your phone will ask for camera access. Only {view.recipientName} sees the video, at the reveal. Delete or re-record any time.</p>
               </div>
             )}
             <button onClick={() => { void submitContribution(); }} disabled={submitting}
@@ -266,7 +266,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
               )}
             </div>
             <Link href={`/sandbox?ref=${slug}`} className="mt-3 inline-block text-[13px] font-semibold text-stone-600 underline underline-offset-2">
-              Never do the awkward money-collection text again — start your own wish
+              Never send the awkward money-collection text again. Start your own wish
             </Link>
           </section>
         )}
@@ -277,7 +277,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
             <p className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-wider text-stone-500"><Lock className="h-3.5 w-3.5" /> Organiser · {view.organiserName}</p>
             <div className="mt-3 space-y-1 text-[13px] text-stone-600">
               {view.contributors.map((c, i) => <p key={i}>{c.displayName} chipped in £{c.amount}</p>)}
-              {view.contributors.length === 0 && <p className="text-stone-400">No contributions yet — share the link!</p>}
+              {view.contributors.length === 0 && <p className="text-stone-400">No contributions yet. Share the link!</p>}
             </div>
             <Link href={`/p/${slug}?view=receiver`} className="mt-3 inline-block text-[12px] text-stone-500 underline underline-offset-2">
               Preview what {view.recipientName} sees (surprise-safe)
@@ -289,7 +289,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
                   className="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
                   <Gift className="mr-1.5 inline h-4 w-4" />Simulate reveal day
                 </button>
-                <p className="mt-2 text-[11px] text-stone-400">Runs the full reveal experience — you choose the outcome at the end.</p>
+                <p className="mt-2 text-[11px] text-stone-400">Runs the full reveal experience, and you choose the outcome at the end.</p>
               </div>
             ) : (
               <div className="mt-4 rounded-xl bg-emerald-50 p-3 text-[13px] text-emerald-800">

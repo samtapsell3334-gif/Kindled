@@ -267,7 +267,7 @@ function LandscapeSection() {
       <SectionHeadline>{l.headline}</SectionHeadline>
       <p className="mt-2 text-[12px] text-slate-500">
         Axes: <span className="text-slate-300">{l.axes.x}</span> × <span className="text-slate-300">{l.axes.y}</span>
-        {" "}— positions are capability readings, not market-share claims.
+        {" "}(positions are capability readings, not market-share claims).
       </p>
       <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         {l.alternatives.map((a, i) => (
@@ -601,7 +601,7 @@ function ValueTab() {
 
       {/* Revenue models */}
       <div>
-        <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Revenue — how it phases</p>
+        <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-slate-500">Revenue: how it phases</p>
         <div className="grid gap-4 md:grid-cols-3">
           {valueEngine.revenueModels.map((m, i) => {
             const Icon = [Tag, Database, Sparkles][i] ?? Tag;

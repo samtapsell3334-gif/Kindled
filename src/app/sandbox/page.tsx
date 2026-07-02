@@ -101,10 +101,10 @@ function CreatePot() {
       <main className="mx-auto max-w-md px-5 py-12 text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500"><Check className="h-7 w-7 text-white" strokeWidth={3} /></div>
         <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-4 text-[28px] font-bold text-stone-900">Your wish is live</h1>
-        <p className="mt-2 text-[14px] text-stone-500">Share the first link with the people who&apos;ll chip in. Keep the second link private — it&apos;s how you manage the wish and run the reveal.</p>
+        <p className="mt-2 text-[14px] text-stone-500">Share the first link with the people who&apos;ll chip in. Keep the second link private; it&apos;s how you manage the wish and run the reveal.</p>
 
         <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Your invite message — edit it, then send</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Your invite message (edit it, then send)</p>
           <textarea value={msg} onChange={(e) => setShareMsg(e.target.value)} rows={3} aria-label="Invite message"
             className="mt-2 w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-[13px] text-stone-700" />
           <div className="mt-2 flex flex-wrap gap-2">
@@ -179,26 +179,26 @@ function CreatePot() {
 
         <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
           <label className="flex items-center justify-between gap-3">
-            <span className="text-[13px] font-semibold text-stone-700">I&apos;m a parent or guardian — this wish is for my child</span>
+            <span className="text-[13px] font-semibold text-stone-700">I&apos;m a parent or guardian and this wish is for my child</span>
             <input type="checkbox" checked={isChildPot} onChange={(e) => { setIsChildPot(e.target.checked); if (!e.target.checked) setStarChart(false); }} className="h-5 w-5 accent-amber-500" />
           </label>
           {isChildPot && (
             <label className="mt-3 flex items-center justify-between gap-3 border-t border-stone-200 pt-3">
-              <span className="flex items-center gap-1.5 text-[13px] text-stone-600"><Star className="h-4 w-4 text-amber-500" /> Star chart — good behaviour earns towards the goal</span>
+              <span className="flex items-center gap-1.5 text-[13px] text-stone-600"><Star className="h-4 w-4 text-amber-500" /> Star chart: good behaviour earns towards the goal</span>
               <input type="checkbox" checked={starChart} onChange={(e) => setStarChart(e.target.checked)} className="h-5 w-5 accent-amber-500" />
             </label>
           )}
         </div>
 
         <label className="block">
-          <span className="text-[12px] font-semibold text-stone-600">Wish name <span className="font-normal text-stone-400">(auto-filled — edit if you like)</span></span>
+          <span className="text-[12px] font-semibold text-stone-600">Wish name <span className="font-normal text-stone-400">(auto-filled, edit if you like)</span></span>
           <input value={title} onChange={(e) => { setTitle(e.target.value); setTitleTouched(true); }} placeholder="e.g. Ava's 8th Birthday"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
         </label>
 
         <p className="pt-2 text-[11px] font-bold uppercase tracking-widest text-amber-600">3 · Build the list</p>
         <div>
-          <span className="text-[12px] font-semibold text-stone-600">Tap to add — prices and shops fill in automatically</span>
+          <span className="text-[12px] font-semibold text-stone-600">Tap to add, and prices and shops fill in automatically</span>
           <div className="mt-1.5 grid grid-cols-2 gap-2">
             {catalogue.map((c) => {
               const on = items.some((i) => i.name === c.name);
@@ -253,7 +253,7 @@ function CreatePot() {
           <input type="email" inputMode="email" autoComplete="email" value={organiserEmail} onChange={(e) => setOrganiserEmail(e.target.value)} placeholder="you@email.com"
             className="mt-1.5 w-full rounded-xl border border-stone-200 px-3.5 py-2.5 text-[14px]" />
           <span className="mt-1 block text-[11px] leading-snug text-stone-400">
-            We&apos;ll only use this to tell you when the real Kindled launches — nothing is sent in the sandbox. See our <Link href="/privacy" className="underline">Privacy Policy</Link>.
+            We&apos;ll only use this to tell you when the real Kindled launches. Nothing is sent in the sandbox. See our <Link href="/privacy" className="underline">Privacy Policy</Link>.
           </span>
         </label>
 

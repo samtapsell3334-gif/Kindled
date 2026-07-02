@@ -1,7 +1,7 @@
 {
   "meta": {
     "company": "Kindled",
-    "tagline": "A high-velocity, data-driven gifting network — built on viral mechanics and fintech-grade economics.",
+    "tagline": "A high-velocity, data-driven gifting network built on viral mechanics and fintech-grade economics.",
     "confidential": "Private & Confidential — Not for Distribution",
     "access": {
       "label": "Secure Access",
@@ -24,7 +24,7 @@
       },
       {
         "figure": "10M+",
-        "label": "UK Open Banking users — rails are mature",
+        "label": "UK Open Banking users. The rails are mature",
         "source": "Open Banking Ltd, 2023"
       },
       {
@@ -34,7 +34,7 @@
       },
       {
         "figure": "0.5%",
-        "label": "platform take on contributions — card-light",
+        "label": "platform take on contributions, card-light",
         "source": "Kindled"
       }
     ]
@@ -67,7 +67,7 @@
     "whyNow": [
       {
         "title": "Open Banking Is Mature",
-        "body": "Account-to-account payments are now fast, trusted, and a fraction of card cost. We are built on these rails from day one — a structural margin advantage over anyone still routing through Visa and Mastercard."
+        "body": "Account-to-account payments are now fast, trusted, and a fraction of card cost. We are built on these rails from day one, a structural margin advantage over anyone still routing through Visa and Mastercard."
       },
       {
         "title": "AI Unlocked a New Emotion",
@@ -93,7 +93,7 @@
         "id": "intent",
         "title": "Data-Driven Intent Revenue",
         "metric": "Captured at £0 marginal cost",
-        "body": "When someone adds a wishlist item, they declare exactly what they want to buy — category, brand, price point — before any money moves. It is the most valuable signal in commerce, and we capture it as a by-product of a delightful consumer experience."
+        "body": "When someone adds a wishlist item, they declare exactly what they want to buy (category, brand, price point) before any money moves. It is the most valuable signal in commerce, and we capture it as a by-product of a delightful consumer experience."
       },
       {
         "id": "overhead",
@@ -107,7 +107,7 @@
     "label": "joint wishes · Milestone Engine",
     "title": "From Clutter to Life-Milestones",
     "hook": "Stack your birthdays. Combine your Christmases. Accelerate your Expedition.",
-    "body": "Two people link accounts and every occasion stacks toward a categorised Major Goal. This moves users from buying clutter to funding life-milestones — and moves Kindled from a one-off utility to a multi-year relationship.",
+    "body": "Two people link accounts and every occasion stacks toward a categorised Major Goal. This moves users from buying clutter to funding life-milestones, and moves Kindled from a one-off utility to a multi-year relationship.",
     "stat": {
       "value": "+40%",
       "label": "conversion on high-ticket goals when two partners pool over 3 years"
@@ -129,7 +129,7 @@
         "pct": 100
       }
     ],
-    "caption": "Modelled: two partners, three occasions a year, category-weighted momentum. A solo wish never reaches the high-ticket goal — a joint wish does.",
+    "caption": "Modelled: two partners, three occasions a year, category-weighted momentum. A solo wish never reaches the high-ticket goal. A joint wish does.",
     "pillars": [
       {
         "title": "The 3-Year Compound Effect",
@@ -137,11 +137,11 @@
       },
       {
         "title": "3-Year Predictive Intent",
-        "body": "Categorised milestones give us multi-year forward intent. We don't just know a couple wants to spend — we know whether they're Foundation builders (Home & DIY) or Expedition seekers (Travel & Adventure), and roughly when they'll book. That forward window is worth a premium in retail data licensing."
+        "body": "Categorised milestones give us multi-year forward intent. We know more than the fact that a couple wants to spend: we know whether they're Foundation builders (Home & DIY) or Expedition seekers (Travel & Adventure), and roughly when they'll book. That forward window is worth a premium in retail data licensing."
       },
       {
         "title": "Multi-Year Lock-In",
-        "body": "A shared, years-long goal makes leaving costly and staying rewarding. joint wishes shift Kindled from a one-off gifting utility to a long-term relational tool — the retention engine behind durable lifetime value."
+        "body": "A shared, years-long goal makes leaving costly and staying rewarding. joint wishes shift Kindled from a one-off gifting utility to a long-term relational tool, which is where the retention engine behind durable lifetime value."
       }
     ],
     "categories": [
@@ -172,18 +172,18 @@
     "subheadline": "We make money while actively rewarding the user. That alignment is the moat.",
     "fairness": {
       "title": "Trust on Gifts, Lock-In on Rewards",
-      "body": "Cashing a wish's gift balance out to a bank is always free — no exit fee, no trap. That builds the one thing a money product cannot fake: trust. Earned cashback is treated differently, by design.",
-      "lockedLoop": "Gift money is freely withdrawable; earned cashback is not. The user's 3% lands as credit credited only to their own wishes — non-withdrawable, redeemable solely against partner gift cards. To spend it, a contributor has to become a host. So the reward itself acquires the next customer, and every redemption loops back into the catalogue as fresh GMV.",
+      "body": "Cashing a wish's gift balance out to a bank is always free. No exit fee, no trap. That builds the one thing a money product cannot fake: trust. Earned cashback is treated differently, by design.",
+      "lockedLoop": "Gift money is freely withdrawable; earned cashback is not. The user's 3% lands as credit credited only to their own wishes: non-withdrawable, redeemable solely against partner gift cards. To spend it, a contributor has to become a host. So the reward itself acquires the next customer, and every redemption loops back into the catalogue as fresh GMV.",
       "points": [
         "Gift balance → withdraw to bank: 100%, zero fee, builds trust.",
         "Earned cashback → credit: own wishes only, never cashable.",
-        "To spend cashback you start your own wish — acquisition, baked in.",
+        "To spend cashback you start your own wish. Acquisition, baked in.",
         "credit redeems into gift cards, recirculates, and compounds for both sides."
       ]
     },
     "cashbackMath": {
       "title": "The Cashback Math",
-      "intro": "A retailer pays an affiliate commission when a wish converts into a real purchase. We split it so the user is rewarded and the platform profits — but the user's share is credited as ringfenced credit, not withdrawable cash.",
+      "intro": "A retailer pays an affiliate commission when a wish converts into a real purchase. We split it so the user is rewarded and the platform profits, but the user's share is credited as ringfenced credit, not withdrawable cash.",
       "exampleLabel": "On a £100 partner purchase",
       "commission": {
         "label": "Retailer commission",
@@ -192,7 +192,7 @@
       },
       "split": [
         {
-          "label": "User credit — own wishes only",
+          "label": "User credit (own wishes only)",
           "value": "3%",
           "amount": "£3.00",
           "tone": "user"
@@ -206,16 +206,16 @@
       ],
       "compoundLoop": {
         "title": "Ringfenced & Compounding",
-        "body": "The 3% is never withdrawable. It lands as credit inside the user's own wishes — so to spend it, a contributor has to start their own wish. That's customer acquisition baked into the reward. And because credit only redeems back into wishes that convert to partner gift cards, every pound recirculates: it earns commission again, credits more credit, and compounds — GMV that can't leak out of the ecosystem."
+        "body": "The 3% is never withdrawable. It lands as credit inside the user's own wishes, so to spend it, a contributor has to start their own wish. That's customer acquisition baked into the reward. And because credit only redeems back into wishes that convert to partner gift cards, every pound recirculates: it earns commission again, credits more credit, and compounds — GMV that can't leak out of the ecosystem."
       },
-      "takeaway": "The user feels rewarded, the platform profits on the same transaction, and the reward itself recruits the next host and recirculates as GMV — value that compounds instead of cashing out."
+      "takeaway": "The user feels rewarded, the platform profits on the same transaction, and the reward itself recruits the next host and recirculates as GMV. Value that compounds instead of cashing out."
     },
     "revenueModels": [
       {
         "id": "giftCards",
         "title": "Gift Card Commissions",
         "tag": "Phase 1 · live from launch",
-        "body": "How it works: when a funded wish is redeemed as a retailer gift card, the retailer pays Kindled a commission on the load. Why now: it's immediate and margin-light — retailer-funded, no fee to the family, and it earns from the very first redeemed wish."
+        "body": "How it works: when a funded wish is redeemed as a retailer gift card, the retailer pays Kindled a commission on the load. Why now: it's immediate and margin-light, because retailer-funded, no fee to the family, and it earns from the very first redeemed wish."
       },
       {
         "id": "affiliate",
@@ -227,25 +227,25 @@
         "id": "retailMedia",
         "title": "Retail Media",
         "tag": "Phase 2",
-        "body": "How it works: retailers pay to reach high-intent gift buyers at the moment of decision, on-platform — built on first-party intent (wishlists, occasions, budgets) that Kindled owns. Why then: premium media pricing needs the Phase 1 foundation of declared demand at scale first."
+        "body": "How it works: retailers pay to reach high-intent gift buyers at the moment of decision, on-platform, built on first-party intent (wishlists, occasions, budgets) that Kindled owns. Why then: premium media pricing needs the Phase 1 foundation of declared demand at scale first."
       }
     ]
   },
   "edge": {
     "headline": "The Competitive Edge",
-    "subheadline": "We don't just hold the data — we hand its value back to the user, and that keeps them coming.",
+    "subheadline": "We hand the data's value back to the user, and that is what keeps them coming.",
     "smartShopper": {
       "title": "The 'Smart Shopper' Hook",
       "body": "We track the live price of every item on a wishlist. When a Ninja air fryer that's been sitting in a wish drops £20 at a partner retailer, we ping the givers: 'The thing they want just got cheaper — fund it now.'",
-      "effect": "It converts contributions at the exact moment of best value, and positions Kindled as the family's advocate, not just a checkout."
+      "effect": "It converts contributions at the exact moment of best value, and positions Kindled as the family's advocate rather than a checkout."
     },
     "dataBack": {
       "title": "The 'Data-Back' Guarantee",
-      "body": "Because we can see aggregate demand — what thousands of families want, and the price they'll pay — we use that collective leverage to secure the best possible price for the user.",
+      "body": "Because we can see aggregate demand (what thousands of families want, and the price they'll pay) we use that collective leverage to secure the best possible price for the user.",
       "effect": "The data asset works for the customer first. That's what earns the right to license it second."
     },
     "unitEconomics": {
-      "title": "Unit Economics — Why the Rails Matter",
+      "title": "Unit Economics: Why the Rails Matter",
       "subtitle": "Modelled per £100 contributed to a wish",
       "columns": [
         "Card processing (Stripe)",
@@ -278,12 +278,12 @@
       "takeaway": "~97% lower processing cost and instant settlement. At scale, the rail choice alone is the difference between thin and structural margin."
     },
     "cleanRoom": {
-      "title": "Data clean rooms — the path",
-      "body": "Kindled's first-party gifting intent — wishlists, occasions, budgets, declared before the spend — can be matched with a retailer's own data inside a privacy-preserving clean room. No raw personal data changes hands in either direction; both sides work only with privacy-safe aggregates. For retailers, that unlocks closed-loop attribution — this media spend produced these gift purchases — which is what earns premium media pricing.",
+      "title": "Data clean rooms: the path",
+      "body": "Kindled's first-party gifting intent (wishlists, occasions, budgets, declared before the spend) can be matched with a retailer's own data inside a privacy-preserving clean room. No raw personal data changes hands in either direction; both sides work only with privacy-safe aggregates. For retailers, that unlocks closed-loop attribution — this media spend produced these gift purchases — which is what earns premium media pricing.",
       "path": [
-        "Phase 1 — first-party data foundation, consented and GDPR-clean",
-        "Phase 2 — on-platform retail media",
-        "At scale — clean-room partnerships with major retailers"
+        "Phase 1: first-party data foundation, consented and GDPR-clean",
+        "Phase 2: on-platform retail media",
+        "At scale: clean-room partnerships with major retailers"
       ],
       "note": "Stated honestly: this is roadmap. No clean-room partnership exists today."
     }
@@ -295,7 +295,7 @@
       {
         "id": "light",
         "title": "A host lights a wish",
-        "body": "Someone sets up a wish for a birthday, baby shower or Christmas — in 90 seconds, for free.",
+        "body": "Someone sets up a wish for a birthday, baby shower or Christmas. It takes 90 seconds and costs nothing.",
         "icon": "flame",
         "color": "#f59e0b"
       },
@@ -309,7 +309,7 @@
       {
         "id": "give",
         "title": "Givers chip in",
-        "body": "Each pays via Open Banking in seconds — and quietly declares exactly what they'd love too.",
+        "body": "Each pays via Open Banking in seconds, and quietly declares exactly what they'd love too.",
         "icon": "gift",
         "color": "#10b981"
       },
@@ -323,14 +323,14 @@
       {
         "id": "convert",
         "title": "Givers become hosts",
-        "body": "Around 1 in 6 starts their own wish — and the loop begins again, bigger each turn.",
+        "body": "Around 1 in 6 starts their own wish, and the loop begins again, bigger each turn.",
         "icon": "repeat",
         "color": "#f43f5e"
       }
     ],
     "multiplier": {
       "value": "6×",
-      "label": "people per wish — every one a future host"
+      "label": "people per wish, every one a future host"
     },
     "compounding": {
       "label": "What one wish becomes",
@@ -352,7 +352,7 @@
           "people": "216 reached"
         }
       ],
-      "caption": "Three turns of the loop from a single wish. No paid acquisition — the product is the marketing."
+      "caption": "Three turns of the loop from a single wish. No paid acquisition; the product is the marketing."
     }
   },
   "risk": {
@@ -362,10 +362,10 @@
       {
         "title": "Frictionless Flow",
         "risk": "Payment and sign-up friction is where consumer products die.",
-        "mitigation": "No app and no account for givers — a link opens, Open Banking confirms in seconds, no card details typed. The host onboards once. Every step that could lose a user has been removed."
+        "mitigation": "No app and no account for givers: a link opens, Open Banking confirms in seconds, no card details typed. The host onboards once. Every step that could lose a user has been removed."
       },
       {
-        "title": "AI Quality — No Uncanny Valley",
+        "title": "AI Quality: No Uncanny Valley",
         "risk": "A cheap or creepy reveal would poison the emotional core.",
         "mitigation": "Reveals run on curated, brand-controlled templates with quality gates, and always fall back to a polished generated motion experience. We ship 'tasteful and shareable', never 'almost human'."
       },
@@ -390,7 +390,7 @@
       },
       {
         "title": "Engineer the Social Moment",
-        "body": "The AI reveal is deliberately built as a high-dopamine peak — the screenshot-worthy second that makes someone want this for someone they love. That single moment is our cheapest, highest-converting channel."
+        "body": "The AI reveal is deliberately built as a high-dopamine peak, the screenshot-worthy second that makes someone want this for someone they love. That single moment is our cheapest, highest-converting channel."
       }
     ]
   },
@@ -429,7 +429,7 @@
           {
             "title": "AI Reveal GA + Cashback Catalogue",
             "quarter": "Q1–Q2 2027",
-            "why": "Turn on the distribution engine and close the cashback loop — contributors earn, spend, and generate more data.",
+            "why": "Turn on the distribution engine and close the cashback loop, so contributors earn, spend, and generate more data.",
             "deliverables": [
               "Reveal video pipeline + social sharing",
               "Curated catalogue + sponsored auction",
@@ -448,7 +448,7 @@
           {
             "title": "B2B Intent Data Licensing",
             "quarter": "Q3 2027",
-            "why": "Activate the high-margin revenue layer Phase 1 quietly built — verified purchase intent as a licensed feed.",
+            "why": "Activate the high-margin revenue layer Phase 1 quietly built: verified purchase intent as a licensed feed.",
             "deliverables": [
               "Segment builder (category, price, recency)",
               "Data export API",
@@ -484,11 +484,11 @@
   },
   "pitch": {
     "label": "The 20-second version",
-    "text": "Britain wastes £1.27 billion every Christmas on unwanted gifts. Kindled is the group-gifting platform where friends and family pool into meaningful goals — kept secret, then revealed together on the big day. We land with parents and kids' gift lists, the most habitual gifting occasion there is, where every contributor experiences the product just by chipping in. From there we expand into the household's biggest goals. Revenue starts on day one with gift card commissions and scales into retail media built on first-party gifting intent. We're raising £250,000 pre-seed.",
+    "text": "Britain wastes £1.27 billion every Christmas on unwanted gifts. Kindled is the group-gifting platform where friends and family pool into meaningful goals, kept secret, then revealed together on the big day. We land with parents and kids' gift lists, the most habitual gifting occasion there is, where every contributor experiences the product just by chipping in. From there we expand into the household's biggest goals. Revenue starts on day one with gift card commissions and scales into retail media built on first-party gifting intent. We're raising £250,000 pre-seed.",
     "structure": [
       {
         "k": "Problem",
-        "v": "£1.27bn wasted every Christmas — group gifting is uncoordinated"
+        "v": "£1.27bn wasted every Christmas because group gifting is uncoordinated"
       },
       {
         "k": "Solution",
@@ -496,7 +496,7 @@
       },
       {
         "k": "Wedge",
-        "v": "kids' lists — every contributor becomes a user"
+        "v": "kids' lists, where every contributor becomes a user"
       },
       {
         "k": "Moat",
@@ -514,25 +514,25 @@
     "steps": [
       {
         "title": "The wedge",
-        "body": "Launch with parents of younger kids. A parent builds the child's list — catalogue circles, star-chart goals — and shares one link with the people who already send the \"what does she want this year?\" text. Kids' occasions are high-frequency and emotionally non-negotiable; Kindled simply formalises a ritual that already exists."
+        "body": "Launch with parents of younger kids. A parent builds the child's list (catalogue circles, star-chart goals) and shares one link with the people who already send the \"what does she want this year?\" text. Kids' occasions are high-frequency and emotionally non-negotiable; Kindled simply formalises a ritual that already exists."
       },
       {
         "title": "The conversion",
-        "body": "Every grandparent, aunt and family friend who chips in experiences the product with zero set-up — and finishes as an activated user with a payment method on file. One child's wish recruits many adults."
+        "body": "Every grandparent, aunt and family friend who chips in experiences the product with zero set-up, and finishes as an activated user with a payment method on file. One child's wish recruits many adults."
       },
       {
         "title": "The snowball",
-        "body": "Converted adults are then shown grown-up goals through playful discovery — \"Would you rather?\" prompts (a log burner, or a Maldives fund?), aspirational wish galleries, stacked-ambition stories — nudging them to start wishes of their own. (\"Would you rather?\" is roadmap, not yet built.)"
+        "body": "Converted adults are then shown grown-up goals through playful discovery: \"Would you rather?\" prompts (a log burner, or a Maldives fund?), aspirational wish galleries, stacked-ambition stories — nudging them to start wishes of their own. (\"Would you rather?\" is roadmap, not yet built.)"
       },
       {
         "title": "The CAC logic",
-        "body": "The child's wish is the acquisition channel. In the wedge phase, paid CAC is close to zero by design. This is strategy framing — not a forecast, and no conversion rates are claimed."
+        "body": "The child's wish is the acquisition channel. In the wedge phase, paid CAC is close to zero by design. This is strategy framing, not a forecast, and no conversion rates are claimed."
       }
     ]
   },
   "landscape": {
     "eyebrow": "The landscape",
-    "headline": "What people actually use today — and why we win",
+    "headline": "What people actually use today, and why we win",
     "axes": {
       "x": "Group coordination",
       "y": "Emotional experience (the reveal)"
@@ -541,7 +541,7 @@
       {
         "name": "Cash in a card",
         "coord": "low / low",
-        "body": "Zero coordination, zero moment. Money without meaning — and it's what Kindled most often replaces."
+        "body": "Zero coordination, zero moment. Money without meaning, and it's what Kindled most often replaces."
       },
       {
         "name": "Bank transfer / Monzo split",
@@ -561,26 +561,26 @@
       {
         "name": "Registries",
         "coord": "medium / medium",
-        "body": "Single-occasion and formal — weddings, not birthdays, kids or everyday goals."
+        "body": "Single-occasion and formal: weddings, not birthdays, kids or everyday goals."
       }
     ],
-    "whyWeWin": "Kindled is the only option that combines what to buy (wishlists), buying together (pooling) and a moment worth remembering (the reveal) — then adds stacking and the kids/star-chart ecosystem on top. Functional alternatives can't offer the experience; copying the retail-media economics would mean rebuilding a first-party intent dataset from zero."
+    "whyWeWin": "Kindled is the only option that combines what to buy (wishlists), buying together (pooling) and a moment worth remembering (the reveal), then adds stacking and the kids/star-chart ecosystem on top. Functional alternatives can't offer the experience; copying the retail-media economics would mean rebuilding a first-party intent dataset from zero."
   },
   "behaviour": {
     "eyebrow": "Behaviour change",
-    "headline": "What has to shift — and why we'll win it",
+    "headline": "What has to shift, and why we'll win it",
     "rows": [
       {
         "current": "Cash in a card",
         "new": "Organised wishes",
         "lever": "One shared link; chip in from a message in seconds",
-        "sticks": "Zero contributor effort — it's WhatsApp-native, not another app to adopt"
+        "sticks": "Zero contributor effort: it's WhatsApp-native, not another app to adopt"
       },
       {
         "current": "Guess-buying",
         "new": "Wishlist-led gifting",
         "lever": "Receiver-curated lists with real-time claim locking",
-        "sticks": "Removes the anxiety that drives overspend — Mintel's UK gift-buying research finds the pressure to get the right gift pushes people past what they meant to spend"
+        "sticks": "Removes the anxiety that drives overspend. Mintel's UK gift-buying research finds the pressure to get the right gift pushes people past what they meant to spend"
       },
       {
         "current": "Single-event gifts",
@@ -592,7 +592,7 @@
         "current": "Private wishlists",
         "new": "Shared family rituals",
         "lever": "Kids' catalogue circling, star charts, and the reveal",
-        "sticks": "Rituals repeat — the reveal becomes the moment everyone anticipates"
+        "sticks": "Rituals repeat; the reveal becomes the moment everyone anticipates"
       }
     ]
   },
@@ -611,7 +611,7 @@
         "dur": 12,
         "visual": "potfill",
         "headline": "Create a wish → share one link → sealed until the reveal.",
-        "caption": "Group gifting done properly — one link, everyone in, revealed on the big day."
+        "caption": "Group gifting done properly: one link, everyone in, revealed on the big day."
       },
       {
         "dur": 15,
@@ -623,7 +623,7 @@
         "dur": 15,
         "visual": "wedge",
         "headline": "Kids' lists are the wedge.",
-        "caption": "Parents create; grandparents, aunts and friends chip in — every contributor becomes an activated user. The child's wish IS the acquisition channel."
+        "caption": "Parents create; grandparents, aunts and friends chip in, and every contributor becomes an activated user. The child's wish IS the acquisition channel."
       },
       {
         "dur": 10,

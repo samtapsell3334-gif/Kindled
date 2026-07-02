@@ -117,7 +117,7 @@ export function WaitlistForm({ variant = "light" }: { variant?: "light" | "dark"
       )}
 
       <p id="waitlist-consent" className={`mt-3 text-[12px] leading-relaxed ${dark ? "text-white/40" : "text-stone-400"}`}>
-        We&apos;ll only email you about early access and launch — no spam, unsubscribe anytime. See our{" "}
+        We&apos;ll only email you about early access and launch. No spam, and you can unsubscribe anytime. See our{" "}
         <Link href="/privacy" className={`underline underline-offset-2 ${dark ? "hover:text-white/70" : "hover:text-stone-600"}`}>
           Privacy&nbsp;Policy
         </Link>

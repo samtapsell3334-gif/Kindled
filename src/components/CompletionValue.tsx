@@ -33,7 +33,7 @@ export function CompletionValue({
       <div className="mt-4 flex items-center gap-2.5 rounded-2xl bg-[#f59e0b]/[0.1] px-4 py-3 text-left">
         <Wallet className="h-5 w-5 shrink-0 text-[#f59e0b]" />
         <p className="text-[12px] leading-snug text-[#fdf6e3]/85">
-          Start your own wish and you unlock <span className="font-bold text-[#f59e0b]">{userSharePct}% back in credit</span> on catalogue purchases — ring-fenced to your goals.
+          Start your own wish and you unlock <span className="font-bold text-[#f59e0b]">{userSharePct}% back in credit</span> on catalogue purchases, ring-fenced to your goals.
         </p>
       </div>
 

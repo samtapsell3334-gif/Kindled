@@ -335,7 +335,7 @@ export function FirstKindlersCTA() {
                       Reserve your spot
                     </h2>
                     <p className="mt-2 max-w-[300px] mx-auto text-[13px] text-white/45 leading-relaxed">
-                      Be one of our first families. We&apos;ll invite you in as soon as your spot opens up — and you&apos;ll help shape how Kindled works.
+                      Be one of our first families. We&apos;ll invite you in as soon as your spot opens up, and you&apos;ll help shape how Kindled works.
                     </p>
                   </div>
 

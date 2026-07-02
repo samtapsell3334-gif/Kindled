@@ -48,7 +48,7 @@ const METRICS: MetricDef[] = [
   {
     stat: 58, label: "Have received an unwanted gift",
     Icon: Brain,
-    copy: "3 in 5 Brits (58%) have received an unwanted gift — around 31 million adults. An approved list removes the guesswork.",
+    copy: "3 in 5 Brits (58%) have received an unwanted gift. That's around 31 million adults. An approved list removes the guesswork.",
     source: "Finder UK unwanted-gifts research, 2025",
     accent: "#fb923c", glow: "rgba(251,146,60,0.4)",
     bg: "from-orange-950/80 to-amber-950/50", border: "border-amber-500/20",
@@ -56,7 +56,7 @@ const METRICS: MetricDef[] = [
   {
     stat: 41, displayOverride: "£41", label: "Wasted per person on missed gifts",
     Icon: Leaf,
-    copy: "£41 — the average each of us wastes on gifts that miss the mark. Coordinated gifting puts it back into the goal.",
+    copy: "£41 is the average each of us wastes on gifts that miss the mark. Coordinated gifting puts it back into the goal.",
     source: "Finder UK unwanted-gifts research, 2025",
     accent: "#34d399", glow: "rgba(52,211,153,0.4)",
     bg: "from-emerald-950/80 to-teal-950/50", border: "border-emerald-500/20",
@@ -64,7 +64,7 @@ const METRICS: MetricDef[] = [
   {
     stat: 0, displayOverride: "0", label: "Duplicates when you guide your buyers",
     Icon: RotateCcw,
-    copy: "Real-time claim locking means no two people can buy the same thing — a product feature, not a survey.",
+    copy: "Real-time claim locking means no two people can buy the same thing. A product feature, not a survey.",
     source: "How Kindled works",
     accent: "#a78bfa", glow: "rgba(167,139,250,0.4)",
     bg: "from-violet-950/80 to-purple-950/50", border: "border-violet-500/20",
@@ -345,7 +345,7 @@ function MilestoneSimulator() {
 
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
               className="mb-4 text-center text-[12px] leading-relaxed text-white/40 px-2">
-              One more Christmas — just £{Math.ceil(stillNeeded / 8)} each from those 8 people and the sofa is Clara&apos;s.
+              One more Christmas: just £{Math.ceil(stillNeeded / 8)} each from those 8 people and the sofa is Clara&apos;s.
             </motion.p>
 
             <button onClick={reset}
@@ -386,7 +386,7 @@ export function GiftingImpactPanel() {
               Gifting, reinvented
             </h2>
             <p className="mx-auto mt-2 max-w-[280px] text-[13px] leading-relaxed text-white/38">
-              See what your circle could really unlock — and the industry problem we&apos;re solving.
+              See what your circle could really unlock, and the industry problem we&apos;re solving.
             </p>
           </motion.div>
 
@@ -395,7 +395,7 @@ export function GiftingImpactPanel() {
             <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
               viewport={{ once: true }} transition={{ delay: 0.1 }}
               className="mb-3 text-[10px] font-black uppercase tracking-[0.18em] text-white/30">
-              Industry context — tap to expand
+              Industry context (tap to expand)
             </motion.p>
             <div className="grid grid-cols-2 gap-2.5">
               {METRICS.map((m, i) => (

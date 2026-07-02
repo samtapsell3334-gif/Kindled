@@ -106,7 +106,7 @@ function Visual({ scene, animate }: { scene: FilmScene; animate: boolean }) {
   if (v === "timeline") {
     return (
       <div className="w-full space-y-2 px-8">
-        {[["Phase 1", "Gift card commissions — live from launch"], ["Phase 2", "Retail media on first-party gifting intent"], ["Roadmap", "Clean-room partnerships"]].map(([a, b], i) => (
+        {[["Phase 1", "Gift card commissions, live from launch"], ["Phase 2", "Retail media on first-party gifting intent"], ["Roadmap", "Clean-room partnerships"]].map(([a, b], i) => (
           <div key={a} className="flex items-center gap-3" style={animate ? { animation: `film-pop 0.4s ${i * 0.5}s both` } : undefined}>
             <span className="w-20 shrink-0 rounded-full bg-amber-400/20 py-1 text-center text-[11px] font-bold text-amber-200">{a}</span>
             <span className="text-[12px] text-white/75">{b}</span>

@@ -130,7 +130,7 @@ function LoadingScreen({
         </p>
         <h2 className="mt-2 text-[22px] font-black leading-tight text-white">{potTitle}</h2>
         <p className="mt-1 text-[13px] text-stone-400">
-          £{amountRaised.toFixed(0)} raised — your moment is being crafted
+          £{amountRaised.toFixed(0)} raised. Your moment is being made
           {".".repeat(dot)}
         </p>
       </div>
@@ -146,7 +146,7 @@ function LoadingScreen({
         onClick={onSkip}
         className="mt-4 text-[11px] text-stone-500 underline underline-offset-4 transition-colors hover:text-stone-300"
       >
-        Skip — reveal now without video
+        Skip and reveal now without video
       </button>
     </div>
   );

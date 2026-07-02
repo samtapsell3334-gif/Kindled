@@ -47,7 +47,7 @@ export default function MyPotsPage() {
         </div>
 
         <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold">My wishes</h1>
-        <p className="mt-1 text-[13px] text-stone-500">Every wish you&apos;ve built on this device — share them, watch them fill, then run the reveal.</p>
+        <p className="mt-1 text-[13px] text-stone-500">Every wish you&apos;ve built on this device. Share them, watch them fill, then run the reveal.</p>
 
         {mine.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-stone-300 p-8 text-center">
@@ -77,7 +77,7 @@ export default function MyPotsPage() {
                       <p className="mt-1.5 text-[12px] text-stone-500">£{v.raised} of £{v.goal} · {v.contributors.length} contributor{v.contributors.length === 1 ? "" : "s"} · {v.messageCount} sealed message{v.messageCount === 1 ? "" : "s"}</p>
                     </>
                   ) : (
-                    <p className="mt-2 text-[12px] text-stone-400">Loading… (the sandbox may have been reset — wishes don&apos;t survive a reset)</p>
+                    <p className="mt-2 text-[12px] text-stone-400">Loading… (the sandbox may have been reset; wishes don&apos;t survive a reset)</p>
                   )}
                   <div className="mt-3 flex gap-2">
                     <Link href={`/p/${p.slug}?key=${p.managerKey}`}
@@ -112,7 +112,7 @@ export default function MyPotsPage() {
         <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-5">
           <p className="text-[13px] font-bold text-stone-800">Big dreams take more than one birthday</p>
           <p className="mt-1 text-[12px] leading-relaxed text-stone-600">
-            A wish that isn&apos;t finished by the big day simply <span className="font-semibold">stacks forward</span> — birthday to Christmas to birthday — so nothing raised is ever wasted.
+            A wish that isn&apos;t finished by the big day simply <span className="font-semibold">stacks forward</span>, birthday to Christmas to birthday, so nothing raised is ever wasted.
           </p>
         </div>
 

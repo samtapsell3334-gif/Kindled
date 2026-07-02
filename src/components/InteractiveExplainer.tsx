@@ -34,7 +34,7 @@ const SCENES: SceneConfig[] = [
     startSec: 20,
     endSec: 45,
     caption:
-      "Meet Kindling. Instead of temporary wish lists, you maintain lifetime Continuous Wishes for the things you actually want — open year-round, steadily collecting contributions.",
+      "Meet Kindling. Instead of temporary wish lists, you maintain lifetime Continuous Wishes for the things you actually want: open year-round, steadily collecting contributions.",
   },
   {
     index: 2,
@@ -42,7 +42,7 @@ const SCENES: SceneConfig[] = [
     startSec: 45,
     endSec: 70,
     caption:
-      "Got a birthday or Christmas coming up? Toggle on Wrapped Up mode. Your progress bar instantly locks — keeping the suspense alive so your surprise stays a surprise.",
+      "Got a birthday or Christmas coming up? Toggle on Wrapped Up mode. Your progress bar instantly locks, keeping the suspense alive so your surprise stays a surprise.",
   },
   {
     index: 3,
@@ -50,7 +50,7 @@ const SCENES: SceneConfig[] = [
     startSec: 70,
     endSec: 95,
     caption:
-      "While you're in the dark, your friends see the real progress. They can chip in instantly with one tap and record personal video messages — the closer to the goal, the more the word spreads!",
+      "While you're in the dark, your friends see the real progress. They can chip in instantly with one tap and record personal video messages. The closer to the goal, the more the word spreads!",
   },
   {
     index: 4,
@@ -334,7 +334,7 @@ function Scene2({ p }: { p: number }) {
         <div className={cn("flex animate-fade-up items-center gap-1.5 rounded-full border px-3 py-1.5", "border-emerald-500/30 bg-emerald-500/10")}>
           <InfinityIcon className={cn("h-3.5 w-3.5", SCENE_TEXT[1])} />
           <span className={cn("text-[11px] font-semibold", SCENE_TEXT[1])}>
-            Open year-round — never expires
+            Open year-round, never expires
           </span>
         </div>
       )}
@@ -398,7 +398,7 @@ function Scene3({ p }: { p: number }) {
             <div className="animate-gift-glow-plum rounded-xl border border-violet-500/20 bg-gradient-to-b from-violet-700/25 to-fuchsia-800/15">
               <div className="animate-scale-in flex flex-col items-center gap-2 py-4">
                 <Gift className="h-9 w-9 text-violet-300" strokeWidth={1.2} />
-                <p className="text-[12px] font-semibold text-stone-200">Locked — Unwraps Jun 28</p>
+                <p className="text-[12px] font-semibold text-stone-200">Locked. Unwraps Jun 28</p>
                 <div className="flex items-center gap-1 rounded-full bg-stone-800/60 px-2.5 py-1">
                   <Lock className="h-2.5 w-2.5 text-stone-400" />
                   <span className="text-[10px] text-stone-400">Balance hidden from you</span>
@@ -454,7 +454,7 @@ function Scene4({ p }: { p: number }) {
             </div>
             <div className="min-w-0">
               <p className="truncate text-[13px] font-bold text-stone-100">Mountain Bike</p>
-              <p className={cn("text-[11px] font-medium", SCENE_TEXT[3])}>85% funded — help push it over!</p>
+              <p className={cn("text-[11px] font-medium", SCENE_TEXT[3])}>85% funded. Help push it over!</p>
             </div>
           </div>
 

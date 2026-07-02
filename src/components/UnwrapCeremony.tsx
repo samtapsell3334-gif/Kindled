@@ -465,7 +465,7 @@ function SplashScreen({
   const [copied, setCopied] = useState(false);
 
   function handleThankYou() {
-    const msg = `Thank you all so much for my ${potTitle} — I'm genuinely overwhelmed by your generosity!`;
+    const msg = `Thank you all so much for my ${potTitle}! I'm genuinely overwhelmed by your generosity!`;
     void navigator.clipboard.writeText(msg).catch(() => undefined);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
@@ -503,7 +503,7 @@ function SplashScreen({
                 <span className="font-bold text-amber-400">{boosterEntries} entries</span> into
                 the{" "}
                 <span className="font-semibold text-stone-200">£2,500 quarterly prize draw</span>.
-                There&apos;s a free entry route — no purchase necessary. Good luck!
+                There&apos;s a free entry route, so no purchase is necessary. Good luck!
               </p>
             </div>
           </div>

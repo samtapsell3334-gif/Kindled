@@ -148,7 +148,7 @@ export default function DashboardPage() {
         <Panel title="3 · K-factor" csv={() => k ? download("k-factor", [["metric", "value"], ["contributions", k.contributions], ["referred wishes", k.referredPots], ["invite views per wish", k.invites.toFixed(2)], ["contributor→creator conversion", k.conv.toFixed(3)], ["K", k.K]]) : undefined}>
           {k && (
             <div className="text-[13px] text-stone-600">
-              <p className="mb-2 text-[12px] italic text-stone-400">K = average invites per new user × invite → new-wish conversion. Sandbox sample — small numbers, honestly labelled.</p>
+              <p className="mb-2 text-[12px] italic text-stone-400">K = average invites per new user × invite → new-wish conversion. Sandbox sample: small numbers, honestly labelled.</p>
               <p>Views per wish (invite proxy): <b>{k.invites.toFixed(2)}</b> · Contributor → creator conversion: <b>{(k.conv * 100).toFixed(1)}%</b></p>
               <p className="mt-1 text-[20px] font-bold text-stone-900">K = {k.K}</p>
               <p className="mt-2 text-[12px]">Referral chain: {k.referredPots} pot{k.referredPots === 1 ? "" : "s"} created from shared links ({events.filter((e) => e.event === "pot_created" && e.ref).map((e) => `←${String(e.ref).slice(0, 6)}`).join(" · ") || "none yet"})</p>
@@ -160,7 +160,7 @@ export default function DashboardPage() {
           <div className="flex flex-wrap gap-6 text-[13px] text-stone-600">
             {outcomes.map(([o, c]) => <p key={o}>{o}: <b>{c}</b></p>)}
             {outcomes.length === 0 && <p className="text-stone-400">No reveals yet</p>}
-            <p>Simulated gift-card commission: <b>£{commission.toFixed(2)}</b> <span className="text-stone-400">(simulated — sandbox)</span></p>
+            <p>Simulated gift-card commission: <b>£{commission.toFixed(2)}</b> <span className="text-stone-400">(simulated, sandbox only)</span></p>
           </div>
         </Panel>
 

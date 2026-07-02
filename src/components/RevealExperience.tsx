@@ -361,7 +361,7 @@ export function RevealExperience(p: RevealExperienceProps) {
           <div>
             <p className="text-[13px] uppercase tracking-[0.25em] text-amber-400/70">Together, everyone raised</p>
             <p style={{ fontFamily: "var(--font-display)" }} className="mt-3 text-[88px] font-black leading-none tabular-nums">£{count.toLocaleString()}</p>
-            {!fullyFunded && <p className="mt-3 text-[15px] text-white/60">towards the goal — and that&apos;s worth celebrating</p>}
+            {!fullyFunded && <p className="mt-3 text-[15px] text-white/60">towards the goal, and that&apos;s worth celebrating</p>}
             <p className="mt-8 text-[12px] text-white/40">Tap to continue</p>
           </div>
         )}
@@ -420,16 +420,16 @@ export function RevealExperience(p: RevealExperienceProps) {
         {beat === "options" && (
           <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm">
             <p style={{ fontFamily: "var(--font-display)" }} className="text-[26px] font-bold">
-              {fullyFunded ? "Fully funded — choose how to take it" : `You're ${pct}% of the way — your choice`}
+              {fullyFunded ? "Fully funded. Choose how to take it" : `You're ${pct}% of the way. Your choice`}
             </p>
             <div className="mt-5 grid gap-2.5">
               <button disabled={outcomeBusy} onClick={() => { void choose("gift_card", "Smyths"); }}
                 className="rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
-                Take it now — convert to a gift card
+                Take it now: convert to a gift card
               </button>
               <button disabled={outcomeBusy} onClick={() => { void choose("stack"); }}
                 className="rounded-2xl border border-amber-400/40 bg-white/[0.06] py-3.5 text-[14px] font-bold">
-                Keep it building — stack to the next occasion
+                Keep it building: stack to the next occasion
                 <span className="block text-[11px] font-medium text-amber-200/70">
                   Carried forward, your £{p.raised} starts the next pot at {p.goal > 0 ? Math.min(100, Math.round((p.raised / p.goal) * 100)) : 0}% of this goal
                 </span>
@@ -439,7 +439,7 @@ export function RevealExperience(p: RevealExperienceProps) {
                 Mark the gift as purchased
               </button>
             </div>
-            <p className="mt-3 text-[11px] text-white/40">All three are wins — nothing raised is ever lost.</p>
+            <p className="mt-3 text-[11px] text-white/40">All three are wins. Nothing raised is ever lost.</p>
           </div>
         )}
 
@@ -452,11 +452,11 @@ export function RevealExperience(p: RevealExperienceProps) {
             <p className="mt-2 text-[14px] text-white/60">£{p.raised.toLocaleString()} · {p.contributors.length} people · one very happy {p.recipientName}</p>
             {reacting ? (
               <div className="mt-5 text-left">
-                <p className="mb-2 text-[12px] text-white/60">Film {p.isChild ? "their face for the family" : "the reaction"} — you can delete or re-record before anything is kept.</p>
+                <p className="mb-2 text-[12px] text-white/60">Film {p.isChild ? "their face for the family" : "the reaction"}. You can delete or re-record before anything is kept.</p>
                 <KindleRecord contributionId={`reaction_${p.slug}`} onRecorded={(m) => { setReactionRef(m.url); setReacting(false); beacon("reaction"); }} onCancel={() => setReacting(false)} />
               </div>
             ) : reactionRef ? (
-              <p className="mt-5 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-[13px] font-semibold text-emerald-200">Reaction saved — share it below ✓</p>
+              <p className="mt-5 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-[13px] font-semibold text-emerald-200">Reaction saved. Share it below ✓</p>
             ) : (
               <button onClick={() => setReacting(true)} className="mt-5 w-full rounded-2xl border border-amber-400/40 bg-white/[0.06] py-3.5 text-[14px] font-bold">
                 Film the reaction

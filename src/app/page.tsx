@@ -23,7 +23,7 @@ const EMBERS = Array.from({ length: 22 }, (_, i) => ({
 }));
 
 const MARQUEE_ITEMS = [
-  "No duplicate gifts — ever",
+  "No duplicate gifts, ever",
   "Magical reveals on the big day",
   "Chip in any amount",
   "Gifts stay secret until the big day",
@@ -40,7 +40,7 @@ const STEPS = [
     n: "01",
     icon: Flame,
     title: "Start your wish",
-    desc: "Add what you actually want — paste links from any shop, pick from the catalogue, or create custom goals. Takes under 2 minutes.",
+    desc: "Add what you actually want. Paste links from any shop, pick from the catalogue, or create custom goals. Takes under 2 minutes.",
     grad: "from-amber-400 to-orange-500",
     shadow: "rgba(251,146,60,0.35)",
     bg: "from-amber-50 to-orange-50",
@@ -50,7 +50,7 @@ const STEPS = [
     n: "02",
     icon: Share2,
     title: "Share one link",
-    desc: "Send a single link to everyone — family, friends, colleagues abroad. They chip in any amount, no app download, no account needed.",
+    desc: "Send a single link to family, friends, even colleagues abroad. They chip in any amount, with no app to download and no account to make.",
     grad: "from-orange-400 to-rose-500",
     shadow: "rgba(244,63,94,0.3)",
     bg: "from-orange-50 to-rose-50",
@@ -81,7 +81,7 @@ const FEATURES = [
   {
     icon: Users,
     title: "Unlimited contributors",
-    desc: "Anyone with the link can chip in — no app download, no account, no friction whatsoever.",
+    desc: "Anyone with the link can chip in. No app to download, no account to make.",
     color: "text-amber-600",
     bg: "bg-amber-50",
     border: "border-amber-100",
@@ -90,7 +90,7 @@ const FEATURES = [
   {
     icon: Star,
     title: "Star chart for kids",
-    desc: "Remember circling the catalogue? Now it's their turn — stars earned through chores unlock the goals they circled.",
+    desc: "Remember circling the catalogue? Now it's their turn. Stars earned through chores unlock the goals they circled.",
     color: "text-orange-600",
     bg: "bg-orange-50",
     border: "border-orange-100",
@@ -99,7 +99,7 @@ const FEATURES = [
   {
     icon: RefreshCw,
     title: "Carry-over balances",
-    desc: "Incomplete birthday goals carry to Christmas seamlessly. Nothing is ever lost or wasted.",
+    desc: "Incomplete birthday goals simply carry over to Christmas. Nothing is ever lost or wasted.",
     color: "text-[#ff6b6b]",
     bg: "bg-rose-50",
     border: "border-rose-100",
@@ -108,7 +108,7 @@ const FEATURES = [
   {
     icon: Shield,
     title: "Parent dashboard",
-    desc: "Event dates, catalogue browsing with virtual marker pens, gift approvals — full family control.",
+    desc: "Event dates, catalogue browsing with virtual marker pens, gift approvals. The family stays in control.",
     color: "text-amber-600",
     bg: "bg-amber-50",
     border: "border-amber-100",
@@ -117,7 +117,7 @@ const FEATURES = [
   {
     icon: Trophy,
     title: "A little extra: prize draw",
-    desc: "On top of it all, every contributor is entered into our quarterly £2,500 prize draw — free entry route, no purchase necessary.",
+    desc: "On top of it all, every contributor is entered into our quarterly £2,500 prize draw. There's a free entry route, so no purchase is necessary.",
     color: "text-orange-600",
     bg: "bg-orange-50",
     border: "border-orange-100",
@@ -130,7 +130,7 @@ const FEATURES = [
 // real person (avoids presenting invented reviews as genuine — DMCC Act 2024).
 const SCENARIOS = [
   {
-    quote: "No more three copies of the same book at every birthday — everyone chips into the gifts that actually get used, and the reveal is the bit that brings the happy tears.",
+    quote: "No more three copies of the same book at every birthday. Everyone chips into the gifts that actually get used, and the reveal is the bit that brings the happy tears.",
     persona: "The parent done with duplicate gifts",
     color: "bg-[#ff6b6b]",
   },
@@ -140,17 +140,17 @@ const SCENARIOS = [
     color: "bg-amber-500",
   },
   {
-    quote: "A star chart turns good behaviour into gift momentum — a goal earned along the way and fully funded by the big day.",
+    quote: "A star chart turns good behaviour into gift momentum: a goal earned along the way and fully funded by the big day.",
     persona: "The family using star charts",
     color: "bg-orange-500",
   },
   {
-    quote: "Watching someone discover who came together to make their gift happen — that shared moment is the whole point.",
+    quote: "Watching someone discover who came together to make their gift happen. That shared moment is the whole point.",
     persona: "The friend who wants it to feel special",
     color: "bg-rose-500",
   },
   {
-    quote: "Set up in a couple of minutes, one link shared, and the family chips in over the week — coordination without the awkward money chat.",
+    quote: "Set up in a couple of minutes, one link shared, and the family chips in over the week. Nobody has to have the awkward money chat.",
     persona: "The organiser of the group gift",
     color: "bg-amber-600",
   },
@@ -376,7 +376,7 @@ function Hero() {
               transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50"
             >
-              One shared wish, one link to send. Friends, family and everyone in between chip in any amount — no app, no account — and it stays sealed until you reveal it together on the big day.
+              One shared wish, one link to send. Friends, family and everyone in between chip in any amount, with no app and no account, and it stays sealed until you reveal it together on the big day.
             </motion.p>
 
             <motion.div
@@ -639,7 +639,7 @@ function Problem() {
             {
               stat: "3 in 5",
               label: "Brits have received an unwanted gift",
-              desc: "58% of us — around 31 million adults — have unwrapped something that missed the mark.",
+              desc: "58% of us (around 31 million adults) have unwrapped something that missed the mark.",
               color: "text-rose-600",
               bg: "bg-rose-50",
               border: "border-rose-100",
@@ -657,7 +657,7 @@ function Problem() {
             {
               stat: "£41",
               label: "wasted per person on gifts that missed",
-              desc: "The average value of unwanted gifts each of us receives — because nobody coordinated.",
+              desc: "The average value of unwanted gifts each of us receives, because nobody coordinated.",
               color: "text-orange-600",
               bg: "bg-orange-50",
               border: "border-orange-100",
@@ -678,7 +678,7 @@ function Problem() {
         {/* The anxiety → overspend beat (qualitative — no invented percentage) */}
         <Reveal delay={0.2} className="mt-10 text-center">
           <p className="mx-auto max-w-[560px] text-[15px] leading-relaxed text-stone-600">
-            And not knowing what to buy is how overspending happens — Mintel found the pressure to get
+            Not knowing what to buy is also how overspending happens. Mintel found the pressure to get
             the right gift pushes people past what they meant to spend.
           </p>
           <p className="mt-2 text-[11px] italic text-stone-400">Source: Mintel UK gift-buying research</p>
@@ -714,7 +714,7 @@ function RevealPreview() {
           The reveal is the bit they remember
         </h2>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-white/50">
-          The reveal happens on the day you set — birthday, Christmas, the big moment — not just when the wish is full. Everyone gathers for the gift, who chipped in, and a fair few happy tears.
+          The reveal happens on the day you set: birthday, Christmas, the big moment. It doesn&apos;t wait for the wish to be full. Everyone gathers for the gift, who chipped in, and a fair few happy tears.
         </p>
 
         <div
@@ -835,7 +835,7 @@ function Features() {
             Built for real families
           </h2>
           <p className="mt-4 text-[16px] text-stone-500 max-w-[500px] mx-auto leading-relaxed">
-            Every feature designed around how friends and families actually give — and how kids actually get excited about gifts.
+            Every feature is designed around how friends and families actually give, and how kids actually get excited about gifts.
           </p>
         </Reveal>
 
@@ -893,7 +893,7 @@ function AudienceSplit() {
                 Your wishlist.<br />Your rules.
               </h3>
               <p className="text-[14px] text-stone-600 leading-relaxed mb-6">
-                Set up your wish in 2 minutes. Add anything — from any shop. Kids get star charts and parent controls. Every gift stays secret until you trigger the reveal.
+                Set up your wish in 2 minutes. Add anything from any shop. Kids get star charts and parent controls. Every gift stays secret until you trigger the reveal.
               </p>
               <div className="space-y-2.5">
                 {[
@@ -925,11 +925,11 @@ function AudienceSplit() {
                 Give meaningfully.<br />Get rewarded.
               </h3>
               <p className="text-[14px] text-stone-600 leading-relaxed mb-6">
-                Chip in any amount you like — from £5 to £500. No account needed, no app, done in thirty seconds.
+                Chip in any amount you like, from £5 to £500. No account, no app, done in thirty seconds.
               </p>
               <div className="space-y-2.5">
                 {[
-                  "Chip in any amount — no minimum, no account required",
+                  "Chip in any amount, with no minimum and no account",
                   "See exactly what's funded, live",
                   "Earn 2% back in credit on catalogue purchases",
                   "Buy smaller items outright if you prefer",
@@ -1016,7 +1016,7 @@ function Testimonials() {
             Tears at the reveal.<br />That&apos;s the goal.
           </h2>
           <p className="mx-auto mt-4 max-w-[460px] text-[15px] leading-relaxed text-stone-500">
-            Kindled is launching soon, so these aren&apos;t customer reviews yet — they&apos;re the everyday moments we&apos;re building Kindled to create.
+            Kindled is launching soon, so these aren&apos;t customer reviews yet. They&apos;re the everyday moments we&apos;re building Kindled to create.
           </p>
         </Reveal>
 
@@ -1075,11 +1075,11 @@ function StackSection() {
             </h2>
             <p className="mt-4 max-w-[460px] text-[16px] leading-relaxed text-stone-500">
               Stack events and watch the wish grow across the year. A goal that isn&apos;t reached by one
-              occasion simply carries forward to the next — birthday to Christmas to birthday — so
+              occasion simply carries forward to the next, birthday to Christmas to birthday, so
               nothing is ever wasted and the big things stay in reach.
             </p>
             <p className="mt-3 max-w-[460px] text-[14px] leading-relaxed text-stone-500">
-              And if the big day arrives before the goal does, the reveal still happens — take what was
+              And if the big day arrives before the goal does, the reveal still happens. Take what was
               raised, keep it stacking, or switch to a goal within reach. Your choice, never smallprint.
             </p>
           </Reveal>
@@ -1127,22 +1127,22 @@ function HowMoneyWorks() {
     {
       icon: Shield,
       title: "Collected securely by Stripe",
-      body: "When someone chips in, the payment is handled by Stripe — the same infrastructure trusted by millions of businesses. We never see or store full card numbers.",
+      body: "When someone chips in, the payment is handled by Stripe, the same infrastructure trusted by millions of businesses. We never see or store full card numbers.",
     },
     {
       icon: Gift,
       title: "Every penny goes to the goal",
-      body: "Contributions are tracked against the wish's goal so the family can watch it grow — or, on a surprise wish, it stays hidden from the recipient until reveal day.",
+      body: "Contributions are tracked against the wish's goal so the family can watch it grow. On a surprise wish it stays hidden from the recipient until reveal day.",
     },
     {
       icon: RefreshCw,
       title: "Nothing is wasted if it falls short",
-      body: "If a wish isn't fully funded by the big day, the reveal still happens — and the family chooses: take what was raised towards the goal, stack it forward to the next occasion, or switch to a goal within reach. No pressure, no lost money.",
+      body: "If a wish isn't fully funded by the big day, the reveal still happens and the family chooses: take what was raised towards the goal, stack it forward to the next occasion, or switch to a goal within reach. No pressure, no lost money.",
     },
     {
       icon: Lock,
       title: "Private by design",
-      body: "Payment data is encrypted in transit, and a recipient never sees who gave what — or how much — until the reveal.",
+      body: "Payment data is encrypted in transit, and a recipient never sees who gave what, or how much, until the reveal.",
     },
   ];
 
@@ -1283,7 +1283,7 @@ function Footer() {
         <p className="text-[12px] text-stone-400">Made with love in the UK · © 2026 Kindled. All rights reserved.</p>
       </div>
       <p className="mx-auto mt-6 max-w-5xl text-center text-[11px] leading-relaxed text-stone-400">
-        Prize draw: 18+, UK residents only. No purchase necessary — a free entry route and full{" "}
+        Prize draw: 18+, UK residents only. No purchase necessary; a free entry route and full{" "}
         <Link href="/terms#prize-draw" className="underline underline-offset-2 hover:text-stone-600">terms</Link> apply.
       </p>
     </footer>
