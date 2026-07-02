@@ -156,6 +156,23 @@ export default function DashboardPage() {
           )}
         </Panel>
 
+        <Panel title="3b · Occasions (v11 WS-1)">
+          {events && (() => {
+            const occasions = new Set(events.filter((e) => e.event === "pot_created").map((e) => e.potId)).size;
+            const wishesAdded = events.filter((e) => e.event === "wish_added_to_occasion").length;
+            const attributed = events.filter((e) => e.event === "contribution_completed" && e.props && "item_id" in (e.props as object));
+            // per-wish funding velocity: attributed contributions per wish per day of activity
+            const days = Math.max(1, new Set(events.map((ev) => new Date(ev.ts).toISOString().slice(0, 10))).size);
+            return (
+              <div className="flex flex-wrap gap-6 text-[13px] text-stone-600">
+                <p>Average wishes per occasion: <b>{occasions ? (wishesAdded / occasions).toFixed(1) : "—"}</b></p>
+                <p>Attributed chip-ins: <b>{attributed.length}</b></p>
+                <p>Per-wish funding velocity: <b>{wishesAdded ? (attributed.length / wishesAdded / days).toFixed(2) : "—"}</b> <span className="text-stone-400">chip-ins/wish/day</span></p>
+              </div>
+            );
+          })()}
+        </Panel>
+
         <Panel title="4 · Reveal economics" csv={() => download("reveals", [["outcome", "count"], ...outcomes, ["simulated commission £", commission]])}>
           <div className="flex flex-wrap gap-6 text-[13px] text-stone-600">
             {outcomes.map(([o, c]) => <p key={o}>{o}: <b>{c}</b></p>)}
