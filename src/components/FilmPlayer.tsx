@@ -199,9 +199,19 @@ export function FilmPlayer({ film }: { film: Film }) {
         )}
 
         {done && (
-          <button onClick={() => setIdx(-1)} className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-[13px] font-bold text-white">
-            <RotateCcw className="h-4 w-4" /> Watch again
-          </button>
+          <div className="flex flex-col items-center gap-2.5">
+            <button onClick={() => setIdx(-1)} className="flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-[13px] font-bold text-white">
+              <RotateCcw className="h-4 w-4" /> Watch again
+            </button>
+            <button onClick={() => {
+              track("film_shared", { film: film.id, channel: "native" });
+              const url = `${location.origin}/film`;
+              if (navigator.share) void navigator.share({ title: "How Kindled works · 60 seconds", url }).catch(() => {});
+              else void navigator.clipboard?.writeText(url);
+            }} className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-5 py-2.5 text-[12px] font-bold text-stone-900">
+              Share the film
+            </button>
+          </div>
         )}
       </div>
 

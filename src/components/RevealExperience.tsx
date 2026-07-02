@@ -470,6 +470,10 @@ export function RevealExperience(p: RevealExperienceProps) {
                 className="rounded-2xl border border-white/15 bg-white/[0.05] py-3.5 text-[14px] font-bold disabled:opacity-60">
                 {thanked ? "Thank-you sent to everyone who chipped in ✓" : "Send a thank-you to everyone"}
               </button>
+              <a href={`/sandbox?goal=${encodeURIComponent(`${p.recipientName}'s Christmas pot`)}&ref=${p.slug}`}
+                className="rounded-2xl border border-amber-400/30 bg-white/[0.04] py-3 text-[13px] font-bold text-amber-200">
+                The next occasion: start {p.recipientName}&apos;s Christmas pot →
+              </a>
               <button onClick={() => { setBeat("sealed"); setShown(0); setCount(0); }}
                 className="rounded-2xl border border-white/10 py-3 text-[13px] font-semibold text-white/60">
                 Replay the reveal
