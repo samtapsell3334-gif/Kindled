@@ -3295,7 +3295,7 @@ function JointFireView() {
  * both the contributor and receiver views (no longer its own tab): two real hosts
  * pooling every occasion toward one long-term goal. Tapping it opens the full engine.
  */
-function JointFireFeature({ onOpen }: { onOpen: () => void }) {
+function JointFireFeature({ onOpen, hideAmounts = false }: { onOpen: () => void; hideAmounts?: boolean }) {
   const goal = MILESTONE_GOALS.EXPEDITION; // The Maldives — a holiday a couple of years out
   const proj = projectCumulative(JOINT_PARTNERS, JOINT_EVENTS, { years: 2, momentum: 0.12 });
   const at2 = proj.find((p) => p.year === 2) ?? proj[proj.length - 1]!;
@@ -3328,9 +3328,9 @@ function JointFireFeature({ onOpen }: { onOpen: () => void }) {
         </p>
         <div className="mt-3.5 flex items-center gap-3">
           <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#fdf6e3]/15">
-            <div className="h-full rounded-full bg-[#f59e0b]" style={{ width: `${pct}%`, boxShadow: "0 0 8px rgba(245,158,11,0.6)" }} />
+            <div className="h-full rounded-full bg-[#f59e0b]" style={{ width: hideAmounts ? "100%" : `${pct}%`, opacity: hideAmounts ? 0.25 : 1, boxShadow: "0 0 8px rgba(245,158,11,0.6)" }} />
           </div>
-          <span className="shrink-0 text-[12px] font-bold tabular-nums text-[#f59e0b]">{pct}% of £{goal.value.toLocaleString()}</span>
+          <span className="shrink-0 text-[12px] font-bold tabular-nums text-[#f59e0b]">{hideAmounts ? "Progress visible only to the two of them" : `${pct}% of £${goal.value.toLocaleString()}`}</span>
         </div>
         <div className="mt-4 flex items-center justify-between">
           <span className="text-[12px] text-[#fdf6e3]/50">On track in ~2 years</span>
@@ -3679,7 +3679,7 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint }: {
         {/* ── Joint pot feature — works for grown-ups & big goals too ── */}
         <div>
           <p className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff6b6b]">Not just for kids</p>
-          <JointFireFeature onOpen={onOpenJoint} />
+          <JointFireFeature onOpen={onOpenJoint} hideAmounts />
           <p className="mt-2.5 px-1 text-[11px] leading-relaxed text-[#0f172a]/50">
             Kindled works for any recipient, any age — a child&apos;s first bike, your own birthday, or two people saving for a holiday or a new car together.
           </p>

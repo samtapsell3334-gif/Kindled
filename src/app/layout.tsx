@@ -61,8 +61,8 @@ export const metadata: Metadata = {
     description: "Chip into shared pots for the gifts that actually matter — revealed on the big day.",
   },
   icons: {
-    icon: "/favicon.svg",
-    apple: "/apple-touch-icon.png",
+    icon: "/favicon.svg?v=2",
+    apple: "/apple-touch-icon.png?v=2",
   },
   appleWebApp: {
     capable: true,
