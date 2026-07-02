@@ -310,7 +310,7 @@ export function RevealExperience(p: RevealExperienceProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex flex-col overflow-hidden bg-[#0a0400] text-white"
+      className="fixed inset-0 z-[90] flex flex-col overflow-hidden text-white [background:var(--night)]"
       onClick={tapToAdvance ? next : undefined}
       role="region"
       aria-label="The reveal"

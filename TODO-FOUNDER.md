@@ -33,6 +33,13 @@ was completed and is ticked below with evidence; what remains is the short
    Open in Neon → Branches → create a "development" branch, then point the
    development env DATABASE_URL at it. Two minutes.
 
+## v8.2b colour decision — YOUR PHONE PASS, then one line
+- Preview Direction 2 on your phone: open kindledgift.co.uk/?theme=ember-teal
+  (sticks for the browsing session; ?theme=legacy switches back). Check hero,
+  a wish page, the payment sheet, the reveal.
+- Happy? Say "flip the theme" (or edit src/lib/theme.ts DEFAULT_THEME to
+  "ember-teal"). Revert is the same single line. OG/share cards follow the flip.
+
 ## Legal & compliance — drafted, awaiting the two founder actions above
 - [x] Privacy + terms templates complete and published; entity details are the
       only gap (blocked on incorporation). Solicitor brief: docs/legal-brief.md.

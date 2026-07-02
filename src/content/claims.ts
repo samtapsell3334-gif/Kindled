@@ -64,6 +64,11 @@ export const NOUN = "wish" as const;
 export const NOUN_PLURAL = "wishes" as const;
 export const STATUS_LABELS = ["Just started", "Warming up", "Almost there", "Fully funded"] as const;
 
+/** The trust strip (v8.2b P0.3) — worn at the exact moments trust is questioned. */
+export const TRUST = {
+  items: ["Payments by Stripe", "Money held safely until the reveal", "Free to start"],
+} as const;
+
 /** Core taglines. */
 export const TAGLINES = {
   signoff: "Gifting, reignited.",

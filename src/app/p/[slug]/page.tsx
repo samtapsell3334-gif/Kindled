@@ -21,6 +21,7 @@ import { LogoMark } from "@/components/Logo";
 import { MaterialisingGift } from "@/components/sandbox/MaterialisingGift";
 import { giftVisualFor } from "@/lib/sandbox/gift-visual";
 import { DemoBanner } from "@/components/DemoBanner";
+import { TrustStrip } from "@/components/TrustStrip";
 import { KindleRecord } from "@/components/KindleRecord";
 import { RevealExperience } from "@/components/RevealExperience";
 import type { RevealOutcome } from "@/lib/sandbox/types";
@@ -114,7 +115,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
 
   if (missing) {
     return (
-      <div className="min-h-screen bg-[#fdf9f5]"><DemoBanner />
+      <div className="min-h-screen bg-ground"><DemoBanner />
         <main className="mx-auto max-w-md px-5 py-16 text-center">
           <p className="text-[15px] text-stone-600">This wish doesn&apos;t exist (the sandbox may have been reset).</p>
           <Link href="/sandbox" className="mt-4 inline-block rounded-2xl bg-stone-900 px-5 py-3 text-[14px] font-bold text-white">Start a wish</Link>
@@ -122,12 +123,12 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
       </div>
     );
   }
-  if (!view) return <div className="min-h-screen bg-[#fdf9f5]"><DemoBanner /><p className="py-16 text-center text-[14px] text-stone-500">Warming up…</p></div>;
+  if (!view) return <div className="min-h-screen bg-ground"><DemoBanner /><p className="py-16 text-center text-[14px] text-stone-500">Warming up…</p></div>;
 
   // ── Receiver surprise view — the API sent no numbers; render the warmth ──
   if (view.kind === "receiver_surprise") {
     return (
-      <div className="min-h-screen bg-[#0f172a] text-[#fdf6e3]"><DemoBanner />
+      <div className="min-h-screen bg-night text-[#fdf6e3]"><DemoBanner />
         <main className="mx-auto max-w-md px-5 py-16 text-center">
           <h1 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold">Something&apos;s being kept warm for you, {view.recipientName}</h1>
           {/* WS-2.3: the big-day teaser — anticipation without information */}
@@ -156,14 +157,14 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
   // link. Catalogue taps only; no free text, no data collected from the child.
   if (asKid && view.kind === "manager" && managerKey) {
     return (
-      <div className="min-h-screen bg-[#fdf9f5] text-stone-900"><DemoBanner />
+      <div className="min-h-screen bg-ground text-stone-900"><DemoBanner />
         <KidCircleView view={view} slug={slug} managerKey={managerKey} onChanged={() => { void load(); }} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
+    <div className="min-h-screen bg-ground text-stone-900">
       <DemoBanner />
       <main className="mx-auto max-w-md px-5 py-8 pb-24">
         <p className="text-[11px] font-bold uppercase tracking-widest text-amber-700">{view.occasion} · {new Date(view.eventDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</p>
@@ -203,7 +204,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
 
         {/* Granted (WS-2.5): a completed wish is the product's proof */}
         {view.status !== "open" && (
-          <section aria-label="Wish granted" className="mt-4 rounded-3xl bg-[#0f172a] p-6 text-center text-[#fdf6e3]">
+          <section aria-label="Wish granted" className="mt-4 rounded-3xl bg-night p-6 text-center text-[#fdf6e3]">
             <MaterialisingGift visual={{ mode: "complete" }} size={110} className="mx-auto" />
             <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-amber-300">{view.status === "stacked" ? "Stacked forward" : "Granted"}</p>
             <p className="mt-2 text-[15px] font-semibold">
@@ -212,7 +213,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
                 : `${view.contributors.length} ${view.contributors.length === 1 ? "person" : "people"} made this happen for ${view.recipientName}.`}
             </p>
             <button onClick={() => setShowReveal(true)}
-              className="mt-4 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
+              className="mt-4 w-full rounded-2xl cta-primary py-3.5 text-[14px] font-bold">
               <Sparkles className="mr-1.5 inline h-4 w-4" />Watch the reveal
             </button>
           </section>
@@ -221,7 +222,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         {/* Guest CTA */}
         {!isManager && view.status === "open" && step === "idle" && (
           <button onClick={() => { setStep("amount"); beacon("start"); }}
-            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-[15px] font-bold text-stone-900">
+            className="mt-6 w-full rounded-2xl cta-primary py-4 text-[15px] font-bold">
             Chip in for {view.recipientName}
           </button>
         )}
@@ -257,6 +258,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
         {step === "sheet" && (
           <section aria-label="Payment" className="mt-6 rounded-2xl border border-stone-200 bg-white p-5">
             <p className="text-[10px] font-bold uppercase tracking-widest text-stone-500">Step 2 of 3 · Payment</p>
+            <TrustStrip className="mt-2" />
             <div className="mb-3 mt-1 flex items-center justify-between">
               <p className="text-[14px] font-bold">Pay £{amount}</p>
               <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-700">Demo: no money moves</span>
@@ -275,7 +277,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
               <p className="text-[11px] text-stone-500">This demo card is never read or sent; your £{amount} goes straight into the wish. <Link href="/#money" className="underline">How the money works</Link></p>
             </div>
             <button onClick={() => setStep("message")}
-              className="mt-3 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">Pay £{amount} (simulated)</button>
+              className="mt-3 w-full rounded-2xl cta-primary py-3.5 text-[14px] font-bold">Pay £{amount} (simulated)</button>
           </section>
         )}
 
@@ -333,7 +335,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
               </div>
               {wyr && (
                 <Link href={`/sandbox?goal=${encodeURIComponent(wyr.replace(/[^\w ]/g, "").trim())}&ref=${slug}`}
-                  className="mt-3 inline-block w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3 text-[14px] font-bold text-stone-900">
+                  className="mt-3 inline-block w-full rounded-2xl cta-primary py-3 text-[14px] font-bold">
                   Start your own wish for it
                 </Link>
               )}
@@ -385,7 +387,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
             {view.status === "open" ? (
               <div className="mt-4 border-t border-stone-200 pt-4">
                 <button disabled={revealBusy} onClick={() => { void openReveal(); }}
-                  className="w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">
+                  className="w-full rounded-2xl cta-primary py-3.5 text-[14px] font-bold">
                   <Gift className="mr-1.5 inline h-4 w-4" />Simulate reveal day
                 </button>
                 <p className="mt-2 text-[11px] text-stone-500">Runs the full reveal experience, and you choose the outcome at the end.</p>

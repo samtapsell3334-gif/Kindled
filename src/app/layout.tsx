@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { DEFAULT_THEME } from "@/lib/theme";
 import { Geist, Geist_Mono, Fredoka, Fraunces, Outfit, Gabarito } from "next/font/google";
 import "./globals.css";
 import { ConsentBanner } from "@/components/ConsentBanner";
@@ -80,8 +81,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" suppressHydrationWarning>
+    <html lang="en-GB" suppressHydrationWarning data-theme={DEFAULT_THEME}>
       <body className={`${fontSans.variable} ${fontMono.variable} ${fontDisplay.variable} ${fontSerif.variable} ${fontOutfit.variable} ${fontLogo.variable} font-sans antialiased`}>
+        {/* v8.2 preview switch: ?theme=ember-teal|legacy overrides data-theme
+            during parse (before paint) and persists for the session. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var q=new URLSearchParams(location.search).get("theme");if(q==="ember-teal"||q==="legacy"){sessionStorage.setItem("kindled-theme",q);}var t=sessionStorage.getItem("kindled-theme");if(t==="ember-teal"||t==="legacy"){document.documentElement.dataset.theme=t;}}catch(e){}})();`,
+          }}
+        />
         {children}
         <ConsentBanner />
       </body>

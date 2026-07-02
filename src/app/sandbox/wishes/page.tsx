@@ -37,7 +37,7 @@ export default function MyPotsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
+    <div className="min-h-screen bg-ground text-stone-900">
       <DemoBanner />
       <main className="mx-auto max-w-md px-5 py-8 pb-20">
         <div className="mb-6 flex items-center justify-between">
@@ -53,7 +53,7 @@ export default function MyPotsPage() {
         {mine.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-dashed border-stone-300 p-8 text-center">
             <p className="text-[14px] text-stone-500">No wishes yet.</p>
-            <Link href="/sandbox" className="mt-3 inline-block rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-[14px] font-bold text-stone-900">Start your first wish</Link>
+            <Link href="/sandbox" className="mt-3 inline-block rounded-2xl cta-primary px-6 py-3 text-[14px] font-bold">Start your first wish</Link>
             <div className="mt-6 text-left"><ExampleWishes /></div>
           </div>
         ) : (

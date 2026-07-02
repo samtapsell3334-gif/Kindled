@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { NIGHT_CANVAS } from "@/lib/theme";
 import { getPotBySlug, ensureHydrated } from "@/lib/sandbox/store";
 
 /**
@@ -26,7 +27,7 @@ export default async function PotOgImage({ params }: { params: Promise<{ slug: s
       <div style={{
         width: "100%", height: "100%", display: "flex", flexDirection: "column",
         justifyContent: "center", padding: "72px", position: "relative", fontFamily: "sans-serif",
-        background: "linear-gradient(160deg, #1a0800 0%, #0a0400 60%, #050200 100%)",
+        background: `linear-gradient(160deg, ${NIGHT_CANVAS} 0%, ${NIGHT_CANVAS} 100%)`,
       }}>
         {embers.map((e, i) => (
           <div key={i} style={{ position: "absolute", left: e.left, top: e.top, width: e.s, height: e.s, borderRadius: 999, background: "#fbbf24", opacity: e.o, display: "flex" }} />

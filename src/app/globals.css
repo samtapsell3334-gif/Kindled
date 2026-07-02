@@ -6,6 +6,78 @@
   --font-family-outfit: var(--font-outfit), 'Outfit', ui-sans-serif, sans-serif;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   v8.2 COLOUR SYSTEM — role tokens, two registers.
+   `legacy` (default) captures today's values VERBATIM so converted surfaces
+   render pixel-identically until the founder flips DEFAULT_THEME (one line,
+   src/lib/theme.ts). `ember-teal` is Direction 2: warm paper, teal structure,
+   ember only where action/emotion live. Preview: any URL + ?theme=ember-teal.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root,
+[data-theme="legacy"] {
+  --ground: #fdf9f5;            /* sandbox/wish page backing (verbatim) */
+  --ground-warm: #fdf6e3;       /* demo/homepage warm paper (verbatim vh-sand) */
+  --card: #ffffff;
+  --structure: #0f172a;         /* vh-midnight — nav/structure ink */
+  --structure-dark: #0f172a;
+  --structure-mid: #57534e;     /* stone-600 secondary structure */
+  --ember: #f59e0b;
+  --ember-strong: #f97316;
+  --ember-soft: #fef3c7;
+  --cta-bg: linear-gradient(to right, #fbbf24, #f97316); /* amber-400→orange-500 verbatim */
+  --cta-ink: #1c1917;           /* stone-900 on CTAs (verbatim) */
+  --night: #0f172a;             /* reveal / set-piece canvas */
+  --ink: #1c1917;
+  --ink-soft: #78716c;          /* stone-500 */
+  --on-structure: #fdf6e3;
+  --on-structure-soft: rgba(253, 246, 227, 0.6);
+  --btn2-border: #d6d3d1;       /* stone-300 secondary-button border */
+  --btn2-ink: #44403c;          /* stone-700 secondary-button text */
+  --footer-bg: #fffdf7;
+  --footer-ink: #44403c;
+  --footer-ink-soft: #78716c;
+  --nav-bg: rgba(7, 3, 0, 0.90);
+  --nav-bg-solid: rgba(7, 3, 0, 0.95);
+  --hero-bg: radial-gradient(ellipse 100% 70% at 50% 80%, #1a0800 0%, #0a0400 45%, #000 100%);
+}
+
+[data-theme="ember-teal"] {
+  --ground: #FAF5EB;
+  --ground-warm: #FAF5EB;
+  --card: #ffffff;
+  --structure: #085041;
+  --structure-dark: #04342C;
+  --structure-mid: #0F6E56;
+  --ember: #EF9F27;
+  --ember-strong: #EF9F27;
+  --ember-soft: #FAC775;
+  --cta-bg: linear-gradient(to right, #EF9F27, #EF9F27); /* flat ember fill */
+  --cta-ink: #412402;           /* dark amber — never white on ember */
+  --night: #04342C;
+  --ink: #2C2C2A;
+  --ink-soft: #5F5E5A;
+  --on-structure: #E1F5EE;
+  --on-structure-soft: #9FE1CB;
+  --btn2-border: #0F6E56;
+  --btn2-ink: #0F6E56;
+  --footer-bg: #04342C;
+  --footer-ink: #E1F5EE;
+  --footer-ink-soft: #9FE1CB;
+  --nav-bg: rgba(8, 80, 65, 0.92);
+  --nav-bg-solid: rgba(4, 52, 44, 0.96);
+  --hero-bg: radial-gradient(ellipse 100% 70% at 50% 80%, #0F6E56 0%, #085041 45%, #04342C 100%);
+}
+
+/* v8.2 reusable token classes — components carry roles, not hexes. */
+.cta-primary { background: var(--cta-bg); color: var(--cta-ink); }
+.btn-secondary { border: 1px solid var(--btn2-border); color: var(--btn2-ink); }
+.bg-ground { background-color: var(--ground); }
+.bg-ground-warm { background-color: var(--ground-warm); }
+.bg-night { background-color: var(--night); }
+.bg-footer { background-color: var(--footer-bg); }
+.text-footer-ink { color: var(--footer-ink); }
+.text-footer-soft { color: var(--footer-ink-soft); }
+
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;

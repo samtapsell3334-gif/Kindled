@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { NIGHT_CANVAS } from "@/lib/theme";
 
 /**
  * Code-rendered OG image (1200×630) — closes the founder TODO without shipping a
@@ -23,7 +24,7 @@ export default function OgImage() {
         style={{
           width: "100%", height: "100%", display: "flex", flexDirection: "column",
           justifyContent: "center", padding: "72px",
-          background: "linear-gradient(160deg, #1a0800 0%, #0a0400 60%, #050200 100%)",
+          background: NIGHT_CANVAS,
           position: "relative", fontFamily: "sans-serif",
         }}
       >

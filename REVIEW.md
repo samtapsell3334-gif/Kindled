@@ -378,3 +378,52 @@ notification emails on — signups are safe in the DB either way.
 Also: last footer contrast stragglers darkened (homepage a11y toward 100).
 
 **Final:** homepage a11y **100** (verified live post-deploy) — both audited pages now perfect: sandbox 100, homepage 100.
+
+## 2026-07-02 — v8.2/v8.2b: colour system built, Direction 2 implemented behind the switch
+
+**Mechanism (v8.2):** two token registers in globals.css — `legacy` captures
+today's values VERBATIM (converted surfaces render pixel-identically);
+`ember-teal` carries Direction 2 (warm paper #FAF5EB, teal structure
+#085041/#04342C, ember #EF9F27 with dark-amber ink #412402, night reserved for
+set-pieces). `data-theme` on <html>, default from src/lib/theme.ts
+(DEFAULT_THEME = "legacy" — THE one-line founder flip / revert). Preview on any
+URL with `?theme=ember-teal` (session-persistent, pre-paint, no flash).
+
+**Direction-2 patterns live:** teal nav band + teal hero frame; TrustStrip
+component (claims.ts TRUST copy — never hardcoded) under the hero and inside
+the payment sheet; primary CTAs = flat ember with dark-amber ink (legacy keeps
+the verbatim gradient via the --cta-bg token); footer flips to the night-step
+teal with cream/mint text; wish cards stay white on cream; reveal backdrop and
+granted/receiver panels bound to --night.
+
+**AA contrast matrix (ember-teal, enforced as a unit test that fails on token edits):**
+| pair | values | ratio |
+|---|---|---|
+| CTA dark-amber on ember | #412402 on #EF9F27 | 6.54:1 |
+| mint on structure teal | #9FE1CB on #085041 | 6.31:1 |
+| cream on structure teal | #E1F5EE on #085041 | 8.28:1 |
+| ink on cream | #2C2C2A on #FAF5EB | 12.88:1 |
+| soft ink on cream | #5F5E5A on #FAF5EB | 5.97:1 |
+| structure-mid link on cream | #0F6E56 on #FAF5EB | 5.71:1 |
+| cream on night step | #E1F5EE on #04342C | 12.07:1 |
+| mint on night step | #9FE1CB on #04342C | 9.20:1 |
+
+**--night usage (grepped, allowlist-enforced by test):** RevealExperience
+(reveal backdrop), p/[slug]/page.tsx (receiver teaser ground + granted panel),
+globals.css/theme.ts (definitions). OG/share cards use NIGHT_CANVAS from
+theme.ts — server artwork can't read data-theme, so they follow DEFAULT_THEME
+and regenerate on flip.
+
+**Evidence:** audit/colour/ — hero/money/wish/sandbox-create ×
+(legacy, ember-teal) + the current-default OG card. Logo variants: existing
+dark-variant (cream) lockup reads correctly on teal structure; light variant on
+cream — no missing variant, no TODO needed.
+
+**Coverage note (honest):** converted this pass = homepage structure (nav,
+hero, CTAs, footer, trust strip), the full sandbox loop, reveal/OG night
+set-pieces. The marketing demo's interior (wishes/demo) still carries legacy
+hex values — it renders identically in both registers until its own conversion
+pass; the CI raw-hex rule is enforced on the token-component list and grows
+with each converted file. Suite: 96 tests green (4 new colour guards).
+DEFAULT NOT FLIPPED — founder previews with ?theme=ember-teal and flips
+DEFAULT_THEME after the phone pass.
