@@ -503,3 +503,8 @@ All sixteen workstreams executed. Evidence per audit line:
     film": zero. PASS
 
 Suite: 111 tests green. Build clean. Live verification after deploy below.
+
+**Live post-deploy verification:** data-theme=ember-teal live on all domains;
+/film 308→home; /beta 200 with wrong-PIN 401 + PIN absent from bundle; /survey
+live. Lighthouse mobile a11y: homepage 100, /survey 100, /sandbox 100 (helper
+text darkened for the new cream ground). Deployment 54b5448 aliased ×4.
