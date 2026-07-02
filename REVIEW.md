@@ -427,3 +427,12 @@ pass; the CI raw-hex rule is enforced on the token-component list and grows
 with each converted file. Suite: 96 tests green (4 new colour guards).
 DEFAULT NOT FLIPPED — founder previews with ?theme=ember-teal and flips
 DEFAULT_THEME after the phone pass.
+
+## 2026-07-02 — v8.2b coverage extension
+
+Site chrome now responds to the switch: DemoBanner (--banner-bg), legal pages
+(--page-plain: white under legacy, cream under ember-teal — honouring the
+"no pure-white grounds" rule in Direction 2), film page ground. Remaining
+unconverted (renders identically in both registers, logged for a future pass):
+the marketing demo's interior mock (wishes/demo in-app surfaces + About-tab
+Monochrome Luxe sections) and the investor war room. 96 tests green.

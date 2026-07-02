@@ -15,7 +15,7 @@ export function LegalShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-white text-stone-800">
+    <div className="min-h-screen text-stone-800 [background:var(--page-plain)]">
       <header className="border-b border-stone-100">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
           <Link href="/" aria-label="Kindled home">

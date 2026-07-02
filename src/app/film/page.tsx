@@ -17,7 +17,7 @@ export const metadata: Metadata = {
  */
 export default function FilmPage() {
   return (
-    <div className="min-h-screen bg-[#fdf9f5] text-stone-900">
+    <div className="min-h-screen bg-ground text-stone-900">
       <header className="border-b border-stone-100 bg-white">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
           <Link href="/" aria-label="Kindled home">
