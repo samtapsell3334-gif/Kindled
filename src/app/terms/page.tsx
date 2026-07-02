@@ -54,9 +54,20 @@ export default function TermsPage() {
         <li><strong>Free entry route:</strong> send your name and email by post/email as set out below to receive an entry with no purchase.</li>
         <li>Winners are drawn at random each quarter and notified by email.</li>
       </UL>
+      <H2 id="prize-draw-rules">Prize draw — full rules (draft)</H2>
+      <UL>
+        <li><strong>Promoter:</strong> Kindled (legal entity being incorporated — this line will carry the company name, number and registered address before launch). Contact: <a href="mailto:sam.tapsell@kindledgift.co.uk" className="underline">sam.tapsell@kindledgift.co.uk</a>.</li>
+        <li><strong>Draw periods:</strong> quarterly — 1 January–31 March, 1 April–30 June, 1 July–30 September, 1 October–31 December, each closing 23:59 (UK time) on the final day.</li>
+        <li><strong>Entry:</strong> each completed contribution to a wish during the period earns one entry, automatically.</li>
+        <li><strong>Free entry route (no purchase necessary):</strong> email your full name and email address with the subject &quot;Prize draw entry&quot; to the contact address above during the draw period. Each valid request earns one entry, treated identically to a contribution entry, including in the draw method and odds.</li>
+        <li><strong>Eligibility:</strong> UK residents aged 18 or over. Our staff and their households are excluded.</li>
+        <li><strong>Prize:</strong> one winner per draw period receives £2,500, paid by bank transfer within 28 days of confirmation. No cash alternative is needed (the prize is cash); the prize is not transferable before payment.</li>
+        <li><strong>Draw method:</strong> one entry selected by a verifiably random electronic draw within 14 days of the period closing, under independent observation.</li>
+        <li><strong>Winner notification:</strong> by email within 14 days of the draw; if a winner does not respond within 28 days, a redraw is held. The winner&apos;s surname and county are available on request (or with the winner&apos;s consent, published), per the CAP Code.</li>
+        <li><strong>Data:</strong> entry data is used only to administer the draw and is deleted within 6 months of the draw date.</li>
+      </UL>
       <Todo>
-        Publish full prize-draw rules: promoter identity and address, exact free-entry postal/email instructions, opening
-        and closing dates, draw date/method, number of prizes, winner notification and publication, and data handling.
+        Solicitor: confirm CAP Code Section 8 compliance of the rules above and insert the promoter&apos;s legal identity once the company is incorporated (see docs/legal-brief.md).
       </Todo>
 
       <H2>Acceptable use</H2>
