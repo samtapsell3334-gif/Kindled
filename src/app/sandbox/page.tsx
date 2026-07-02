@@ -50,6 +50,7 @@ function CreatePot() {
   const [error, setError] = useState("");
   const [created, setCreated] = useState<{ slug: string; managerKey: string } | null>(null);
   const [copied, setCopied] = useState<"share" | "manage" | null>(null);
+  const [shareMsg, setShareMsg] = useState("");
 
   const catalogue = useMemo(
     () => (isChildPot ? CATALOGUE.filter((c) => ["Toys", "Games", "Sports", "Craft"].includes(c.category)) : CATALOGUE),
@@ -93,6 +94,7 @@ function CreatePot() {
 
   if (created) {
     const shareUrl = `${window.location.origin}/p/${created.slug}`;
+    const msg = shareMsg || `We're all chipping in for ${title} — tap to join in 🎉 ${shareUrl}`;
     const manageUrl = `${shareUrl}?key=${created.managerKey}`;
     return (
       <main className="mx-auto max-w-md px-5 py-12 text-center">
@@ -101,18 +103,23 @@ function CreatePot() {
         <p className="mt-2 text-[14px] text-stone-500">Share the first link with the people who&apos;ll chip in. Keep the second link private — it&apos;s how you manage the pot and run the reveal.</p>
 
         <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Share link</p>
-          <p className="mt-1 break-all text-[13px] text-stone-700">{shareUrl}</p>
-          <div className="mt-2 flex gap-2">
-            <button onClick={() => copy(shareUrl, "share")} className="flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-2 text-[12px] font-bold text-white">
-              {copied === "share" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied === "share" ? "Copied" : "Copy"}
-            </button>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700">Your invite message — edit it, then send</p>
+          <textarea value={msg} onChange={(e) => setShareMsg(e.target.value)} rows={3} aria-label="Invite message"
+            className="mt-2 w-full rounded-xl border border-amber-200 bg-white px-3 py-2 text-[13px] text-stone-700" />
+          <div className="mt-2 flex flex-wrap gap-2">
+            <a href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-xl bg-[#25D366] px-3.5 py-2 text-[12px] font-bold text-white">
+              <Share2 className="h-3.5 w-3.5" /> WhatsApp
+            </a>
             {typeof navigator !== "undefined" && !!navigator.share && (
-              <button onClick={() => { void navigator.share({ title: "Chip into our pot", url: shareUrl }).catch(() => {}); }}
+              <button onClick={() => { void navigator.share({ text: msg }).catch(() => {}); }}
                 className="flex items-center gap-1.5 rounded-xl border border-stone-300 px-3.5 py-2 text-[12px] font-bold text-stone-700">
                 <Share2 className="h-3.5 w-3.5" /> Share
               </button>
             )}
+            <button onClick={() => copy(msg, "share")} className="flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-2 text-[12px] font-bold text-white">
+              {copied === "share" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied === "share" ? "Copied" : "Copy message"}
+            </button>
           </div>
         </div>
 

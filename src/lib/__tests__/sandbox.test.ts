@@ -133,3 +133,24 @@ describe("stack + reset", () => {
     expect(listEvents()).toHaveLength(0);
   });
 });
+
+// ── v7 mandated test 4: pot routes emit per-pot OG meta, surprise-safe ─────────
+describe("per-pot OG metadata (v7 Stage 0)", () => {
+  it("emits per-pot title/description with no amounts or item names", async () => {
+    const pot = basePot();
+    contribute(pot.slug, { displayName: "Grandma", amount: 20 });
+    const { generateMetadata } = await import("@/app/p/[slug]/layout");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: pot.slug }) });
+    expect(JSON.stringify(meta.title)).toContain("Ava's 8th Birthday");
+    const flat = JSON.stringify(meta);
+    expect(flat).not.toContain("20");        // no amounts
+    expect(flat).not.toContain("LEGO");      // no item names
+    expect(flat).not.toContain(pot.managerKey);
+    expect((meta.twitter as { card?: string }).card).toBe("summary_large_image");
+  });
+  it("falls back safely for unknown slugs", async () => {
+    const { generateMetadata } = await import("@/app/p/[slug]/layout");
+    const meta = await generateMetadata({ params: Promise.resolve({ slug: "nope" }) });
+    expect(JSON.stringify(meta.title)).toContain("Kindled");
+  });
+});

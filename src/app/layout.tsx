@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     locale: "en_GB",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Kindled — group gifting for friends & family",
     description: "Chip into shared pots for the gifts that actually matter — revealed on the big day.",
   },

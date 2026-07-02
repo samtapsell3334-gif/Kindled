@@ -44,6 +44,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
   const [revealBusy, setRevealBusy] = useState(false);
   const [voucher, setVoucher] = useState<string | null>(null);
   const [showReveal, setShowReveal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [revealMsgs, setRevealMsgs] = useState<{ displayName: string; text?: string; videoRef?: string }[] | null>(null);
 
   async function openReveal() {
@@ -77,6 +78,8 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
     void fetch(`/api/sandbox/pots/${slug}/contribute?step=${stepName}`, { method: "PUT" });
 
   async function submitContribution() {
+    if (submitting) return; // double-tap cannot double-submit
+    setSubmitting(true);
     const res = await fetch(`/api/sandbox/pots/${slug}/contribute`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -91,6 +94,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
       }),
     });
     if (res.ok) { setStep("done"); void load(); }
+    setSubmitting(false);
   }
 
   if (missing) {
@@ -207,7 +211,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
                 <input readOnly value="12/29" aria-label="Expiry (demo)" className="flex-1 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-[14px] text-stone-500" />
                 <input readOnly value="123" aria-label="Security code (demo)" className="w-20 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-[14px] text-stone-500" />
               </div>
-              <p className="text-[11px] text-stone-400">Demo card — pre-filled so you never type a real card number. These fields are never sent anywhere.</p>
+              <p className="text-[11px] text-stone-400">Demo card — pre-filled so you never type a real card number. These fields are never sent anywhere. <Link href="/#money" className="underline">How the money works</Link></p>
             </div>
             <button onClick={() => setStep("message")}
               className="mt-3 w-full rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 py-3.5 text-[14px] font-bold text-stone-900">Pay £{amount} (simulated)</button>
@@ -227,11 +231,14 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
             ) : recording ? (
               <div className="mt-3"><KindleRecord contributionId={contributionId} onRecorded={(m) => { setVideoRef(m.url); setRecording(false); }} onCancel={() => setRecording(false)} /></div>
             ) : (
-              <button onClick={() => setRecording(true)} className="mt-2 w-full rounded-xl border border-stone-300 py-2.5 text-[13px] font-bold text-stone-700">Record a video instead</button>
+              <div className="mt-2">
+                <button onClick={() => setRecording(true)} className="w-full rounded-xl border border-stone-300 py-2.5 text-[13px] font-bold text-stone-700">Record a video instead</button>
+                <p className="mt-1 text-[11px] text-stone-400">Your phone will ask for camera access — only {view.recipientName} sees the video, at the reveal. Delete or re-record any time.</p>
+              </div>
             )}
-            <button onClick={() => { void submitContribution(); }}
-              className="mt-4 w-full rounded-2xl bg-stone-900 py-3.5 text-[14px] font-bold text-white">
-              {message || videoRef ? "Seal it for the reveal" : "Finish without a message"}
+            <button onClick={() => { void submitContribution(); }} disabled={submitting}
+              className="mt-4 w-full rounded-2xl bg-stone-900 py-3.5 text-[14px] font-bold text-white disabled:opacity-60">
+              {submitting ? "Sealing…" : message || videoRef ? "Seal it for the reveal" : "Finish without a message"}
             </button>
           </section>
         )}
