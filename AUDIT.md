@@ -44,3 +44,11 @@ Throttled-4G timing and Lighthouse need a local Chrome run → TODO-FOUNDER.
 | X.7 | Error/empty states | **PASS w/ P2 note** | Dead pot, camera-deny fallback (text path), double-submit guarded; mid-flow reset message on 404. Offline mid-payment state is browser-default → P2. |
 
 **P0s: 3 found/known, 3 fixed. P1s: 2 found, 2 fixed. P2s noted above (share-clip video, richer next-occasion seed, offline state, founder Lighthouse/throttle runs).**
+
+## Post-deploy live re-walk note (0.1)
+Per-pot og:image URL + renderer verified live (200, surprise-safe fallback design).
+On Vercel, og:title/description fall back to the safe default because page and API
+routes run as separate lambdas — the in-memory store cannot share pots across them.
+The metadata pipeline is correct (unit-tested with real store data; full behaviour
+locally); production gains complete per-pot previews the moment DATABASE_URL lands
+(the single already-logged founder unlock). Fallback leaks nothing.
