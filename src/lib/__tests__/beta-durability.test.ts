@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { createPot, getPotBySlug, resetSandbox } from "../sandbox/store";
-import { questionSequence, QUESTIONS } from "../../content/survey";
+import { questionSequence, QUESTIONS, computeTwoYearProjection, tierFor, optionACopy, optionBCopy, bandMidpoint } from "../../content/survey";
 
 /**
  * v11 WS-13 acceptance: the sandbox admin reset must NEVER touch the waitlist
@@ -30,23 +30,20 @@ describe("waitlist + survey survive the sandbox reset", () => {
   });
 });
 
-describe("survey branching (v11 WS-14)", () => {
-  it("whip-round follow-up appears only after Yes", () => {
-    expect(questionSequence({}, "buyer").some((q) => q.id === "q8b_worst_bit")).toBe(false);
-    expect(questionSequence({ q8_whipround: "Yes" }, "buyer").some((q) => q.id === "q8b_worst_bit")).toBe(true);
+describe("survey branching (v13)", () => {
+  it("whipround worst-bit is skipped only when there's no group-gift habit", () => {
+    expect(questionSequence({}, "buyer").some((q) => q.id === "whipround_worst_bit")).toBe(true);
+    expect(questionSequence({ group_gift_method: "We don't really do group gifts" }, "buyer").some((q) => q.id === "whipround_worst_bit")).toBe(false);
+    expect(questionSequence({ group_gift_method: "Cash in a card" }, "buyer").some((q) => q.id === "whipround_worst_bit")).toBe(true);
   });
-  it("the child WYR shows only to parents", () => {
-    expect(questionSequence({}, "buyer").some((q) => q.id === "q10_wyr_child")).toBe(false);
-    expect(questionSequence({}, "parent").some((q) => q.id === "q10_wyr_child")).toBe(true);
-    expect(questionSequence({}, "both").some((q) => q.id === "q10_wyr_child")).toBe(true);
-  });
-  it("the objection question is present (research integrity)", () => {
-    expect(QUESTIONS.some((q) => q.id === "q15_objection")).toBe(true);
-  });
-});
 
-describe("v11.3 survey addendum — curated-list concept test (parent/both branch)", () => {
-  it("New screens A and B appear ONLY for parent/both, never for buyer", () => {
+  it("the kids WYR (Q7) shows only to parents/both, never buyer", () => {
+    expect(questionSequence({}, "buyer").some((q) => q.id === "wyr_kids_choice")).toBe(false);
+    expect(questionSequence({}, "parent").some((q) => q.id === "wyr_kids_choice")).toBe(true);
+    expect(questionSequence({}, "both").some((q) => q.id === "wyr_kids_choice")).toBe(true);
+  });
+
+  it("Q9a/Q9b (duplicate pain + curated-list) show ONLY for parent/both, never buyer", () => {
     for (const seg of ["parent", "both"]) {
       const seq = questionSequence({}, seg);
       expect(seq.some((q) => q.id === "duplicate_pain_experienced"), seg).toBe(true);
@@ -57,16 +54,39 @@ describe("v11.3 survey addendum — curated-list concept test (parent/both branc
     expect(buyerSeq.some((q) => q.id === "curated_list_appeal")).toBe(false);
   });
 
-  it("both new screens sit immediately after q7_landed and before q8_whipround", () => {
+  it("Q9a/Q9b sit immediately after asked_frequency (Q9) and before buy_behaviour (Q10)", () => {
     const seq = questionSequence({}, "both").map((q) => q.id);
-    const iLanded = seq.indexOf("q7_landed");
+    const iAsked = seq.indexOf("asked_frequency");
     const iPain = seq.indexOf("duplicate_pain_experienced");
     const iAppeal = seq.indexOf("curated_list_appeal");
-    const iWhip = seq.indexOf("q8_whipround");
-    expect(iLanded).toBeGreaterThanOrEqual(0);
-    expect(iPain).toBe(iLanded + 1);
+    const iBuy = seq.indexOf("buy_behaviour");
+    expect(iAsked).toBeGreaterThanOrEqual(0);
+    expect(iPain).toBe(iAsked + 1);
     expect(iAppeal).toBe(iPain + 1);
-    expect(iWhip).toBe(iAppeal + 1);
+    expect(iBuy).toBe(iAppeal + 1);
+  });
+
+  it("the objection question is present (research integrity)", () => {
+    expect(QUESTIONS.some((q) => q.id === "objection")).toBe(true);
+  });
+
+  it("the appeal question has all nine options", () => {
+    const q = QUESTIONS.find((x) => x.id === "appeal");
+    expect(q?.kind).toBe("multi");
+    if (q?.kind === "multi") {
+      expect(q.options).toHaveLength(9);
+      for (const added of ["No duplicate gifts", "Buyers know exactly what to get", "Being able to add a surprise contribution on the day"]) {
+        expect(q.options).toContain(added);
+      }
+    }
+  });
+
+  it("the concept paragraph (Q16) doesn't narrow to a single pooled pot", () => {
+    const q = QUESTIONS.find((x) => x.id === "concept_intent");
+    expect(q?.kind).toBe("single");
+    if (q?.kind === "single") {
+      expect(q.concept).toMatch(/specific things|surprise on the big day/i);
+    }
   });
 
   it("duplicate_pain_experienced is a multi-select with the five specified options", () => {
@@ -87,22 +107,94 @@ describe("v11.3 survey addendum — curated-list concept test (parent/both branc
     }
   });
 
-  it("the appeal question (q14) was widened to all nine Patch 3 options", () => {
-    const q = QUESTIONS.find((x) => x.id === "q14_appeal");
-    expect(q?.kind).toBe("multi");
-    if (q?.kind === "multi") {
-      expect(q.options).toHaveLength(9);
-      for (const added of ["No duplicate gifts", "Buyers know exactly what to get", "Being able to add a surprise contribution on the day"]) {
-        expect(q.options).toContain(added);
-      }
+  it("the two numeric steppers (Q2/Q3) have the specified range and starting values", () => {
+    const outgoing = QUESTIONS.find((x) => x.id === "people_bought_for");
+    const incoming = QUESTIONS.find((x) => x.id === "people_buying_for_you");
+    expect(outgoing?.kind).toBe("stepper");
+    expect(incoming?.kind).toBe("stepper");
+    if (outgoing?.kind === "stepper") { expect(outgoing.min).toBe(0); expect(outgoing.max).toBe(30); expect(outgoing.start).toBe(8); expect(outgoing.topLabel).toBe("30+"); }
+    if (incoming?.kind === "stepper") { expect(incoming.min).toBe(0); expect(incoming.max).toBe(30); expect(incoming.start).toBe(6); expect(incoming.topLabel).toBe("30+"); }
+  });
+
+  it("the two banded value questions (Q4/Q5) share identical bands/midpoints", () => {
+    const bday = QUESTIONS.find((x) => x.id === "bday_value_band");
+    const xmas = QUESTIONS.find((x) => x.id === "xmas_value_band");
+    expect(bday?.kind).toBe("banded");
+    expect(xmas?.kind).toBe("banded");
+    if (bday?.kind === "banded" && xmas?.kind === "banded") {
+      expect(bday.options).toEqual(xmas.options);
+      expect(bday.options.map((o) => o.mid)).toEqual([25, 75, 150, 300, 500]);
     }
   });
 
-  it("the concept paragraph (Patch 2) no longer narrows to a single pooled pot", () => {
-    const q = QUESTIONS.find((x) => x.id === "q13_concept");
-    expect(q?.kind).toBe("single");
-    if (q?.kind === "single") {
-      expect(q.concept).toMatch(/specific things|surprise on the big day/i);
+  it("the calculated WYR (Q6) is present and depends on nothing parent-specific", () => {
+    for (const seg of ["parent", "buyer", "both"]) {
+      expect(questionSequence({}, seg).some((q) => q.id === "wyr_2yr_choice"), seg).toBe(true);
     }
+  });
+});
+
+describe("Q6 calculation engine (v13)", () => {
+  it("computes two_year_gifts and two_year_value from Q3/Q4/Q5 answers", () => {
+    const p = computeTwoYearProjection({ people_buying_for_you: 6, bday_value_band: "£50–£100", xmas_value_band: "£100–£200" });
+    expect(p).not.toBeNull();
+    expect(p?.twoYearGifts).toBe(12); // 6 * 2
+    expect(p?.twoYearValue).toBe(450); // (75 + 150) * 2
+  });
+
+  it("returns null when the inputs aren't all answered yet", () => {
+    expect(computeTwoYearProjection({})).toBeNull();
+    expect(computeTwoYearProjection({ people_buying_for_you: 6 })).toBeNull();
+  });
+
+  it("bandMidpoint maps every band label to its documented midpoint", () => {
+    expect(bandMidpoint("Under £50")).toBe(25);
+    expect(bandMidpoint("£50–£100")).toBe(75);
+    expect(bandMidpoint("£100–£200")).toBe(150);
+    expect(bandMidpoint("£200–£400")).toBe(300);
+    expect(bandMidpoint("£400+")).toBe(500);
+    expect(bandMidpoint("not a band")).toBe(0);
+  });
+
+  it("tier boundaries match the brief across all four tiers", () => {
+    expect(tierFor(0)).toBe("low");
+    expect(tierFor(299)).toBe("low");
+    expect(tierFor(300)).toBe("mid");
+    expect(tierFor(799)).toBe("mid");
+    expect(tierFor(800)).toBe("high");
+    expect(tierFor(1499)).toBe("high");
+    expect(tierFor(1500)).toBe("top");
+    expect(tierFor(5000)).toBe("top");
+  });
+
+  it("three profiles spanning all four tiers produce sane, distinct copy", () => {
+    // Low tier: small household, modest bands.
+    const low = computeTwoYearProjection({ people_buying_for_you: 2, bday_value_band: "Under £50", xmas_value_band: "Under £50" })!;
+    expect(low.tier).toBe("low");
+    expect(optionACopy(low)).toContain("4 gifts");
+    expect(optionACopy(low)).toContain("£100");
+    expect(optionBCopy(low)).toContain("trainers or headphones");
+
+    // High tier: larger family, generous bands.
+    const high = computeTwoYearProjection({ people_buying_for_you: 8, bday_value_band: "£200–£400", xmas_value_band: "£200–£400" })!;
+    expect(high.tier).toBe("high");
+    expect(optionBCopy(high)).toContain("hot tub");
+
+    // Top tier: big extended family, top bands.
+    const top = computeTwoYearProjection({ people_buying_for_you: 15, bday_value_band: "£400+", xmas_value_band: "£400+" })!;
+    expect(top.tier).toBe("top");
+    expect(optionACopy(top)).toContain("30 gifts");
+    expect(optionBCopy(top)).toContain("villa holiday");
+
+    // Mid tier, for completeness across all four.
+    const mid = computeTwoYearProjection({ people_buying_for_you: 4, bday_value_band: "£100–£200", xmas_value_band: "£100–£200" })!;
+    expect(mid.tier).toBe("mid");
+    expect(optionBCopy(mid)).toContain("sofa");
+  });
+
+  it("Option A/B copy always sums to the same two_year_value quoted in both cards", () => {
+    const p = computeTwoYearProjection({ people_buying_for_you: 10, bday_value_band: "£100–£200", xmas_value_band: "£200–£400" })!;
+    expect(optionACopy(p)).toContain(`£${p.twoYearValue}`);
+    expect(optionBCopy(p)).toContain(`£${p.twoYearValue}`);
   });
 });

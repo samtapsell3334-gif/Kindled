@@ -189,3 +189,105 @@ generic single-question auto-loop to avoid a duplicate panel.
 `src/app/beta/page.tsx`. Full verification detail in REVIEW.md's "v11.3 —
 Survey Addendum" section (build green, 130 tests green, both branches
 tap-tested live, dashboard panels confirmed against real seeded data).
+
+## v13 — Survey Content + Data Persistence (2026-07-03)
+
+Supersedes v11.2/v11.3/v11.4/v12 per the v13 brief's own instruction — not
+reconciling with those, building fresh from the brief's exact spec.
+
+**P0 diagnosis (before writing any code):**
+
+1. *Does prior survey work exist/ship?* Yes — `git log` shows v11.3 as the
+   latest and only shipped survey work (commits `557c3d2` original 17-Q
+   survey, `53cf2e3` + `0474721` the v11.3 addendum). No v11.4 or v12 commit
+   exists anywhere in history (`git log --oneline --all | grep -i "v11.4\|v12"`
+   → empty) — those version numbers in the brief's superseding list don't
+   correspond to real prior work in this repo; nothing to reconcile.
+2. *Is /survey serving the latest build, or a silently rolled-back deploy?*
+   No evidence of rollback: every deployment in `vercel ls` (last 5h) shows
+   `● Ready`, none failed. In the immediately prior session, the live
+   `/survey` route's actual served JS bundle
+   (`/_next/static/chunks/app/survey/page-*.js`, fetched directly by URL,
+   not via a browser or cache) was grepped and found to contain every v11.3
+   string (`duplicate_pain_experienced`, `curated_list_appeal`, the 9-option
+   appeal list, the new concept paragraph) — so the build pipeline is
+   correctly shipping current `main`. A user report ("survey questions are
+   the same") right before this brief arrived is most likely a client-side
+   cache/tab-staleness issue on the reporter's device, not a deploy failure
+   — but since this can't be fully ruled out from the server side alone,
+   this v13 pass proves everything fresh with actual mobile-viewport
+   screenshots against the live URL rather than relying on that prior
+   bundle-content check.
+3. *What is survey/waitlist storage actually implemented as?* Read
+   `src/app/api/survey/route.ts`, `src/app/api/signup/route.ts`,
+   `src/lib/waitlist.ts`, `src/lib/db.ts`, and `prisma/schema.prisma`
+   directly (not assumed from memory): `prisma/schema.prisma`'s datasource
+   is `provider = "postgresql"`, `url = env("DATABASE_URL")` — a real
+   external Postgres connection string, not SQLite-on-local-disk and not an
+   in-memory array. Both routes write via `db.surveyResponse.upsert()` /
+   `db.waitlistSignup.upsert()` through the shared Prisma client singleton
+   in `src/lib/db.ts`. `DATABASE_URL` is confirmed set for the Production
+   Vercel environment (`vercel env ls production`), pointing at a live Neon
+   Postgres instance (`ep-dawn-flower-ahtmkrxl...neon.tech`). `/api/beta`'s
+   read side queries the same two tables via Prisma, and — importantly —
+   the PIN check (`body.pin !== expected`) happens and returns 401 BEFORE
+   either `findMany` call runs, so no data can be read pre-auth.
+   **Conclusion: storage is already genuinely durable, not ephemeral.**
+   Part A is therefore "confirm, don't rebuild" — but per the brief's own
+   standard ("proven via the restart test... not assumed"), this still gets
+   the full empirical proof in Part D (submit test data → real redeploy →
+   confirm survival) rather than being marked done on code-reading alone.
+
+**Part B implementation notes:**
+
+- `src/content/survey.ts` fully replaced (not patched) — new `SurveyQuestion`
+  kinds added: `"stepper"` (numeric, min/max/start/topLabel), `"banded"`
+  (single-select where each option carries a `mid` value for the calc
+  engine), `"calc_wyr"` (Q6's dynamically-generated pair). The old `"single"
+  | "multi" | "wyr" | "text"` kinds carry over unchanged in shape.
+- Field ids were chosen to match the brief's "complete field list for this
+  route" verbatim (`people_bought_for`, `bday_value_band`, `wyr_2yr_choice`,
+  etc.) so the data model needs no translation layer between the survey
+  content and the dashboard/CSV.
+- **Storage decision for WYR answers:** the brief's data model types
+  `wyr_kids_choice` as `(A/B/null)`, but the pre-existing "wyr" kind stored
+  the literal option text (e.g. "Ten small toys..."). Changed the "wyr"
+  renderer to store `"A"`/`"B"` (keyed to the question's original `a`/`b`
+  slots, independent of the side-randomised *display* order) so both the
+  static Q7 pair and the calculated Q6 pair persist the same shape — this
+  also makes the dashboard's head-to-head panels trivial (just count `"A"`
+  vs `"B"`) rather than needing to match against literal option strings.
+- **"Neither" routing changed**: previously routed to a dead-end "Thanks all
+  the same!" screen; now routes straight to the same "done" stage used by
+  everyone else, which already contains the Q20 email-capture UI — this
+  satisfies "thank-and-end, but still offer the Q20 email step" without a
+  separate code path. The now-unused "ended" stage was removed.
+- `is_parent` is stored as a genuine JS boolean (not a string), computed at
+  screener-selection time from `segment`, matching the brief's `(bool)` type
+  exactly — JSON round-trips booleans natively so this needed no backend
+  change.
+- The intro screen's H1 was changed from "Two minutes on gift-giving?" to "A
+  few minutes on gift-giving?" — the old copy would have directly
+  contradicted the brief's own required "About 4–5 minutes" line on the same
+  screen (the survey is now 20+2 screens, not the previous 17). The OG
+  title/description are independently specified by the brief and left
+  exactly as given, even though they use a different time figure ("under
+  four minutes") than the on-page estimate — that's the brief's own wording
+  in two different contexts (a pre-click hook vs. an honest in-flow
+  estimate), not something to reconcile.
+- Dashboard (`src/app/beta/page.tsx`): added a `Panel` wrapper component to
+  cut repetition across the many new panels; added `meanOf`/`medianOf`/
+  `histogram` helpers for the two numeric-stepper questions; the two new
+  parents-only panels (duplicate/panic pain, curated-list appeal) and the
+  new "kids version" WYR panel all use the `parentsCompleted` base
+  (independent of the page's segment toggle) for the same reason established
+  in v11.3 — otherwise buyer rows who never saw these questions would dilute
+  the percentages. `DEDICATED_SINGLE_IDS` now excludes every "single" kind
+  question that gets its own titled panel, so the generic per-question
+  auto-loop only picks up the ones that don't (asked_frequency,
+  group_gift_method, whipround_worst_bit, concept_intent).
+- Old `beta-durability.test.ts` survey-branching tests referenced field ids
+  that no longer exist after this rewrite (`q13_concept`, `q8_whipround`,
+  `q10_wyr_child`, etc.) — replaced entirely with v13-equivalent tests rather
+  than patched, plus new tests for the calculation engine (tier boundaries,
+  three profiles spanning all four tiers, band-midpoint mapping).
