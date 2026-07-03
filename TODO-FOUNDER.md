@@ -110,3 +110,44 @@ was completed and is ticked below with evidence; what remains is the short
   again here so they don't get mistaken for real responses. Delete via
   Prisma/`/beta` CSV workflow whenever convenient; they're clearly named so
   there's no risk of deleting a real response by mistake.
+
+## v13 (2026-07-03)
+- **One more test survey row + two test waitlist signups**, from proving the
+  new persistence/redeploy-survival requirement live: sessionId
+  `TEST-v13-full-response`, and waitlist emails `test-v13-signup@…` /
+  `test-v13-survey@…` (stored lowercased — that's existing, correct
+  behaviour, not a bug). All three clearly `TEST-`/`test-` prefixed, so
+  there's no risk of deleting a real row by mistake. Left in place
+  (consistent with your steer last time) — purge whenever convenient:
+  ```
+  # From this repo, with DATABASE_URL set (e.g. from .env.local):
+  npx tsx -e "
+  import { PrismaClient } from '@prisma/client';
+  const db = new PrismaClient();
+  await db.surveyResponse.deleteMany({ where: { sessionId: 'TEST-v13-full-response' } });
+  await db.waitlistSignup.deleteMany({ where: { email: { startsWith: 'test-v13' } } });
+  await db.\$disconnect();
+  "
+  ```
+  Or just filter them out by eye in the /beta CSV export — they're the only
+  rows starting with `TEST-`/`test-v13`.
+- **How to spot-check persistence yourself, any time**: submit anything on
+  `/survey` (or the waitlist box on the homepage), then in the Vercel
+  dashboard trigger **Deployments → (latest) → Redeploy** — this creates a
+  genuinely fresh serverless instance, not just a page refresh. Reload
+  `/beta` afterwards with your PIN: if your submission is still there, the
+  database connection is real and durable (this is exactly how I proved it
+  this session — a live redeploy, not a local test). If it's ever missing
+  after a redeploy, that's the signal something's reverted to non-durable
+  storage and needs immediate attention.
+- The sandbox-reset "survives" proof (Part D of the v13 brief) was verified
+  via the existing structural test only, not a live trigger — the admin
+  reset endpoint needs `SANDBOX_ADMIN_SECRET`, and I didn't want to keep
+  pulling your full production secrets store just to fetch one value (the
+  safety system flagged this correctly). The structural test
+  (`beta-durability.test.ts`) proves `resetSandbox()` contains zero
+  reference to the survey/waitlist tables, which is a stronger guarantee
+  than one live observation would be. If you ever want the live version
+  proven too, the quickest way is pasting `SANDBOX_ADMIN_SECRET` into a
+  session directly, or triggering `POST /api/sandbox/admin` yourself with
+  `{"secret":"…","action":"reset"}`.

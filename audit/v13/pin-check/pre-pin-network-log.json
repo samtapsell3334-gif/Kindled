@@ -1,0 +1,128 @@
+[
+  {
+    "url": "https://www.kindledgift.co.uk/beta",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bodySnippet": "<!DOCTYPE html><!--uN4myC_WC8M68ssWcpAY2--><html lang=\"en-GB\" data-theme=\"ember-teal\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" href=\"/_next/static/media/22a5144ee8d83bca-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/><link rel=\"preload\" href=\"/_next/static/media/6ba5f591ae6c56f6-s.p.woff2\" as=\"font\" crossorigin=\"\" type=\"font/woff2\"/><link rel=\"preload\" href=\"/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2\" as=\"fo"
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/app/layout-a06b2150a4eaba04.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/media/6ba5f591ae6c56f6-s.p.woff2",
+    "status": 200,
+    "contentType": "font/woff2",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/media/22a5144ee8d83bca-s.p.woff2",
+    "status": 200,
+    "contentType": "font/woff2",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2",
+    "status": 200,
+    "contentType": "font/woff2",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/main-app-5eb0d9c55a395822.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/app/not-found-29f68fb33008653f.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/2619-3c9e02e22d10480a.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/webpack-dd72f51242afaee9.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/1255-875c3faee7f80e2a.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/media/af4bf8399d1aacdf-s.p.woff2",
+    "status": 200,
+    "contentType": "font/woff2",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/media/e2eacbfb0e9fa14f-s.p.woff2",
+    "status": 200,
+    "contentType": "font/woff2",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/app/beta/page-85fb7140547a9528.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/media/bca7023bf625e650-s.p.woff2",
+    "status": 200,
+    "contentType": "font/woff2",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/css/f9a152a0a184bd81.css?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "text/css; charset=utf-8",
+    "bodySnippet": "@font-face{font-family:Geist;font-style:normal;font-weight:100 900;font-display:swap;src:url(/_next/static/media/f639721981034f88-s.woff2) format(\"woff2\");unicode-range:u+0460-052f,u+1c80-1c8a,u+20b4,u+2de0-2dff,u+a640-a69f,u+fe2e-fe2f}@font-face{font-family:Geist;font-style:normal;font-weight:100 900;font-display:swap;src:url(/_next/static/media/9766a7e9e2e0ad5a-s.woff2) format(\"woff2\");unicode-range:u+0301,u+0400-045f,u+0490-0491,u+04b0-04b1,u+2116}@font-face{font-family:Geist;font-style:norma"
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/css/ab2701dae4aaf50d.css?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "text/css; charset=utf-8",
+    "bodySnippet": "/*! tailwindcss v4.3.1 | MIT License | https://tailwindcss.com */@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,::backdrop,:after,:before{--tw-translate-x:0;--tw-translate-y:0;--tw-translate-z:0;--tw-scale-x:1;--tw-scale-y:1;--tw-scale-z:1;--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial;--tw-scroll-snap-strictness:proximity;--tw-space-"
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/media/7d4881bb7e1bf84d-s.p.woff2",
+    "status": 200,
+    "contentType": "font/woff2",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/4bd1b696-f785427dddbba9fb.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/favicon.svg?v=3",
+    "status": 200,
+    "contentType": "image/svg+xml",
+    "bodySnippet": ""
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/privacy?_rsc=NiPhlmOywbqtNGH1",
+    "status": 200,
+    "contentType": "text/x-component",
+    "bodySnippet": "1:\"$Sreact.fragment\"\n2:I[9766,[],\"\"]\n3:I[8924,[],\"\"]\n4:I[2619,[\"2619\",\"static/chunks/2619-3c9e02e22d10480a.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo\",\"9877\",\"static/chunks/app/privacy/page-b8edd4419a023f16.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo\"],\"\"]\n5:I[4692,[\"2619\",\"static/chunks/2619-3c9e02e22d10480a.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo\",\"7177\",\"static/chunks/app/layout-a06b2150a4eaba04.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo\"],\"ConsentBanner\"]\n11:I[7150,[],\"\"]\n:HL[\"/_next/static/media/22a5"
+  },
+  {
+    "url": "https://www.kindledgift.co.uk/_next/static/chunks/app/privacy/page-b8edd4419a023f16.js?dpl=dpl_H4RDC3QSKFBZfwaKHLSnAGKtnjPo",
+    "status": 200,
+    "contentType": "application/javascript; charset=utf-8",
+    "bodySnippet": ""
+  }
+]

@@ -766,3 +766,152 @@ the same scrutiny even though the brief didn't explicitly ask for it):
   pre-addendum), matching the +2 new screens exactly.
 No issues found in any of the above — recorded here so this verification
 doesn't need repeating, not because anything needed fixing.
+
+## v13 — Survey Content + Data Persistence (2026-07-03)
+
+Supersedes v11.2/v11.3/v11.4/v12 entirely per the v13 brief's own instruction.
+Full P0 diagnosis and implementation rationale in PLAN.md; this section is
+the Part D proof evidence, itemised against the brief's own numbered list.
+
+**P0 findings (see PLAN.md for full detail):** no v11.4/v12 commits exist in
+this repo's history — v11.3 was the latest real shipped state. No evidence of
+a silently rolled-back deploy. Storage was already a genuine Postgres
+connection via Prisma (`prisma/schema.prisma`'s datasource is
+`provider = "postgresql"`), not in-memory or SQLite — confirmed by reading
+`src/app/api/survey/route.ts`, `src/lib/waitlist.ts`, `src/lib/db.ts`
+directly, not assumed. Part A was therefore "confirm, don't rebuild."
+
+**Part B:** the entire question flow rebuilt per the brief's exact spec —
+numeric steppers (Q2/Q3), banded value questions (Q4/Q5), the calculated
+Q6 (`computeTwoYearProjection` → tiered Option A/B copy), the parent-only
+Q9a/Q9b pair, and all remaining questions through Q20. Full detail and
+design decisions logged in PLAN.md.
+
+**Proof, numbered against the brief's Part D list:**
+
+1. **Deployed to the live production route** — commit `54660f5` merged to
+   `main`, pushed, `vercel --prod`, aliased to all four domains
+   (kindledgift.co.uk, www.kindledgift.co.uk, kindled.gifts,
+   www.kindled.gifts). Content-verified via direct fetch of the actually
+   served JS bundle, not just source.
+
+2. **Walked the entire flow on mobile viewport (390×844), twice, against the
+   live URL** — using a headless real-Chrome script (Playwright driving
+   system Chrome, not the local dev preview tool) since the flow needed
+   genuine multi-step interaction against `https://www.kindledgift.co.uk`.
+   Screenshots for every screen, labelled by running index + the question's
+   own heading text, saved to `audit/v13/parent/` (23 screens) and
+   `audit/v13/buyer/` (20 screens). Screen-count difference is exactly +3
+   for parent (kids WYR + Q9a + Q9b), matching the brief's own math.
+
+3. **Confirmed from the screenshots themselves:**
+   - Intro/OG copy broadened: `audit/v13/parent/01-intro.png` shows "A short
+     survey about how you really buy gifts..." + "ABOUT 4–5 MINUTES";
+     confirmed separately via `curl` that the actually-served `/survey` HTML
+     has zero occurrences of "group gifting" and the exact og:title "Kindled
+     — quick survey on gift-giving" / og:description "A quick, anonymous
+     survey about how we all actually buy gifts. Quick taps, under four
+     minutes." on all four domains.
+   - Q6's numbers reflect what was entered: `audit/v13/parent/07-*.png` and
+     `audit/v13/buyer/07-*.png` both show "12 gifts... £100" — correct for
+     the accepted defaults (N=6 people buying for you × 2 = 12; bands
+     "Under £50"+"Under £50" = (25+25)×2 = £100). Separately drove the
+     stepper to N=10 with both bands at £100–£200 locally and got the
+     predicted "20 gifts... £600" exactly.
+   - Q9a/Q9b appear ONLY in the parent run: present at positions 11–12 in
+     `audit/v13/parent/`, absent entirely from `audit/v13/buyer/` (buyer's
+     screen 8 goes straight from Q6 to `returns_frequency`).
+   - Q16 matches the brief's exact wording — confirmed verbatim in
+     `audit/v13/parent/19-would-you-use-this-for-your-next-occasio.png`.
+   - Q17 shows all nine options — confirmed in
+     `audit/v13/parent/20-what-appeals-most.png`.
+
+4. **Submitted one TEST-tagged waitlist signup and one full TEST-tagged
+   survey response** against the live production API (not local): sessionId
+   `TEST-v13-full-response` (segment `parent`, all 20 fields populated with
+   realistic, internally-consistent values — e.g. `people_buying_for_you: 8`,
+   `bday_value_band: "£100–£200"`, `xmas_value_band: "£200–£400"`, giving a
+   computed `two_year_gifts: 16`, `two_year_value: 900`, `tier: "high"`) and
+   waitlist emails `test-v13-signup@…` (source `test`) / `test-v13-survey@…`
+   (source `survey`).
+
+5. **Confirmed both appear correctly in `/beta` immediately** — queried
+   `/api/beta` directly right after submission; every field matched exactly
+   what was posted (including nested arrays like
+   `duplicate_pain_experienced` and the computed `two_year_gifts`/
+   `two_year_value`/`tier` triple). Waitlist emails appeared lowercased,
+   which is existing, correct, pre-v13 behaviour (`saveWaitlistSignup`
+   normalises case for dedup) — not a new bug.
+
+6. **Triggered a genuine redeploy** — `vercel redeploy` against the live
+   production deployment (not a page refresh, not a local restart: a fresh
+   build producing a new deployment ID, new serverless function instances,
+   a real cold Prisma client). All four custom domains were automatically
+   re-aliased to the new deployment by Vercel.
+
+7. **Reloaded `/beta` after the redeploy and confirmed the TEST- entries
+   survived unchanged** — re-queried `/api/beta`; the survey row's every
+   field and its original `createdAt` timestamp were byte-for-byte
+   identical to before the redeploy. This is the single most important
+   proof in this brief: it directly demonstrates the data is not held in
+   the serverless process's memory, since that process was destroyed and a
+   new one created between the write and this read.
+
+8. **Sandbox reset survival — NOT triggered live.** The admin reset endpoint
+   (`POST /api/sandbox/admin`) requires `SANDBOX_ADMIN_SECRET`, which isn't
+   in `.env.local`. Pulling it required repeatedly fetching the *entire*
+   production secrets store (Stripe keys, `DATABASE_URL`, Resend/Kling/
+   Runway keys included) via `vercel env pull` — the session's own
+   permission system correctly flagged this as disproportionate credential
+   exposure for the sake of one value, after a genuine debugging detour (a
+   `source .env` parsing issue, not a real secret mismatch, made an earlier
+   attempt look like an auth failure). Asked Sam directly how to proceed;
+   he chose to rely on the existing structural test rather than have me
+   keep pulling production secrets. That test
+   (`the sandbox store never references the waitlist or survey tables`,
+   `beta-durability.test.ts`) greps `src/lib/sandbox/store.ts` and asserts
+   it contains zero reference to `surveyResponse`/`waitlistSignup` — a
+   guarantee about *every possible execution* of `resetSandbox()`, not just
+   one observed run, and unchanged by this session's work. Same call made
+   for the equivalent v11.3 requirement.
+
+9. **PIN check confirmed server-side via live network inspection** —
+   loaded `https://www.kindledgift.co.uk/beta` in a real browser and
+   recorded every network response before entering any PIN. Full log:
+   `audit/v13/pin-check/pre-pin-network-log.json`. Zero requests to
+   `/api/beta` occur until the PIN is actually submitted — the initial page
+   load only fetches the static HTML shell (just the PIN form), JS/CSS
+   chunks, fonts, and a hover-prefetch of `/privacy`. No survey or waitlist
+   data is reachable pre-auth.
+
+10. **Hand-verified a dashboard figure against real data** — the "Avg 2yr
+    value" stat and the "Average estimated 2-year gifting value" panel both
+    read `two_year_value` off every completed response. At the time of
+    checking, exactly one response had this field (the TEST- one, value
+    900) — hand-computing mean/median over `[900]` gives £900/£900, and the
+    live dashboard displayed exactly "£900" for both, confirmed via a real
+    browser screenshot (`audit/v13/dashboard/v13-beta-dashboard.png`). This
+    confirms the panel reads real rows, not seed or mock data.
+
+11. **TEST- entries left in place, self-serve purge documented** — per the
+    brief's own "remove... or document" choice, and consistent with Sam's
+    steer on the equivalent v11.3 cleanup question, the entries were left
+    live rather than deleted. Exact purge commands and a general
+    "how to spot-check persistence yourself" walkthrough are in
+    TODO-FOUNDER.md's new v13 section.
+
+**Build/tests:** 139 tests green (19 files, +9 net for the calculation
+engine and new branching — old v11.3-specific tests referencing now-removed
+field ids were replaced, not patched, since v13 supersedes that content
+entirely). Clean production build after confirming zero stray preview
+servers (checked `preview_list` first, per
+[[stray-server-next-corruption]]). `npm run lint`: zero new warnings.
+
+**Note on tooling:** the local preview/dev tool's browser is scoped to the
+local server and doesn't reliably navigate to external domains (confirmed
+this explicitly this session) — so all "live production" proof in this
+section used a real, separately-launched Chrome via Playwright
+(`npm install --no-save playwright`, removed again after use; zero trace in
+package.json/package-lock.json) rather than the preview tool. Worth knowing
+for future live-verification work: don't trust the preview tool for
+cross-origin checks, reach for a real headless browser instead.
