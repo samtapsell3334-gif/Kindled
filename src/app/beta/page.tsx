@@ -279,14 +279,14 @@ export default function BetaPage() {
 
             {/* Dashboard item 3 — the pooled-goal test (Q6) */}
             <Panel title="The pooled-goal test" sub={`n=${wyr2yr.a + wyr2yr.b}`}>
-              <Bar label="I'll take the mix" count={wyr2yr.a} total={wyr2yr.a + wyr2yr.b} />
-              <Bar label="Pool it together" count={wyr2yr.b} total={wyr2yr.a + wyr2yr.b} />
+              <Bar label="A mix of gifts across the year" count={wyr2yr.a} total={wyr2yr.a + wyr2yr.b} />
+              <Bar label="Everyone pooling toward one thing" count={wyr2yr.b} total={wyr2yr.a + wyr2yr.b} />
             </Panel>
 
             {/* Dashboard item 4 — kids version (Q7) */}
             <Panel title="Kids version" sub={`n=${wyrKids.a + wyrKids.b}`}>
-              <Bar label="Ten small toys, unwrapped one by one" count={wyrKids.a} total={wyrKids.a + wyrKids.b} />
-              <Bar label="Everyone chipping in for the one big thing they'll actually remember" count={wyrKids.b} total={wyrKids.a + wyrKids.b} />
+              <Bar label="Ten gifts, family left to choose on their own" count={wyrKids.a} total={wyrKids.a + wyrKids.b} />
+              <Bar label="Everyone contributing to one big, special gift" count={wyrKids.b} total={wyrKids.a + wyrKids.b} />
             </Panel>
 
             <Panel title="Pain ranking" sub="share reporting high pain">

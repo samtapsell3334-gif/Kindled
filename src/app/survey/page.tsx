@@ -1,32 +1,24 @@
 "use client";
 
 /**
- * The market-research survey (v14: unbranched). Mobile-first, one question
- * per screen, quick-tap where possible, consent up front, answers stored
- * server-side (append-only, durable). WYR sides — including the calculated
- * Q6 pair — are randomised per session. Every respondent gets the same
- * question sequence regardless of the Q1 screener answer (v14: removed the
- * old parent/buyer decision-tree branching), so the end-of-survey "power of
- * your wishes" projection always has the data it needs. The thank-you
- * screen converts: the projection, then waitlist capture (source=survey) +
- * share.
+ * The market-research survey (v16). Mobile-first, one question per screen,
+ * quick-tap where possible, consent up front, answers stored server-side
+ * (append-only, durable). Every WYR pair is side-randomised per session.
+ * Every respondent gets the same question sequence regardless of the Q1
+ * screener answer (v14: removed the old parent/buyer decision-tree
+ * branching). Q6 asks a plain mix-vs-pool preference with no numbers shown
+ * — the personalised calculation stays a surprise, computed once at
+ * completion and revealed only on the thank-you screen ("the power of your
+ * wishes"), right before the waitlist capture (source=survey) + share.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, Minus, Plus, Share2 } from "lucide-react";
 import { LogoMark } from "@/components/Logo";
-import { SCREENER, QUESTIONS, questionSequence, computeGiftProjection, optionACopy, optionBCopy, TIER_EXAMPLES } from "@/content/survey";
+import { SCREENER, QUESTIONS, questionSequence, computeGiftProjection, TIER_EXAMPLES } from "@/content/survey";
 
 type Answers = Record<string, string | string[] | number | boolean>;
-
-function renderBold(text: string) {
-  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-    part.startsWith("**") && part.endsWith("**")
-      ? <strong key={i}>{part.slice(2, -2)}</strong>
-      : <span key={i}>{part}</span>
-  );
-}
 
 export default function SurveyPage() {
   const sessionId = useRef(`svy_${Math.random().toString(36).slice(2, 12)}${Date.now().toString(36)}`).current;
@@ -39,9 +31,8 @@ export default function SurveyPage() {
   const [stepperDraft, setStepperDraft] = useState(0);
   const [email, setEmail] = useState("");
   const [emailState, setEmailState] = useState<"idle" | "sent">("idle");
-  // Side-randomisation per session, fixed per pair (order-bias control) —
-  // covers both static WYR pairs and the calculated Q6 pair.
-  const flips = useMemo(() => Object.fromEntries(QUESTIONS.filter((q) => q.kind === "wyr" || q.kind === "calc_wyr").map((q) => [q.id, Math.random() < 0.5])), []);
+  // Side-randomisation per session, fixed per pair (order-bias control).
+  const flips = useMemo(() => Object.fromEntries(QUESTIONS.filter((q) => q.kind === "wyr").map((q) => [q.id, Math.random() < 0.5])), []);
 
   const seq = questionSequence(answers);
   const q = seq[idx];
@@ -57,9 +48,23 @@ export default function SurveyPage() {
     }).catch(() => {});
 
   function advance(updates: Answers) {
-    const next = { ...answers, ...updates };
-    setAnswers(next);
+    let next: Answers = { ...answers, ...updates };
     const isLast = idx >= questionSequence(next).length - 1;
+    // v16: the calculation is a surprise reserved for the end screen, not a
+    // mid-survey reveal — so compute + persist the projection fields once,
+    // at completion, rather than tying them to whichever question happens
+    // to ask about mix-vs-pool.
+    if (isLast) {
+      const projection = computeGiftProjection(next);
+      if (projection) {
+        next = {
+          ...next,
+          one_year_gifts: projection.oneYearGifts, one_year_value: projection.oneYearValue,
+          two_year_gifts: projection.twoYearGifts, two_year_value: projection.twoYearValue, tier: projection.tier,
+        };
+      }
+    }
+    setAnswers(next);
     persist(next, isLast);
     if (isLast) setStage("done");
     else { setIdx((i) => i + 1); setMultiDraft([]); setTextDraft(""); }
@@ -125,7 +130,7 @@ export default function SurveyPage() {
             {q.kind === "single" && q.concept && (
               <p className="mb-4 rounded-2xl border border-stone-200 bg-[var(--card)] p-4 text-[14px] leading-relaxed text-stone-700">{q.concept}</p>
             )}
-            {q.kind !== "calc_wyr" && <h2 className="text-[20px] font-bold leading-snug">{q.text}</h2>}
+            <h2 className="text-[20px] font-bold leading-snug">{q.text}</h2>
             {(q.kind === "single" || q.kind === "banded") && "helper" in q && q.helper && (
               <p className="mt-1.5 text-[13px] text-stone-500">{q.helper}</p>
             )}
@@ -183,29 +188,6 @@ export default function SurveyPage() {
                   </button>
                 </>
               )}
-              {q.kind === "calc_wyr" && (() => {
-                const projection = computeGiftProjection(answers);
-                if (!projection) return null;
-                const cardA = { key: "A" as const, copy: optionACopy(projection), button: "I'll take the mix" };
-                const cardB = { key: "B" as const, copy: optionBCopy(projection), button: "Pool it together" };
-                const ordered = flips[q.id] ? [cardB, cardA] : [cardA, cardB];
-                return (
-                  <>
-                    <h2 className="mb-4 text-[20px] font-bold leading-snug">Here&apos;s what that looks like for you…</h2>
-                    {ordered.map((c) => (
-                      <button key={c.key} onClick={() => advance({
-                        [q.id]: c.key,
-                        one_year_gifts: projection.oneYearGifts, one_year_value: projection.oneYearValue,
-                        two_year_gifts: projection.twoYearGifts, two_year_value: projection.twoYearValue, tier: projection.tier,
-                      })}
-                        className="mb-2.5 w-full rounded-2xl border border-stone-200 bg-[var(--card)] p-4 text-left transition-transform active:scale-[0.98]">
-                        <p className="text-[14px] leading-relaxed text-stone-700">{renderBold(c.copy)}</p>
-                        <p className="mt-3 text-[14px] font-bold text-[var(--ember)]">{c.button} →</p>
-                      </button>
-                    ))}
-                  </>
-                );
-              })()}
             </div>
           </div>
         )}

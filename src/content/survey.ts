@@ -17,8 +17,7 @@ export type SurveyQuestion =
   | { id: string; kind: "wyr"; text: string; a: string; b: string }
   | { id: string; kind: "text"; text: string; placeholder: string }
   | { id: string; kind: "stepper"; text: string; helper?: string; min: number; max: number; start: number; topLabel: string }
-  | { id: string; kind: "banded"; text: string; helper?: string; options: { label: string; mid: number }[] }
-  | { id: string; kind: "calc_wyr"; text: string };
+  | { id: string; kind: "banded"; text: string; helper?: string; options: { label: string; mid: number }[] };
 
 export const SCREENER = {
   id: "q1_segment",
@@ -61,8 +60,10 @@ export const CURATED_LIST_CONCEPT =
   "automatically marked off, so nobody doubles up, nobody panics in the " +
   "shop, and your child gets exactly what you know is right for them.";
 
-/** Gift-value calculation engine (Q6's mid-survey WYR, and the v14
- *  end-of-survey "power of your wishes" projection — same maths, two uses). */
+/** Gift-value calculation engine — v16: used exclusively for the
+ *  end-of-survey "power of your wishes" reveal. Q6 itself is now a plain,
+ *  non-personalised WYR (no numbers shown mid-survey); the calculation
+ *  stays a surprise until the conversion screen. */
 export type Tier = "low" | "mid" | "high" | "top";
 
 export function tierFor(twoYearValue: number): Tier {
@@ -79,11 +80,6 @@ export const TIER_EXAMPLES: Record<Tier, readonly [string, string, string]> = {
   high: ["a hot tub", "a log burner", "a proper long weekend abroad"],
   top: ["a family trip to Disney", "a villa holiday", "a full living-room refit"],
 };
-
-function tierExamplesJoined(tier: Tier): string {
-  const [a, b, c] = TIER_EXAMPLES[tier];
-  return `${a}, ${b}, or ${c}`;
-}
 
 export interface GiftProjection {
   oneYearGifts: number;
@@ -110,17 +106,6 @@ export function computeGiftProjection(answers: Record<string, unknown>): GiftPro
   return { oneYearGifts, oneYearValue, twoYearGifts, twoYearValue, tier: tierFor(twoYearValue) };
 }
 
-export function optionACopy(p: GiftProjection): string {
-  return `Over the next two years, that's roughly **${p.twoYearGifts} gifts** worth around ` +
-    `**£${p.twoYearValue}** altogether — a real mix, like most of us get: some spot on, some not quite right.`;
-}
-
-export function optionBCopy(p: GiftProjection): string {
-  return `Or: that same **£${p.twoYearValue}**, pooled together and put toward the things you'd ` +
-    `actually choose — maybe ${tierExamplesJoined(p.tier)} — plus a few fun surprises along the way, and ` +
-    "the everyday things you actually need, picked by you (think the razor, the trainers, the clothes you'd have chosen anyway).";
-}
-
 export const QUESTIONS: SurveyQuestion[] = [
   { id: "people_bought_for", kind: "stepper",
     text: "Roughly how many people do you buy gifts for in a typical year?",
@@ -134,11 +119,14 @@ export const QUESTIONS: SurveyQuestion[] = [
     helper: "Just a rough guess is perfect.", options: VALUE_BANDS },
   { id: "xmas_value_band", kind: "banded",
     text: "And at Christmas?", options: VALUE_BANDS },
-  { id: "wyr_2yr_choice", kind: "calc_wyr", text: "" },
+  { id: "wyr_2yr_choice", kind: "wyr",
+    text: "Thinking about all the gifts you get in a year, would you rather…",
+    a: "A mix of gifts across the year — some spot on, some not quite right",
+    b: "Everyone pooling toward one bigger thing you'd actually choose" },
   { id: "wyr_kids_choice", kind: "wyr",
     text: "If you could choose for your kids, which sounds better over the next couple of years?",
-    a: "Ten small toys, unwrapped one by one",
-    b: "Everyone chipping in for the one big thing they'll actually remember" },
+    a: "Ten gifts, with everyone in the family left to choose on their own",
+    b: "Everyone contributing to that one big, special gift for them" },
   { id: "returns_frequency", kind: "single",
     text: "How often do you end up returning, exchanging, or quietly re-gifting something you were given?",
     options: ["Never", "Occasionally", "Most occasions", "Almost every time"] },
