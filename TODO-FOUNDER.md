@@ -182,3 +182,8 @@ was completed and is ticked below with evidence; what remains is the short
   built this, what personal experience motivated it) for you to replace
   directly in that file whenever you're ready. It will look visibly
   "unfinished/placeholder" until you do — that's deliberate, not a bug.
+- **One more test waitlist row**, from proving the new referral prompt
+  live: an email starting `proof-test-` (timestamped, so the exact address
+  is in the /beta CSV export). Same as every other TEST row this session —
+  clearly named, safe to delete whenever convenient, left in place by
+  default per your steer on the earlier ones.

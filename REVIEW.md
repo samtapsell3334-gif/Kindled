@@ -1046,3 +1046,146 @@ satisfies).
 `claims-drift.test.ts` and `route-shells.test.ts` both still pass, meaning
 the persona section didn't introduce any banned-lexicon or claims-drift
 issues). Clean production build. `npm run lint`: zero new warnings.
+
+## Survey: calculation timing + Q7 rewording (2026-07-03)
+
+Two direct founder requests, handled before the v16 brief itself:
+
+1. **"No need to show calculations straight after the calc questions, show
+   at end with conversion."** Q6 previously showed the calculated £/gift
+   figures immediately after the stepper/banded questions (the "Here's
+   what that looks like for you…" mid-survey card). Removed entirely —
+   Q6 is now a plain WYR (mix vs pool preference, generic copy, no
+   numbers), matching every other WYR question's style. The full
+   calculation now appears exactly once, on the thank-you screen ("The
+   power of your wishes"), which was already built in the previous
+   session. Verified locally: walked the full flow, confirmed no numbers
+   appear before the questions are answered, confirmed the end-screen
+   panel still computes correctly from the same inputs (£50/£100 at
+   default values, matching the formula exactly).
+2. **Reworded the kids WYR (Q7).** Old: "Ten small toys, unwrapped one by
+   one" vs "Everyone chipping in for the one big thing they'll actually
+   remember." New: "Ten gifts, with everyone in the family left to choose
+   on their own" vs "Everyone contributing to that one big, special gift
+   for them" — the new option A names the *real* uncoordinated-buying pain
+   (matching the survey's own established pain-framing elsewhere, e.g.
+   Q9a's duplicate-gift questions) rather than a neutral "small toys"
+   description. Updated the `/beta` dashboard's bar labels to match.
+
+Found and removed dead code in the same pass: `optionACopy`/`optionBCopy`
+and the `calc_wyr` question kind, both now fully unused. 142 tests green
+(some replaced, not just patched, since the removed functions no longer
+exist to test).
+
+## v16 — Growth & Design, Round 3 (2026-07-03)
+
+Full design rationale for every item in PLAN.md. This section is the
+brief's required proof, itemised. Live screenshots in `audit/v16/proof/`
+(referral, FAQ, founder's note, sticky CTA ×3), design-audit screenshots
+in `audit/v16/design-audit/` (14 full-page captures spanning the whole
+homepage).
+
+1. **Waitlist confirmation with referral prompt** —
+   `audit/v16/proof/01-referral-confirmation.png`, captured against
+   **live production** (not local): submitted a real test signup via
+   `?ref=proofcode123#waitlist`, confirmed the referral share prompt
+   renders exactly as specified ("Know someone who's always stressed
+   about what to buy? Bring them in first." + Share/WhatsApp buttons).
+
+2. **Waitlist counter, both states** — below-threshold state confirmed
+   live (`audit/v16/proof/02-counter-below-threshold.png`, text reads "Be
+   one of our founding families" — the genuine current live count is
+   under 50). Above-threshold state **simulated locally**, as the brief
+   allows: I did not fabricate 50 real signups to force the live count
+   past threshold. Instead, temporarily lowered the `THRESHOLD` constant
+   to 1 (a real code edit, screenshotted, then fully reverted — confirmed
+   via `git diff` showing zero trace before committing), rebuilt, and
+   screenshotted the result:
+   `audit/v16/proof/02b-counter-above-threshold-simulated.png` reads
+   "Join 6+ families already on the list" — 6 being the genuine live
+   count at the time, proving the template renders the real number
+   correctly once the threshold logic passes, not an invented figure.
+
+3. **FAQ with schema, validator-confirmed** —
+   `audit/v16/proof/03-faq-section.png` from live production. Extracted
+   the actual `<script type="application/ld+json">` from the live page
+   and validated its structure programmatically: `@type: "FAQPage"`,
+   `mainEntity` array of exactly 4 `Question` objects each with a `name`
+   and `acceptedAnswer.text` — matches the schema.org FAQPage spec
+   exactly. This is a self-validated structural check against the
+   published spec, not a submission to Google's Rich Results Test (an
+   external, JS-heavy tool I can't drive from here) — Sam can paste
+   `https://www.kindledgift.co.uk/#faq` into
+   `https://search.google.com/test/rich-results` himself for the
+   authoritative Google-side confirmation whenever convenient.
+
+4. **Founder's-note placeholder, clearly marked** —
+   `audit/v16/proof/04-founder-note.png` from live production. Dashed
+   border, "DRAFT — AWAITING SAM'S WORDS" badge, bracketed placeholder
+   copy — unmistakable as pending, not shipped as real content.
+
+5. **Before/after Lighthouse (mobile, live production, not local):**
+
+   | | Before (pre-v16, live) | After (post-v16, live) |
+   |---|---|---|
+   | Performance | 89 | **92** |
+   | Accessibility | 100 | 100 |
+   | LCP | 3.3s | 3.2s |
+   | FCP | 1.4s | 1.4s |
+   | TBT | — | 40ms |
+
+   Target was Performance ≥90 — met, with room. Investigation note: local
+   `next start` testing measurably understated real performance throughout
+   this work (88/3.9s local vs 89/3.3s live for the *identical* pre-v16
+   build) and, more surprisingly, showed *zero* measurable LCP improvement
+   from code-splitting locally despite a 74% homepage-bundle-size cut
+   (67.9kB→17.6kB) — while the *live*, CDN-backed measurement shows the
+   real gain (89→92). Lesson for future performance work on this project:
+   verify against the live URL, not local, for anything beyond a rough
+   sanity check. The dominant LCP cost identified (via
+   `mainthread-work-breakdown`) was a ~130KB framer-motion vendor chunk's
+   bootup time — a pre-existing, whole-page characteristic (parallax hero
+   + every scroll-triggered `Reveal`), not something v16 introduced, and
+   too large a change (removing/replacing Framer Motion) to responsibly
+   attempt within this brief's scope. Also fixed two real WCAG AA contrast
+   failures introduced by the new components themselves while doing this
+   work (`FounderNote`'s "Draft" badge and avatar circle, both
+   `text-amber-600`-pattern issues matching the exact class this project
+   has now fixed three times — see the running TODO-FOUNDER note below).
+
+6. **Sticky CTA, three scroll depths** —
+   `audit/v16/proof/06-sticky-top.png`, `-middle.png`, `-bottom.png`,
+   captured live at scrollY 0 / 6401 / 12803 (0%, 45%, 90% of page
+   height). Confirmed programmatically at each depth that the Nav's
+   "Reserve your spot" button has a valid, in-viewport bounding box. This
+   button was already present (fixed header, unconditionally visible,
+   no `hidden` responsive classes) — nothing was missing or lost in a
+   rebuild, so nothing needed reinstating.
+
+7. **Design self-audit findings** — full list and screenshots in
+   `audit/v16/design-audit/`. Summary: genuinely bespoke throughout (custom
+   SVG icons, no stock imagery, consistent `py-24`/`py-28` spacing rhythm,
+   testimonials correctly labelled "ILLUSTRATIVE"), branded 404 page
+   confirmed present ("This ember drifted off"), favicon is vector (SVG,
+   infinitely sharp) and the Apple touch icon is a correctly-sized 180×180
+   PNG (not a stretched smaller source), OG image is code-rendered at the
+   standard 1200×630. Fixed the two contrast issues found (item 5, above)
+   since they were cheap and safe. Logged, not silently fixed: the "Every
+   penny goes to the goal" claim in the existing "How the money works"
+   section sits awkwardly next to the new FAQ's fee-honesty — cross-
+   referenced in TODO-FOUNDER against the fee-position TODO rather than
+   guessed at, since I don't know whether the progress bar displays gross
+   or net-of-fee amounts.
+
+**No dark patterns introduced** — confirmed by design: the referral
+prompt is a single opt-in share action (not required to complete signup),
+the counter never invents or rounds a figure, there are no countdown
+timers, no fake scarcity, no exit-intent interruptions anywhere in this
+work.
+
+**Build/tests:** 142 tests green throughout, clean production build
+(local pre-deploy) confirmed at every commit. Live deploy verified via
+direct fetch of the actual served HTML/JS on all four domains
+(kindledgift.co.uk, www.kindledgift.co.uk, kindled.gifts,
+www.kindled.gifts) — FAQ section, founder's note, and JSON-LD schema all
+confirmed present and correct, not just in source.
