@@ -587,3 +587,49 @@ Documented deviations (expert calls, logged not hidden):
   (data minimisation); the column renders when a name source exists.
 - Physical-device runs (real iPhone/Android) and the WhatsApp preview
   re-scrape remain founder-only, listed in TODO-FOUNDER.
+
+## 2026-07-03 — v11.1 punch-list (external audit): all 17 closed
+
+**P0-1 THE GATE (shipped first, as demanded):** src/lib/route-shell-audit.ts +
+route-shells.test.ts — audits the BUILT html of every prerendered route
+(15 shells incl. /sandbox, /beta, /survey, client-shell routes). Rules:
+banned lexicon on visible text (script payloads stripped — no internal-name
+false positives), Kindle-as-verb, Kindlers, retired stats, locked viewport,
+per-route theme-color = #0C4E4C, large-card⇒og:image, retired-noun meta,
+zeroed stat counters. NINE injection fixtures prove each rule detects its
+miss class; the built-output sweep then ran against the pre-fix build and
+caught exactly the audit's findings (kindle-as-verb, large-card-no-image,
+zeroed-counter) before passing post-fix. The gate fails loudly when the build
+is absent — it can never silently skip.
+
+**P0 misses:** (2) /sandbox shell verified clean in current build (teal
+theme-color, og:image, wish copy — the audit snapshot predated v8 fixes); all
+15 shells enumerated and swept by the gate. (3) "Kindle" buttons → VERB_CHIP_IN
+from claims.ts ("Chip in"/"Chipped in!"); "Kindle Paperwhite" (real product)
+excepted. (4) /wishes/demo has its own night-set OG card (Billy framing,
+rendered 200, in build). (5) useCountUp SSRs the TRUE figure (58% in built
+html — gate-tested); count-up is enhancement only.
+
+**P1 demo corrections:** (6) granted strip top + open wish/Chip-in unscrolled
+at 390×844 — contributor-state screenshot: audit/v11-1/contributor-390x844.png.
+(7) "Reserve your spot", sentence-case perk chips, consent line aligned.
+(8) "Parent's pick" chip removed; zero parent-management claims on Billy
+(grep). (9) all rendered dates derive from occasionTargetIso (rolled forward;
+past dates cannot render). (10) ONE lockup: Logo variant="auto" +
+.logo-follow-theme CSS vars — "KindledKindled" gone from built footer
+(grep-verified); demo h1 is "Kindled" with the subtitle a sibling <p>.
+(11) DrawMicrocopy component (claims.DRAW + terms link) at every draw mention
+(demo sheet, conversion block, ceremony).
+
+**P1 evidence (12–17):** sandbox internals covered by 124-test suite (occasions
++ redaction, K-CTA, SSRF ×9, star beats) and the v11 production acceptance run;
+/beta PIN "1066" absent from every built chunk (grep 0) + reset-survival test
+green; survey branching/WYR randomisation unit-tested, prod completion → /beta
+proven 2026-07-02; zero user-facing "AI" across ALL built routes (visible-text
+grep: none); tab states screenshot (teal pill/cream bar, AA); sandbox
+ember-teal screenshot audit/v11-1/; homepage dupes: "KindledKindled" fixed,
+marquee clones aria-hidden (99 aria-hidden nodes in shell).
+
+Suite: 124 green (12 new gate tests). v11 sixteen-point audit re-affirmed —
+items unchanged by v11.1 stand on the 2026-07-02 evidence; items touched
+(2,3,7,8) re-verified above.
