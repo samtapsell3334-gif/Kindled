@@ -60,6 +60,14 @@ export default function BetaPage() {
     return all;
   }, [data, seg]);
   const completed = responses.filter((r) => r.completed);
+  // v11.3 Patch 4: these two panels are ALWAYS parents-only (the questions
+  // themselves only ever reach parent/both respondents), independent of the
+  // page's global segment toggle — otherwise buyer-segment rows (who never
+  // saw these questions) would dilute the denominator and understate %s.
+  const parentsCompleted = useMemo(
+    () => (data?.survey ?? []).filter((r) => r.completed && isParent(r)),
+    [data],
+  );
 
   if (!data) {
     return (
@@ -84,14 +92,14 @@ export default function BetaPage() {
     return { entries, max };
   })();
 
-  const single = (id: string, opts: string[]) => {
-    const counts = opts.map((o) => ({ o, n: completed.filter((r) => r.answers[id] === o).length }));
+  const single = (id: string, opts: string[], base: Response[] = completed) => {
+    const counts = opts.map((o) => ({ o, n: base.filter((r) => r.answers[id] === o).length }));
     const total = counts.reduce((s, c) => s + c.n, 0);
     return { counts, total };
   };
-  const multi = (id: string, opts: string[]) => {
-    const counts = opts.map((o) => ({ o, n: completed.filter((r) => Array.isArray(r.answers[id]) && r.answers[id].includes(o)).length }));
-    return { counts, total: completed.length };
+  const multi = (id: string, opts: string[], base: Response[] = completed) => {
+    const counts = opts.map((o) => ({ o, n: base.filter((r) => Array.isArray(r.answers[id]) && r.answers[id].includes(o)).length }));
+    return { counts, total: base.length };
   };
 
   const concept = single("q13_concept", ["Definitely", "Probably", "Not sure", "Probably not"]);
@@ -225,7 +233,35 @@ export default function BetaPage() {
               })}
             </div>
 
-            {QUESTIONS.filter((x) => x.kind === "single").map((s) => {
+            {/* v11.3 Patch 4: "Duplicate & panic pain" — pitch-ready, e.g.
+                "X% of parents have had a child receive a duplicate gift".
+                Parents-only base, independent of the segment toggle. */}
+            {(() => {
+              const dupDef = QUESTIONS.find((x) => x.id === "duplicate_pain_experienced");
+              if (!dupDef || dupDef.kind !== "multi") return null;
+              const m = multi(dupDef.id, dupDef.options, parentsCompleted);
+              return (
+                <div className="rounded-2xl border border-stone-200 bg-[var(--card)] p-4">
+                  <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-stone-600">Duplicate &amp; panic pain <span className="font-normal normal-case text-stone-400">(parents, n={m.total})</span></p>
+                  {m.counts.map((c) => <Bar key={c.o} label={c.o} count={c.n} total={m.total} />)}
+                </div>
+              );
+            })()}
+
+            {/* v11.3 Patch 4: "Curated list appeal" — parents segment only. */}
+            {(() => {
+              const curDef = QUESTIONS.find((x) => x.id === "curated_list_appeal");
+              if (!curDef || curDef.kind !== "single") return null;
+              const r = single(curDef.id, curDef.options, parentsCompleted);
+              return (
+                <div className="rounded-2xl border border-stone-200 bg-[var(--card)] p-4">
+                  <p className="mb-2 text-[12px] font-bold uppercase tracking-wide text-stone-600">Curated list appeal <span className="font-normal normal-case text-stone-400">(parents, n={r.total})</span></p>
+                  {r.counts.map((c) => <Bar key={c.o} label={c.o} count={c.n} total={r.total} />)}
+                </div>
+              );
+            })()}
+
+            {QUESTIONS.filter((x) => x.kind === "single" && x.id !== "curated_list_appeal").map((s) => {
               if (s.kind !== "single") return null;
               const r = single(s.id, s.options);
               return (

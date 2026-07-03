@@ -11,7 +11,7 @@ import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, Share2 } from "lucide-react";
 import { LogoMark } from "@/components/Logo";
-import { SCREENER, QUESTIONS, CONCEPT_PARAGRAPH, questionSequence } from "@/content/survey";
+import { SCREENER, QUESTIONS, questionSequence } from "@/content/survey";
 
 type Answers = Record<string, string | string[]>;
 
@@ -68,7 +68,7 @@ export default function SurveyPage() {
           <div className="text-center">
             <LogoMark variant="light" size={44} className="mx-auto" />
             <h1 style={{ fontFamily: "var(--font-display)" }} className="mt-4 text-[26px] font-bold leading-tight">Two minutes on gift-giving?</h1>
-            <p className="mt-2 text-[14px] text-stone-600">A short survey about how you really buy gifts. Quick taps, no typing (one optional line at the end).</p>
+            <p className="mt-2 text-[14px] text-stone-600">A few honest questions about gift-giving — for yourself, your kids, and the people you love. Takes about 4–5 minutes, and it&apos;s genuinely useful to us.</p>
             <p className="mt-4 text-[11px] leading-snug text-stone-600">
               Anonymous; answers are stored so we can publish honest totals. No email needed unless you ask for early access at the end. <Link href="/privacy" className="underline">Privacy</Link>.
             </p>
@@ -98,8 +98,8 @@ export default function SurveyPage() {
         {stage === "questions" && q && (
           <div>
             <Dots />
-            {q.id === "q13_concept" && (
-              <p className="mb-4 rounded-2xl border border-stone-200 bg-[var(--card)] p-4 text-[14px] leading-relaxed text-stone-700">{CONCEPT_PARAGRAPH}</p>
+            {q.kind === "single" && q.concept && (
+              <p className="mb-4 rounded-2xl border border-stone-200 bg-[var(--card)] p-4 text-[14px] leading-relaxed text-stone-700">{q.concept}</p>
             )}
             <h2 className="text-[20px] font-bold leading-snug">{q.text}</h2>
             <div className="mt-4 space-y-2.5">

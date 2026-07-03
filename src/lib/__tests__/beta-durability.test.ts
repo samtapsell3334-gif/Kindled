@@ -44,3 +44,65 @@ describe("survey branching (v11 WS-14)", () => {
     expect(QUESTIONS.some((q) => q.id === "q15_objection")).toBe(true);
   });
 });
+
+describe("v11.3 survey addendum — curated-list concept test (parent/both branch)", () => {
+  it("New screens A and B appear ONLY for parent/both, never for buyer", () => {
+    for (const seg of ["parent", "both"]) {
+      const seq = questionSequence({}, seg);
+      expect(seq.some((q) => q.id === "duplicate_pain_experienced"), seg).toBe(true);
+      expect(seq.some((q) => q.id === "curated_list_appeal"), seg).toBe(true);
+    }
+    const buyerSeq = questionSequence({}, "buyer");
+    expect(buyerSeq.some((q) => q.id === "duplicate_pain_experienced")).toBe(false);
+    expect(buyerSeq.some((q) => q.id === "curated_list_appeal")).toBe(false);
+  });
+
+  it("both new screens sit immediately after q7_landed and before q8_whipround", () => {
+    const seq = questionSequence({}, "both").map((q) => q.id);
+    const iLanded = seq.indexOf("q7_landed");
+    const iPain = seq.indexOf("duplicate_pain_experienced");
+    const iAppeal = seq.indexOf("curated_list_appeal");
+    const iWhip = seq.indexOf("q8_whipround");
+    expect(iLanded).toBeGreaterThanOrEqual(0);
+    expect(iPain).toBe(iLanded + 1);
+    expect(iAppeal).toBe(iPain + 1);
+    expect(iWhip).toBe(iAppeal + 1);
+  });
+
+  it("duplicate_pain_experienced is a multi-select with the five specified options", () => {
+    const q = QUESTIONS.find((x) => x.id === "duplicate_pain_experienced");
+    expect(q?.kind).toBe("multi");
+    if (q?.kind === "multi") {
+      expect(q.options).toHaveLength(5);
+      expect(q.options).toContain("None of these");
+    }
+  });
+
+  it("curated_list_appeal carries its own concept paragraph and four appeal levels", () => {
+    const q = QUESTIONS.find((x) => x.id === "curated_list_appeal");
+    expect(q?.kind).toBe("single");
+    if (q?.kind === "single") {
+      expect(q.concept).toBeTruthy();
+      expect(q.options).toEqual(["Extremely appealing", "Quite appealing", "Not that appealing", "Not for me"]);
+    }
+  });
+
+  it("the appeal question (q14) was widened to all nine Patch 3 options", () => {
+    const q = QUESTIONS.find((x) => x.id === "q14_appeal");
+    expect(q?.kind).toBe("multi");
+    if (q?.kind === "multi") {
+      expect(q.options).toHaveLength(9);
+      for (const added of ["No duplicate gifts", "Buyers know exactly what to get", "Being able to add a surprise contribution on the day"]) {
+        expect(q.options).toContain(added);
+      }
+    }
+  });
+
+  it("the concept paragraph (Patch 2) no longer narrows to a single pooled pot", () => {
+    const q = QUESTIONS.find((x) => x.id === "q13_concept");
+    expect(q?.kind).toBe("single");
+    if (q?.kind === "single") {
+      expect(q.concept).toMatch(/specific things|surprise on the big day/i);
+    }
+  });
+});

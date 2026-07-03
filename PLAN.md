@@ -154,3 +154,38 @@ segment, createdAt) via Prisma migration. /beta = client page + POST /api/beta
 (BETA_PIN env, server-gated, rate-limited, same pattern as /api/investor);
 noindex + robots excluded. Sandbox reset physically cannot touch Postgres tables
 (it clears the in-memory store + sandbox_state row only) — asserted by test.
+
+## v11.3 Survey Addendum (patches v11.2, no rebuild)
+
+**Placement decision for Patch 4 (logged, since the brief's anchor question
+"how often are you/your kids asked what you want" doesn't exist in the built
+survey):** inserted immediately after `q7_landed` ("how many gifts really
+landed" — the last general pain question) and before `q8_whipround` (the
+first organising/buying-behaviour question). This satisfies the brief's own
+stated intent — "prime the theme [q5-q7 general pain], surface the real pain
+[new screen A, duplicates/panic], then offer the relief [new screen B,
+concept] ... before buying behaviour [q8, whip-round organising]" — using the
+closest real equivalents in the actual built question order.
+
+Field ids match the brief's data-model section exactly: `duplicate_pain_experienced`
+(multi, parentsOnly) and `curated_list_appeal` (single, parentsOnly). Both
+render generically via the existing `parentsOnly` filter in `questionSequence()`
+(extended to the multi variant type) — no new branching logic needed.
+
+`q13_concept`'s CONCEPT_PARAGRAPH rendering is generalised from a hardcoded
+`q.id === "q13_concept"` check to a `concept?: string` field on the question
+object, so the new curated-list question can carry its own paragraph the same
+way, cleanly.
+
+Dashboard: both new fields get dedicated panels (not the generic per-question
+auto-loop), based on a parents-only completed set independent of the page's
+global segment toggle, per the brief's "parents segment only" instruction —
+this keeps percentages accurate rather than diluted by buyer-segment rows
+that never saw these questions. `curated_list_appeal` is excluded from the
+generic single-question auto-loop to avoid a duplicate panel.
+
+**Status: implemented and verified 2026-07-03** — all four patches live in
+`src/content/survey.ts`, `src/app/survey/{page,layout}.tsx`,
+`src/app/beta/page.tsx`. Full verification detail in REVIEW.md's "v11.3 —
+Survey Addendum" section (build green, 130 tests green, both branches
+tap-tested live, dashboard panels confirmed against real seeded data).

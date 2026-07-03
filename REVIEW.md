@@ -639,3 +639,100 @@ items unchanged by v11.1 stand on the 2026-07-02 evidence; items touched
 **Final:** demo a11y **100** live (every audited route now perfect: homepage
 100, sandbox 100, survey 100, demo 100). Kids' warmer-mix register (v8.2b
 pattern 5) completed as .kids-register — token-derived, a mode not a palette.
+
+## v11.3 — Survey Addendum (2026-07-03)
+
+Four patches on top of the existing (already-live) survey system — no
+rebuild, all additive.
+
+**Patch 1 (intro + OG copy):** intro paragraph broadened from "how you really
+buy gifts" (narrow, generic) to explicitly name kids and loved ones. `/survey`
+now carries its own `openGraph`/`twitter` metadata block (title: "Kindled —
+quick survey on gift-giving") instead of inheriting the root layout's
+"group gifting" copy. Verified against the actual served HTML, not source:
+`curl localhost:3000/survey | grep og:title` → new copy; `grep -c "group
+gifting"` on the full served page → **0** occurrences. Root homepage still
+legitimately uses the phrase 10×, confirming the fix is scoped to `/survey`
+only, not a global rename.
+
+**Patch 2 (concept blurb):** `CONCEPT_PARAGRAPH` rewritten from "one pot
+everyone pools into" to cover specific wishlist items OR one pooled goal,
+funded flexibly, with day-of surprise contributions possible. Verified
+rendered verbatim on the `q13_concept` screen via live DOM read.
+
+**Patch 3 (appeal options):** `q14_appeal` widened from 6 to 9 options —
+added "No duplicate gifts," "Buyers know exactly what to get," "Being able to
+add a surprise contribution on the day." Verified all 9 render in order via
+live DOM read; unit-tested (`beta-durability.test.ts`).
+
+**Patch 4 (curated-list concept test):** two new parent/both-only screens
+inserted between `q7_landed` and `q8_whipround` — placement decision and
+rationale logged in PLAN.md, since the brief's anchor question didn't map to
+an exact existing screen ID. New screen A (`duplicate_pain_experienced`,
+multi, 5 options) and new screen B (`curated_list_appeal`, single, carries
+its own concept paragraph, 4 appeal levels) both ride the same generic
+`parentsOnly` filter already used by `q10_wyr_child` — no new branching
+logic required, just extending the type union.
+
+Verified via real browser tap-through, both branches:
+- Parent/both: screener → q2..q7 → **new screen A** → **new screen B**
+  (concept text renders verbatim) → q8_whipround → ... — confirmed exact
+  position via live screenshots.
+- Buyer: screener → q2..q7 → jumps straight to q8_whipround, skipping both
+  new screens entirely — confirmed via live DOM read.
+- Unit tests added (5 new, in `beta-durability.test.ts`): screen presence by
+  segment, exact adjacent-position assertions (`iPain === iLanded + 1` etc.),
+  option-count/content checks for both new questions and the widened q14.
+
+**Dashboard (Patch 4):** two new dedicated panels on `/beta`'s Survey tab —
+"Duplicate & panic pain" and "Curated list appeal" — both computed from a
+`parentsCompleted` base that is **independent of the page's segment toggle**
+(so a founder viewing "Non-parents" still sees the correct parents-only n and
+%, rather than a diluted or empty panel). `curated_list_appeal` is excluded
+from the generic per-question auto-loop to avoid a duplicate panel. Verified
+live: seeded 2 parent responses + 1 buyer response via the real `/api/survey`
+endpoint against the actual database, confirmed both panels render correct
+counts/percentages, confirmed the parents-only n stayed fixed (5 and 2)
+after switching the segment toggle to "Non-parents", confirmed no duplicate
+"curated list appeal" panel appears in the generic single-question list.
+
+**Storage / reset survival:** no schema change — both new fields ride in the
+existing opaque `SurveyResponse.answers` JSON column, same mechanism as every
+other question. The existing structural test (`the sandbox store never
+references the waitlist or survey tables`) already guarantees `resetSandbox()`
+cannot touch this data regardless of which fields the JSON blob contains —
+verified this still passes. Did **not** additionally trigger a live reset
+against the shared dev/prod database to "prove" this further: DATABASE_URL is
+the same Neon instance across local/preview/production (confirmed via
+`vercel env ls`), and given the user had just asked me to hold off on a
+different DB mutation in this same session, I judged the structural
+guarantee + live write/read-back round-trip (below) sufficient without an
+extra live mutation against shared data.
+
+**Live round-trip proof:** posted real answers containing both new field IDs
+to `/api/survey` against the actual Neon database, then confirmed `/beta`
+read them back correctly (exact percentages matched what was posted). Note:
+this used the same shared database Vercel production reads — 3 test rows
+(`test_v113_parent1`, `test_v113_parent2`, `test_v113_buyer1`) remain in the
+live table; I asked the user whether to delete them and they said to leave
+them for now. Logged in TODO-FOUNDER.md.
+
+**Timing re-estimate:** the worst-case branch (parent/both, with the
+whip-round follow-up) is now 18 questions + the screener = 19 taps, up from
+17 pre-addendum (+2 for the new screens). Modelled per-question-type dwell
+time (intro 8s, plain single ~4s, WYR ~3s, multi-select ~7–11s depending on
+option count, concept-paragraph screens ~10s each for the read) gives a
+brisk-respondent estimate of **~1 min 43s**, or roughly **2.5–3.5 min** for a
+slower/more deliberate reader. This is a modelled estimate, not a
+stopwatch-on-a-real-human figure (not something this session can produce) —
+but it comfortably sits under the "4–5 minutes" ceiling the intro copy
+promises, so that promise remains a safe over-estimate rather than broken by
+the two added screens.
+
+**Build/tests:** clean production build (`rm -rf .next && npm run build`,
+zero errors) after confirming zero stray preview servers first (see
+[[stray-server-next-corruption]] memory — checked `preview_list` before
+rebuilding, per the lesson from earlier this session). Full suite: **130
+green** (19 files), up from 124 — 6 new tests added for the addendum, all
+passing. `npm run lint`: zero new warnings (one pre-existing, unrelated
+`no-console` warning in `api/track/route.ts`).

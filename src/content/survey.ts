@@ -10,8 +10,8 @@
  */
 
 export type SurveyQuestion =
-  | { id: string; kind: "single"; text: string; options: string[]; parentsOnly?: boolean }
-  | { id: string; kind: "multi"; text: string; options: string[] }
+  | { id: string; kind: "single"; text: string; options: string[]; parentsOnly?: boolean; concept?: string }
+  | { id: string; kind: "multi"; text: string; options: string[]; parentsOnly?: boolean }
   | { id: string; kind: "wyr"; text: string; a: string; b: string; parentsOnly?: boolean }
   | { id: string; kind: "text"; text: string; placeholder: string };
 
@@ -26,10 +26,23 @@ export const SCREENER = {
   ],
 } as const;
 
+/** v11.3 Patch 2 — broadened from "one pot everyone pools into" to reflect
+ *  the real offer: specific items OR one pooled goal, funded however people
+ *  want, surprise contributions possible on the day. */
 export const CONCEPT_PARAGRAPH =
-  "One link where friends and family chip into a chosen gift for someone. " +
-  "Amounts stay private, messages and videos are attached, and everything " +
-  "stays secret until it's revealed on the day.";
+  "One shared link for everyone who loves them. Add the specific things " +
+  "they'd genuinely like — big or small — or set one bigger goal for " +
+  "everyone to pool toward. People chip in whatever they want, some " +
+  "contributions can even land as a surprise on the big day itself, and " +
+  "it's all revealed together when it matters.";
+
+/** v11.3 Patch 4, New screen B — the curated-list concept (parents/both only). */
+export const CURATED_LIST_CONCEPT =
+  "Imagine building your child's list yourself — the things you know " +
+  "they'll actually love or need — then sharing it with grandparents, " +
+  "aunts, uncles and friends. As each thing gets bought, it's " +
+  "automatically marked off, so nobody doubles up, nobody panics in the " +
+  "shop, and your child gets exactly what you know is right for them.";
 
 export const QUESTIONS: SurveyQuestion[] = [
   { id: "q2_group_gifts", kind: "single", text: "How do you usually handle group gifts?",
@@ -44,6 +57,21 @@ export const QUESTIONS: SurveyQuestion[] = [
     options: ["Yes, often", "Sometimes", "No"] },
   { id: "q7_landed", kind: "single", text: "Think of the last few gifts you gave. How many really landed?",
     options: ["All", "Most", "Some", "Honestly, no idea"] },
+  // v11.3 Patch 4 — New screens A and B (parent/both only). Placement: right
+  // after the general pain questions (q5-q7), before the organising/buying
+  // question (q8_whipround). See PLAN.md for the full placement rationale.
+  { id: "duplicate_pain_experienced", kind: "multi", parentsOnly: true,
+    text: "Which of these have actually happened to you?",
+    options: [
+      "My child ended up with the same toy or gift twice",
+      "I've bought something, only to find someone else already got it",
+      "A relative or friend asked me last-minute what to buy and I panicked for an answer",
+      "I've had to guess, and got it wrong",
+      "None of these",
+    ] },
+  { id: "curated_list_appeal", kind: "single", parentsOnly: true, concept: CURATED_LIST_CONCEPT,
+    text: "How appealing does that sound?",
+    options: ["Extremely appealing", "Quite appealing", "Not that appealing", "Not for me"] },
   { id: "q8_whipround", kind: "single", text: "Ever organised a group collection (a whip-round)?",
     options: ["Yes", "No"] },
   { id: "q8b_worst_bit", kind: "single", text: "What was the worst bit?",
@@ -56,10 +84,17 @@ export const QUESTIONS: SurveyQuestion[] = [
     a: "Send a gift card", b: "Chip into a chosen gift with a video message attached" },
   { id: "q12_wyr_time", kind: "wyr", text: "Would you rather…",
     a: "Three hours guessing in shops", b: "Three minutes chipping in online" },
-  { id: "q13_concept", kind: "single", text: "Would you use this for your next occasion?",
+  { id: "q13_concept", kind: "single", concept: CONCEPT_PARAGRAPH, text: "Would you use this for your next occasion?",
     options: ["Definitely", "Probably", "Not sure", "Probably not"] },
+  // v11.3 Patch 3 — widened from 6 to 9 options (added: no duplicates,
+  // buyers-know-exactly, surprise-on-the-day).
   { id: "q14_appeal", kind: "multi", text: "What appeals most?",
-    options: ["No more guessing", "One big gift instead of lots of small ones", "The reveal moment", "Video messages", "No chasing money", "Nothing really"] },
+    options: [
+      "No more guessing", "One big gift instead of lots of small ones", "The reveal moment",
+      "Video messages attached", "No chasing money", "No duplicate gifts",
+      "Buyers know exactly what to get", "Being able to add a surprise contribution on the day",
+      "Nothing really",
+    ] },
   { id: "q15_objection", kind: "multi", text: "What would put you off?",
     options: ["Trusting it with money", "Yet another app or site", "I prefer choosing gifts myself", "Possible fees", "Nothing much"] },
   { id: "q16_worst_moment", kind: "text", text: "Your worst gift-buying moment, in one line?",

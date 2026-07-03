@@ -101,3 +101,12 @@ was completed and is ticked below with evidence; what remains is the short
 - Survey test row (sessionId svy_audit_test1) left in the table so the
   dashboard demos with data; delete from /beta CSV workflows when real
   responses arrive.
+
+## v11.3 (2026-07-03)
+- Three more test survey rows are in the live table from verifying the new
+  "Duplicate & panic pain" / "Curated list appeal" dashboard panels:
+  sessionId `test_v113_parent1`, `test_v113_parent2`, `test_v113_buyer1`. I
+  asked whether to delete them and you said to leave them for now — flagging
+  again here so they don't get mistaken for real responses. Delete via
+  Prisma/`/beta` CSV workflow whenever convenient; they're clearly named so
+  there's no risk of deleting a real response by mistake.
