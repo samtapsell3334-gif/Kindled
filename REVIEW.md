@@ -635,3 +635,7 @@ items unchanged by v11.1 stand on the 2026-07-02 evidence; items touched
 (2,3,7,8) re-verified above.
 
 **v11.1 close-out:** demo a11y raised 90 → 95+ live (close/remove buttons named, strip contrast, heading order). Live SHA verified per deploy throughout.
+
+**Final:** demo a11y **100** live (every audited route now perfect: homepage
+100, sandbox 100, survey 100, demo 100). Kids' warmer-mix register (v8.2b
+pattern 5) completed as .kids-register — token-derived, a mode not a palette.
