@@ -40,6 +40,8 @@ import { RevealExperience } from "@/components/RevealExperience";
 import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
 import { LogoMark } from "@/components/Logo";
 import { toReceiverPots, type ReceiverPot } from "@/lib/demo/receiver-view";
+import { VERB_CHIP_IN } from "@/content/claims";
+import { DrawMicrocopy } from "@/components/DrawMicrocopy";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -187,7 +189,6 @@ const CHECKLIST_POTS: DemoPot[] = [
     contributors: 0, boosterEntries: 0,
     accentGradient: "from-rose-400 to-red-500",
     tributes: [],
-    tag: "Parent's pick",
     isClaimed: false,
   },
 ];
@@ -546,10 +547,10 @@ function ProfileHeader({ potCount, totalGoal, onShare: _onShare, isContributor, 
               <LogoMark variant="dark" size={30} />
             </div>
             <div>
-              <h1 className="flex min-w-0 items-baseline gap-2">
-                <span style={{ fontFamily: "var(--font-logo), 'Avenir Next', sans-serif", fontWeight: 800, letterSpacing: "-0.015em" }} className="shrink-0 text-[17px] text-[#23201C]">Kindled</span>
-                <span className="truncate text-[11px] font-medium tracking-tight text-[#0f172a]/40">Billy&apos;s List</span>
-              </h1>
+              <div className="flex min-w-0 items-baseline gap-2">
+                <h1 style={{ fontFamily: "var(--font-logo), 'Avenir Next', sans-serif", fontWeight: 800, letterSpacing: "-0.015em" }} className="shrink-0 text-[17px] text-[#23201C]">Kindled</h1>
+                <p className="truncate text-[11px] font-medium tracking-tight text-[#0f172a]/40">Billy&apos;s list</p>
+              </div>
               <p className="text-[11px] tracking-tight text-[#0f172a]/50">
                 {isContributor
                   ? <>Contributing to <span className="font-semibold text-[#0f172a]/75">Billy&apos;s List</span></>
@@ -624,6 +625,12 @@ function occasionTargetIso(pot: { eventLabel: string }): string {
     return d.toISOString();
   };
   return occasion === "christmas" ? roll(11, 25) : roll(5, 28);
+}
+
+/** v11.1 P1-9: the rendered date ALWAYS derives from the same rolled-forward
+ *  source as the countdowns — a past date can never render. */
+function occasionDateLabel(pot: { eventLabel: string }): string {
+  return new Date(occasionTargetIso(pot)).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
 function occasionLabel(occasion: Occasion): string {
@@ -738,7 +745,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
             {hideStackNote && pot.eventLabel !== "Ongoing" && (
               <div className="mt-2 flex items-center gap-1.5">
                 <CalendarDays className="h-3 w-3 shrink-0 text-[#0f172a]/35" />
-                <p className="text-[10px] text-[#0f172a]/40">Next event: <span className="font-medium text-[#0f172a]/60">{pot.eventLabel} · {pot.eventDate}</span></p>
+                <p className="text-[10px] text-[#0f172a]/40">Next event: <span className="font-medium text-[#0f172a]/60">{pot.eventLabel} · {occasionDateLabel(pot)}</span></p>
               </div>
             )}
             {pot.stackNote && !hideStackNote && (
@@ -764,7 +771,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
                 {kindled
                   ? <Check className="h-4 w-4" />
                   : <Flame className="h-4 w-4" />}
-                {kindled ? "Kindled!" : "Kindle"}
+                {kindled ? "Chipped in!" : VERB_CHIP_IN}
               </motion.button>
             </div>
 
@@ -928,7 +935,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           </div>
           <div className="shrink-0 rounded-xl bg-black/20 px-2.5 py-1.5 text-right">
             <p className="text-[9px] uppercase tracking-wider text-stone-500">{pot.eventLabel}</p>
-            <p className="text-[12px] font-bold text-stone-200">{pot.eventDate}</p>
+            <p className="text-[12px] font-bold text-stone-200">{occasionDateLabel(pot)}</p>
           </div>
         </div>
         <div className={cn(th.glow, "mt-4 flex flex-col items-center gap-3 rounded-2xl py-6 border border-white/5 bg-gradient-to-b", th.box)}>
@@ -939,7 +946,7 @@ function LockedPotCard({ pot, onReveal }: { pot: DemoPot; onReveal: (p: DemoPot)
           <Gift className={cn("h-14 w-14", isXmas ? "text-amber-400" : "text-violet-300")} strokeWidth={1.2} />
           <div className="flex items-center gap-1.5">
             <Lock className="h-3 w-3 text-stone-400" />
-            <p className="text-[12px] font-semibold text-stone-200">Locked · Unwraps {pot.eventDate}</p>
+            <p className="text-[12px] font-semibold text-stone-200">Locked · Unwraps {occasionDateLabel(pot)}</p>
           </div>
           <CountdownTimer targetIso={targetIso} eventLabel={pot.eventLabel} />
           <button
@@ -1125,7 +1132,7 @@ function ContributionPromptModal({
                 </div>
                 <div>
                   <p className="text-[12px] font-bold text-[#f59e0b]">Chip In &amp; Win</p>
-                  <p className="text-[11px] text-white/55 leading-snug">Chipping in automatically enters you into our <span className="text-[#f59e0b] font-semibold">£2,500 quarterly prize draw</span>. A free entry route is available, so no purchase is necessary.</p>
+                  <p className="text-[11px] text-white/55 leading-snug">Chipping in automatically enters you into our <span className="text-[#f59e0b] font-semibold">£2,500 quarterly prize draw</span>. <DrawMicrocopy /></p>
                 </div>
               </div>
               <div className="h-px bg-white/8" />
@@ -3554,7 +3561,7 @@ export default function DemoPage() {
               <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-[#f59e0b]/[0.12] px-3.5 py-3">
                 <Trophy className="mt-0.5 h-4 w-4 shrink-0 text-[#f59e0b]" />
                 <p className="text-[11px] leading-snug text-[#fdf6e3]/80">
-                  <span className="font-bold text-[#fdf6e3]">Enter our £2,500 quarterly prize draw</span> with every contribution. A free entry route is available.{" "}
+                  <span className="font-bold text-[#fdf6e3]">Enter our £2,500 quarterly prize draw</span> with every contribution. <DrawMicrocopy />{" "}
                   Plus earn <span className="font-bold text-[#f59e0b]">2% credit back</span> on your own future wishes.
                 </p>
               </div>

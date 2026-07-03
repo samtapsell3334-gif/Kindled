@@ -1260,8 +1260,7 @@ function Footer() {
   return (
     <footer className="border-t border-stone-200 bg-footer px-5 py-10">
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 md:flex-row">
-        <span className="theme-legacy-only"><Logo variant="light" size={30} /></span>
-        <span className="theme-ember-only"><Logo variant="dark" size={30} /></span>
+        <span className="logo-follow-theme"><Logo variant="auto" size={30} /></span>
         <div className="flex flex-wrap justify-center gap-6">
           {(["How it works|#how", "Live demo|/wishes/demo", "Gift survey|/survey", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");

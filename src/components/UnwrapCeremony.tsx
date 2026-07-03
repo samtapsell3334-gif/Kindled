@@ -9,6 +9,7 @@ import {
 } from "react";
 import { Heart, Copy, Check, ChevronRight, SkipForward, Gift, Flame, User, Trophy, Sparkles, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DrawMicrocopy } from "@/components/DrawMicrocopy";
 import { FundingBar } from "@/components/pots/FundingBar";
 import type { GiftingMode, VideoTribute } from "@/types/pots";
 
@@ -503,7 +504,7 @@ function SplashScreen({
                 <span className="font-bold text-amber-400">{boosterEntries} entries</span> into
                 the{" "}
                 <span className="font-semibold text-stone-200">£2,500 quarterly prize draw</span>.
-                There&apos;s a free entry route, so no purchase is necessary. Good luck!
+                <DrawMicrocopy /> Good luck!
               </p>
             </div>
           </div>

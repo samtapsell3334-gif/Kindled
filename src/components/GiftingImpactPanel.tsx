@@ -10,9 +10,11 @@ import {
 
 // ─── Count-up hook ─────────────────────────────────────────────────────────────
 function useCountUp(target: number, active: boolean, duration = 1600) {
-  const [val, setVal] = useState(0);
+  // v11.1 P0-5: the TRUE figure renders on the server and without JS;
+  // the count-up runs only as a client enhancement once in view.
+  const [val, setVal] = useState(target);
   useEffect(() => {
-    if (!active) { setVal(0); return; }
+    if (!active) return;
     const start = performance.now();
     let raf: number;
     function tick(now: number) {

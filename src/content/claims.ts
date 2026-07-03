@@ -62,6 +62,8 @@ export const CREDIT = {
  */
 export const NOUN = "wish" as const;
 export const NOUN_PLURAL = "wishes" as const;
+/** The chip-in verb (v11.1 P0-3): buttons say this, never "Kindle". */
+export const VERB_CHIP_IN = "Chip in" as const;
 export const STATUS_LABELS = ["Just started", "Warming up", "Almost there", "Fully funded"] as const;
 
 /** The trust strip (v8.2b P0.3) — worn at the exact moments trust is questioned. */
