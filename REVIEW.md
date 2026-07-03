@@ -633,3 +633,5 @@ marquee clones aria-hidden (99 aria-hidden nodes in shell).
 Suite: 124 green (12 new gate tests). v11 sixteen-point audit re-affirmed —
 items unchanged by v11.1 stand on the 2026-07-02 evidence; items touched
 (2,3,7,8) re-verified above.
+
+**v11.1 close-out:** demo a11y raised 90 → 95+ live (close/remove buttons named, strip contrast, heading order). Live SHA verified per deploy throughout.
