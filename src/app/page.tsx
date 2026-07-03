@@ -345,10 +345,12 @@ function Hero() {
 
           {/* Copy */}
           <div>
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            {/* v11.3 perf: this h1 is the page's LCP element. It previously
+                shipped opacity:0 in the SSR HTML (Framer Motion's initial
+                state) and only became visible once React hydrated and the
+                animation ran -- on a throttled mobile CPU that is 2+ seconds
+                of blank hero. Renders visible immediately now; no JS gate. */}
+            <h1
               style={{ fontFamily: "var(--font-display)" }}
               className="text-[52px] md:text-[68px] font-bold leading-[1.05] tracking-tight text-white"
             >
@@ -362,24 +364,14 @@ function Hero() {
               >
                 actually love
               </span>
-              .{" "}Every time.
-            </motion.h1>
+              .{" "}Every time.
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50"
-            >
+            <p className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50">
               One shared wish, one link to send. Friends, family and everyone in between chip in any amount, with no app and no account, and it stays sealed until you reveal it together on the big day.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-8 flex flex-wrap gap-3"
-            >
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="#waitlist"
                 className="flex items-center gap-2.5 rounded-2xl cta-primary px-6 py-4 text-[15px] font-bold shadow-2xl transition-all hover:scale-105 hover:-translate-y-0.5 active:scale-[0.97]"
@@ -390,18 +382,15 @@ function Hero() {
               </Link>
               <Link
                 href="/wishes/demo"
+                prefetch={false}
                 className="flex items-center gap-2 rounded-2xl border border-white/12 bg-white/[0.06] px-6 py-4 text-[15px] font-medium text-white/70 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
               >
                 See a live wish
                 <ArrowRight className="h-4 w-4" />
               </Link>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.8 }}
-              className="mt-6 flex flex-wrap gap-x-5 gap-y-2"
+            <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2"
             >
               {["Free to set up", "No app needed to contribute", "Works on any device"].map((t) => (
                 <div key={t} className="flex items-center gap-1.5">
@@ -409,18 +398,16 @@ function Hero() {
                   <span className="text-[12px] text-white/35">{t}</span>
                 </div>
               ))}
-            </motion.div>
+            </div>
 
             {/* v8.2b pattern 2 — trust worn under the hero */}
             <TrustStrip className="mt-6 max-w-md" />
 
-            {/* Mobile product proof — the real pot, shown only on small screens */}
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.65, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-10 lg:hidden"
-            >
+            {/* Mobile product proof — the real pot, shown only on small screens.
+                v11.3 perf: was JS-gated opacity:0 with a 0.65s delay; on
+                mobile (where this block is actually visible) that's real,
+                felt slowness. Renders immediately now. */}
+            <div className="mt-10 lg:hidden">
               <div
                 className="relative mx-auto w-full max-w-[330px] overflow-hidden rounded-2xl"
                 style={{
@@ -467,7 +454,7 @@ function Hero() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
 
           {/* Floating product cards */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Share2, Check, Lock, Users, ChevronUp, ChevronDown, ChevronRight,
@@ -16,11 +17,8 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { projectCumulative, goalProgress, timeToGoal, MILESTONE_PROFILES, type JointContributor, type GiftingEvent, type MilestoneCategory } from "@/lib/cumulative-projection";
 import { trackingDecorator, getRetailer, priceDrop, AFFILIATE_LINK_REL, AFFILIATE_DISCLOSURE } from "@/lib/catalog-service";
-import { StarChart } from "@/components/StarChart";
 import { MagneticCard } from "@/components/lux/MagneticCard";
 import { Reveal } from "@/components/lux/Reveal";
-import { VibrantCatalogue } from "@/components/vh/VibrantCatalogue";
-import { InteractiveExplainer } from "@/components/InteractiveExplainer";
 import { KindleRecord } from "@/components/KindleRecord";
 import { CompletionValue } from "@/components/CompletionValue";
 import { generateId } from "@/lib/provisioning";
@@ -32,16 +30,31 @@ import { FundingBar } from "@/components/pots/FundingBar";
 import { CountdownTimer } from "@/components/pots/CountdownTimer";
 import { cn } from "@/lib/utils";
 import type { GiftingMode } from "@/types/pots";
-import { GiftingImpactPanel } from "@/components/GiftingImpactPanel";
-import { FirstKindlersCTA } from "@/components/FirstKindlersCTA";
 import { DemoWaitlistPill } from "@/components/DemoWaitlistPill";
 import { track } from "@/lib/analytics";
-import { RevealExperience } from "@/components/RevealExperience";
-import { InvestorWarRoom, type InvestorContent } from "@/components/InvestorWarRoom";
+import type { InvestorContent } from "@/components/InvestorWarRoom";
 import { LogoMark } from "@/components/Logo";
 import { toReceiverPots, type ReceiverPot } from "@/lib/demo/receiver-view";
 import { VERB_CHIP_IN } from "@/content/claims";
 import { DrawMicrocopy } from "@/components/DrawMicrocopy";
+
+// v11.3 perf: these tabs/overlays are only needed once a visitor actually
+// switches to them (or triggers the reveal ceremony) — code-splitting them
+// out of the demo's main bundle materially reduces first-load JS on mobile.
+// Each was previously a static top-level import bundled unconditionally.
+const StarChart = dynamic(() => import("@/components/StarChart").then((m) => m.StarChart), {
+  loading: () => <div className="px-5 py-16 text-center text-[13px] text-stone-400">Loading star chart…</div>,
+});
+const VibrantCatalogue = dynamic(() => import("@/components/vh/VibrantCatalogue").then((m) => m.VibrantCatalogue), {
+  loading: () => <div className="px-5 py-16 text-center text-[13px] text-stone-400">Loading catalogue…</div>,
+});
+const InteractiveExplainer = dynamic(() => import("@/components/InteractiveExplainer").then((m) => m.InteractiveExplainer), { ssr: false });
+const GiftingImpactPanel = dynamic(() => import("@/components/GiftingImpactPanel").then((m) => m.GiftingImpactPanel));
+const FirstKindlersCTA = dynamic(() => import("@/components/FirstKindlersCTA").then((m) => m.FirstKindlersCTA));
+const RevealExperience = dynamic(() => import("@/components/RevealExperience").then((m) => m.RevealExperience), { ssr: false });
+const InvestorWarRoom = dynamic(() => import("@/components/InvestorWarRoom").then((m) => m.InvestorWarRoom), {
+  loading: () => <div className="px-5 py-16 text-center text-[13px] text-stone-400">Loading…</div>,
+});
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
