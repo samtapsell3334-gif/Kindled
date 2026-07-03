@@ -943,3 +943,106 @@ Full rationale in PLAN.md. Verified locally before deploy:
 - 142 tests green (+19 net: unbranching tests, projection-engine tests
   including one-year/two-year consistency and the 3-examples-per-tier
   check). Clean build.
+
+## v14 — Landing page persona benefits (2026-07-03)
+
+Full rationale and the section-placement/icon/animation-bug decisions in
+PLAN.md. This section is the brief's required proof, itemised.
+
+1. **Screenshots of all three persona tab states, mobile viewport
+   (390×844):** `audit/v14/01-tab-contributor.png`,
+   `02-tab-receiver.png`, `03-tab-parent.png`, plus
+   `04-tab-contributor-perks.png` showing the secondary draw/credit row.
+   Captured via a genuinely separate Chrome instance (Playwright, not the
+   embedded preview tool — see the animation-bug note below for why that
+   distinction mattered this session).
+
+2. **Grep confirming zero absolute "0%"/"there will be 0"-style claims:**
+   swept `page.tsx` for zero/always/never/100%/guarantee language. One real
+   fix on the homepage ("Billy sees zero progress" → "Billy never sees a
+   running total" — same meaning, no longer a bare falsifiable number).
+   One more found and removed from `content/claims.ts`:
+   `MECHANICS.zeroDuplicates`, an unused export (confirmed via repo-wide
+   grep — zero references anywhere) carrying the identical "0" problem;
+   deleted rather than reworded since nothing renders it. Everything else
+   the grep surfaced was either non-claim content (CSS animation
+   percentages, a persona quote about a *different* method's downside, not
+   a claim about Kindled) or an actual code-enforced structural guarantee
+   (Stripe never seeing full card numbers; receivers never seeing amounts
+   pre-reveal) rather than marketing spin — left those as "never" since
+   they're true and important trust copy, not something one edge case can
+   break.
+
+3. **Hero subheadline no longer implies mandatory group participation:**
+   replaced with the brief's exact wording ("Buy it outright, chip in
+   together, or build toward something bigger"). Confirmed via direct file
+   read post-edit; the H1 didn't have the same problem so was left alone
+   per the brief's own instruction.
+
+4. **Draw cadence and cashback % match `content/claims.ts` exactly:**
+   canonical values are `DRAW.name = "quarterly prize draw"`, `DRAW.amount
+   = "£2,500"`, `CREDIT.line = "2% back in credit on catalogue purchases"`.
+   Checked the *actual live homepage* for the "monthly raffle" drift the
+   brief warned about — found zero occurrences of "monthly" anywhere;
+   every existing mention already said "quarterly £2,500" and "2% back in
+   credit" (the Features array, the old bullets, the footer disclaimer).
+   No founder decision needed; nothing logged to TODO-FOUNDER for this
+   item since there was no genuine conflict to resolve. The new section's
+   secondary perks row uses these exact canonical values directly from the
+   imported constants (not hand-retyped), and reuses the existing
+   `DrawMicrocopy` component for the compliance line + terms link, per
+   established convention.
+
+5. **Reduced-motion walkthrough, screenshotted:**
+   `audit/v14/05-reduced-motion.png`, captured via a Playwright browser
+   context with `reducedMotion: "reduce"` emulated. Verified programmatically
+   too: all pillar card opacities read `1` immediately (no stagger delay),
+   confirmed via `getComputedStyle` right after scroll-into-view with no
+   wait time needed — matching the "static layout, no cross-fade delay"
+   requirement exactly.
+
+**A genuine bug found, root-caused, and fixed (worth recording in detail
+since it cost real debugging time):** the first implementation of the
+scroll-triggered stagger-in used framer-motion's `whileInView` prop
+directly on each pillar card. Cards got stuck at partial opacity
+indefinitely — confirmed via `getComputedStyle` polling, and confirmed this
+was **not** a testing-tool artifact by reproducing it in a completely
+separate, freshly-launched real Chrome (Playwright), ruling out the
+embedded preview tool's Electron runtime as the cause. Added temporary
+console logging and found the underlying `useInView` boolean *did* flip to
+`true` correctly on scroll — meaning the bug was specifically `whileInView`
+fighting the parent tab-switcher's `AnimatePresence`, not the visibility
+detection itself. Fixed by switching to the same manual `useInView` +
+`animate` pattern this file's own pre-existing `Reveal` component already
+uses successfully elsewhere on the page, hoisted once at the section level
+rather than per-card. Also opacity-traced the tab-switch transition
+specifically and found it correct but slow (~1.25s, from
+`AnimatePresence mode="wait"` fully finishing the exit animation before
+the next tab's cards even start entering, compounded by their own
+re-stagger) — tightened both springs to bring this to ~900ms.
+
+**Accessibility:** Lighthouse against the local production build initially
+came back 96 with two real (not new-but-newly-surfaced) contrast failures:
+the section's eyebrow label at `text-amber-600` (3.05:1, needs 4.5:1) and
+the draw/credit compliance footnote at `text-stone-400` (2.46:1). Both
+fixed by switching to shades already proven AA-safe elsewhere in this exact
+codebase this session (`text-amber-700` — used successfully on
+`/survey`'s own eyebrow labels; `text-stone-600` — the standard secondary-
+text shade used throughout this page's body copy). Re-ran Lighthouse:
+**100**. While fixing this, found `text-amber-600` was a **pre-existing
+pattern repeated in 5 other places** on this same page (How it works,
+Features, Stack "{pct}%" labels, How money works, FinalCTA eyebrows) — all
+carrying the identical contrast failure, unrelated to anything this brief
+touched. Fixed all 6 site-wide (this new section + the 5 pre-existing
+ones) to `text-amber-700` rather than leaving 5 known WCAG-AA failures
+sitting on the homepage just because they were out of the brief's literal
+scope — it's a one-line-per-instance, zero-risk colour-shade swap, not a
+redesign. Left the 3 unrelated `color: "text-amber-600"` icon-fill
+instances alone (feature-card icons inside white circular badges, a
+different, non-text 3:1 contrast requirement that this shade already
+satisfies).
+
+**Build/tests:** 142 tests green (no regressions from the new component —
+`claims-drift.test.ts` and `route-shells.test.ts` both still pass, meaning
+the persona section didn't introduce any banned-lexicon or claims-drift
+issues). Clean production build. `npm run lint`: zero new warnings.

@@ -11,6 +11,7 @@ import {
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { Logo } from "@/components/Logo";
 import { TrustStrip } from "@/components/TrustStrip";
+import { PersonaBenefits } from "@/components/PersonaBenefits";
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -73,7 +74,7 @@ const FEATURES = [
   {
     icon: Lock,
     title: "Surprise-proof secrets",
-    desc: "Billy sees zero progress until reveal day. Contributors can chat, but the gift stays completely hidden.",
+    desc: "Billy never sees a running total until reveal day. Contributors can chat, but the gift stays completely hidden.",
     color: "text-[#ff6b6b]",
     bg: "bg-rose-50",
     border: "border-rose-100",
@@ -367,8 +368,11 @@ function Hero() {
               .{" "}Every time.
             </h1>
 
+            {/* v14 Fix 1: the old copy implied every wish needs group funding.
+                It doesn't — buy outright, chip in, or pool toward something
+                bigger are all real paths. */}
             <p className="mt-6 max-w-[500px] text-[17px] leading-relaxed text-white/50">
-              One shared wish, one link to send. Friends, family and everyone in between chip in any amount, with no app and no account, and it stays sealed until you reveal it together on the big day.
+              One list for the people who love them. Buy it outright, chip in together, or build toward something bigger — sealed until the big day.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -741,7 +745,7 @@ function HowItWorks() {
     <section id="how" className="bg-white py-28 px-5">
       <div className="mx-auto max-w-5xl">
         <Reveal className="text-center mb-16">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-3">How Kindled works</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-700 mb-3">How Kindled works</p>
           <h2
             style={{ fontFamily: "var(--font-display)" }}
             className="text-[38px] md:text-[52px] font-bold text-stone-900 leading-[1.1]"
@@ -812,7 +816,7 @@ function Features() {
     <section id="features" className="bg-[#fdf9f5] py-28 px-5">
       <div className="mx-auto max-w-5xl">
         <Reveal className="text-center mb-16">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-3">Everything you need</p>
+          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-700 mb-3">Everything you need</p>
           <h2
             style={{ fontFamily: "var(--font-display)" }}
             className="text-[38px] md:text-[52px] font-bold text-stone-900 leading-[1.1]"
@@ -844,92 +848,6 @@ function Features() {
               </motion.div>
             </Reveal>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Audience split ───────────────────────────────────────────────────────────
-
-function AudienceSplit() {
-  return (
-    <section id="families" className="bg-white py-28 px-5">
-      <div className="mx-auto max-w-5xl">
-        <Reveal className="text-center mb-16">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-3">Who Kindled is for</p>
-          <h2
-            style={{ fontFamily: "var(--font-display)" }}
-            className="text-[38px] md:text-[52px] font-bold text-stone-900 leading-[1.1]"
-          >
-            Works for everyone involved
-          </h2>
-        </Reveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Families */}
-          <Reveal from="left">
-            <div className="rounded-3xl border border-amber-100 bg-gradient-to-br from-amber-50 to-orange-50 p-8 h-full">
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-300/40">
-                <Gift className="h-7 w-7 text-white" strokeWidth={1.5} />
-              </div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-amber-600 mb-2">For families & receivers</p>
-              <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold text-stone-900 mb-3 leading-tight">
-                Your wishlist.<br />Your rules.
-              </h3>
-              <p className="text-[14px] text-stone-600 leading-relaxed mb-6">
-                Set up your wish in 2 minutes. Add anything from any shop. Kids get star charts and parent controls. Every gift stays secret until you trigger the reveal.
-              </p>
-              <div className="space-y-2.5">
-                {[
-                  "Add items from any website by pasting a link",
-                  "Star chart mode turns chores into gift momentum",
-                  "Gifts stay hidden from you until reveal day",
-                  "Incomplete goals carry over to the next occasion",
-                  "Full parent controls and event scheduling",
-                ].map((t) => (
-                  <div key={t} className="flex items-start gap-2.5">
-                    <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-amber-400">
-                      <Check className="h-2.5 w-2.5 text-stone-900" strokeWidth={3} />
-                    </div>
-                    <p className="text-[13px] text-stone-700">{t}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-
-          {/* Contributors */}
-          <Reveal from="right" delay={0.1}>
-            <div id="contributors" className="rounded-3xl border border-rose-100 bg-gradient-to-br from-rose-50 to-orange-50 p-8 h-full">
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#ff6b6b] to-[#f59e0b] shadow-lg shadow-rose-300/40">
-                <Heart className="h-7 w-7 text-white" strokeWidth={1.5} />
-              </div>
-              <p className="text-[11px] font-bold uppercase tracking-widest text-[#ff6b6b] mb-2">For contributors</p>
-              <h3 style={{ fontFamily: "var(--font-display)" }} className="text-[28px] font-bold text-stone-900 mb-3 leading-tight">
-                Give meaningfully.<br />Get rewarded.
-              </h3>
-              <p className="text-[14px] text-stone-600 leading-relaxed mb-6">
-                Chip in any amount you like, from £5 to £500. No account, no app, done in thirty seconds.
-              </p>
-              <div className="space-y-2.5">
-                {[
-                  "Chip in any amount, with no minimum and no account",
-                  "See exactly what's funded, live",
-                  "Earn 2% back in credit on catalogue purchases",
-                  "Buy smaller items outright if you prefer",
-                  "See who else contributed in the reveal",
-                ].map((t) => (
-                  <div key={t} className="flex items-start gap-2.5">
-                    <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#ff6b6b]">
-                      <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
-                    </div>
-                    <p className="text-[13px] text-stone-700">{t}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
         </div>
       </div>
     </section>
@@ -1054,7 +972,7 @@ function StackSection() {
       <div className="mx-auto max-w-5xl">
         <div className="grid items-center gap-10 md:grid-cols-2">
           <Reveal>
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-600">Stack</p>
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-700">Stack</p>
             <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[34px] font-bold leading-[1.1] text-stone-900 md:text-[44px]">
               Big dreams take more than one birthday
             </h2>
@@ -1076,7 +994,7 @@ function StackSection() {
                   <div key={s.label}>
                     <div className="mb-1.5 flex items-baseline justify-between">
                       <p className="text-[13px] font-semibold text-stone-700">{s.label}</p>
-                      <p className="text-[12px] font-bold text-amber-600">{s.pct}%</p>
+                      <p className="text-[12px] font-bold text-amber-700">{s.pct}%</p>
                     </div>
                     <div className="h-2.5 overflow-hidden rounded-full bg-stone-100">
                       <motion.div
@@ -1135,7 +1053,7 @@ function HowMoneyWorks() {
     <section id="money" className="scroll-mt-24 bg-white py-28 px-5">
       <div className="mx-auto max-w-5xl">
         <Reveal className="mb-12 text-center">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-600">Where does your money go?</p>
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-700">Where does your money go?</p>
           <h2 style={{ fontFamily: "var(--font-display)" }} className="text-[38px] font-bold leading-[1.1] text-stone-900 md:text-[52px]">
             How the money works
           </h2>
@@ -1196,7 +1114,7 @@ function FinalCTA() {
               </div>
             </div>
 
-            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-600">
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-amber-700">
               Kindled is launching soon
             </p>
             <h2
@@ -1283,12 +1201,12 @@ export default function LandingPage() {
       <Nav />
       <Hero />
       <MarqueeBand />
+      <PersonaBenefits />
       <Problem />
       <RevealPreview />
       <HowItWorks />
       <StackSection />
       <HowMoneyWorks />
-      <AudienceSplit />
       <Features />
       <Stats />
       <Testimonials />

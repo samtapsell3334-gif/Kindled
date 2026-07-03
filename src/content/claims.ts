@@ -32,15 +32,6 @@ export const STATS = {
   },
 } as const;
 
-/** Product mechanics — features, never presented as research. */
-export const MECHANICS = {
-  zeroDuplicates: {
-    value: "0",
-    label: "duplicates when you guide your buyers",
-    source: "How Kindled works",
-  },
-} as const;
-
 /** The prize draw — one name, one amount, compliance microcopy everywhere. */
 export const DRAW = {
   name: "quarterly prize draw",

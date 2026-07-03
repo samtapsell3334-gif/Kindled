@@ -345,3 +345,88 @@ stage, above the email-capture CTA, using `computeGiftProjection(answers)`
 computed live from the respondent's own in-memory answers (not a round-trip
 to the server) — guaranteed non-null now, since the unbranched sequence
 means Q3/Q4/Q5 are always answered before `done` is reachable.
+
+## v14 — Landing page persona benefits (2026-07-03)
+
+**Fix 1 (hero subheadline):** replaced with the brief's exact wording. The
+old copy ("One shared wish, one link to send. Friends, family and everyone
+in between chip in any amount...") implied every wish needs group funding —
+it doesn't. New copy names all three real paths (buy outright / chip in /
+build toward something bigger).
+
+**Fix 2 (draw/cashback reconciliation):** checked `content/claims.ts` before
+touching anything — `DRAW.name = "quarterly prize draw"`, `DRAW.amount =
+"£2,500"`, `CREDIT.line = "2% back in credit on catalogue purchases"`. Then
+grepped the live homepage for any drift the brief worried about (a "monthly"
+mismatch) — found **none**: `src/app/page.tsx` already said "quarterly
+£2,500 prize draw" and "2% back in credit" in every existing location (the
+Features array, the old AudienceSplit bullets, the footer disclaimer). No
+founder decision needed; nothing to log in TODO-FOUNDER for this one — the
+canonical value was already the only value in use.
+
+**Absolute-claims sweep:** grepped `page.tsx` for zero/always/never/100%/
+guarantee-style language. Found and fixed one genuine bare-absolute claim:
+"Billy sees zero progress until reveal day" → "Billy never sees a running
+total until reveal day" (same meaning, not a falsifiable number — this
+mirrors the brief's own preferred pattern, which explicitly lists "never
+chase money again" as the GOOD alternative to a "0" claim). Also found and
+deleted `MECHANICS.zeroDuplicates` from `claims.ts` — an unused (verified via
+repo-wide grep) exported object with the exact same "0" problem; since
+nothing rendered it, removed rather than reworded. Everything else that
+matched the sweep pattern turned out to be either non-claim content (CSS
+gradient/animation percentages, a persona quote describing a past feeling
+with a different method, not a claim about Kindled) or a real structural
+guarantee already enforced in code (Stripe never seeing full card numbers;
+receivers never seeing amounts pre-reveal — both literal architecture facts,
+not marketing spin, so left as "never").
+
+**Section identification:** the brief describes "the current benefits/
+bullets section near the top of the homepage" — the actual page has no
+single section matching that description exactly (same class of ambiguity
+as the v13 brief's non-existent anchor question). The closest and clearly
+intended target was `AudienceSplit` (`id="families"`, a two-column "For
+families & receivers" / "For contributors" bullet split) — its content maps
+almost 1:1 onto the new three-tab structure (contributor tab ≈ old
+"contributors" column; receiver + parent tabs ≈ the old combined "families"
+column, split into two sharper personas). It was NOT physically positioned
+directly under the hero, though (it sat after Features, ~4 sections down).
+Per the brief's explicit positioning instruction ("high on the page,
+directly beneath the hero/trust-strip area"), replaced `AudienceSplit`
+entirely (function deleted, not left dead) and inserted the new
+`PersonaBenefits` component immediately after `MarqueeBand`, before
+`Problem` — the first content section a visitor sees after the hero.
+`id="families"` moved onto the new section so the nav's existing "Who it's
+for" link keeps working.
+
+**Custom icons:** 15 hand-authored SVG icons (simple geometric line-art,
+`var(--ember)`/`var(--structure)` duotone, no lucide/stock imports) — one
+per pillar across all three tabs, two concepts reused where genuinely the
+same idea recurs (duplicate-prevention in tab 1 vs tab 3's list-sharing).
+
+**Sourced captions:** added under exactly two pillars where a real
+claims.ts-backed figure fit naturally without forcing it — "Never double
+up" (Finder UK unwanted-gift stat) and "Give exactly what fits" (Mintel
+overspend-pressure line) — left every other pillar caption-free per the
+brief's own "omit if no sourced figure fits" instruction.
+
+**A real animation bug, found and fixed (and a testing lesson):** the first
+implementation used framer-motion's `whileInView` prop directly on each
+pillar card, nested inside the tab-switcher's `AnimatePresence`. This left
+cards stuck at partial opacity indefinitely. Spent real time ruling out
+false leads first — confirmed via a genuinely separate, freshly-launched
+Chrome (not the embedded preview tool) that this was NOT a tooling/headless
+artifact, then added temporary console logging and confirmed the
+underlying `useInView` state DID flip to `true` correctly — meaning the bug
+was specifically `whileInView`'s interaction with the parent
+`AnimatePresence`, not the visibility detection itself. Fixed by hoisting a
+single `useInView` call to the section level (the same manual pattern this
+file's existing, working `Reveal` component already uses) and passing the
+resulting boolean down to each card's `animate` prop instead. Separately,
+opacity-traced the tab-switch transition over time and found it settling
+correctly but slowly (~1.25s, a consequence of `AnimatePresence
+mode="wait"` fully finishing the exit animation before mounting the next
+tab's content, compounded by each card's own re-entry stagger) — tightened
+both springs (higher stiffness) to bring this down to ~900ms, judged
+adequate for "not an abrupt swap" without risking layout jank from a
+true-overlap crossfade (which would need absolute-positioning the
+exiting content).
