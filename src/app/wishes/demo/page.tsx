@@ -1238,7 +1238,7 @@ function CreatorSignUpModal({ onClose }: { onClose: () => void }) {
           <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-white/20" />
 
           {/* Close */}
-          <button onClick={onClose} className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20">
+          <button onClick={onClose} aria-label="Close" className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20">
             <X className="h-4 w-4" />
           </button>
 
@@ -1730,7 +1730,7 @@ function NewGiftSheet({ onAdd, onClose }: { onAdd: (pot: DemoPot) => void; onClo
             <h2 className="font-editorial text-[20px] font-semibold text-[#0f172a] leading-tight">New Gift</h2>
             <p className="text-[12px] text-[#0f172a]/45">Add something special to the list</p>
           </div>
-          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f6ecd2] text-[#0f172a]/55 active:scale-95 transition-transform">
+          <button onClick={onClose} aria-label="Close" className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f6ecd2] text-[#0f172a]/55 active:scale-95 transition-transform">
             <span className="text-[14px] font-bold leading-none">✕</span>
           </button>
         </div>
@@ -3318,7 +3318,7 @@ export default function DemoPage() {
             className="font-outfit mx-3 mb-1 flex items-center gap-2 rounded-full bg-[#fffdf7] px-4 py-2.5 vh-lift"
           >
             <div className={cn("h-2 w-2 shrink-0 rounded-full", isContributor ? "bg-[#0f172a]/40" : "bg-[#ff6b6b]")} />
-            <p className="min-w-0 flex-1 text-[11px] leading-snug tracking-tight text-[#0f172a]/55">
+            <p className="min-w-0 flex-1 text-[11px] leading-snug tracking-tight text-[#0f172a]/70">
               {isContributor
                 ? <><span className="font-bold text-[#0f172a]">Contributor view</span>. You&apos;re seeing Billy&apos;s wish as a family member. Tap any gift to chip in.</>
                 : <><span className="font-bold text-[#0f172a]">Billy&apos;s list</span>. He built it himself; friends and family chip in and track it here. Switch tabs to explore.</>
@@ -3341,7 +3341,7 @@ export default function DemoPage() {
             className="font-outfit mx-3 mb-1 flex items-center gap-2 rounded-full bg-[#fffdf7] px-4 py-2.5 vh-lift"
           >
             <div className="h-2 w-2 shrink-0 rounded-full bg-[#0f172a]/40" />
-            <p className="text-[11px] leading-snug tracking-tight text-[#0f172a]/55">
+            <p className="text-[11px] leading-snug tracking-tight text-[#0f172a]/70">
               <span className="font-bold text-[#0f172a]">Billy&apos;s view</span>. This is what Billy sees on his device. Amounts are hidden; all he gets is the excitement of what&apos;s coming.
             </p>
           </motion.div>
@@ -3461,9 +3461,9 @@ export default function DemoPage() {
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff6b6b]">
               {isContributor ? "Active gift wishes" : "Gift List"}
             </p>
-            <p className="font-editorial mt-1 text-[26px] font-semibold leading-tight text-[#0f172a]">
+            <h2 className="font-editorial mt-1 text-[26px] font-semibold leading-tight text-[#0f172a]">
               {activePots.filter((p) => !p.isChecklist).length} {isContributor ? "wishes to fund" : "gifts to fund or buy"}
-            </p>
+            </h2>
           </div>
           <div className="flex flex-col gap-3.5">
             {(isContributor ? activePots.filter((p) => !p.isChecklist) : activePots).map((pot) => (
