@@ -72,6 +72,10 @@
   --hero-bg: radial-gradient(ellipse 100% 70% at 50% 80%, #0F6E56 0%, #085041 45%, #04342C 100%);
 }
 
+/* v11.1 P1-10 — one lockup that follows the register (footer etc.). */
+.logo-follow-theme { --logo-ink: #23201C; --logo-d1: #128280; --logo-d2: #14807C; --logo-d3: #EE7A3A; --logo-d4: #E8622C; }
+[data-theme="ember-teal"] .logo-follow-theme { --logo-ink: #FAF5EE; --logo-d1: #FAF5EE; --logo-d2: #FAF5EE; --logo-d3: #F0A63C; --logo-d4: #EE7A3A; }
+
 /* v8.2 reusable token classes — components carry roles, not hexes. */
 /* Theme-conditional visibility: for spots whose LOGO VARIANT must follow the
    register (e.g. the footer flips light→night between themes). */

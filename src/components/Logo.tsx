@@ -32,22 +32,27 @@ export function LogoMark({
   size = 32,
   className = "",
 }: {
-  variant?: "light" | "dark";
+  variant?: "light" | "dark" | "auto";
   compact?: boolean;
   size?: number;
   className?: string;
 }) {
   const dark = variant === "dark";
+  // "auto" (v11.1 P1-10): colours come from CSS vars set by .logo-follow-theme,
+  // so ONE lockup renders and follows the register — never two in the DOM.
+  const auto = variant === "auto";
+  const d = (light: string, darkFill: string, varName: string) =>
+    auto ? `var(${varName}, ${light})` : dark ? darkFill : light;
   const dots = compact
     ? [
-        { cx: 22, cy: 46, r: 7, fill: dark ? "#FAF5EE" : "#14807C" },
-        { cx: 40, cy: 30, r: 9, fill: dark ? "#EE7A3A" : "#E8622C" },
+        { cx: 22, cy: 46, r: 7, fill: d("#14807C", "#FAF5EE", "--logo-d2") },
+        { cx: 40, cy: 30, r: 9, fill: d("#E8622C", "#EE7A3A", "--logo-d4") },
       ]
     : [
-        { cx: 9, cy: 55, r: 2.8, fill: dark ? "#FAF5EE" : "#128280" },
-        { cx: 20, cy: 49.5, r: 4, fill: dark ? "#FAF5EE" : "#14807C" },
-        { cx: 31.5, cy: 41.5, r: 5.2, fill: dark ? "#F0A63C" : "#EE7A3A" },
-        { cx: 43, cy: 31, r: 6.4, fill: dark ? "#EE7A3A" : "#E8622C" },
+        { cx: 9, cy: 55, r: 2.8, fill: d("#128280", "#FAF5EE", "--logo-d1") },
+        { cx: 20, cy: 49.5, r: 4, fill: d("#14807C", "#FAF5EE", "--logo-d2") },
+        { cx: 31.5, cy: 41.5, r: 5.2, fill: d("#EE7A3A", "#F0A63C", "--logo-d3") },
+        { cx: 43, cy: 31, r: 6.4, fill: d("#E8622C", "#EE7A3A", "--logo-d4") },
       ];
   return (
     <svg viewBox="0 0 64 64" width={size} height={size} className={className} aria-hidden="true" focusable="false">
@@ -63,7 +68,7 @@ export function Logo({
   className = "",
   wordmark = true,
 }: {
-  variant?: "light" | "dark";
+  variant?: "light" | "dark" | "auto";
   size?: number;
   className?: string;
   wordmark?: boolean;
@@ -74,7 +79,7 @@ export function Logo({
       {wordmark && (
         <span
           style={{ fontFamily: "var(--font-logo), 'Avenir Next', 'Trebuchet MS', sans-serif", fontWeight: 800, letterSpacing: "-0.015em", fontSize: Math.round(size * (34 / 64)), lineHeight: 1 }}
-          className={variant === "dark" ? "text-[#FAF5EE]" : "text-[#23201C]"}
+          className={variant === "dark" ? "text-[#FAF5EE]" : variant === "auto" ? "text-[var(--logo-ink,#23201C)]" : "text-[#23201C]"}
         >
           Kindled
         </span>

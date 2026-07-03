@@ -236,9 +236,9 @@ const PLACEHOLDERS = [
 ];
 
 const PERKS = [
-  { Icon: Rocket,  label: "Early Access"   },
-  { Icon: Gift,    label: "Launch Perks"   },
-  { Icon: Trophy,  label: "Founder Status" },
+  { Icon: Rocket,  label: "Early access" },
+  { Icon: Gift,    label: "Launch perks" },
+  { Icon: Trophy,  label: "Founder status" },
 ];
 
 export function FirstKindlersCTA() {
@@ -378,11 +378,11 @@ export function FirstKindlersCTA() {
                     >
                       <span className="flex items-center justify-center gap-2">
                         {stage === "submitting" ? (
-                          "Securing your spot…"
+                          "Reserving your spot…"
                         ) : (
                           <>
                             <Flame className="h-4 w-4" />
-                            Reserve My Creator Spot
+                            Reserve your spot
                             <ArrowRight className="h-4 w-4" />
                           </>
                         )}
@@ -390,7 +390,7 @@ export function FirstKindlersCTA() {
                       <BurstRing active={showBurst} />
                     </motion.button>
                     <p className="mt-2.5 text-center text-[10px] text-white/22">
-                      No spam. Unsubscribe anytime.
+                      Early-access updates only. No spam, unsubscribe anytime.
                     </p>
                   </div>
                 </motion.div>
