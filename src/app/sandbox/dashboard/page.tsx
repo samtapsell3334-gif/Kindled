@@ -93,6 +93,9 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-[#fdf9f5]"><DemoBanner />
         <main className="mx-auto max-w-sm px-5 py-20 text-center">
+        <p className="mb-4 rounded-xl border border-stone-200 bg-[var(--card)] px-4 py-2.5 text-[12px] text-stone-600">
+          Waitlist sign-ups and survey results live in the founder console: <a href="/beta" className="font-bold underline">/beta</a> (PIN-gated).
+        </p>
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-stone-900"><Lock className="h-5 w-5 text-amber-400" /></span>
           <h1 className="mt-4 text-[22px] font-bold text-stone-900">Business dashboard</h1>
           <input type="password" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Admin secret"

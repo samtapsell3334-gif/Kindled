@@ -3311,12 +3311,17 @@ export default function DemoPage() {
             className="font-outfit mx-3 mb-1 flex items-center gap-2 rounded-full bg-[#fffdf7] px-4 py-2.5 vh-lift"
           >
             <div className={cn("h-2 w-2 shrink-0 rounded-full", isContributor ? "bg-[#0f172a]/40" : "bg-[#ff6b6b]")} />
-            <p className="text-[11px] leading-snug tracking-tight text-[#0f172a]/55">
+            <p className="min-w-0 flex-1 text-[11px] leading-snug tracking-tight text-[#0f172a]/55">
               {isContributor
                 ? <><span className="font-bold text-[#0f172a]">Contributor view</span>. You&apos;re seeing Billy&apos;s wish as a family member. Tap any gift to chip in.</>
                 : <><span className="font-bold text-[#0f172a]">Billy&apos;s list</span>. He built it himself; friends and family chip in and track it here. Switch tabs to explore.</>
               }
             </p>
+            {/* v11 follow-up: the contributor perspective is reachable in-UI, not just by URL */}
+            <button onClick={() => setIsContributor((v) => !v)}
+              className="shrink-0 rounded-full border border-[#0f172a]/15 px-2.5 py-1 text-[10px] font-bold text-[#0f172a]/70">
+              {isContributor ? "View as owner" : "View as contributor"}
+            </button>
           </motion.div>
         )}
         {viewMode === "receiver" && (

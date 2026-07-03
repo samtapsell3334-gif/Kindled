@@ -1263,7 +1263,7 @@ function Footer() {
         <span className="theme-legacy-only"><Logo variant="light" size={30} /></span>
         <span className="theme-ember-only"><Logo variant="dark" size={30} /></span>
         <div className="flex flex-wrap justify-center gap-6">
-          {(["How it works|#how", "Live demo|/wishes/demo", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
+          {(["How it works|#how", "Live demo|/wishes/demo", "Gift survey|/survey", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-footer-soft hover:text-footer-ink transition-colors">

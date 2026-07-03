@@ -26,7 +26,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   // Named funnel events (v11 WS-14): rows are the durable record; the event
   // stream feeds the same dashboard as the rest of the loop.
   await ensureHydrated();
-  const answerCount = Object.keys(body.answers as object).length;
+  const answerCount = Object.keys(body.answers).length;
   if (body.completed === true) logEvent("survey_completed", {});
   else if (answerCount <= 1) logEvent("survey_started", {});
   await flushPersist();
