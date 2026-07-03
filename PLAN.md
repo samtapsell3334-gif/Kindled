@@ -291,3 +291,57 @@ reconciling with those, building fresh from the brief's exact spec.
   `q10_wyr_child`, etc.) — replaced entirely with v13-equivalent tests rather
   than patched, plus new tests for the calculation engine (tier boundaries,
   three profiles spanning all four tiers, band-midpoint mapping).
+
+## v14a — Survey unbranched + "power of your wishes" (2026-07-03)
+
+Founder request, direct: "not decision tree... everyone gets the same
+questions" + a personalised value projection at the end, "in a year and in
+2 years... 3 powerful examples."
+
+**Unbranching:** removed `parentsOnly` entirely from the type and from the
+three questions that had it (`wyr_kids_choice`, `duplicate_pain_experienced`,
+`curated_list_appeal`) — everyone now gets the identical sequence. Also
+routed the screener's "Neither" answer through the full flow instead of
+early-exiting to "done", since an identity-based early exit is the same
+"decision tree" pattern the request was about. Kept the one remaining skip
+(`whipround_worst_bit` hidden if `group_gift_method` = "We don't really do
+group gifts") since that's driven by the answer just given, not by who the
+respondent is — asking it anyway would be nonsensical, not more consistent.
+`questionSequence()` no longer takes a `segment` parameter at all, since it
+plays no role any more.
+
+**Projection engine:** renamed `computeTwoYearProjection`/`TwoYearProjection`
+to `computeGiftProjection`/`GiftProjection` since it now also returns
+`oneYearGifts`/`oneYearValue` (simply the two-year figures halved — same
+N and same V_b+V_x, just ×1 instead of ×2). `TIER_EXAMPLES` restructured
+from one combined string per tier into a 3-item tuple, reusing the exact
+same approved phrases split into discrete items (no new claims invented).
+
+**Real bug found and fixed in passing:** the Q6 calc_wyr answer handler was
+only ever persisting `wyr_2yr_choice` (the A/B pick) — it never actually
+wrote `two_year_gifts`/`two_year_value`/`tier` into a real respondent's
+answers row, despite the v13 brief's data model explicitly listing those as
+fields to store. This was invisible in the v13 proof because that session's
+TEST- row was posted via a direct API call that manually included those
+fields, not through the actual UI. Fixed by switching the click handler from
+`record()` to `advance()` with the full computed set merged in (now also
+including the new `one_year_gifts`/`one_year_value`). Real respondents from
+now on will have complete rows; anyone who completed the survey before this
+fix will be missing those three (now five) derived fields — harmless (the
+dashboard's `numbersOf()` helper already filters to only rows where the
+field is a number), just worth knowing if historical CSV exports look
+sparse on those columns.
+
+**Dashboard:** the "Kids version" and "Duplicate & panic pain" / "Curated
+list appeal" panels no longer use a hardcoded always-parents-only base
+(`parentsCompleted`, now deleted) — they use the same segment-toggle-
+respecting `completed` base as every other panel, since the underlying
+questions are asked of everyone now. The founder can still get a
+parents-only view via the existing All/Parents/Non-parents toggle at the
+top of the tab.
+
+**New end-screen panel:** "The power of your wishes" renders on the `done`
+stage, above the email-capture CTA, using `computeGiftProjection(answers)`
+computed live from the respondent's own in-memory answers (not a round-trip
+to the server) — guaranteed non-null now, since the unbranched sequence
+means Q3/Q4/Q5 are always answered before `done` is reachable.

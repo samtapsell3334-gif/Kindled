@@ -1,19 +1,22 @@
 "use client";
 
 /**
- * The market-research survey (v13). Mobile-first, one question per screen,
- * quick-tap where possible, consent up front, answers stored server-side
- * (append-only, durable). WYR sides — including the calculated Q6 pair —
- * are randomised per session. The thank-you screen converts: waitlist
- * capture (source=survey) + share. "Neither" respondents skip straight to
- * the same thank-you/email screen rather than a dead end.
+ * The market-research survey (v14: unbranched). Mobile-first, one question
+ * per screen, quick-tap where possible, consent up front, answers stored
+ * server-side (append-only, durable). WYR sides — including the calculated
+ * Q6 pair — are randomised per session. Every respondent gets the same
+ * question sequence regardless of the Q1 screener answer (v14: removed the
+ * old parent/buyer decision-tree branching), so the end-of-survey "power of
+ * your wishes" projection always has the data it needs. The thank-you
+ * screen converts: the projection, then waitlist capture (source=survey) +
+ * share.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Check, Minus, Plus, Share2 } from "lucide-react";
 import { LogoMark } from "@/components/Logo";
-import { SCREENER, QUESTIONS, questionSequence, computeTwoYearProjection, optionACopy, optionBCopy } from "@/content/survey";
+import { SCREENER, QUESTIONS, questionSequence, computeGiftProjection, optionACopy, optionBCopy, TIER_EXAMPLES } from "@/content/survey";
 
 type Answers = Record<string, string | string[] | number | boolean>;
 
@@ -40,7 +43,7 @@ export default function SurveyPage() {
   // covers both static WYR pairs and the calculated Q6 pair.
   const flips = useMemo(() => Object.fromEntries(QUESTIONS.filter((q) => q.kind === "wyr" || q.kind === "calc_wyr").map((q) => [q.id, Math.random() < 0.5])), []);
 
-  const seq = questionSequence(answers, segment);
+  const seq = questionSequence(answers);
   const q = seq[idx];
 
   useEffect(() => {
@@ -56,7 +59,7 @@ export default function SurveyPage() {
   function advance(updates: Answers) {
     const next = { ...answers, ...updates };
     setAnswers(next);
-    const isLast = idx >= questionSequence(next, segment).length - 1;
+    const isLast = idx >= questionSequence(next).length - 1;
     persist(next, isLast);
     if (isLast) setStage("done");
     else { setIdx((i) => i + 1); setMultiDraft([]); setTextDraft(""); }
@@ -108,8 +111,8 @@ export default function SurveyPage() {
                   setSegment(o.segment);
                   const next: Answers = { ...answers, [SCREENER.id]: o.label, is_parent: o.segment === "parent" || o.segment === "both" };
                   setAnswers(next);
-                  if (o.segment === "neither") { persist(next, true, o.segment); setStage("done"); }
-                  else { persist(next, false, o.segment); setStage("questions"); }
+                  persist(next, false, o.segment);
+                  setStage("questions");
                 }} />
               ))}
             </div>
@@ -181,7 +184,7 @@ export default function SurveyPage() {
                 </>
               )}
               {q.kind === "calc_wyr" && (() => {
-                const projection = computeTwoYearProjection(answers);
+                const projection = computeGiftProjection(answers);
                 if (!projection) return null;
                 const cardA = { key: "A" as const, copy: optionACopy(projection), button: "I'll take the mix" };
                 const cardB = { key: "B" as const, copy: optionBCopy(projection), button: "Pool it together" };
@@ -190,7 +193,11 @@ export default function SurveyPage() {
                   <>
                     <h2 className="mb-4 text-[20px] font-bold leading-snug">Here&apos;s what that looks like for you…</h2>
                     {ordered.map((c) => (
-                      <button key={c.key} onClick={() => record(q.id, c.key)}
+                      <button key={c.key} onClick={() => advance({
+                        [q.id]: c.key,
+                        one_year_gifts: projection.oneYearGifts, one_year_value: projection.oneYearValue,
+                        two_year_gifts: projection.twoYearGifts, two_year_value: projection.twoYearValue, tier: projection.tier,
+                      })}
                         className="mb-2.5 w-full rounded-2xl border border-stone-200 bg-[var(--card)] p-4 text-left transition-transform active:scale-[0.98]">
                         <p className="text-[14px] leading-relaxed text-stone-700">{renderBold(c.copy)}</p>
                         <p className="mt-3 text-[14px] font-bold text-[var(--ember)]">{c.button} →</p>
@@ -210,6 +217,42 @@ export default function SurveyPage() {
             <p className="mt-2 text-[14px] text-stone-600">
               Kindled is one link where friends and family chip into a chosen gift, revealed on the day. Launching soon.
             </p>
+
+            {/* v14: "the power of your wishes" — a personalised projection from
+                the respondent's own answers, right before the sign-up CTA.
+                computeGiftProjection is never null here: the survey is
+                unbranched, so Q3/Q4/Q5 are always answered by the time
+                every question has been walked through. */}
+            {(() => {
+              const projection = computeGiftProjection(answers);
+              if (!projection) return null;
+              return (
+                <div className="mt-6 rounded-2xl border border-stone-200 bg-[var(--card)] p-5 text-left">
+                  <p className="text-center text-[12px] font-bold uppercase tracking-wide text-amber-700">The power of your wishes</p>
+                  <p className="mt-1 text-center text-[13px] text-stone-600">Based on birthdays and Christmas alone, from what you told us:</p>
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-[var(--ember-soft)] p-3 text-center">
+                      <p className="text-[22px] font-bold">£{projection.oneYearValue}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-600">In a year</p>
+                    </div>
+                    <div className="rounded-xl bg-[var(--ember-soft)] p-3 text-center">
+                      <p className="text-[22px] font-bold">£{projection.twoYearValue}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-600">In 2 years</p>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-[13px] font-bold text-stone-800">That could be:</p>
+                  <ul className="mt-1.5 space-y-1">
+                    {TIER_EXAMPLES[projection.tier].map((ex) => (
+                      <li key={ex} className="flex items-start gap-1.5 text-[13px] text-stone-700">
+                        <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full [background:var(--ember)]" />
+                        {ex}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
+
             <p className="mt-4 text-[15px] font-bold">Want early access when we launch?</p>
             {emailState === "idle" ? (
               <div className="mt-3">

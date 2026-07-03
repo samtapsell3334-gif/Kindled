@@ -12,9 +12,9 @@
  */
 
 export type SurveyQuestion =
-  | { id: string; kind: "single"; text: string; options: string[]; parentsOnly?: boolean; concept?: string }
-  | { id: string; kind: "multi"; text: string; options: string[]; parentsOnly?: boolean }
-  | { id: string; kind: "wyr"; text: string; a: string; b: string; parentsOnly?: boolean }
+  | { id: string; kind: "single"; text: string; options: string[]; concept?: string }
+  | { id: string; kind: "multi"; text: string; options: string[] }
+  | { id: string; kind: "wyr"; text: string; a: string; b: string }
   | { id: string; kind: "text"; text: string; placeholder: string }
   | { id: string; kind: "stepper"; text: string; helper?: string; min: number; max: number; start: number; topLabel: string }
   | { id: string; kind: "banded"; text: string; helper?: string; options: { label: string; mid: number }[] }
@@ -61,7 +61,8 @@ export const CURATED_LIST_CONCEPT =
   "automatically marked off, so nobody doubles up, nobody panics in the " +
   "shop, and your child gets exactly what you know is right for them.";
 
-/** Q6 calculation engine. */
+/** Gift-value calculation engine (Q6's mid-survey WYR, and the v14
+ *  end-of-survey "power of your wishes" projection — same maths, two uses). */
 export type Tier = "low" | "mid" | "high" | "top";
 
 export function tierFor(twoYearValue: number): Tier {
@@ -71,40 +72,52 @@ export function tierFor(twoYearValue: number): Tier {
   return "top";
 }
 
-export const TIER_EXAMPLES: Record<Tier, string> = {
-  low: "a great pair of trainers or headphones, plus a nice day out",
-  mid: "a new sofa, a weekend away, or that course you've been meaning to do",
-  high: "a hot tub, a log burner, or a proper long weekend abroad",
-  top: "a family trip to Disney, a villa holiday, or a full living-room refit",
+/** Exactly three discrete examples per tier (v14: "3 powerful examples"). */
+export const TIER_EXAMPLES: Record<Tier, readonly [string, string, string]> = {
+  low: ["a great pair of trainers or headphones", "a nice day out", "something you'd never quite treat yourself to"],
+  mid: ["a new sofa", "a weekend away", "that course you've been meaning to do"],
+  high: ["a hot tub", "a log burner", "a proper long weekend abroad"],
+  top: ["a family trip to Disney", "a villa holiday", "a full living-room refit"],
 };
 
-export interface TwoYearProjection {
+function tierExamplesJoined(tier: Tier): string {
+  const [a, b, c] = TIER_EXAMPLES[tier];
+  return `${a}, ${b}, or ${c}`;
+}
+
+export interface GiftProjection {
+  oneYearGifts: number;
+  oneYearValue: number;
   twoYearGifts: number;
   twoYearValue: number;
   tier: Tier;
 }
 
-/** N = people_buying_for_you (Q3, exact int). V_b/V_x = Q4/Q5 band midpoints. */
-export function computeTwoYearProjection(answers: Record<string, unknown>): TwoYearProjection | null {
+/** N = people_buying_for_you (Q3, exact int). V_b/V_x = Q4/Q5 band midpoints.
+ *  Unbranched (v14): every respondent answers Q3/Q4/Q5, so this is never
+ *  null in practice once those three questions are reached. */
+export function computeGiftProjection(answers: Record<string, unknown>): GiftProjection | null {
   const n = answers["people_buying_for_you"];
   const bBand = answers["bday_value_band"];
   const xBand = answers["xmas_value_band"];
   if (typeof n !== "number" || typeof bBand !== "string" || typeof xBand !== "string") return null;
   const vb = bandMidpoint(bBand);
   const vx = bandMidpoint(xBand);
+  const oneYearGifts = n;
+  const oneYearValue = vb + vx;
   const twoYearGifts = n * 2;
   const twoYearValue = (vb + vx) * 2;
-  return { twoYearGifts, twoYearValue, tier: tierFor(twoYearValue) };
+  return { oneYearGifts, oneYearValue, twoYearGifts, twoYearValue, tier: tierFor(twoYearValue) };
 }
 
-export function optionACopy(p: TwoYearProjection): string {
+export function optionACopy(p: GiftProjection): string {
   return `Over the next two years, that's roughly **${p.twoYearGifts} gifts** worth around ` +
     `**£${p.twoYearValue}** altogether — a real mix, like most of us get: some spot on, some not quite right.`;
 }
 
-export function optionBCopy(p: TwoYearProjection): string {
+export function optionBCopy(p: GiftProjection): string {
   return `Or: that same **£${p.twoYearValue}**, pooled together and put toward the things you'd ` +
-    `actually choose — maybe ${TIER_EXAMPLES[p.tier]} — plus a few fun surprises along the way, and ` +
+    `actually choose — maybe ${tierExamplesJoined(p.tier)} — plus a few fun surprises along the way, and ` +
     "the everyday things you actually need, picked by you (think the razor, the trainers, the clothes you'd have chosen anyway).";
 }
 
@@ -122,7 +135,7 @@ export const QUESTIONS: SurveyQuestion[] = [
   { id: "xmas_value_band", kind: "banded",
     text: "And at Christmas?", options: VALUE_BANDS },
   { id: "wyr_2yr_choice", kind: "calc_wyr", text: "" },
-  { id: "wyr_kids_choice", kind: "wyr", parentsOnly: true,
+  { id: "wyr_kids_choice", kind: "wyr",
     text: "If you could choose for your kids, which sounds better over the next couple of years?",
     a: "Ten small toys, unwrapped one by one",
     b: "Everyone chipping in for the one big thing they'll actually remember" },
@@ -132,7 +145,7 @@ export const QUESTIONS: SurveyQuestion[] = [
   { id: "asked_frequency", kind: "single",
     text: "How often are you (or your kids) asked what you'd actually like for birthdays or Christmas?",
     options: ["Rarely", "Sometimes", "Often", "Every time"] },
-  { id: "duplicate_pain_experienced", kind: "multi", parentsOnly: true,
+  { id: "duplicate_pain_experienced", kind: "multi",
     text: "Which of these have actually happened to you?",
     options: [
       "My child ended up with the same toy or gift twice",
@@ -141,7 +154,7 @@ export const QUESTIONS: SurveyQuestion[] = [
       "I've had to guess, and got it wrong",
       "None of these",
     ] },
-  { id: "curated_list_appeal", kind: "single", parentsOnly: true, concept: CURATED_LIST_CONCEPT,
+  { id: "curated_list_appeal", kind: "single", concept: CURATED_LIST_CONCEPT,
     text: "How appealing does that sound?",
     options: ["Extremely appealing", "Quite appealing", "Not that appealing", "Not for me"] },
   { id: "buy_behaviour", kind: "single",
@@ -178,11 +191,17 @@ export const QUESTIONS: SurveyQuestion[] = [
     placeholder: "Optional — one line" },
 ];
 
-/** The visible sequence for a given state (branching lives here, tested). */
-export function questionSequence(answers: Record<string, unknown>, segment: string | null): SurveyQuestion[] {
+/**
+ * The visible sequence (v14: unbranched — every respondent gets the same
+ * questions regardless of the Q1 screener answer, so the end-of-survey
+ * projection always has the data it needs). The one remaining skip is
+ * answer-driven, not identity-driven: asking "what's the worst bit of
+ * organising a group gift" to someone who just said they don't do them
+ * would be nonsensical, not a persona branch.
+ */
+export function questionSequence(answers: Record<string, unknown>): SurveyQuestion[] {
   return QUESTIONS.filter((q) => {
     if (q.id === "whipround_worst_bit" && answers["group_gift_method"] === "We don't really do group gifts") return false;
-    if ("parentsOnly" in q && q.parentsOnly && segment !== "parent" && segment !== "both") return false;
     return true;
   });
 }

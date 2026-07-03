@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { createPot, getPotBySlug, resetSandbox } from "../sandbox/store";
-import { questionSequence, QUESTIONS, computeTwoYearProjection, tierFor, optionACopy, optionBCopy, bandMidpoint } from "../../content/survey";
+import { questionSequence, QUESTIONS, computeGiftProjection, tierFor, optionACopy, optionBCopy, bandMidpoint, TIER_EXAMPLES } from "../../content/survey";
 
 /**
  * v11 WS-13 acceptance: the sandbox admin reset must NEVER touch the waitlist
@@ -30,32 +30,40 @@ describe("waitlist + survey survive the sandbox reset", () => {
   });
 });
 
-describe("survey branching (v13)", () => {
-  it("whipround worst-bit is skipped only when there's no group-gift habit", () => {
-    expect(questionSequence({}, "buyer").some((q) => q.id === "whipround_worst_bit")).toBe(true);
-    expect(questionSequence({ group_gift_method: "We don't really do group gifts" }, "buyer").some((q) => q.id === "whipround_worst_bit")).toBe(false);
-    expect(questionSequence({ group_gift_method: "Cash in a card" }, "buyer").some((q) => q.id === "whipround_worst_bit")).toBe(true);
+describe("survey sequence (v14: unbranched)", () => {
+  it("every segment gets the exact same question sequence — no decision tree", () => {
+    const parent = questionSequence({}).map((q) => q.id);
+    const buyer = questionSequence({}).map((q) => q.id);
+    const both = questionSequence({}).map((q) => q.id);
+    const neither = questionSequence({}).map((q) => q.id);
+    // questionSequence no longer takes a segment at all — this is the point:
+    // there is exactly one sequence, not one per segment.
+    expect(parent).toEqual(buyer);
+    expect(buyer).toEqual(both);
+    expect(both).toEqual(neither);
   });
 
-  it("the kids WYR (Q7) shows only to parents/both, never buyer", () => {
-    expect(questionSequence({}, "buyer").some((q) => q.id === "wyr_kids_choice")).toBe(false);
-    expect(questionSequence({}, "parent").some((q) => q.id === "wyr_kids_choice")).toBe(true);
-    expect(questionSequence({}, "both").some((q) => q.id === "wyr_kids_choice")).toBe(true);
+  it("whipround worst-bit is the one remaining skip — answer-driven, not identity-driven", () => {
+    expect(questionSequence({}).some((q) => q.id === "whipround_worst_bit")).toBe(true);
+    expect(questionSequence({ group_gift_method: "We don't really do group gifts" }).some((q) => q.id === "whipround_worst_bit")).toBe(false);
+    expect(questionSequence({ group_gift_method: "Cash in a card" }).some((q) => q.id === "whipround_worst_bit")).toBe(true);
   });
 
-  it("Q9a/Q9b (duplicate pain + curated-list) show ONLY for parent/both, never buyer", () => {
-    for (const seg of ["parent", "both"]) {
-      const seq = questionSequence({}, seg);
-      expect(seq.some((q) => q.id === "duplicate_pain_experienced"), seg).toBe(true);
-      expect(seq.some((q) => q.id === "curated_list_appeal"), seg).toBe(true);
-    }
-    const buyerSeq = questionSequence({}, "buyer");
-    expect(buyerSeq.some((q) => q.id === "duplicate_pain_experienced")).toBe(false);
-    expect(buyerSeq.some((q) => q.id === "curated_list_appeal")).toBe(false);
+  it("the kids WYR (Q7) is asked of everyone — no longer parent-gated", () => {
+    expect(questionSequence({}).some((q) => q.id === "wyr_kids_choice")).toBe(true);
+    expect(QUESTIONS.find((q) => q.id === "wyr_kids_choice")).not.toHaveProperty("parentsOnly");
+  });
+
+  it("Q9a/Q9b (duplicate pain + curated-list) are asked of everyone — no longer parent-gated", () => {
+    const seq = questionSequence({});
+    expect(seq.some((q) => q.id === "duplicate_pain_experienced")).toBe(true);
+    expect(seq.some((q) => q.id === "curated_list_appeal")).toBe(true);
+    expect(QUESTIONS.find((q) => q.id === "duplicate_pain_experienced")).not.toHaveProperty("parentsOnly");
+    expect(QUESTIONS.find((q) => q.id === "curated_list_appeal")).not.toHaveProperty("parentsOnly");
   });
 
   it("Q9a/Q9b sit immediately after asked_frequency (Q9) and before buy_behaviour (Q10)", () => {
-    const seq = questionSequence({}, "both").map((q) => q.id);
+    const seq = questionSequence({}).map((q) => q.id);
     const iAsked = seq.indexOf("asked_frequency");
     const iPain = seq.indexOf("duplicate_pain_experienced");
     const iAppeal = seq.indexOf("curated_list_appeal");
@@ -127,24 +135,37 @@ describe("survey branching (v13)", () => {
     }
   });
 
-  it("the calculated WYR (Q6) is present and depends on nothing parent-specific", () => {
-    for (const seg of ["parent", "buyer", "both"]) {
-      expect(questionSequence({}, seg).some((q) => q.id === "wyr_2yr_choice"), seg).toBe(true);
-    }
+  it("the calculated WYR (Q6) is present for everyone", () => {
+    expect(questionSequence({}).some((q) => q.id === "wyr_2yr_choice")).toBe(true);
   });
 });
 
-describe("Q6 calculation engine (v13)", () => {
-  it("computes two_year_gifts and two_year_value from Q3/Q4/Q5 answers", () => {
-    const p = computeTwoYearProjection({ people_buying_for_you: 6, bday_value_band: "£50–£100", xmas_value_band: "£100–£200" });
+describe("gift projection engine (v14: 1-year + 2-year, 3 examples per tier)", () => {
+  it("computes one- and two-year gifts/value from Q3/Q4/Q5 answers", () => {
+    const p = computeGiftProjection({ people_buying_for_you: 6, bday_value_band: "£50–£100", xmas_value_band: "£100–£200" });
     expect(p).not.toBeNull();
+    expect(p?.oneYearGifts).toBe(6);
+    expect(p?.oneYearValue).toBe(225); // 75 + 150
     expect(p?.twoYearGifts).toBe(12); // 6 * 2
     expect(p?.twoYearValue).toBe(450); // (75 + 150) * 2
   });
 
+  it("one-year figures are always exactly half the two-year figures", () => {
+    const p = computeGiftProjection({ people_buying_for_you: 9, bday_value_band: "£200–£400", xmas_value_band: "£400+" })!;
+    expect(p.oneYearGifts * 2).toBe(p.twoYearGifts);
+    expect(p.oneYearValue * 2).toBe(p.twoYearValue);
+  });
+
+  it("every tier has exactly three discrete examples", () => {
+    for (const tier of ["low", "mid", "high", "top"] as const) {
+      expect(TIER_EXAMPLES[tier]).toHaveLength(3);
+      for (const example of TIER_EXAMPLES[tier]) expect(typeof example).toBe("string");
+    }
+  });
+
   it("returns null when the inputs aren't all answered yet", () => {
-    expect(computeTwoYearProjection({})).toBeNull();
-    expect(computeTwoYearProjection({ people_buying_for_you: 6 })).toBeNull();
+    expect(computeGiftProjection({})).toBeNull();
+    expect(computeGiftProjection({ people_buying_for_you: 6 })).toBeNull();
   });
 
   it("bandMidpoint maps every band label to its documented midpoint", () => {
@@ -169,31 +190,31 @@ describe("Q6 calculation engine (v13)", () => {
 
   it("three profiles spanning all four tiers produce sane, distinct copy", () => {
     // Low tier: small household, modest bands.
-    const low = computeTwoYearProjection({ people_buying_for_you: 2, bday_value_band: "Under £50", xmas_value_band: "Under £50" })!;
+    const low = computeGiftProjection({ people_buying_for_you: 2, bday_value_band: "Under £50", xmas_value_band: "Under £50" })!;
     expect(low.tier).toBe("low");
     expect(optionACopy(low)).toContain("4 gifts");
     expect(optionACopy(low)).toContain("£100");
     expect(optionBCopy(low)).toContain("trainers or headphones");
 
     // High tier: larger family, generous bands.
-    const high = computeTwoYearProjection({ people_buying_for_you: 8, bday_value_band: "£200–£400", xmas_value_band: "£200–£400" })!;
+    const high = computeGiftProjection({ people_buying_for_you: 8, bday_value_band: "£200–£400", xmas_value_band: "£200–£400" })!;
     expect(high.tier).toBe("high");
     expect(optionBCopy(high)).toContain("hot tub");
 
     // Top tier: big extended family, top bands.
-    const top = computeTwoYearProjection({ people_buying_for_you: 15, bday_value_band: "£400+", xmas_value_band: "£400+" })!;
+    const top = computeGiftProjection({ people_buying_for_you: 15, bday_value_band: "£400+", xmas_value_band: "£400+" })!;
     expect(top.tier).toBe("top");
     expect(optionACopy(top)).toContain("30 gifts");
     expect(optionBCopy(top)).toContain("villa holiday");
 
     // Mid tier, for completeness across all four.
-    const mid = computeTwoYearProjection({ people_buying_for_you: 4, bday_value_band: "£100–£200", xmas_value_band: "£100–£200" })!;
+    const mid = computeGiftProjection({ people_buying_for_you: 4, bday_value_band: "£100–£200", xmas_value_band: "£100–£200" })!;
     expect(mid.tier).toBe("mid");
     expect(optionBCopy(mid)).toContain("sofa");
   });
 
   it("Option A/B copy always sums to the same two_year_value quoted in both cards", () => {
-    const p = computeTwoYearProjection({ people_buying_for_you: 10, bday_value_band: "£100–£200", xmas_value_band: "£200–£400" })!;
+    const p = computeGiftProjection({ people_buying_for_you: 10, bday_value_band: "£100–£200", xmas_value_band: "£200–£400" })!;
     expect(optionACopy(p)).toContain(`£${p.twoYearValue}`);
     expect(optionBCopy(p)).toContain(`£${p.twoYearValue}`);
   });

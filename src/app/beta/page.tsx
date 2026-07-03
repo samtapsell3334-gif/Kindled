@@ -90,14 +90,6 @@ export default function BetaPage() {
     return all;
   }, [data, seg]);
   const completed = responses.filter((r) => r.completed);
-  // These panels are ALWAYS parents-only (the underlying questions only ever
-  // reach parent/both respondents), independent of the page's global segment
-  // toggle — otherwise buyer-segment rows (who never saw these questions)
-  // would dilute the denominator and understate %s.
-  const parentsCompleted = useMemo(
-    () => (data?.survey ?? []).filter((r) => r.completed && isParent(r)),
-    [data],
-  );
 
   if (!data) {
     return (
@@ -148,8 +140,10 @@ export default function BetaPage() {
 
   // Pooled-goal test (dashboard item 3): Q6 A/B choice.
   const wyr2yr = { a: completed.filter((r) => r.answers["wyr_2yr_choice"] === "A").length, b: completed.filter((r) => r.answers["wyr_2yr_choice"] === "B").length };
-  // Kids version (dashboard item 4): Q7 A/B choice, parents-only base.
-  const wyrKids = { a: parentsCompleted.filter((r) => r.answers["wyr_kids_choice"] === "A").length, b: parentsCompleted.filter((r) => r.answers["wyr_kids_choice"] === "B").length };
+  // Kids version (dashboard item 4): Q7 A/B choice. v14: unbranched, so this
+  // uses the same segment-toggle-respecting `completed` base as everything
+  // else — the founder can already slice by Parents/Non-parents up top.
+  const wyrKids = { a: completed.filter((r) => r.answers["wyr_kids_choice"] === "A").length, b: completed.filter((r) => r.answers["wyr_kids_choice"] === "B").length };
 
   // Pain ranking — share reporting high pain per dimension (v13 fields).
   const PAINS: [string, string, string[]][] = [
@@ -180,7 +174,7 @@ export default function BetaPage() {
   const DEDICATED_SINGLE_IDS = new Set(["curated_list_appeal", ...BEHAVIOUR.map(([id]) => id)]);
 
   const exportSurvey = () => {
-    const ids = [SCREENER.id, "is_parent", ...QUESTIONS.map((x) => x.id), "two_year_gifts", "two_year_value", "tier"];
+    const ids = [SCREENER.id, "is_parent", ...QUESTIONS.map((x) => x.id), "one_year_gifts", "one_year_value", "two_year_gifts", "two_year_value", "tier"];
     download("kindled-survey.csv", csvOf([
       ["sessionId", "segment", "completed", "createdAt", ...ids],
       ...responses.map((r) => [r.sessionId, r.segment ?? "", String(r.completed), r.createdAt,
@@ -289,8 +283,8 @@ export default function BetaPage() {
               <Bar label="Pool it together" count={wyr2yr.b} total={wyr2yr.a + wyr2yr.b} />
             </Panel>
 
-            {/* Dashboard item 4 — kids version (Q7), parents only */}
-            <Panel title="Kids version" sub={`parents, n=${wyrKids.a + wyrKids.b}`}>
+            {/* Dashboard item 4 — kids version (Q7) */}
+            <Panel title="Kids version" sub={`n=${wyrKids.a + wyrKids.b}`}>
               <Bar label="Ten small toys, unwrapped one by one" count={wyrKids.a} total={wyrKids.a + wyrKids.b} />
               <Bar label="Everyone chipping in for the one big thing they'll actually remember" count={wyrKids.b} total={wyrKids.a + wyrKids.b} />
             </Panel>
@@ -299,25 +293,25 @@ export default function BetaPage() {
               {painRank.map((p) => <Bar key={p.label} label={p.label} count={p.pct} total={100} />)}
             </Panel>
 
-            {/* Dashboard item 5 — duplicate & panic pain (Q9a), parents only */}
+            {/* Dashboard item 5 — duplicate & panic pain (Q9a) */}
             {(() => {
               const dupDef = QUESTIONS.find((x) => x.id === "duplicate_pain_experienced");
               if (!dupDef || dupDef.kind !== "multi") return null;
-              const m = multi(dupDef.id, dupDef.options, parentsCompleted);
+              const m = multi(dupDef.id, dupDef.options);
               return (
-                <Panel title="Duplicate & panic pain" sub={`parents, n=${m.total}`}>
+                <Panel title="Duplicate & panic pain" sub={`n=${m.total}`}>
                   {m.counts.map((c) => <Bar key={c.o} label={c.o} count={c.n} total={m.total} />)}
                 </Panel>
               );
             })()}
 
-            {/* Dashboard item 6 — curated-list appeal (Q9b), parents only */}
+            {/* Dashboard item 6 — curated-list appeal (Q9b) */}
             {(() => {
               const curDef = QUESTIONS.find((x) => x.id === "curated_list_appeal");
               if (!curDef || curDef.kind !== "single") return null;
-              const r = single(curDef.id, curDef.options, parentsCompleted);
+              const r = single(curDef.id, curDef.options);
               return (
-                <Panel title="Curated list appeal" sub={`parents, n=${r.total}`}>
+                <Panel title="Curated list appeal" sub={`n=${r.total}`}>
                   {r.counts.map((c) => <Bar key={c.o} label={c.o} count={c.n} total={r.total} />)}
                 </Panel>
               );

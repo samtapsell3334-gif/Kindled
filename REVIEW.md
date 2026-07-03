@@ -915,3 +915,31 @@ section used a real, separately-launched Chrome via Playwright
 package.json/package-lock.json) rather than the preview tool. Worth knowing
 for future live-verification work: don't trust the preview tool for
 cross-origin checks, reach for a real headless browser instead.
+
+## v14a — Survey unbranched + "power of your wishes" (2026-07-03)
+
+Full rationale in PLAN.md. Verified locally before deploy:
+
+- Walked the "Regular gift-buyer, no kids" segment end to end: confirmed Q7
+  ("If you could choose for your kids...") now appears — previously this
+  segment skipped it entirely. Confirmed via `questionSequence({})` no
+  longer accepting a segment argument at all (one sequence, not one per
+  segment) and a test asserting parent/buyer/both/neither all produce the
+  identical array.
+- Reached the `done` screen and confirmed "The power of your wishes" panel:
+  with people_buying_for_you=8 and both value bands at £100–£200 (mid=150
+  each), got exactly **£300 in a year / £600 in 2 years**
+  (300 = 150+150; 600 = 300×2 — matches the entered values precisely) plus
+  three discrete example bullets ("a new sofa", "a weekend away", "that
+  course you've been meaning to do") matching the mid tier. Screenshot:
+  the panel sits directly above the email-capture CTA as intended.
+- Found and fixed a real bug while implementing this: the live survey UI
+  never actually persisted `two_year_gifts`/`two_year_value`/`tier` for real
+  respondents (only the A/B choice) — the v13 proof session's dashboard
+  numbers looked correct only because that TEST- row was posted via a
+  direct API call that manually included those fields. Real respondents
+  would have been silently missing them from launch. Fixed by routing the
+  Q6 click handler through `advance()` with the full computed set.
+- 142 tests green (+19 net: unbranching tests, projection-engine tests
+  including one-year/two-year consistency and the 3-examples-per-tier
+  check). Clean build.
