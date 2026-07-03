@@ -3224,10 +3224,14 @@ function ReceiverView({ pots, onShare, onReveal, onOpenJoint, onAddWish }: {
 
 export default function DemoPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("parent");
-  const [isContributor, setIsContributor] = useState(false);
+  // v11.2: the demo defaults to the CONTRIBUTOR perspective — that's the
+  // experience visitors are here to see (K-CTA, granted strip, Chip in).
+  // ?view=owner opts into the host/owner tools; old ?view=parent/host also work.
+  const [isContributor, setIsContributor] = useState(true);
   const [grantedOpen, setGrantedOpen] = useState<string | null>(null);
   useEffect(() => {
-    setIsContributor(new URLSearchParams(window.location.search).get("view") === "contributor");
+    const v = new URLSearchParams(window.location.search).get("view");
+    setIsContributor(v !== "owner" && v !== "parent" && v !== "host");
   }, []);
   const [showNewGift, setShowNewGift] = useState(false);
   const [pots, setPots] = useState<DemoPot[]>([...INITIAL_POTS, ...CHECKLIST_POTS]);
@@ -3307,6 +3311,31 @@ export default function DemoPage() {
       {/* ── Role switcher (always visible) ── */}
       <RoleSwitcher role={viewMode} onChange={setViewMode} />
 
+      {/* v11.2 — a full-width, unmissable perspective switch. This was a tiny
+          pill before and visitors never found it; this is the fix. */}
+      {viewMode === "parent" && (
+        <div className="mx-3 mb-1.5 flex rounded-2xl bg-[#0f172a]/[0.06] p-1">
+          <button
+            onClick={() => setIsContributor(true)}
+            className={cn(
+              "flex-1 rounded-xl py-2.5 text-[12px] font-bold transition-colors",
+              isContributor ? "bg-[#ff6b6b] text-white shadow-sm" : "text-[#0f172a]/55",
+            )}
+          >
+            Friends &amp; family view
+          </button>
+          <button
+            onClick={() => setIsContributor(false)}
+            className={cn(
+              "flex-1 rounded-xl py-2.5 text-[12px] font-bold transition-colors",
+              !isContributor ? "bg-[#0f172a] text-white shadow-sm" : "text-[#0f172a]/55",
+            )}
+          >
+            Billy&apos;s (owner) view
+          </button>
+        </div>
+      )}
+
       {/* ── Context strip — tells visitors which perspective they're seeing ── */}
       <AnimatePresence mode="wait">
         {viewMode === "parent" && (
@@ -3318,18 +3347,13 @@ export default function DemoPage() {
             transition={{ duration: 0.2 }}
             className="font-outfit mx-3 mb-1 flex items-center gap-2 rounded-full bg-[#fffdf7] px-4 py-2.5 vh-lift"
           >
-            <div className={cn("h-2 w-2 shrink-0 rounded-full", isContributor ? "bg-[#0f172a]/40" : "bg-[#ff6b6b]")} />
+            <div className={cn("h-2 w-2 shrink-0 rounded-full", isContributor ? "bg-[#ff6b6b]" : "bg-[#0f172a]/40")} />
             <p className="min-w-0 flex-1 text-[11px] leading-snug tracking-tight text-[#0f172a]/70">
               {isContributor
                 ? <><span className="font-bold text-[#0f172a]">Contributor view</span>. You&apos;re seeing Billy&apos;s wish as a family member. Tap any gift to chip in.</>
                 : <><span className="font-bold text-[#0f172a]">Billy&apos;s list</span>. He built it himself; friends and family chip in and track it here. Switch tabs to explore.</>
               }
             </p>
-            {/* v11 follow-up: the contributor perspective is reachable in-UI, not just by URL */}
-            <button onClick={() => setIsContributor((v) => !v)}
-              className="shrink-0 rounded-full border border-[#0f172a]/15 px-2.5 py-1 text-[10px] font-bold text-[#0f172a]/70">
-              {isContributor ? "View as owner" : "View as contributor"}
-            </button>
           </motion.div>
         )}
         {viewMode === "receiver" && (
@@ -3413,7 +3437,8 @@ export default function DemoPage() {
           )}
         </motion.div>
       ) : viewMode === "stars" ? (
-        <motion.div key="stars" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
+        <motion.div key="stars" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          className="kids-register">
           <StarChart goalLabel="Billy's Nintendo Switch" goalValue={150} />
         </motion.div>
       ) : viewMode === "receiver" ? (

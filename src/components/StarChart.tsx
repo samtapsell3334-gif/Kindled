@@ -177,11 +177,19 @@ export function StarChart({
                   ? <Star className="h-3.5 w-3.5 fill-white text-white" />
                   : isNext ? <span className="h-1.5 w-1.5 rounded-full bg-[#f59e0b]" />
                   : <span className="h-1.5 w-1.5 rounded-full bg-[#0f172a]/15" />}
-                {/* v11 WS-4: the felt-tip ring — a child's biro loop around a freshly earned star */}
+                {/* v11 WS-4: the felt-tip ring — a child's biro loop around a freshly earned star.
+                    Draws in with the pop; then STAYS as a thin sticker-book outline (v11.2 —
+                    this is the visible-at-rest evidence of the redesign, not just a mid-tap flash). */}
                 {pop && (
                   <svg viewBox="0 0 100 60" className="pointer-events-none absolute -inset-2" aria-hidden="true">
                     <path d="M50 4 C82 2 97 14 96 30 C95 48 74 57 48 56 C22 55 4 46 4 30 C4 13 24 6 54 5"
                       fill="none" stroke="#ff6b6b" strokeWidth="6" strokeLinecap="round" pathLength={1} className="animate-felt-draw" />
+                  </svg>
+                )}
+                {earned && !pop && (
+                  <svg viewBox="0 0 100 60" className="pointer-events-none absolute -inset-2 opacity-60" aria-hidden="true">
+                    <path d="M50 4 C82 2 97 14 96 30 C95 48 74 57 48 56 C22 55 4 46 4 30 C4 13 24 6 54 5"
+                      fill="none" stroke="#ff6b6b" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
                 )}
               </motion.button>

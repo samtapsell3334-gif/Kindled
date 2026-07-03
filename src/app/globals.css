@@ -72,14 +72,16 @@
   --hero-bg: radial-gradient(ellipse 100% 70% at 50% 80%, #0F6E56 0%, #085041 45%, #04342C 100%);
 }
 
-/* v8.2b pattern 5 (completed v11.1) — the kids' register: the SAME tokens in
-   a warmer mix (more cream/ember-soft, less structure teal). A mode, not a
-   palette: it derives entirely from the active register's own variables. */
+/* v8.2b pattern 5 (completed v11.1, strengthened v11.2) — the kids' register:
+   the SAME tokens in a warmer mix (more cream/ember-soft, less structure
+   teal). A mode, not a palette: it derives entirely from the active
+   register's own variables. Bumped to 40%/70% so it reads as a genuinely
+   distinct, warmer surface at a glance, not a barely-there tint. */
 .kids-register {
-  background: color-mix(in srgb, var(--ember-soft) 20%, var(--ground));
+  background: color-mix(in srgb, var(--ember-soft) 40%, var(--ground));
 }
 .kids-register .kids-accent {
-  background: color-mix(in srgb, var(--ember-soft) 55%, var(--card));
+  background: color-mix(in srgb, var(--ember-soft) 70%, var(--card));
 }
 
 /* v11.1 P1-10 — one lockup that follows the register (footer etc.). */

@@ -236,6 +236,13 @@ function Nav() {
             <ChevronRight className="h-3.5 w-3.5" />
           </Link>
           <Link
+            href="/survey"
+            className="hidden md:flex items-center gap-1 text-[13px] font-medium text-white/50 hover:text-white transition-colors duration-200"
+          >
+            2-min survey
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+          <Link
             href="/#waitlist"
             className="flex items-center gap-1.5 rounded-xl cta-primary px-4 py-2 text-[13px] font-bold shadow-lg shadow-amber-500/25 transition-all hover:scale-105 hover:shadow-amber-500/50 active:scale-[0.97]"
           >
@@ -262,7 +269,7 @@ function Nav() {
             className="overflow-hidden border-t border-white/8 backdrop-blur-2xl md:hidden [background:var(--nav-bg-solid)]"
           >
             <div className="flex flex-col gap-0.5 px-5 py-4">
-              {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["Live demo", "/wishes/demo"]].map(([l, h]) => (
+              {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["Live demo", "/wishes/demo"], ["2-min survey", "/survey"]].map(([l, h]) => (
                 <a
                   key={l}
                   href={h}
@@ -1262,7 +1269,7 @@ function Footer() {
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 md:flex-row">
         <span className="logo-follow-theme"><Logo variant="auto" size={30} /></span>
         <div className="flex flex-wrap justify-center gap-6">
-          {(["How it works|#how", "Live demo|/wishes/demo", "Gift survey|/survey", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor"] as const).map((item) => {
+          {(["How it works|#how", "Live demo|/wishes/demo", "Gift survey|/survey", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor", "Founder console|/beta"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-footer-soft hover:text-footer-ink transition-colors">
