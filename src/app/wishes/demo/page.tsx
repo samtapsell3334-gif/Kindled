@@ -717,6 +717,7 @@ function LivePotCard({ pot, onRemove, onKindle, onBuy, onAmountSelected, hideSta
           </div>
           {onRemove && !pot.isClaimed && (
             <motion.button whileTap={{ scale: 0.9 }} onClick={() => onRemove(pot.id)}
+              aria-label={`Remove ${pot.title} from the list`}
               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f6ecd2] text-[#0f172a]/40 transition-colors hover:text-[#ff6b6b]">
               <X className="h-3.5 w-3.5" />
             </motion.button>
