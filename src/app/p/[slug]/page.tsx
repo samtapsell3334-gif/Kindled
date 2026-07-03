@@ -159,7 +159,7 @@ export default function PotPage({ params }: { params: Promise<{ slug: string }> 
   // link. Catalogue taps only; no free text, no data collected from the child.
   if (asKid && view.kind === "manager" && managerKey) {
     return (
-      <div className="min-h-screen bg-ground text-stone-900"><DemoBanner />
+      <div className="kids-register min-h-screen text-stone-900"><DemoBanner />
         <KidCircleView view={view} slug={slug} managerKey={managerKey} onChanged={() => { void load(); }} />
       </div>
     );
@@ -529,7 +529,7 @@ function KidCircleView({ view, slug, managerKey, onChanged }: {
       </h1>
       <p className="mt-1.5 text-[13px] text-stone-600">Tap anything that makes your eyes go big. A grown-up says yes before it counts.</p>
       {view.starChartEnabled && (
-        <p className="mt-2 flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-800">
+        <p className="kids-accent mt-2 flex items-center gap-1.5 rounded-xl px-3 py-2 text-[12px] font-semibold text-amber-800">
           <Sparkles className="h-3.5 w-3.5 shrink-0" /> Your stars go toward whatever gets circled.
         </p>
       )}

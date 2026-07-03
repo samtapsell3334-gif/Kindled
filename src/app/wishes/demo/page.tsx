@@ -1405,7 +1405,7 @@ function InvestorPinGate({
             className="flex h-12 items-center justify-center rounded-xl bg-stone-100 text-[18px] font-semibold text-stone-800 transition-all active:scale-95 active:bg-stone-200 hover:bg-stone-200">
             0
           </button>
-          <button onClick={handleBackspace}
+          <button onClick={handleBackspace} aria-label="Delete last digit"
             className="flex h-12 items-center justify-center rounded-xl bg-stone-100 text-stone-500 transition-all active:scale-95 active:bg-stone-200 hover:bg-stone-200">
             <ChevronDown className="h-5 w-5 rotate-90" strokeWidth={2.5} />
           </button>

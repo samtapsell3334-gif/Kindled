@@ -72,6 +72,16 @@
   --hero-bg: radial-gradient(ellipse 100% 70% at 50% 80%, #0F6E56 0%, #085041 45%, #04342C 100%);
 }
 
+/* v8.2b pattern 5 (completed v11.1) — the kids' register: the SAME tokens in
+   a warmer mix (more cream/ember-soft, less structure teal). A mode, not a
+   palette: it derives entirely from the active register's own variables. */
+.kids-register {
+  background: color-mix(in srgb, var(--ember-soft) 20%, var(--ground));
+}
+.kids-register .kids-accent {
+  background: color-mix(in srgb, var(--ember-soft) 55%, var(--card));
+}
+
 /* v11.1 P1-10 — one lockup that follows the register (footer etc.). */
 .logo-follow-theme { --logo-ink: #23201C; --logo-d1: #128280; --logo-d2: #14807C; --logo-d3: #EE7A3A; --logo-d4: #E8622C; }
 [data-theme="ember-teal"] .logo-follow-theme { --logo-ink: #FAF5EE; --logo-d1: #FAF5EE; --logo-d2: #FAF5EE; --logo-d3: #F0A63C; --logo-d4: #EE7A3A; }
