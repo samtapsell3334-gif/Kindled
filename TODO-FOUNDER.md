@@ -151,3 +151,34 @@ was completed and is ticked below with evidence; what remains is the short
   proven too, the quickest way is pasting `SANDBOX_ADMIN_SECRET` into a
   session directly, or triggering `POST /api/sandbox/admin` yourself with
   `{"secret":"…","action":"reset"}`.
+
+## v16 (2026-07-03)
+- **[TODO: founder to confirm exact fee position]** — the new homepage FAQ
+  ("Are there any fees?") deliberately ships with neutral placeholder copy
+  rather than a specific figure. `src/lib/fees.ts` has an internal
+  calculation already (0.5% platform fee + a flat 5p processing cost,
+  deducted from the gross before it reaches the wish — so a contributor
+  giving £20 has £20 taken from their card, and the wish receives
+  £20 minus that fee), but that's an implementation detail, not something
+  I've seen you sign off as a public-facing claim in `content/claims.ts`.
+  Once you confirm the exact position you want stated publicly, update the
+  FAQ answer in `src/components/FAQSection.tsx` (and consider adding it to
+  `content/claims.ts` as the canonical source, matching how the prize draw
+  and credit rate already work).
+  **Related, found during this session's design audit:** the existing "How
+  the money works" section (homepage, `#money`) has a card titled "Every
+  penny goes to the goal." I didn't change this — it's defensible read as
+  "every contribution counts toward the visible funding target," but it
+  sits awkwardly next to the new FAQ's honest "fees not yet confirmed"
+  answer, and I don't know whether the wish's progress bar displays the
+  gross amount given or the net-of-fee amount. Worth reviewing both pieces
+  of copy together once the fee position is confirmed.
+- **The founder's note section is a placeholder, deliberately not written
+  by me** — `src/components/FounderNote.tsx`, positioned just above the
+  final waitlist CTA. This is the one section on the whole site where
+  AI-drafted personal narrative would undermine the entire point: it needs
+  to be genuinely in your own words. The layout/styling is shipped and
+  ready; the copy is clearly marked as a placeholder with prompts (why you
+  built this, what personal experience motivated it) for you to replace
+  directly in that file whenever you're ready. It will look visibly
+  "unfinished/placeholder" until you do — that's deliberate, not a bug.

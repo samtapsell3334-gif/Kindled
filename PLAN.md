@@ -430,3 +430,100 @@ both springs (higher stiffness) to bring this down to ~900ms, judged
 adequate for "not an abrupt swap" without risking layout jank from a
 true-overlap crossfade (which would need absolute-positioning the
 exiting content).
+
+## v16 — Growth & Design, Round 3 (2026-07-03)
+
+Seven-item brief, fully specified (per the founder's own framing: vaguer
+"find things to improve" instructions have landed less reliably on this
+build than exact specs). Plus two survey tweaks handled first: moved the
+Q6 calculation reveal to the end-only conversion screen (was previously
+showing mid-survey), and reworded the Q7 kids WYR — see REVIEW.md for both.
+
+**1. Referral chain:** found the existing `?ref=` infrastructure in
+`src/app/sandbox/page.tsx` / `src/app/api/sandbox/pots/[slug]/route.ts` —
+that's sandbox-pot-specific plumbing (`logEvent()` writing to the sandbox's
+own in-memory event log), not reusable as-is for the real waitlist. The
+REAL match for "the same event schema already logging ref chains" turned
+out to be `src/lib/analytics.ts`'s `track()` — the actual production,
+consent-gated, documented funnel-event schema already used for
+`waitlist_submitted` etc. Extended that: `WaitlistForm.tsx` now reads
+`?ref=` on mount, tags the signup's existing `source` field (no schema
+change — `source` was already a free-form string) as
+`"waitlist_referral"`, and offers every successful signup a personal
+share link (`?ref=<random-code>#waitlist`, code generated client-side and
+cached in localStorage — no account/PII needed) via both the native share
+sheet and a direct WhatsApp link, since WhatsApp is explicitly the
+acquisition channel called out in item 5.
+
+**2. Threshold-gated counter:** new tiny public endpoint,
+`/api/waitlist/count` — deliberately the ONLY unauthenticated waitlist
+read in the app, safe because it returns nothing but an aggregate number
+(no emails, no sources, no secret needed, unlike `/api/admin/waitlist`).
+`WaitlistCounter.tsx` fetches it with `cache: "no-store"` on every mount.
+Copy interpretation: the brief's example "Join 50+ families" reads as a
+template (`Join {count}+ families...`) where `{count}` is always the
+exact live number and "+" is a fixed stylistic suffix, not a rounding
+operation — this reconciles the example wording with the brief's own
+explicit "never round up" instruction. Defaults to the qualitative
+framing while loading and whenever the real count is under 50, so there's
+never a flash of a wrong number.
+
+**3. FAQ:** `FAQSection.tsx`, FAQPage JSON-LD, four questions matching the
+live survey's Q18 objection categories exactly. The fees answer is
+deliberately neutral placeholder copy — `content/claims.ts` has no
+confirmed contributor-facing fee figure (checked directly, not assumed).
+`src/lib/fees.ts` does have a real internal calculation (0.5% + 5p,
+deducted from gross before it reaches the wish), but per the brief's own
+explicit instruction, an internal calculation module isn't the same thing
+as a founder-approved public claim — logged to TODO-FOUNDER rather than
+surfaced, and cross-referenced against a related finding (below).
+
+**4. Founder's note:** `FounderNote.tsx` — layout/styling shipped, copy is
+an unmistakable bracketed placeholder (`[Sam — write this yourself: ...]`)
+with a visible "Draft — awaiting Sam's words" badge and dashed border, so
+it can never be mistaken for shipped real content if it's accidentally
+left unedited. No backstory invented. Flagged in TODO-FOUNDER.
+
+**5. Performance:** code-split the four new below-the-fold client
+components (`PersonaBenefits`, `FAQSection`, `FounderNote`,
+`WaitlistCounter`) via `next/dynamic()` — homepage's own chunk dropped
+from 67.9kB to 17.6kB. This had **zero measurable effect on LCP** in local
+testing (stayed at 3.9s before and after), which redirected the
+investigation: `mainthread-work-breakdown`/`bootup-time` pointed at a
+130KB framer-motion vendor chunk (~1.75s simulated bootup cost) as the
+dominant cost, not anything page-specific — a pre-existing, whole-page
+characteristic (Framer Motion is used extensively throughout this file:
+hero parallax, every `Reveal` scroll-in), not something v16 introduced.
+Also found local `next start` measurably understates real performance
+versus the CDN-backed live site (88/3.9s local vs 89/3.3s live, for the
+*same* pre-v16 build) — so final verification happens against the live
+URL post-deploy, not local, and the "before" figure quoted in REVIEW.md is
+the live pre-v16 site, not a local baseline.
+
+**6. Sticky CTA:** searched for `sticky`/`fixed` patterns site-wide — found
+none by that name, but the existing `<Nav>` component's header is already
+`fixed inset-x-0 top-0` with an unconditionally-visible (no responsive
+`hidden` classes) "Reserve your spot" button. Verified programmatically at
+three scroll depths (0%, 40%, 85% of page height) that this button stays
+at a constant `top: 16px` and is genuinely visible at all three — this
+already satisfies "a visitor deep in a long page can still convert without
+scrolling." Judged a second, separate floating CTA would be redundant
+(arguably tipping toward the "no dark patterns/nothing manipulative"
+concern the brief itself warns about — two persistent asks stacked) rather
+than something to add on top.
+
+**7. Design self-audit:** walked all 14 sections via full-page screenshots
+(real Chrome, not the embedded preview tool — see the note on why that
+matters in earlier v14 entries). Overall found genuinely bespoke, not
+templated: custom SVG icon set in PersonaBenefits, no stock imagery,
+consistent spacing rhythm (`py-24`/`py-28` throughout), testimonials
+correctly labelled "ILLUSTRATIVE" (not fabricated as real). Confirmed the
+existing branded 404 page ("This ember drifted off") and confirmed
+favicon/OG images are vector/correctly-sized, not stretched raster. One
+content-accuracy question surfaced and logged rather than silently
+fixed: "How the money works" states "Every penny goes to the goal" — this
+is defensible under a "counts toward the visible funding target"
+reading, but sits awkwardly next to the new FAQ's honest "fees not yet
+confirmed" answer, and I don't have certainty about whether the progress
+bar displays gross or net-of-fee amounts. Cross-referenced with the fee
+TODO in TODO-FOUNDER rather than guessing a rewrite.

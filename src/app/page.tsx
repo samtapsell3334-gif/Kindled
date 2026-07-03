@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useScroll, useTransform, AnimatePresence, useReducedMotion } from "framer-motion";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   Flame, Lock, Star, Users, Trophy, Check,
@@ -11,7 +12,14 @@ import {
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { Logo } from "@/components/Logo";
 import { TrustStrip } from "@/components/TrustStrip";
-import { PersonaBenefits } from "@/components/PersonaBenefits";
+
+// v16.5: below-the-fold / non-critical-path components split into their own
+// chunks so the hero's own JS isn't competing with them for parse/hydrate
+// time on first load — this is a direct mobile-LCP lever, not just tidiness.
+const WaitlistCounter = dynamic(() => import("@/components/WaitlistCounter").then((m) => m.WaitlistCounter));
+const FAQSection = dynamic(() => import("@/components/FAQSection").then((m) => m.FAQSection));
+const FounderNote = dynamic(() => import("@/components/FounderNote").then((m) => m.FounderNote));
+const PersonaBenefits = dynamic(() => import("@/components/PersonaBenefits").then((m) => m.PersonaBenefits));
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -221,7 +229,7 @@ function Nav() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-7">
-          {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"]].map(([l, h]) => (
+          {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["FAQ", "#faq"]].map(([l, h]) => (
             <a key={l} href={h} className="text-[13px] font-medium text-white/50 hover:text-white transition-colors duration-200">
               {l}
             </a>
@@ -270,7 +278,7 @@ function Nav() {
             className="overflow-hidden border-t border-white/8 backdrop-blur-2xl md:hidden [background:var(--nav-bg-solid)]"
           >
             <div className="flex flex-col gap-0.5 px-5 py-4">
-              {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["Live demo", "/wishes/demo"], ["2-min survey", "/survey"]].map(([l, h]) => (
+              {[["How it works", "#how"], ["Features", "#features"], ["Who it's for", "#families"], ["FAQ", "#faq"], ["Live demo", "/wishes/demo"], ["2-min survey", "/survey"]].map(([l, h]) => (
                 <a
                   key={l}
                   href={h}
@@ -1129,6 +1137,8 @@ function FinalCTA() {
 
             <WaitlistForm variant="light" />
 
+            <WaitlistCounter className="mt-5 flex items-center justify-center text-[13px] font-semibold text-amber-700" />
+
             <p className="mt-6 text-[13px] text-stone-500">
               Just want a look first?{" "}
               <Link href="/wishes/demo" className="font-semibold text-stone-700 underline underline-offset-2 hover:text-stone-900">
@@ -1174,7 +1184,7 @@ function Footer() {
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 md:flex-row">
         <span className="logo-follow-theme"><Logo variant="auto" size={30} /></span>
         <div className="flex flex-wrap justify-center gap-6">
-          {(["How it works|#how", "Live demo|/wishes/demo", "Gift survey|/survey", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor", "Founder console|/beta"] as const).map((item) => {
+          {(["How it works|#how", "FAQ|#faq", "Live demo|/wishes/demo", "Gift survey|/survey", "Privacy|/privacy", "Terms|/terms", "Contact|/contact", "Investors|/investor", "Founder console|/beta"] as const).map((item) => {
             const [l, h] = item.split("|");
             return (
               <Link key={l} href={h!} className="text-[13px] text-footer-soft hover:text-footer-ink transition-colors">
@@ -1210,6 +1220,8 @@ export default function LandingPage() {
       <Features />
       <Stats />
       <Testimonials />
+      <FAQSection />
+      <FounderNote />
       <FinalCTA />
       <Footer />
     </>

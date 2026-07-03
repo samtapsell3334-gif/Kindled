@@ -12,9 +12,16 @@
  *     ts: number, path: string, session: string }
  *
  * Canonical event names:
- *   waitlist_viewed · waitlist_submitted · demo_opened · pot_chip_in_started ·
- *   pot_chip_in_completed · reveal_viewed · stack_chosen · catalogue_item_circled ·
- *   parent_approval_action · would_you_rather_interaction · investor_unlocked
+ *   waitlist_viewed · waitlist_submitted · waitlist_referral_shared ·
+ *   demo_opened · pot_chip_in_started · pot_chip_in_completed · reveal_viewed ·
+ *   stack_chosen · catalogue_item_circled · parent_approval_action ·
+ *   would_you_rather_interaction · investor_unlocked
+ *
+ * v16: waitlist_submitted carries a `ref` prop when the signup arrived via a
+ * ?ref= referral link (the same querystring convention already used for
+ * wish-sharing) — the signup itself is durably tagged
+ * source="waitlist_referral" via the existing WaitlistSignup.source field,
+ * no schema change.
  */
 
 const CONSENT_KEY = "kindled-consent";
