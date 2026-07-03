@@ -736,3 +736,33 @@ rebuilding, per the lesson from earlier this session). Full suite: **130
 green** (19 files), up from 124 — 6 new tests added for the addendum, all
 passing. `npm run lint`: zero new warnings (one pre-existing, unrelated
 `no-console` warning in `api/track/route.ts`).
+
+**Deeper pass beyond the brief's own acceptance list** (this site holds an
+a11y-100 bar across every audited route, so the two brand-new screens got
+the same scrutiny even though the brief didn't explicitly ask for it):
+- Live Lighthouse a11y re-run against production `/survey`: still **100**
+  (Lighthouse only reaches the intro screen automatically, since the rest is
+  JS-gated navigation).
+- Manually walked the accessibility tree (`preview_snapshot`) for both new
+  screens specifically, since Lighthouse can't reach them unaided: correct
+  single `<h2>` heading per screen (no level skip), every option button
+  correctly named, `aria-pressed` genuinely flips true/false on the
+  multi-select as state updates (confirmed by re-reading the DOM attribute
+  after a render tick — an instant post-click read is stale, a timing
+  artefact of the check itself, not the app), and the concept paragraph on
+  screen B exposes as real paragraph text to assistive tech, matching how
+  `q13_concept`'s paragraph already worked pre-addendum.
+- Checked the multi-select "None of these" option for exclusivity logic
+  (i.e. does selecting it also clear other selections): it doesn't — but
+  neither do the two pre-existing multi-selects with an equivalent option
+  (`q14_appeal`'s "Nothing really", `q15_objection`'s "Nothing much").
+  Left unchanged rather than added inconsistently to only the new question.
+- CSV export (`/beta` → Survey → CSV) builds its column list from
+  `QUESTIONS.map(x => x.id)` generically, so both new field IDs are already
+  included with zero code change needed — verified by reading the export
+  function, not just assumed.
+- Screen-count arithmetic cross-checked: the on-screen "Question X of Y"
+  counter now reads up to 17 for the parent/both branch (was 15
+  pre-addendum), matching the +2 new screens exactly.
+No issues found in any of the above — recorded here so this verification
+doesn't need repeating, not because anything needed fixing.
