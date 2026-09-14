@@ -1,0 +1,136 @@
+"""
+One poll cycle: pick the watchlist rows due for a check (scheduler.py),
+fetch each row's market price, search eBay, evaluate matches, and print any
+new deal to the console. This is phase 1 — no Telegram, no alert log, no
+drift detection yet (those are phases 2 and 3).
+"""
+
+from __future__ import annotations
+
+import logging
+import sqlite3
+from datetime import datetime, timezone
+
+import requests
+
+from kestrel.config import Config
+from kestrel.ebay_client import EbayApiError, EbayClient
+from kestrel.matcher import evaluate_listing
+from kestrel.models import MatchResult, WatchlistItem
+from kestrel.pricing import get_market_price_gbp
+from kestrel.scheduler import ScheduleParams, select_rows_for_cycle
+from kestrel.watchlist import list_items, mark_polled
+
+logger = logging.getLogger("kestrel.poller")
+
+
+def is_seen(conn: sqlite3.Connection, item_id: str) -> bool:
+    row = conn.execute("SELECT 1 FROM seen_items WHERE item_id = ?", (item_id,)).fetchone()
+    return row is not None
+
+
+def mark_seen(conn: sqlite3.Connection, item_id: str, watchlist_id: int, listing_type: str) -> None:
+    conn.execute(
+        "INSERT OR IGNORE INTO seen_items (item_id, watchlist_id, listing_type, first_seen_at) VALUES (?, ?, ?, ?)",
+        (item_id, watchlist_id, listing_type, datetime.now(timezone.utc).isoformat()),
+    )
+    conn.commit()
+
+
+def print_match(match: MatchResult) -> None:
+    listing = match.listing
+    item = match.watchlist_item
+    lines = [
+        "=" * 60,
+        f"DEAL: {item.card_name}" + (f" ({item.set_name})" if item.set_name else ""),
+        f"  Game:            {item.game}",
+        f"  Listing type:    {listing.listing_type.value}",
+        f"  Listing price:   GBP {listing.total_price} (incl. postage GBP {listing.shipping_price})",
+        f"  Market price:    GBP {match.market_price_gbp}",
+        f"  Discount:        {match.discount_pct}% below market",
+        f"  Max bid (cap):   GBP {match.max_bid_gbp}",
+    ]
+    if listing.item_end_date:
+        remaining = listing.item_end_date - datetime.now(timezone.utc)
+        minutes = max(int(remaining.total_seconds() // 60), 0)
+        lines.append(f"  Ends in:         ~{minutes} min ({listing.item_end_date.isoformat()})")
+        lines.append(f"  Current bid:     GBP {listing.current_bid_price} ({listing.bid_count} bids)")
+    lines.append(f"  Listing:         {listing.item_web_url}")
+    if listing.image_url:
+        lines.append(f"  Image:           {listing.image_url}")
+    lines.append("=" * 60)
+    print("\n".join(lines))
+
+
+def _evaluate_watchlist_row(
+    conn: sqlite3.Connection,
+    session: requests.Session,
+    config: Config,
+    ebay: EbayClient,
+    item: WatchlistItem,
+) -> list[MatchResult]:
+    market_price = get_market_price_gbp(conn, session, config, item)
+    if market_price is None:
+        logger.warning("Skipping row %s (%s) — no market price available this cycle", item.id, item.card_name)
+        return []
+
+    matches: list[MatchResult] = []
+    try:
+        bin_listings = ebay.search_buy_it_now(item.search_terms)
+        auction_listings = ebay.search_auctions(
+            item.search_terms,
+            window_minutes=config.auction_alert_window_minutes,
+            max_bid_count=config.auction_max_bid_count,
+        )
+    except EbayApiError:
+        logger.exception("eBay search failed for row %s (%s)", item.id, item.card_name)
+        return []
+
+    for listing in [*bin_listings, *auction_listings]:
+        if is_seen(conn, listing.item_id):
+            continue
+
+        result = evaluate_listing(
+            listing,
+            item,
+            market_price,
+            auction_window_minutes=config.auction_alert_window_minutes,
+            auction_max_bid_count=config.auction_max_bid_count,
+        )
+        # Mark seen regardless of match, so a listing that doesn't clear the
+        # cap today doesn't get re-evaluated (and potentially re-logged in
+        # phase 3) every single cycle for its whole lifetime.
+        mark_seen(conn, listing.item_id, item.id, listing.listing_type.value)
+        if result is not None:
+            matches.append(result)
+
+    mark_polled(conn, item.id)
+    return matches
+
+
+def run_poll_cycle(conn: sqlite3.Connection, config: Config, ebay: EbayClient, session: requests.Session) -> list[MatchResult]:
+    all_items = list_items(conn, active_only=True)
+    params = ScheduleParams(
+        poll_interval_seconds=config.poll_interval_seconds,
+        daily_call_budget=config.ebay_daily_call_budget,
+    )
+    due_items = select_rows_for_cycle(all_items, params)
+
+    logger.info(
+        "Poll cycle: %d/%d active rows due this cycle (budget allows %d rows/cycle)",
+        len(due_items),
+        len(all_items),
+        params.rows_per_cycle,
+    )
+
+    all_matches: list[MatchResult] = []
+    for item in due_items:
+        matches = _evaluate_watchlist_row(conn, session, config, ebay, item)
+        for match in matches:
+            print_match(match)
+        all_matches.extend(matches)
+
+    if not all_matches:
+        logger.info("No new deals this cycle.")
+
+    return all_matches
