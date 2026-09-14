@@ -50,13 +50,18 @@ def get_market_price_gbp(
         return cached
 
     price: Decimal | None
-    source_name: str
-    if game == "pokemon":
-        price = pokemon.fetch_market_price_gbp(session, config, item.card_name, item.set_name, item.card_number)
-        source_name = "pokemontcg.io"
-    else:
-        price = yugioh.fetch_market_price_gbp(session, config, item.card_name)
-        source_name = "ygoprodeck"
+    source_name = "pokemontcg.io" if game == "pokemon" else "ygoprodeck"
+    try:
+        if game == "pokemon":
+            price = pokemon.fetch_market_price_gbp(session, config, item.card_name, item.set_name, item.card_number)
+        else:
+            price = yugioh.fetch_market_price_gbp(session, config, item.card_name)
+    except requests.exceptions.RequestException:
+        # A network hiccup talking to the pricing API (timeout, DNS,
+        # connection reset, ...) should skip this row for this cycle, not
+        # crash the whole poll — the next cycle tries again.
+        logger.warning("Network error fetching market price for row %s (%s) via %s", item.id, item.card_name, source_name, exc_info=True)
+        return None
 
     if price is None:
         logger.warning("No market price found for watchlist row %s (%s) via %s", item.id, item.card_name, source_name)
