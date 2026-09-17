@@ -179,6 +179,44 @@ def with_non_english_guard(exclude_terms: str) -> str:
     return ",".join(merged)
 
 
+# Real, confirmed false-positive class found live during a review pass:
+# modern chase-card searches (VMAX/ex/Shining/alt-art) pull in novelty
+# merchandise that isn't a card at all -- keychains, and "display" panels
+# from sellers ("CYAN CITY", "CARDAURA") explicitly printed "Card not
+# included", plus vinyl "slab skin" decals for a PSA case ("Slab not
+# included"). None of these titles contained an existing exclude term, so
+# they matched title_matches_card_name() and priced against the real
+# card's full market value -- producing enormous fake "profit" figures.
+# Deliberately phrase-based (not single words like "display" or "case",
+# which also appear in genuine graded-slab listings) so this only catches
+# the actual "this is not a card" disclaimer sellers are legally obligated
+# to include, not real listings that happen to mention a display case.
+MERCHANDISE_GUARD_TERMS = [
+    "card not included",
+    "cards not included",
+    "slab not included",
+    "card/slab not included",
+    "keychain",
+    "key chain",
+    "keyring",
+    "key ring",
+    "fan art",
+    "fanart",
+    "inspired art",
+    "slab skin",
+]
+
+
+def with_merchandise_guard(exclude_terms: str) -> str:
+    """Append MERCHANDISE_GUARD_TERMS to a row's comma-separated
+    exclude_terms, skipping any already present (case-insensitive) so this
+    is safe to re-apply to a row more than once."""
+    existing = [t.strip() for t in exclude_terms.split(",") if t.strip()]
+    existing_lower = {t.lower() for t in existing}
+    merged = existing + [t for t in MERCHANDISE_GUARD_TERMS if t not in existing_lower]
+    return ",".join(merged)
+
+
 _PUNCTUATION_RE = re.compile(r"[\-|:/,.!\[\]()]+")
 _WHITESPACE_RE = re.compile(r"\s+")
 

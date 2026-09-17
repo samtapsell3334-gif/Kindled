@@ -37,7 +37,7 @@ import requests
 
 from kestrel.config import CONFIG
 from kestrel.db import get_connection, init_db
-from kestrel.matcher import with_non_english_guard
+from kestrel.matcher import with_merchandise_guard, with_non_english_guard
 from kestrel.models import PriceSource, Tier
 from kestrel.pricing.pokemon import _extract_price_eur, _extract_price_usd
 from kestrel.watchlist import add_item, list_items
@@ -61,7 +61,7 @@ SETS: list[tuple[str, str, int]] = [
 # Per the brief: no raw card over this, in GBP.
 MAX_RAW_PRICE_GBP = Decimal("500")
 
-EXCLUDE_TERMS = with_non_english_guard("proxy,custom,lot,digital,playmat")
+EXCLUDE_TERMS = with_merchandise_guard(with_non_english_guard("proxy,custom,lot,digital,playmat"))
 
 PAGE_SIZE = 250
 

@@ -16,6 +16,7 @@ from kestrel.matcher import (
     title_is_excluded,
     title_matches_card_name,
     title_matches_printing,
+    with_merchandise_guard,
     with_non_english_guard,
 )
 from kestrel.models import EbayListing, ListingType, PriceSource, Tier, WatchlistItem
@@ -171,6 +172,48 @@ class TestNonEnglishGuard:
         # exclude huge numbers of genuine listings.
         exclude_terms = with_non_english_guard("").split(",")
         assert not title_is_excluded("Card shipped from the UK, a great deal", exclude_terms)
+
+
+class TestMerchandiseGuard:
+    """Real, confirmed false-positive class: modern chase-card searches
+    matching non-card merchandise (keychains, 'card not included' display
+    panels, fan-art prints, PSA slab skins) that title_matches_card_name()
+    can't tell apart from the real card, since the merchandise title still
+    contains the card's name."""
+
+    def test_appends_guard_terms_to_existing_exclude_terms(self):
+        merged = with_merchandise_guard("proxy,custom")
+        terms = merged.split(",")
+        assert terms[:2] == ["proxy", "custom"]
+        assert "keychain" in terms
+        assert "card not included" in terms
+
+    def test_does_not_duplicate_a_guard_term_already_present(self):
+        merged = with_merchandise_guard("proxy,Keychain")
+        terms = [t.lower() for t in merged.split(",")]
+        assert terms.count("keychain") == 1
+
+    def test_guard_excludes_a_card_not_included_display_listing(self):
+        exclude_terms = with_merchandise_guard("proxy").split(",")
+        assert title_is_excluded(
+            "Vaporeon ex Prismatic Evolutions Display Panel - Card not included", exclude_terms
+        )
+
+    def test_guard_excludes_a_keychain_listing(self):
+        exclude_terms = with_merchandise_guard("proxy").split(",")
+        assert title_is_excluded("Sylveon VMAX Evolving Skies Acrylic Keychain", exclude_terms)
+
+    def test_guard_excludes_a_fan_art_print_listing(self):
+        exclude_terms = with_merchandise_guard("proxy").split(",")
+        assert title_is_excluded("Leafeon ex Fan Art Print Poster", exclude_terms)
+
+    def test_guard_excludes_a_slab_skin_listing(self):
+        exclude_terms = with_merchandise_guard("proxy").split(",")
+        assert title_is_excluded("Rayquaza V Extended Art Slab Skin for PSA", exclude_terms)
+
+    def test_guard_never_excludes_a_plain_english_listing(self):
+        exclude_terms = with_merchandise_guard("proxy").split(",")
+        assert not title_is_excluded("Charizard 4/102 Base Set Holo Near Mint", exclude_terms)
 
 
 class TestTitleMatchesCardName:
