@@ -79,14 +79,15 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-140 tests cover the matcher (discount/cap math, postage inclusion, auction
+145 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
-price cache, the two pricing sources (including currency conversion), the
-eBay client (token caching, 429/5xx backoff, filter-string construction),
-watchlist CRUD/validation, the Telegram alert formatting (HTML escaping,
-photo-vs-text branching, the buy-link button, graceful failure), the alerts
-log/review workflow, and the manual grade-vs-value comparison. None of them
-hit the network — the eBay, pricing, and Telegram HTTP clients all take an
+price cache, the two pricing sources (including currency conversion and the
+Yu-Gi-Oh set-specific-vs-generic-price logic), the eBay client (token
+caching, 429/5xx backoff, filter-string construction), watchlist CRUD/
+validation, the Telegram alert formatting (HTML escaping, photo-vs-text
+branching, the buy-link button, graceful failure), the alerts log/review
+workflow, and the manual grade-vs-value comparison. None of them hit the
+network — the eBay, pricing, and Telegram HTTP clients all take an
 injectable `requests.Session`-shaped object, swapped for a fake in tests.
 
 ## The alerts log and review workflow
@@ -162,6 +163,50 @@ project doesn't have yet (SQLite's `CREATE TABLE IF NOT EXISTS` is a no-op
 against an existing table). The comparison still shows up on every alert
 where it applies — console, Telegram, `MatchResult` — it's just not queried
 back out of `alerts best` yet.
+
+## The vintage watchlist and the set-specific pricing fix
+
+Building out a bigger watchlist (top-priced cards from Legend of Blue Eyes
+White Dragon, Metal Raiders, and Pharaoh's Servant — real early-2000s
+first-print Yu-Gi-Oh sets) surfaced a real pricing bug before a single row
+went in.
+
+**The bug**: `pricing/yugioh.py` used YGOPRODeck's `card_prices` field,
+which blends one card's price across *every* printing it's ever had. For a
+card reprinted dozens of times since 2002 (Red-Eyes Black Dragon, say),
+that collapses to whatever its cheapest modern reprint costs — **£0.13**,
+not the ~£31 a real vintage LOB copy is worth. Every row built on that
+price would compare real eBay listings against a near-zero reference and
+never fire a single genuine alert — a silent failure, not a crash.
+
+**The fix**: `card_sets[].set_price`, YGOPRODeck's *per-printing* price
+field, used when a row has `set_name` (and ideally `card_number` holding
+the exact set code, e.g. `LOB-070`, for an unambiguous match). Confirmed
+live: Red-Eyes Black Dragon via `LOB-070` → £31.36, vs £0.13 generic. Rows
+without a `set_name` (the 4 existing modern Yu-Gi-Oh rows) are unaffected —
+they fall back to the old behavior, which is reasonable for cards with few
+or no reprints yet.
+
+One real limitation, not fully solved: YGOPRODeck's set-level price still
+isn't 1st-Edition-specific — it's a blend across 1st Edition and Unlimited
+copies of that same print, and Unlimited is far more common in circulation,
+so it likely skews the reference *below* what a genuine 1st Edition copy
+is worth. That biases toward **missing** deals rather than false "great
+deal" alerts on non-first-edition stock, which is the safer direction, but
+it's not a guarantee — check `search_terms` matched "1st edition" and read
+the listing before buying, same as everything else in this workflow.
+
+`kestrel/scripts/seed_yugioh_vintage_watchlist.py` built the actual rows:
+top-39 LOB / top-40 Metal Raiders / top-40 Pharaoh's Servant by real
+set-specific price, excluding anything over £500 raw, `exclude_terms`
+including `unlimited` to bias away from non-first-edition listings.
+Idempotent — safe to re-run after tweaking the set list or the £500 cap.
+
+The equivalent Pokemon pass (Base Set 1st Edition, Base Set, Jungle,
+Fossil, Gym Heroes, Neo Genesis, Neo Destiny, 151, Ascended Heroes,
+Prismatic Evolutions, Surging Sparks, Evolving Skies, Legendary Collection)
+is still pending — pokemontcg.io's API was down (site up, API 500/502)
+when this was built.
 
 ## Design decisions and things worth flagging
 

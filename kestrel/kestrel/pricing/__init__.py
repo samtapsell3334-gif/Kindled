@@ -66,7 +66,7 @@ def get_market_price_gbp(
         if game == "pokemon":
             price = pokemon.fetch_market_price_gbp(session, config, item.card_name, item.set_name, item.card_number)
         else:
-            price = yugioh.fetch_market_price_gbp(session, config, item.card_name)
+            price = yugioh.fetch_market_price_gbp(session, config, item.card_name, item.set_name, item.card_number)
     except requests.exceptions.RequestException:
         # A network hiccup talking to the pricing API (timeout, DNS,
         # connection reset, ...) should skip this row for this cycle, not

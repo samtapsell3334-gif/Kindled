@@ -81,3 +81,70 @@ class TestYugiohPricing:
         session = FakeSession(FakeResponse(200, {"data": []}))
         price = yugioh.fetch_market_price_gbp(session, make_config(), "Nonexistent Card")
         assert price is None
+
+
+class TestYugiohSetSpecificPricing:
+    """Regression coverage for a real finding: `card_prices` blends every
+    printing a card has ever had into one figure — for a vintage card
+    reprinted dozens of times since 2002, that collapses to the cheapest
+    current reprint (~£0.14 for Red-Eyes Black Dragon), nowhere near a real
+    first-print value (~£40 via the set-specific figure below). A watchlist
+    row for a specific vintage printing must use `card_sets`, not
+    `card_prices`."""
+
+    def _card(self, card_sets):
+        return {
+            "card_prices": [{"cardmarket_price": "0.15", "tcgplayer_price": "0.23"}],
+            "card_sets": card_sets,
+        }
+
+    def test_uses_set_specific_price_when_set_name_given(self):
+        body = {"data": [self._card([
+            {"set_name": "Legend of Blue Eyes White Dragon", "set_code": "LOB-070", "set_price": "39.69"},
+        ])]}
+        session = FakeSession(FakeResponse(200, body))
+        price = yugioh.fetch_market_price_gbp(
+            session, make_config(), "Red-Eyes Black Dragon", "Legend of Blue Eyes White Dragon", None
+        )
+        assert price == Decimal("31.75")  # 39.69 * 0.80 (fx_usd_to_gbp), not the £0.12ish generic price
+
+    def test_exact_set_code_match_wins_over_ambiguous_variants(self):
+        body = {"data": [self._card([
+            {"set_name": "Legend of Blue Eyes White Dragon", "set_code": "LOB-070", "set_price": "39.69"},
+            {"set_name": "Legend of Blue Eyes White Dragon", "set_code": "LOB-E056", "set_price": "920.45"},
+        ])]}
+        session = FakeSession(FakeResponse(200, body))
+        price = yugioh.fetch_market_price_gbp(
+            session, make_config(), "Red-Eyes Black Dragon", "Legend of Blue Eyes White Dragon", "LOB-070"
+        )
+        assert price == Decimal("31.75")  # picks the exact requested printing, not the pricier variant
+
+    def test_prefers_plain_set_code_when_no_card_number_given(self):
+        body = {"data": [self._card([
+            {"set_name": "Legend of Blue Eyes White Dragon", "set_code": "LOB-EN070", "set_price": "0"},
+            {"set_name": "Legend of Blue Eyes White Dragon", "set_code": "LOB-070", "set_price": "39.69"},
+            {"set_name": "Legend of Blue Eyes White Dragon", "set_code": "LOB-E056", "set_price": "920.45"},
+        ])]}
+        session = FakeSession(FakeResponse(200, body))
+        price = yugioh.fetch_market_price_gbp(
+            session, make_config(), "Red-Eyes Black Dragon", "Legend of Blue Eyes White Dragon", None
+        )
+        assert price == Decimal("31.75")
+
+    def test_falls_back_to_generic_price_when_set_name_not_found(self):
+        body = {"data": [self._card([
+            {"set_name": "Some Other Set", "set_code": "OTH-001", "set_price": "12.00"},
+        ])]}
+        session = FakeSession(FakeResponse(200, body))
+        price = yugioh.fetch_market_price_gbp(
+            session, make_config(), "Red-Eyes Black Dragon", "Legend of Blue Eyes White Dragon", None
+        )
+        assert price == Decimal("0.13")  # generic cardmarket_price(0.15) * 0.85 fallback, not a crash/None
+
+    def test_no_set_name_given_uses_generic_price_unchanged(self):
+        body = {"data": [self._card([
+            {"set_name": "Legend of Blue Eyes White Dragon", "set_code": "LOB-070", "set_price": "39.69"},
+        ])]}
+        session = FakeSession(FakeResponse(200, body))
+        price = yugioh.fetch_market_price_gbp(session, make_config(), "Red-Eyes Black Dragon")
+        assert price == Decimal("0.13")  # backward-compatible: no set_name -> old behavior
