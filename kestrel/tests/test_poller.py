@@ -6,7 +6,7 @@ import pytest
 from kestrel.db import get_connection, init_db
 from kestrel.grading import set_graded_price
 from kestrel.models import EbayListing, ListingType, MatchResult, PriceSource, Tier, WatchlistItem
-from kestrel.poller import _enrich_condition_from_item_detail, _enrich_grade_from_manual_price
+from kestrel.poller import _enrich_condition_from_item_detail, _enrich_grade_from_manual_price, _enrich_price_confidence
 from kestrel.watchlist import add_item
 
 NOW = datetime(2026, 9, 14, 20, 0, 0, tzinfo=timezone.utc)
@@ -65,6 +65,50 @@ class TestEnrichConditionFromItemDetail:
         _enrich_condition_from_item_detail(ebay, match)
 
         assert match.condition_hint == "near mint"  # untouched, not overwritten with nothing
+
+
+def make_watchlist_item(**overrides) -> WatchlistItem:
+    defaults = dict(
+        id=1, game="pokemon", card_name="Gengar", set_name="Fossil", card_number="5/62",
+        price_source=PriceSource.API, manual_market_price=None,
+        discount_threshold=Decimal("0.25"), search_terms="gengar fossil", exclude_terms="",
+        tier=Tier.STANDARD, active=True, last_polled_at=None,
+    )
+    defaults.update(overrides)
+    return WatchlistItem(**defaults)
+
+
+class TestEnrichPriceConfidence:
+    def test_manual_price_source_scores_90_regardless_of_signals(self):
+        item = make_watchlist_item(price_source=PriceSource.MANUAL, set_name=None, card_number=None)
+        match = make_match()
+        _enrich_price_confidence(item, Decimal("50.00"), previous_price=None, result=match)
+        assert match.price_confidence_pct == Decimal("90")
+
+    def test_api_full_identity_repeat_fetch_scores_75(self):
+        item = make_watchlist_item(set_name="Fossil", card_number="5/62")
+        match = make_match()
+        _enrich_price_confidence(item, Decimal("50.00"), previous_price=Decimal("48.00"), result=match)
+        assert match.price_confidence_pct == Decimal("75")
+
+    def test_api_first_ever_fetch_scores_60(self):
+        item = make_watchlist_item(set_name="Fossil", card_number="5/62")
+        match = make_match()
+        _enrich_price_confidence(item, Decimal("50.00"), previous_price=None, result=match)
+        assert match.price_confidence_pct == Decimal("60")
+
+    def test_api_missing_set_or_number_scores_40(self):
+        item = make_watchlist_item(set_name=None, card_number=None)
+        match = make_match()
+        _enrich_price_confidence(item, Decimal("50.00"), previous_price=Decimal("48.00"), result=match)
+        assert match.price_confidence_pct == Decimal("40")
+
+    def test_anomalous_swing_vs_previous_price_scores_25(self):
+        item = make_watchlist_item(set_name="Fossil", card_number="5/62")
+        match = make_match()
+        # 18x swing, same shape as the real anomaly this guards against
+        _enrich_price_confidence(item, Decimal("900.00"), previous_price=Decimal("50.00"), result=match)
+        assert match.price_confidence_pct == Decimal("25")
 
 
 class TestEnrichGradeFromManualPrice:

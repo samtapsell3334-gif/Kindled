@@ -19,7 +19,7 @@ import re
 from datetime import datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
 
-from kestrel.models import EbayListing, ListingType, MatchResult, WatchlistItem
+from kestrel.models import EbayListing, ListingType, MatchResult, PriceSource, WatchlistItem
 
 TWO_PLACES = Decimal("0.01")
 
@@ -66,6 +66,74 @@ def estimate_net_profit(acquisition_cost: Decimal, market_price: Decimal, fee_ra
     """
     net_proceeds = net_breakeven_cap(market_price, fee_rate, resale_postage)
     return quantize_money(net_proceeds - acquisition_cost)
+
+
+def suggest_offer_gbp(
+    listing: EbayListing,
+    net_breakeven_cap: Decimal,
+    negotiation_margin: Decimal = Decimal("0.10"),
+) -> Decimal | None:
+    """
+    An opening Best Offer amount for a listing that accepts one — only
+    meaningful for Buy It Now (eBay doesn't take offers on auctions).
+    eBay's Make Offer negotiates the *item* price only, postage stays as
+    listed, so this targets `net_breakeven_cap - shipping`, then pitches
+    negotiation_margin below that: even a seller who counters upward still
+    leaves real profit, rather than opening right at the price that would
+    leave none. Never suggests offering more than the listing's own asking
+    price — there's no reason to "offer" above what you could already buy
+    it for outright. Returns None when there's no profitable price to offer
+    at all (net_breakeven_cap doesn't cover postage) or the listing isn't
+    Buy It Now.
+    """
+    if listing.listing_type != ListingType.BUY_IT_NOW:
+        return None
+    max_worth_paying_for_item = net_breakeven_cap - listing.shipping_price
+    if max_worth_paying_for_item <= 0:
+        return None
+    target = quantize_money(max_worth_paying_for_item * (Decimal("1") - negotiation_margin))
+    if target <= 0:
+        return None
+    return min(target, listing.item_price)
+
+
+def price_confidence_pct(
+    *,
+    price_source: PriceSource,
+    has_full_identity: bool,
+    is_first_fetch: bool,
+    is_anomalous: bool,
+) -> Decimal:
+    """
+    A heuristic 0-100 read of how much to trust market_price_gbp — NOT a
+    statistical guarantee. There's no sold-comp data behind this (eBay's
+    Buy Browse API doesn't expose completed/sold listings), so this can
+    only score the process, not the outcome, from signals that are real and
+    checkable:
+
+    - A manual price (price_source=MANUAL) is the user's own researched
+      number, not an algorithmic guess — scored highest.
+    - An API price where the watchlist row pins an exact set_name AND
+      card_number is far more likely to have priced the *specific
+      printing* being watched, rather than a same-named card in general
+      (see the real Yu-Gi-Oh generic-vs-set-specific bug this guards
+      against — kestrel/pricing/yugioh.py).
+    - The very first fetch for a card has nothing to sanity-check against
+      yet, so it's scored below a repeat fetch that's held steady.
+    - A fetch flagged anomalous (>=3x swing vs the last known price, see
+      pricing.PRICE_ANOMALY_RATIO) overrides everything else — a number
+      that just swung 3x+ isn't one to trust regardless of how it was
+      sourced.
+    """
+    if is_anomalous:
+        return Decimal("25")
+    if price_source == PriceSource.MANUAL:
+        return Decimal("90")
+    if not has_full_identity:
+        return Decimal("40")
+    if is_first_fetch:
+        return Decimal("60")
+    return Decimal("75")
 
 
 def title_is_excluded(title: str, exclude_terms: list[str]) -> bool:
@@ -232,6 +300,7 @@ def evaluate_listing(
     now: datetime | None = None,
     fee_rate: Decimal = Decimal("0.13"),
     resale_postage: Decimal = Decimal("3.00"),
+    offer_negotiation_margin: Decimal = Decimal("0.10"),
 ) -> MatchResult | None:
     """
     Return a MatchResult if this listing clears the deal bar for this
@@ -247,6 +316,11 @@ def evaluate_listing(
     (that's still the gross, threshold-based cap). Defaults here match
     config.py's so callers that don't care about this still get a sane
     estimate rather than zero.
+
+    When the listing accepts Best Offer, suggested_offer_gbp is set too —
+    see suggest_offer_gbp. Also purely informational: a listing already has
+    to clear the gross cap at its *asking* price to match at all; Best
+    Offer isn't used to rescue an otherwise-too-expensive listing here.
     """
     if title_is_excluded(listing.title, watchlist_item.exclude_terms_list):
         return None
@@ -274,6 +348,11 @@ def evaluate_listing(
     else:  # pragma: no cover - defensive, ListingType is exhaustive today
         return None
 
+    breakeven_cap = net_breakeven_cap(market_price_gbp, fee_rate, resale_postage)
+    suggested_offer = (
+        suggest_offer_gbp(listing, breakeven_cap, offer_negotiation_margin) if listing.accepts_best_offer else None
+    )
+
     return MatchResult(
         listing=listing,
         watchlist_item=watchlist_item,
@@ -282,5 +361,6 @@ def evaluate_listing(
         discount_pct=discount_percentage(total_price, market_price_gbp),
         condition_hint=guess_condition_hint(listing.title),
         estimated_net_profit_gbp=estimate_net_profit(total_price, market_price_gbp, fee_rate, resale_postage),
-        net_breakeven_cap_gbp=net_breakeven_cap(market_price_gbp, fee_rate, resale_postage),
+        net_breakeven_cap_gbp=breakeven_cap,
+        suggested_offer_gbp=suggested_offer,
     )

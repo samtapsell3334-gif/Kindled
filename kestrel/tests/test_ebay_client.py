@@ -193,6 +193,21 @@ class TestNormalizeItem:
         assert listing.total_price == 43
         assert listing.item_end_date == datetime(2026, 9, 14, 20, 5, 0, tzinfo=timezone.utc)
 
+    def test_best_offer_buying_option_is_captured(self):
+        raw = {
+            "itemId": "v1|789|0",
+            "title": "Charizard BIN with Offer",
+            "buyingOptions": ["FIXED_PRICE", "BEST_OFFER"],
+            "price": {"value": "50.00", "currency": "GBP"},
+            "itemWebUrl": "https://ebay.co.uk/itm/789",
+        }
+        listing = normalize_item(raw)
+        assert listing.accepts_best_offer is True
+
+    def test_no_best_offer_option_defaults_false(self):
+        listing = normalize_item(SEARCH_BODY["itemSummaries"][0])
+        assert listing.accepts_best_offer is False
+
 
 class TestGetItemConditionDetail:
     """Real, structured signal confirmed against production: the item

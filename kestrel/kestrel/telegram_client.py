@@ -50,6 +50,15 @@ def _format_message(match: MatchResult) -> str:
         f"Est. net profit after fees/postage: <b>£{match.estimated_net_profit_gbp}</b> (breakeven cap: £{match.net_breakeven_cap_gbp})",
     ]
 
+    if match.price_confidence_pct is not None:
+        lines.append(f"Price confidence: <b>{match.price_confidence_pct}%</b> (heuristic, not a guarantee)")
+
+    if listing.accepts_best_offer:
+        if match.suggested_offer_gbp is not None:
+            lines.append(f"Make Offer accepted — suggest offering: <b>£{match.suggested_offer_gbp}</b>")
+        else:
+            lines.append("Make Offer accepted, but no offer below asking still clears a profitable margin")
+
     if match.detected_grade is not None and match.graded_market_price_gbp is not None:
         lines.append(
             f"Graded value ({html.escape(match.detected_grade.company)} {match.detected_grade.grade}): "

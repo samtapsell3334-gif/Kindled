@@ -272,4 +272,5 @@ def normalize_item(raw: dict[str, Any]) -> EbayListing:
         current_bid_price=_decimal_or_zero(raw.get("currentBidPrice")) if listing_type == ListingType.AUCTION else None,
         bid_count=int(raw["bidCount"]) if raw.get("bidCount") is not None else None,
         item_end_date=item_end_date,
+        accepts_best_offer="BEST_OFFER" in buying_options,
     )

@@ -65,6 +65,10 @@ class EbayListing:
     current_bid_price: Decimal | None = None
     bid_count: int | None = None
     item_end_date: datetime | None = None
+    # eBay's "BEST_OFFER" buying option -- the listing accepts a negotiated
+    # price alongside (or instead of) its stated one. See
+    # matcher.suggest_offer_gbp.
+    accepts_best_offer: bool = False
 
     @property
     def total_price(self) -> Decimal:
@@ -122,6 +126,19 @@ class MatchResult:
     detected_grade: DetectedGrade | None = None
     graded_market_price_gbp: Decimal | None = None
     graded_discount_pct: Decimal | None = None
+    # Set only when listing.accepts_best_offer is True -- see
+    # matcher.suggest_offer_gbp for how it's derived. None means either the
+    # listing doesn't take offers, or no offer below asking price still
+    # clears a genuine margin.
+    suggested_offer_gbp: Decimal | None = None
+    # Heuristic 0-100 read of how much to trust market_price_gbp -- not a
+    # statistical guarantee (there's no sold-comp data behind it), just a
+    # transparent score from real, checkable signals: manual entry vs API
+    # guess, whether the row's set/number pinned an exact printing, whether
+    # this is the very first fetch for this card (nothing to sanity-check
+    # against yet), and whether the fetch was flagged anomalous against the
+    # last known price. See matcher.price_confidence_pct.
+    price_confidence_pct: Decimal | None = None
 
 
 @dataclass

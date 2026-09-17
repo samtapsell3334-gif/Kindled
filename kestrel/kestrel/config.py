@@ -71,6 +71,14 @@ class Config:
     ebay_seller_fee_rate: Decimal = field(default_factory=lambda: _env_decimal("EBAY_SELLER_FEE_RATE", "0.13"))
     resale_postage_gbp: Decimal = field(default_factory=lambda: _env_decimal("RESALE_POSTAGE_GBP", "3.00"))
 
+    # How far below the real net-breakeven cap to pitch an opening Best
+    # Offer (see matcher.suggest_offer_gbp) — leaves genuine profit margin
+    # even if the seller counters upward, rather than offering right up to
+    # the price that would leave zero margin.
+    offer_negotiation_margin: Decimal = field(
+        default_factory=lambda: _env_decimal("OFFER_NEGOTIATION_MARGIN", "0.10")
+    )
+
     # --- eBay Browse API -------------------------------------------------
     ebay_env: str = field(default_factory=lambda: _env_str("EBAY_ENV", "sandbox"))  # "sandbox" | "production"
     ebay_client_id: str = field(default_factory=lambda: _env_str("EBAY_CLIENT_ID", ""))

@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-152 tests cover the matcher (discount/cap math, postage inclusion, auction
+170 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion and the
 Yu-Gi-Oh set-specific-vs-generic-price logic), the eBay client (token
@@ -221,6 +221,34 @@ Fossil, Gym Heroes, Neo Genesis, Neo Destiny, 151, Ascended Heroes,
 Prismatic Evolutions, Surging Sparks, Evolving Skies, Legendary Collection)
 is still pending — pokemontcg.io's API was down (site up, API 500/502)
 when this was built.
+
+## Make Offer and price confidence
+
+Two more informational fields on every alert, neither of which change
+whether a listing counts as a match — the gross, threshold-based cap is
+still the only gate.
+
+**Make Offer**: eBay's Buy Browse API reports `buyingOptions`, which can
+include `BEST_OFFER` alongside `FIXED_PRICE` — the listing takes a
+negotiated price. When it does, `matcher.suggest_offer_gbp()` pitches an
+opening offer: `OFFER_NEGOTIATION_MARGIN` (10% by default) below the real
+net-breakeven cap, minus postage (Best Offer only negotiates the item
+price). Never suggests offering more than the asking price, and returns
+nothing when no profitable offer exists at all. Confirmed live: a real
+Lugia listing came back "Make Offer accepted — suggest offering £52.70."
+
+**Price confidence**: a heuristic 0–100 score of how much to trust
+`market_price_gbp` — explicitly *not* a statistical guarantee, since eBay's
+Buy Browse API has no sold-comp data to calculate a real one from. Scored
+from process signals that are real and checkable: a manual price (90,
+it's your own researched number) scores highest; an API price where the
+row pins an exact `set_name` + `card_number` scores 75 normally, 60 on its
+very first-ever fetch (nothing to sanity-check against yet); a row missing
+that identity (name-only match, ambiguous printing) scores 40; and a fetch
+flagged anomalous (≥3x swing vs. the last known price — the same real
+18x-swing bug documented above) overrides everything else and drops to 25.
+Read it as "how much extra scrutiny this alert's own number deserves," not
+as a probability of profit.
 
 ## Design decisions and things worth flagging
 

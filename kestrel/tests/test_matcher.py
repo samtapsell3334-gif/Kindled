@@ -11,6 +11,8 @@ from kestrel.matcher import (
     max_bid,
     net_breakeven_cap,
     quantize_money,
+    price_confidence_pct,
+    suggest_offer_gbp,
     title_is_excluded,
     title_matches_card_name,
     title_matches_printing,
@@ -306,6 +308,81 @@ class TestEvaluateBuyItNow:
             listing, item, Decimal("100.00"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW
         )
         assert result is None
+
+
+class TestSuggestOfferGbp:
+    def test_targets_below_breakeven_cap_minus_shipping(self):
+        listing = make_bin_listing(item_price=Decimal("60.00"), shipping_price=Decimal("3.00"))
+        # breakeven cap 50.00, minus 3.00 shipping = 47.00, minus 10% margin = 42.30
+        offer = suggest_offer_gbp(listing, net_breakeven_cap=Decimal("50.00"), negotiation_margin=Decimal("0.10"))
+        assert offer == Decimal("42.30")
+
+    def test_never_offers_more_than_asking_item_price(self):
+        listing = make_bin_listing(item_price=Decimal("20.00"), shipping_price=Decimal("0"))
+        # breakeven cap is huge, so the raw target would be way above asking
+        offer = suggest_offer_gbp(listing, net_breakeven_cap=Decimal("500.00"), negotiation_margin=Decimal("0.10"))
+        assert offer == Decimal("20.00")
+
+    def test_none_when_breakeven_cap_does_not_cover_shipping(self):
+        listing = make_bin_listing(item_price=Decimal("10.00"), shipping_price=Decimal("5.00"))
+        offer = suggest_offer_gbp(listing, net_breakeven_cap=Decimal("4.00"))
+        assert offer is None
+
+    def test_none_for_auction_listings(self):
+        listing = make_auction_listing()
+        offer = suggest_offer_gbp(listing, net_breakeven_cap=Decimal("500.00"))
+        assert offer is None
+
+
+class TestPriceConfidencePct:
+    def test_manual_price_scores_highest(self):
+        assert price_confidence_pct(
+            price_source=PriceSource.MANUAL, has_full_identity=True, is_first_fetch=False, is_anomalous=False
+        ) == Decimal("90")
+
+    def test_full_identity_repeat_fetch_scores_75(self):
+        assert price_confidence_pct(
+            price_source=PriceSource.API, has_full_identity=True, is_first_fetch=False, is_anomalous=False
+        ) == Decimal("75")
+
+    def test_first_ever_fetch_scores_lower_than_a_repeat(self):
+        assert price_confidence_pct(
+            price_source=PriceSource.API, has_full_identity=True, is_first_fetch=True, is_anomalous=False
+        ) == Decimal("60")
+
+    def test_missing_set_or_number_scores_lower_still(self):
+        assert price_confidence_pct(
+            price_source=PriceSource.API, has_full_identity=False, is_first_fetch=False, is_anomalous=False
+        ) == Decimal("40")
+
+    def test_anomalous_price_overrides_everything_else(self):
+        assert price_confidence_pct(
+            price_source=PriceSource.MANUAL, has_full_identity=True, is_first_fetch=False, is_anomalous=True
+        ) == Decimal("25")
+
+
+class TestEvaluateListingBestOffer:
+    def test_sets_suggested_offer_when_listing_accepts_best_offer(self):
+        item = make_item(discount_threshold=Decimal("0.40"))
+        listing = make_bin_listing(
+            item_price=Decimal("57.00"), shipping_price=Decimal("3.00"), accepts_best_offer=True
+        )
+        result = evaluate_listing(
+            listing, item, Decimal("100.00"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW
+        )
+        assert result is not None
+        assert result.suggested_offer_gbp is not None
+
+    def test_no_suggested_offer_when_listing_does_not_accept_it(self):
+        item = make_item(discount_threshold=Decimal("0.40"))
+        listing = make_bin_listing(
+            item_price=Decimal("57.00"), shipping_price=Decimal("3.00"), accepts_best_offer=False
+        )
+        result = evaluate_listing(
+            listing, item, Decimal("100.00"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW
+        )
+        assert result is not None
+        assert result.suggested_offer_gbp is None
 
 
 class TestEvaluateAuction:
