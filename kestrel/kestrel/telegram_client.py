@@ -99,6 +99,16 @@ def _buy_button(listing_url: str) -> dict:
     return {"inline_keyboard": [[{"text": "View listing on eBay", "url": listing_url}]]}
 
 
+# Telegram's real limits (confirmed by a live 400 "message caption is too
+# long" failure once Make Offer/price confidence/seller feedback pushed
+# message length past this): a sendPhoto caption caps at 1024 chars, but a
+# plain sendMessage allows up to 4096. Rather than silently truncate detail
+# out of a real deal alert, fall back to sendMessage (no inline photo
+# preview, but the full text and buy button both survive) whenever the
+# formatted message would blow the caption limit.
+TELEGRAM_CAPTION_LIMIT = 1024
+
+
 def send_alert(config: Config, match: MatchResult, session: requests.Session | None = None) -> bool:
     """
     Send one Telegram alert for a match. Returns True on success, False on
@@ -115,7 +125,7 @@ def send_alert(config: Config, match: MatchResult, session: requests.Session | N
     base_url = f"{API_BASE}/bot{config.telegram_bot_token}"
 
     try:
-        if match.listing.image_url:
+        if match.listing.image_url and len(text) <= TELEGRAM_CAPTION_LIMIT:
             resp = session.post(
                 f"{base_url}/sendPhoto",
                 data={

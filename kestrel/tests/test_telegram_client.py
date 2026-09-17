@@ -89,6 +89,22 @@ class TestSendAlert:
         url, kwargs = session.calls[0]
         assert url.endswith("/sendMessage")
 
+    def test_falls_back_to_text_message_when_caption_too_long(self):
+        # Real failure this guards against: Telegram's sendPhoto caption
+        # caps at 1024 chars (sendMessage allows 4096) -- a real alert with
+        # Make Offer/price confidence/seller feedback lines plus a long
+        # condition string got a live 400 "message caption is too long"
+        # once those fields were added. An image_url is present here, so
+        # without the length check this would wrongly try sendPhoto.
+        match = make_match(image_url="https://img/1.jpg")
+        match.condition_hint = "x" * 1100
+        session = FakeSession()
+        result = send_alert(make_config(), match, session)
+        assert result is True
+        url, kwargs = session.calls[0]
+        assert url.endswith("/sendMessage")
+        assert "x" * 1100 in kwargs["data"]["text"]
+
     def test_message_includes_card_name_price_and_discount(self):
         session = FakeSession()
         send_alert(make_config(), make_match(image_url=None), session)
