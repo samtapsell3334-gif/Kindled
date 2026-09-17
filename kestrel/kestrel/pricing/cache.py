@@ -37,6 +37,23 @@ def get_cached_price(conn: sqlite3.Connection, cache_key: str, cache_hours: int)
     return Decimal(row["market_price_gbp"])
 
 
+def get_last_price_any_age(conn: sqlite3.Connection, cache_key: str) -> Decimal | None:
+    """
+    The previously cached price for this card, ignoring the 12h TTL — used
+    only to sanity-check a freshly-fetched price against, never as a
+    substitute for a live fetch. See pricing.get_market_price_gbp's
+    anomaly check for why this exists: found live, the same pokemontcg.io
+    card ID returned an 18x different trendPrice between a targeted query
+    and a bulk-paginated one within a few days, with no real-world reason
+    for the swing.
+    """
+    row = conn.execute(
+        "SELECT market_price_gbp FROM price_cache WHERE cache_key = ?",
+        (cache_key,),
+    ).fetchone()
+    return Decimal(row["market_price_gbp"]) if row else None
+
+
 def set_cached_price(
     conn: sqlite3.Connection,
     cache_key: str,
