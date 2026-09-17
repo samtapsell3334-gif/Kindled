@@ -50,7 +50,7 @@ def print_match(match: MatchResult) -> None:
         f"  Market price:    GBP {match.market_price_gbp}",
         f"  Discount:        {match.discount_pct}% below market",
         f"  Max bid (cap):   GBP {match.max_bid_gbp}",
-        f"  Condition:       {match.condition_hint} (read from title, not authoritative — check the listing)",
+        f"  Condition:       {match.condition_hint} (eBay's seller-declared field when available, else a title guess — always check the listing)",
     ]
     if listing.item_end_date:
         remaining = listing.item_end_date - datetime.now(timezone.utc)
@@ -62,6 +62,20 @@ def print_match(match: MatchResult) -> None:
         lines.append(f"  Image:           {listing.image_url}")
     lines.append("=" * 60)
     print("\n".join(lines))
+
+
+def _enrich_condition_from_item_detail(ebay: EbayClient, result: MatchResult) -> None:
+    """
+    Upgrade result.condition_hint from a title-keyword guess to eBay's real,
+    structured, seller-declared "Card Condition" field when it's available —
+    one extra API call, spent only here, on a listing that already cleared
+    price/title/printing. Never raises: get_item_condition_detail already
+    catches its own failures and returns None, which just means the
+    title-based guess (already set by matcher.evaluate_listing) stands.
+    """
+    detail = ebay.get_item_condition_detail(result.listing.item_id)
+    if detail:
+        result.condition_hint = detail
 
 
 def _evaluate_watchlist_row(
@@ -104,6 +118,7 @@ def _evaluate_watchlist_row(
         # phase 3) every single cycle for its whole lifetime.
         mark_seen(conn, listing.item_id, item.id, listing.listing_type.value)
         if result is not None:
+            _enrich_condition_from_item_detail(ebay, result)
             matches.append(result)
 
     mark_polled(conn, item.id)

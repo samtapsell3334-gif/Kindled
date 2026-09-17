@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from typing import Any
+from urllib.parse import quote
 
 import requests
 
@@ -35,6 +36,7 @@ from kestrel.models import EbayListing, ListingType
 logger = logging.getLogger("kestrel.ebay")
 
 SEARCH_PATH = "/buy/browse/v1/item_summary/search"
+ITEM_PATH = "/buy/browse/v1/item"
 TOKEN_PATH = "/identity/v1/oauth2/token"
 OAUTH_SCOPE = "https://api.ebay.com/oauth/api_scope"
 
@@ -149,6 +151,43 @@ class EbayClient:
         }
         body = self._get_with_backoff(SEARCH_PATH, params)
         return [normalize_item(raw) for raw in body.get("itemSummaries", [])]
+
+    def get_item_condition_detail(self, item_id: str) -> str | None:
+        """
+        One extra call, deliberately only spent on listings that already
+        cleared every other filter (price, title, printing) — not on every
+        raw search result, to stay inside the call budget.
+
+        Confirmed against production: the item detail endpoint carries a
+        real, structured, trading-card-specific condition field
+        (conditionDescriptors -> "Card Condition") that eBay's own search
+        summary doesn't return — seller-declared values like "Heavily
+        played (Poor)" or "Lightly played (Excellent)", plus additionalInfo
+        defect notes ("Major creasing", "Fuzzy corners", ...). This is a
+        far better signal than guessing from the title alone. Returns None
+        on any failure (network error, 404, missing field) rather than
+        raising — the title-based guess_condition_hint fallback already
+        covers that case in poller.py.
+        """
+        try:
+            body = self._get_with_backoff(f"{ITEM_PATH}/{quote(item_id, safe='')}", {})
+        except EbayApiError:
+            logger.warning("Could not fetch item detail for %s — falling back to title-only condition guess", item_id, exc_info=True)
+            return None
+
+        descriptors = body.get("conditionDescriptors") or []
+        for descriptor in descriptors:
+            if descriptor.get("name") != "Card Condition":
+                continue
+            values = descriptor.get("values") or []
+            if not values:
+                continue
+            content = values[0].get("content")
+            extra = values[0].get("additionalInfo") or []
+            if content and extra:
+                return f"{content} — {', '.join(extra)}"
+            return content
+        return None
 
     def search_auctions(
         self,

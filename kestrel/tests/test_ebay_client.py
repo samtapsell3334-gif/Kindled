@@ -192,3 +192,67 @@ class TestNormalizeItem:
         assert listing.bid_count == 1
         assert listing.total_price == 43
         assert listing.item_end_date == datetime(2026, 9, 14, 20, 5, 0, tzinfo=timezone.utc)
+
+
+class TestGetItemConditionDetail:
+    """Real, structured signal confirmed against production: the item
+    detail endpoint's conditionDescriptors -> "Card Condition" field carries
+    seller-declared values ("Heavily played (Poor)") plus specific defect
+    notes, that eBay's search summary never returns."""
+
+    def test_extracts_condition_and_joins_additional_info(self):
+        body = {
+            "conditionDescriptors": [
+                {
+                    "name": "Card Condition",
+                    "values": [
+                        {
+                            "content": "Heavily played (Poor)",
+                            "additionalInfo": ["Major creasing", "Heavily worn and rounded corners"],
+                        }
+                    ],
+                }
+            ]
+        }
+        session = FakeSession(get_responses=[FakeResponse(200, body)])
+        client = EbayClient(make_config(), session)
+
+        result = client.get_item_condition_detail("v1|123|0")
+
+        assert result == "Heavily played (Poor) — Major creasing, Heavily worn and rounded corners"
+
+    def test_returns_bare_content_when_no_additional_info(self):
+        body = {"conditionDescriptors": [{"name": "Card Condition", "values": [{"content": "Near mint or better"}]}]}
+        session = FakeSession(get_responses=[FakeResponse(200, body)])
+        client = EbayClient(make_config(), session)
+
+        assert client.get_item_condition_detail("v1|123|0") == "Near mint or better"
+
+    def test_returns_none_when_no_card_condition_descriptor(self):
+        body = {"conditionDescriptors": [{"name": "Something Else", "values": [{"content": "irrelevant"}]}]}
+        session = FakeSession(get_responses=[FakeResponse(200, body)])
+        client = EbayClient(make_config(), session)
+
+        assert client.get_item_condition_detail("v1|123|0") is None
+
+    def test_returns_none_when_descriptors_missing_entirely(self):
+        session = FakeSession(get_responses=[FakeResponse(200, {})])
+        client = EbayClient(make_config(), session)
+
+        assert client.get_item_condition_detail("v1|123|0") is None
+
+    def test_returns_none_on_failure_never_raises(self):
+        session = FakeSession(get_responses=[FakeResponse(404, text="not found")])
+        client = EbayClient(make_config(ebay_max_retries=0), session)
+
+        assert client.get_item_condition_detail("v1|123|0") is None
+
+    def test_item_id_is_url_encoded_in_the_request_path(self):
+        session = FakeSession(get_responses=[FakeResponse(200, {})])
+        client = EbayClient(make_config(), session)
+
+        client.get_item_condition_detail("v1|307183747642|0")
+
+        url, _ = session.get_calls[0]
+        assert "v1%7C307183747642%7C0" in url
+        assert "|" not in url

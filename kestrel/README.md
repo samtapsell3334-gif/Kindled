@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-96 tests cover the matcher (discount/cap math, postage inclusion, auction
+104 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion), the
 eBay client (token caching, 429/5xx backoff, filter-string construction),
@@ -163,23 +163,52 @@ and always pass. Both run before the price comparison in
 listing can still slip through — but they closed off the two concrete
 failure modes actually observed.
 
-**No condition awareness — found the same way, and it's not fully
-fixable.** A first real poll returned 20+ "deals" on one card, which turned
-out to mostly be genuine copies of the right printing sitting at very
-different prices — because eBay's structured `condition` field is useless
-for trading cards (nearly every listing is `Ungraded` regardless of actual
-grade), and the market price reference has no condition dimension at all.
-`matcher.guess_condition_hint()` does a best-effort keyword read of the
-title (PSA/BGS/CGC → `graded`, NM → `near mint`, LP → `lightly played`, HP
-or DMG → `damaged`/`heavily played`, prioritized roughly by severity, else
-`not stated`) and surfaces it on every alert (console and Telegram) so a
-big discount % next to a damaged or heavily-played copy doesn't read as a
-real deal. This is explicitly not authoritative — a seller who doesn't
-mention condition returns `not stated`, which should read as "look closer,"
-not "presumably fine." There's no way to properly correct the cap itself
-for condition without per-condition comp data, which is a further reason
-phase 3's closing-price log matters — it's the only route to real,
-condition-aware pricing over time.
+**Condition awareness — two tiers, and it's still not fully fixable.** A
+first real poll returned 20+ "deals" on one card, which turned out to
+mostly be genuine copies of the right printing sitting at very different
+prices — because eBay's plain `condition` field is useless for trading
+cards (nearly every listing is `Ungraded` regardless of actual grade), and
+the market price reference has no condition dimension at all.
+
+Two sources now feed `MatchResult.condition_hint`, in priority order:
+1. **`EbayClient.get_item_condition_detail()`** — confirmed against
+   production: the item *detail* endpoint (a different call from search)
+   carries a real, structured, trading-card-specific field
+   (`conditionDescriptors` → `"Card Condition"`) with genuine seller-
+   declared values ("Heavily played (Poor)") plus specific defect notes
+   ("Major creasing", "Fuzzy corners", ...). Far better than guessing.
+   Deliberately spent as **one extra API call per match, not per search
+   result** — only on listings that already cleared price/title/printing —
+   to stay inside the call budget; not currently counted in
+   `EbayDailyCallBudget`'s row/cycle math, which assumes 2 calls/row/check,
+   since it only fires on actual matches, which are far rarer.
+2. **`matcher.guess_condition_hint()`** — a keyword read of the title
+   (PSA/BGS/CGC → `graded`, NM → `near mint`, LP → `lightly played`, HP or
+   DMG → `damaged`/`heavily played`, prioritized by severity, else `not
+   stated`) — used as the initial value, and kept as-is when the detail
+   call fails or the structured field isn't present.
+
+Both are surfaced on every alert (console and Telegram) so a big discount %
+next to a damaged or heavily-played copy doesn't read as a real deal. This
+is still not fully authoritative — a seller can mis-declare condition, and
+`not stated` should read as "look closer," not "presumably fine." There's
+no way to properly correct the *cap itself* for condition without
+per-condition comp data, which is a further reason phase 3's closing-price
+log matters — it's the only route to real, condition-aware pricing over
+time.
+
+**Grading verification (PSA) and full descriptions — researched, not yet
+built.** PSA has a real, free, official public API for cert verification
+(register at psacard.com/publicapi, OAuth2 with your PSA login) — pass a
+cert number, get back the authoritative card and grade, which would both
+improve accuracy and catch fake/mismatched grading labels. Needs its own
+account + token, same pattern as the eBay/Telegram setup, so it's not
+wired in yet. **BGS and CGC have no official API**, only web lookup pages —
+verifying those would mean scraping, which stays off the table per the
+brief's own rule. Full listing descriptions are available via the same
+item-detail call as condition (confirmed) but tend to be generic seller/
+marketplace boilerplate rather than genuine condition detail, so
+`conditionDescriptors` was prioritized over parsing description text.
 
 **eBay call-budgeting (added beyond the brief; watchlist expected to reach
 40+ rows).** Each watchlist check costs two Browse API calls (Buy It Now
