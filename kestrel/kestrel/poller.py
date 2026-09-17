@@ -48,9 +48,11 @@ def print_match(match: MatchResult) -> None:
         f"  Listing type:    {listing.listing_type.value}",
         f"  Listing price:   GBP {listing.total_price} (incl. postage GBP {listing.shipping_price})",
         f"  Market price:    GBP {match.market_price_gbp}",
-        f"  Discount:        {match.discount_pct}% below market",
+        f"  Discount:        {match.discount_pct}% below market (gross, before fees)",
         f"  Max bid (cap):   GBP {match.max_bid_gbp}",
         f"  Condition:       {match.condition_hint} (eBay's seller-declared field when available, else a title guess — always check the listing)",
+        f"  Est. net profit: GBP {match.estimated_net_profit_gbp} (after est. resale fee + postage — tune the estimate in .env)",
+        f"  Net breakeven:   GBP {match.net_breakeven_cap_gbp} (most you could pay and still break even after resale costs)",
     ]
     if listing.item_end_date:
         remaining = listing.item_end_date - datetime.now(timezone.utc)
@@ -112,6 +114,8 @@ def _evaluate_watchlist_row(
             market_price,
             auction_window_minutes=config.auction_alert_window_minutes,
             auction_max_bid_count=config.auction_max_bid_count,
+            fee_rate=config.ebay_seller_fee_rate,
+            resale_postage=config.resale_postage_gbp,
         )
         # Mark seen regardless of match, so a listing that doesn't clear the
         # cap today doesn't get re-evaluated (and potentially re-logged in

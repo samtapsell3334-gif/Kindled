@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-104 tests cover the matcher (discount/cap math, postage inclusion, auction
+110 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion), the
 eBay client (token caching, 429/5xx backoff, filter-string construction),
@@ -209,6 +209,29 @@ brief's own rule. Full listing descriptions are available via the same
 item-detail call as condition (confirmed) but tend to be generic seller/
 marketplace boilerplate rather than genuine condition detail, so
 `conditionDescriptors` was prioritized over parsing description text.
+
+**Net-of-fees resale economics (added beyond the brief).** The headline
+discount % is always gross — against market price only, no cost of
+actually reselling factored in. At low price points this matters more than
+it looks: a card bought for £10 against a ~£17 market (a "40% off" read)
+nets roughly **£1.79**, not ~£7, once eBay's ~13% seller fee and a realistic
+~£3 outbound postage are taken out — worked out in
+`matcher.net_breakeven_cap()` (the most you could pay and still break even)
+and `matcher.estimate_net_profit()` (the real estimated profit for this
+specific listing's actual price), both shown on every alert alongside the
+gross number. `EBAY_SELLER_FEE_RATE` and `RESALE_POSTAGE_GBP` in `.env` are
+estimates to tune to your real numbers, not live-looked-up figures — eBay's
+actual fee has category nuances and occasional fee-free promotions, and
+postage depends on the service you actually use.
+
+This is purely informational and doesn't change whether an alert fires —
+that's still the existing gross, threshold-based cap. It also doesn't
+replace the condition check above; they answer different questions. A real
+example from testing: a listing scored 65.81% off gross with an estimated
+£40.47 net profit — genuinely correct arithmetic — but its condition read
+as `damaged`, and that profit estimate assumes reselling at the *full*
+market price, which isn't realistic for a damaged copy. Read both numbers
+together, not the profit estimate alone.
 
 **eBay call-budgeting (added beyond the brief; watchlist expected to reach
 40+ rows).** Each watchlist check costs two Browse API calls (Buy It Now

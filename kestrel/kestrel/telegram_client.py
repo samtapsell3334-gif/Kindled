@@ -45,8 +45,9 @@ def _format_message(match: MatchResult) -> str:
         "",
         f"Listing price: <b>£{listing.total_price}</b> (incl. postage £{listing.shipping_price})",
         f"Market price: £{match.market_price_gbp}",
-        f"Discount: <b>{match.discount_pct}% below market</b>",
+        f"Discount: <b>{match.discount_pct}% below market</b> (gross, before fees)",
         f"Condition (seller-declared where available, else a title guess): <b>{html.escape(match.condition_hint)}</b>",
+        f"Est. net profit after fees/postage: <b>£{match.estimated_net_profit_gbp}</b> (breakeven cap: £{match.net_breakeven_cap_gbp})",
     ]
 
     if listing.listing_type == ListingType.AUCTION:

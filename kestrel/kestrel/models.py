@@ -80,3 +80,8 @@ class MatchResult:
     # "Ungraded" regardless of actual physical grade). See
     # matcher.guess_condition_hint for what this can and can't tell you.
     condition_hint: str = "not stated"
+    # Net-of-fees resale economics -- see matcher.estimate_resale_economics
+    # for the assumptions (estimated eBay seller fee + return postage cost).
+    # Purely informational: doesn't affect whether this counted as a match.
+    estimated_net_profit_gbp: Decimal = Decimal("0")
+    net_breakeven_cap_gbp: Decimal = Decimal("0")

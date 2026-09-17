@@ -43,6 +43,31 @@ def discount_percentage(total_price: Decimal, market_price: Decimal) -> Decimal:
     return pct.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
+def net_breakeven_cap(market_price: Decimal, fee_rate: Decimal, resale_postage: Decimal) -> Decimal:
+    """
+    The real ceiling: the most you could pay and still break even after
+    reselling at market_price, once eBay's seller fee and your own outbound
+    postage are taken out. Unlike max_bid() (the gross, threshold-based
+    cap that decides whether an alert fires at all), this is purely
+    informational -- the number that actually answers "is this worth it
+    after costs," which the headline discount % never did.
+    """
+    cap = market_price * (Decimal("1") - fee_rate) - resale_postage
+    return quantize_money(cap)
+
+
+def estimate_net_profit(acquisition_cost: Decimal, market_price: Decimal, fee_rate: Decimal, resale_postage: Decimal) -> Decimal:
+    """
+    Estimated real profit (can be negative) from buying this specific
+    listing at acquisition_cost (price + postage-in, i.e. listing.total_price)
+    and reselling at market_price. Same fee/postage assumptions as
+    net_breakeven_cap -- see config.py for why these are estimates to tune,
+    not live-looked-up numbers.
+    """
+    net_proceeds = net_breakeven_cap(market_price, fee_rate, resale_postage)
+    return quantize_money(net_proceeds - acquisition_cost)
+
+
 def title_is_excluded(title: str, exclude_terms: list[str]) -> bool:
     lowered = title.lower()
     return any(term in lowered for term in exclude_terms if term)
@@ -168,6 +193,8 @@ def evaluate_listing(
     auction_window_minutes: int,
     auction_max_bid_count: int,
     now: datetime | None = None,
+    fee_rate: Decimal = Decimal("0.13"),
+    resale_postage: Decimal = Decimal("3.00"),
 ) -> MatchResult | None:
     """
     Return a MatchResult if this listing clears the deal bar for this
@@ -177,6 +204,12 @@ def evaluate_listing(
     Auction: ends within `auction_window_minutes`, bid count within
     `auction_max_bid_count`, and the current bid + postage is at or below
     the cap.
+
+    fee_rate/resale_postage feed the net-of-fees estimate on the result —
+    purely informational, they never affect whether this counts as a match
+    (that's still the gross, threshold-based cap). Defaults here match
+    config.py's so callers that don't care about this still get a sane
+    estimate rather than zero.
     """
     if title_is_excluded(listing.title, watchlist_item.exclude_terms_list):
         return None
@@ -211,4 +244,6 @@ def evaluate_listing(
         max_bid_gbp=cap,
         discount_pct=discount_percentage(total_price, market_price_gbp),
         condition_hint=guess_condition_hint(listing.title),
+        estimated_net_profit_gbp=estimate_net_profit(total_price, market_price_gbp, fee_rate, resale_postage),
+        net_breakeven_cap_gbp=net_breakeven_cap(market_price_gbp, fee_rate, resale_postage),
     )

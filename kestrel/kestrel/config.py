@@ -60,6 +60,17 @@ class Config:
         default_factory=lambda: _env_decimal("DEFAULT_DISCOUNT_THRESHOLD", "0.40")
     )
 
+    # --- Resale economics (net-of-fees estimate) ---------------------------
+    # Every alert's headline discount % is against GROSS market price — it
+    # doesn't know about the cost of actually reselling. These two values
+    # estimate that cost so a real net profit/breakeven number can sit next
+    # to the gross one. Both are estimates, not live-looked-up: eBay's real
+    # fee structure has category nuances and occasional fee-free promotions,
+    # and postage cost depends on what service you actually choose — tune
+    # both to your own real numbers rather than trust the defaults blindly.
+    ebay_seller_fee_rate: Decimal = field(default_factory=lambda: _env_decimal("EBAY_SELLER_FEE_RATE", "0.13"))
+    resale_postage_gbp: Decimal = field(default_factory=lambda: _env_decimal("RESALE_POSTAGE_GBP", "3.00"))
+
     # --- eBay Browse API -------------------------------------------------
     ebay_env: str = field(default_factory=lambda: _env_str("EBAY_ENV", "sandbox"))  # "sandbox" | "production"
     ebay_client_id: str = field(default_factory=lambda: _env_str("EBAY_CLIENT_ID", ""))

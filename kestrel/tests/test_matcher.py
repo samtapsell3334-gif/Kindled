@@ -5,9 +5,11 @@ import pytest
 
 from kestrel.matcher import (
     discount_percentage,
+    estimate_net_profit,
     evaluate_listing,
     guess_condition_hint,
     max_bid,
+    net_breakeven_cap,
     quantize_money,
     title_is_excluded,
     title_matches_card_name,
@@ -87,6 +89,36 @@ class TestDiscountPercentage:
 
     def test_zero_market_price_is_safe(self):
         assert discount_percentage(Decimal("10"), Decimal("0")) == Decimal("0")
+
+
+class TestNetBreakevenCap:
+    def test_basic(self):
+        # market=17, fee=13% -> 14.79, minus £3 postage -> 11.79
+        assert net_breakeven_cap(Decimal("17.00"), Decimal("0.13"), Decimal("3.00")) == Decimal("11.79")
+
+    def test_zero_fee_and_postage_equals_market_price(self):
+        assert net_breakeven_cap(Decimal("100.00"), Decimal("0"), Decimal("0")) == Decimal("100.00")
+
+    def test_high_fixed_postage_can_exceed_market_price_giving_negative_cap(self):
+        # A cheap card with real postage costs can have no viable breakeven at all.
+        result = net_breakeven_cap(Decimal("5.00"), Decimal("0.13"), Decimal("3.00"))
+        assert result < Decimal("2.00")
+
+
+class TestEstimateNetProfit:
+    def test_matches_the_readme_worked_example(self):
+        # £10 acquisition, £17 market, 13% fee, £3 postage -> ~£1.79 profit,
+        # not the ~£7 the gross 40%-off framing would suggest.
+        profit = estimate_net_profit(Decimal("10.00"), Decimal("17.00"), Decimal("0.13"), Decimal("3.00"))
+        assert profit == Decimal("1.79")
+
+    def test_negative_when_acquisition_cost_exceeds_breakeven(self):
+        profit = estimate_net_profit(Decimal("15.00"), Decimal("17.00"), Decimal("0.13"), Decimal("3.00"))
+        assert profit < Decimal("0")
+
+    def test_zero_fee_and_postage_is_just_market_minus_cost(self):
+        profit = estimate_net_profit(Decimal("60.00"), Decimal("100.00"), Decimal("0"), Decimal("0"))
+        assert profit == Decimal("40.00")
 
 
 class TestTitleExclusion:
