@@ -29,12 +29,19 @@ found — existing manual-set-name-less rows are unaffected.
 from __future__ import annotations
 
 import re
+import time
 from decimal import Decimal
 from typing import Any
 
 import requests
 
 from kestrel.config import Config
+
+# Same retry pattern as pricing/pokemon.py -- confirmed live there that
+# these free card-pricing APIs return plain transient 500/502s often enough
+# that a single unretried request silently drops real watchlist coverage.
+_MAX_RETRIES = 3
+_RETRY_BACKOFF_SECONDS = 2.0
 
 # Multiple `card_sets` entries can share one `set_name` (regional/reprint
 # variants of "the same" set under Konami's branding, e.g. "LOB-070" vs
@@ -106,12 +113,18 @@ def fetch_market_price_gbp(
     set_name: str | None = None,
     card_number: str | None = None,
 ) -> Decimal | None:
-    resp = session.get(
-        f"{config.ygoprodeck_base_url}/cardinfo.php",
-        params={"name": card_name},
-        timeout=15,
-    )
-    if resp.status_code != 200:
+    resp = None
+    for attempt in range(_MAX_RETRIES + 1):
+        resp = session.get(
+            f"{config.ygoprodeck_base_url}/cardinfo.php",
+            params={"name": card_name},
+            timeout=15,
+        )
+        if resp.status_code == 200:
+            break
+        if attempt < _MAX_RETRIES:
+            time.sleep(_RETRY_BACKOFF_SECONDS * (attempt + 1))
+    if resp is None or resp.status_code != 200:
         return None
 
     cards = resp.json().get("data") or []

@@ -21,6 +21,7 @@ cards) converted via FX_USD_TO_GBP_RATE when cardmarket has nothing usable.
 
 from __future__ import annotations
 
+import time
 from decimal import Decimal
 from typing import Any
 
@@ -29,6 +30,17 @@ import requests
 from kestrel.config import Config
 
 BASE_QUERY_FIELDS = ["cardmarket"]
+
+# pokemontcg.io is noticeably unreliable in practice -- confirmed live via a
+# direct sample: 4 of 5 consecutive requests came back 500/502 (Cloudflare,
+# no rate-limit headers, so this is general backend instability, not a
+# daily-quota 429). Without a retry, a single row's price lookup silently
+# fails on what's often just a coin flip -- across a few hundred watchlist
+# rows that meant real, wide gaps in a poll cycle's coverage, not just a
+# rare edge case. Same fix pattern already used in the seed scripts and
+# purchases.refresh_market_rate.
+_MAX_RETRIES = 3
+_RETRY_BACKOFF_SECONDS = 2.0
 
 # Preference order when a card has more than one tcgplayer price variant —
 # holofoil/reverseHolofoil are usually a set's premium prints (what most
@@ -91,13 +103,19 @@ def fetch_market_price_gbp(
     if config.pokemontcg_api_key:
         headers["X-Api-Key"] = config.pokemontcg_api_key
 
-    resp = session.get(
-        f"{config.pokemontcg_base_url}/cards",
-        params={"q": _build_query(card_name, set_name, card_number), "pageSize": "5"},
-        headers=headers,
-        timeout=15,
-    )
-    if resp.status_code != 200:
+    resp = None
+    for attempt in range(_MAX_RETRIES + 1):
+        resp = session.get(
+            f"{config.pokemontcg_base_url}/cards",
+            params={"q": _build_query(card_name, set_name, card_number), "pageSize": "5"},
+            headers=headers,
+            timeout=15,
+        )
+        if resp.status_code == 200:
+            break
+        if attempt < _MAX_RETRIES:
+            time.sleep(_RETRY_BACKOFF_SECONDS * (attempt + 1))
+    if resp is None or resp.status_code != 200:
         return None
 
     cards = resp.json().get("data") or []

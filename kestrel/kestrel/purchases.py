@@ -13,7 +13,6 @@ a "to sell" sheet never shows a stale number.
 from __future__ import annotations
 
 import sqlite3
-import time
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -23,14 +22,6 @@ from kestrel.config import Config
 from kestrel.models import Purchase, PurchaseStatus
 from kestrel.pricing import pokemon, yugioh
 from kestrel.watchlist import get_item
-
-# pokemontcg.io in particular is noticeably flaky in practice (confirmed
-# live: plain 500/502 on an otherwise-valid request, gone on retry a few
-# seconds later — same characteristic already worked around in the seed
-# scripts). A one-off "what's this worth" check deserves a retry rather
-# than reporting "no rate" on what's usually a transient blip.
-_RETRIES = 3
-_RETRY_DELAY_SECONDS = 3
 
 
 def _parse_dt(value: str | None) -> datetime | None:
@@ -145,19 +136,15 @@ def refresh_market_rate(session: requests.Session, config: Config, purchase: Pur
     deliberately -- that cache exists to protect the poll cycle's call
     budget across hundreds of watchlist rows; a "what's this worth to sell"
     check is a handful of one-off lookups, not worth adding staleness for.
+
+    Retrying through a transient failure is handled inside
+    pokemon.fetch_market_price_gbp / yugioh.fetch_market_price_gbp
+    themselves (see pricing/pokemon.py) -- no second retry layer here, that
+    would just stack delays for no benefit.
     """
     game = (purchase.game or "").strip().lower()
     if game == "pokemon":
-        fetch = pokemon.fetch_market_price_gbp
-    elif game == "yugioh":
-        fetch = yugioh.fetch_market_price_gbp
-    else:
-        return None
-
-    for attempt in range(_RETRIES):
-        price = fetch(session, config, purchase.card_name, purchase.set_name, purchase.card_number)
-        if price is not None:
-            return price
-        if attempt < _RETRIES - 1:
-            time.sleep(_RETRY_DELAY_SECONDS)
+        return pokemon.fetch_market_price_gbp(session, config, purchase.card_name, purchase.set_name, purchase.card_number)
+    if game == "yugioh":
+        return yugioh.fetch_market_price_gbp(session, config, purchase.card_name, purchase.set_name, purchase.card_number)
     return None

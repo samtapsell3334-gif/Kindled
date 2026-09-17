@@ -1,7 +1,19 @@
 from decimal import Decimal
 
+import pytest
+
 from kestrel.config import Config
 from kestrel.pricing import pokemon, yugioh
+
+
+@pytest.fixture(autouse=True)
+def _no_real_sleep(monkeypatch):
+    # Both modules now retry through transient failures with a real
+    # time.sleep backoff (see the real 500/502 flakiness this guards
+    # against) -- monkeypatched here so the retry-exhaustion tests stay
+    # fast rather than actually sleeping several seconds each.
+    monkeypatch.setattr("kestrel.pricing.pokemon.time.sleep", lambda *_: None)
+    monkeypatch.setattr("kestrel.pricing.yugioh.time.sleep", lambda *_: None)
 
 
 class FakeResponse:
@@ -21,6 +33,19 @@ class FakeSession:
     def get(self, url, **kwargs):
         self.calls.append((url, kwargs))
         return self._response
+
+
+class FakeSequentialSession:
+    """Returns a different response on each successive call -- for testing
+    retry behavior, where the first call(s) fail and a later one succeeds."""
+
+    def __init__(self, responses):
+        self._responses = list(responses)
+        self.calls = []
+
+    def get(self, url, **kwargs):
+        self.calls.append((url, kwargs))
+        return self._responses.pop(0)
 
 
 def make_config(**overrides) -> Config:
@@ -45,6 +70,23 @@ class TestPokemonPricing:
         session = FakeSession(FakeResponse(500, {}))
         price = pokemon.fetch_market_price_gbp(session, make_config(), "Charizard", None, None)
         assert price is None
+
+    def test_retries_through_transient_failures_and_succeeds(self):
+        # Real finding: pokemontcg.io returned 500/502 on 4 of 5 consecutive
+        # live requests during a real poll cycle -- confirmed general
+        # backend instability, not a daily quota 429. Without a retry, this
+        # silently drops a row's price for the whole cycle.
+        body = {"data": [{"cardmarket": {"prices": {"trendPrice": 100.0}}}]}
+        session = FakeSequentialSession([FakeResponse(502), FakeResponse(500), FakeResponse(200, body)])
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Charizard", None, None)
+        assert price == Decimal("85.00")
+        assert len(session.calls) == 3
+
+    def test_gives_up_after_max_retries(self):
+        session = FakeSequentialSession([FakeResponse(502)] * 4)  # 1 initial + 3 retries
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Charizard", None, None)
+        assert price is None
+        assert len(session.calls) == 4
 
     def test_query_includes_all_identity_fields(self):
         body = {"data": [{"cardmarket": {"prices": {"trendPrice": 10.0}}}]}
@@ -121,6 +163,19 @@ class TestYugiohPricing:
         session = FakeSession(FakeResponse(200, {"data": []}))
         price = yugioh.fetch_market_price_gbp(session, make_config(), "Nonexistent Card")
         assert price is None
+
+    def test_retries_through_transient_failures_and_succeeds(self):
+        body = {"data": [{"card_prices": [{"cardmarket_price": "20.00", "tcgplayer_price": "30.00"}]}]}
+        session = FakeSequentialSession([FakeResponse(502), FakeResponse(500), FakeResponse(200, body)])
+        price = yugioh.fetch_market_price_gbp(session, make_config(), "Dark Magician")
+        assert price == Decimal("17.00")
+        assert len(session.calls) == 3
+
+    def test_gives_up_after_max_retries(self):
+        session = FakeSequentialSession([FakeResponse(502)] * 4)
+        price = yugioh.fetch_market_price_gbp(session, make_config(), "Dark Magician")
+        assert price is None
+        assert len(session.calls) == 4
 
 
 class TestYugiohSetSpecificPricing:

@@ -168,36 +168,21 @@ class TestMarkListedAndSold:
 
 
 class TestRefreshMarketRate:
-    """Regression coverage for a real finding: pokemontcg.io returned a
-    plain 500/502 on an otherwise-valid request, gone on retry a few
-    seconds later -- the same flakiness already worked around in the seed
-    scripts. A one-off "what's this worth" check needs the same retry."""
+    """The retry-through-transient-failure behavior itself is tested at the
+    source (pricing/pokemon.py, pricing/yugioh.py) -- refresh_market_rate
+    is deliberately just a thin dispatch by game, with no second retry
+    layer of its own (that would just stack delays for no benefit, see its
+    docstring)."""
 
-    def test_returns_rate_on_first_success(self, monkeypatch):
-        monkeypatch.setattr("kestrel.purchases.time.sleep", lambda *_: None)
+    def test_returns_rate_for_pokemon(self, monkeypatch):
+        monkeypatch.setattr("kestrel.pricing.pokemon.time.sleep", lambda *_: None)
         body = {"data": [{"cardmarket": {"prices": {"trendPrice": 100.0}}}]}
         session = _FakeSession([_FakeResponse(200, body)])
         rate = refresh_market_rate(session, Config(fx_eur_to_gbp=Decimal("0.85")), _make_purchase())
         assert rate == Decimal("85.00")
         assert session.calls == 1
 
-    def test_retries_through_transient_failures(self, monkeypatch):
-        monkeypatch.setattr("kestrel.purchases.time.sleep", lambda *_: None)
-        body = {"data": [{"cardmarket": {"prices": {"trendPrice": 100.0}}}]}
-        session = _FakeSession([_FakeResponse(502), _FakeResponse(500), _FakeResponse(200, body)])
-        rate = refresh_market_rate(session, Config(fx_eur_to_gbp=Decimal("0.85")), _make_purchase())
-        assert rate == Decimal("85.00")
-        assert session.calls == 3
-
-    def test_gives_up_after_max_retries(self, monkeypatch):
-        monkeypatch.setattr("kestrel.purchases.time.sleep", lambda *_: None)
-        session = _FakeSession([_FakeResponse(502), _FakeResponse(502), _FakeResponse(502)])
-        rate = refresh_market_rate(session, Config(), _make_purchase())
-        assert rate is None
-        assert session.calls == 3
-
-    def test_unsupported_game_returns_none_without_any_call(self, monkeypatch):
-        monkeypatch.setattr("kestrel.purchases.time.sleep", lambda *_: None)
+    def test_unsupported_game_returns_none_without_any_call(self):
         session = _FakeSession([])
         rate = refresh_market_rate(session, Config(), _make_purchase(game="football"))
         assert rate is None
