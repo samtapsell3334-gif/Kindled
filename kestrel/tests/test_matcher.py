@@ -9,6 +9,7 @@ from kestrel.matcher import (
     max_bid,
     quantize_money,
     title_is_excluded,
+    title_matches_card_name,
 )
 from kestrel.models import EbayListing, ListingType, PriceSource, Tier, WatchlistItem
 
@@ -97,6 +98,42 @@ class TestTitleExclusion:
         assert not title_is_excluded("anything", [])
 
 
+class TestTitleMatchesCardName:
+    """Regression coverage for a real finding: eBay's q= search does loose
+    keyword matching, not exact-phrase matching. Searching "ten thousand
+    dragon yugioh" returned "Manju of the Ten Thousand Hands" at 1% of the
+    real card's price -- a false "99% off" deal for entirely the wrong card."""
+
+    def test_exact_name_matches(self):
+        assert title_matches_card_name("Charizard Base Set 4/102 Holo", "Charizard")
+
+    def test_case_insensitive(self):
+        assert title_matches_card_name("CHARIZARD base set", "charizard")
+
+    def test_hyphen_normalizes_to_space(self):
+        assert title_matches_card_name("Yu-Gi-Oh! Ten-Thousand Dragon Secret Rare", "Ten Thousand Dragon")
+
+    def test_pipe_and_punctuation_normalizes(self):
+        assert title_matches_card_name("Custom|Ten Thousand Dragon|Ultimate Rare", "Ten Thousand Dragon")
+
+    def test_real_false_positive_is_rejected(self):
+        # The actual listing this check exists to catch.
+        assert not title_matches_card_name(
+            "YuGiOh! Manju of the Ten Thousand Hands GFP2-EN099 Ultra Rare 1st Ed",
+            "Ten Thousand Dragon",
+        )
+
+    def test_unrelated_bulk_lot_is_rejected(self):
+        assert not title_matches_card_name(
+            "Selection of 100+ Used YuGiOh! Common Deck Building Staples #1 | Goat Cards!",
+            "Ten Thousand Dragon",
+        )
+
+    def test_empty_card_name_never_blocks(self):
+        # Defensive: a blank card_name shouldn't silently reject everything.
+        assert title_matches_card_name("anything at all", "")
+
+
 class TestEvaluateBuyItNow:
     def test_matches_when_at_or_under_cap(self):
         item = make_item(discount_threshold=Decimal("0.40"))
@@ -113,6 +150,21 @@ class TestEvaluateBuyItNow:
         listing = make_bin_listing(item_price=Decimal("58.00"), shipping_price=Decimal("3.00"))  # total 61.00
         result = evaluate_listing(
             listing, item, Decimal("100.00"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW
+        )
+        assert result is None
+
+    def test_real_wrong_card_false_positive_is_rejected(self):
+        # The exact real-world case this check exists for: a wildly cheap
+        # listing that clears the cap on price alone, but is a different
+        # card entirely that eBay's loose keyword search matched anyway.
+        item = make_item(card_name="Ten Thousand Dragon", discount_threshold=Decimal("0.25"))
+        listing = make_bin_listing(
+            title="YuGiOh! Manju of the Ten Thousand Hands GFP2-EN099 Ultra Rare 1st Ed",
+            item_price=Decimal("1.49"),
+            shipping_price=Decimal("0"),
+        )
+        result = evaluate_listing(
+            listing, item, Decimal("480.95"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW
         )
         assert result is None
 

@@ -15,6 +15,7 @@ ignored, it's a different language with a different Decimal implementation.
 
 from __future__ import annotations
 
+import re
 from datetime import datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
 
@@ -47,6 +48,35 @@ def title_is_excluded(title: str, exclude_terms: list[str]) -> bool:
     return any(term in lowered for term in exclude_terms if term)
 
 
+_PUNCTUATION_RE = re.compile(r"[\-|:/,.!\[\]()]+")
+_WHITESPACE_RE = re.compile(r"\s+")
+
+
+def _normalize_for_match(text: str) -> str:
+    """Lowercase, fold common punctuation to spaces, collapse whitespace —
+    so "Ten-Thousand Dragon" and "Ten Thousand Dragon" compare equal, but
+    the check stays a real substring match rather than a fuzzy one."""
+    folded = _PUNCTUATION_RE.sub(" ", text.lower())
+    return _WHITESPACE_RE.sub(" ", folded).strip()
+
+
+def title_matches_card_name(title: str, card_name: str) -> bool:
+    """
+    Require the card's actual name to appear (punctuation/case-insensitive)
+    in the listing title — not just eBay's own search relevance.
+
+    Found live, not hypothetical: eBay's Browse API `q` search does loose
+    keyword matching, not exact-phrase matching. A search for "ten thousand
+    dragon yugioh" returned, among genuine copies, a completely different
+    card — "Manju of the Ten Thousand Hands" — at 1% of the real card's
+    price, because it shares two of three search words. Without this check,
+    that reads as a 99%-off deal instead of the wrong card entirely.
+    """
+    if not card_name.strip():
+        return True
+    return _normalize_for_match(card_name) in _normalize_for_match(title)
+
+
 def minutes_remaining(item_end_date: datetime, now: datetime | None = None) -> Decimal:
     now = now or datetime.now(timezone.utc)
     delta = item_end_date - now
@@ -72,6 +102,8 @@ def evaluate_listing(
     the cap.
     """
     if title_is_excluded(listing.title, watchlist_item.exclude_terms_list):
+        return None
+    if not title_matches_card_name(listing.title, watchlist_item.card_name):
         return None
 
     cap = max_bid(market_price_gbp, watchlist_item.discount_threshold)
