@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-194 tests cover the matcher (discount/cap math, postage inclusion, auction
+200 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion and the
 Yu-Gi-Oh set-specific-vs-generic-price logic), the eBay client (token
@@ -369,6 +369,29 @@ the market rate shown is whichever Cardmarket/TCGplayer field the pricing
 module prefers (trendPrice for Pokemon), which can run high for some
 cards — sanity-check against the card's other price signals before
 actually listing at the suggested figure.
+
+## Concurrent polling
+
+A real 485-row scan took 50-60 minutes end-to-end, entirely from per-row
+network latency (an eBay search + a pricing lookup, each a real round
+trip) — never from the eBay call budget, which had huge headroom
+throughout (1125 rows/cycle capacity against 485 rows). Sequential
+per-row checking was the actual bottleneck, not the budget the scheduler
+was built to protect.
+
+```bash
+python -m kestrel poll --workers 8
+python -m kestrel run --workers 8
+```
+
+`poller.run_poll_cycle_concurrent` evaluates rows in parallel instead of
+one at a time. Each worker thread opens its own DB connection, eBay
+client, and HTTP session — no shared mutable state to race on between
+threads. `db.connect()` now sets `PRAGMA journal_mode = WAL` and a
+`busy_timeout` so the several concurrent connections to the same file
+serialize writes automatically (waiting and retrying) instead of raising
+"database is locked". `--workers 1` (the default) keeps the original
+sequential `run_poll_cycle` — this is additive, not a replacement.
 
 ## Design decisions and things worth flagging
 

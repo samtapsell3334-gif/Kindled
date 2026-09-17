@@ -147,6 +147,15 @@ def connect(db_path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    # WAL lets one writer and multiple readers proceed concurrently instead
+    # of the default rollback journal's stricter exclusive locking, and the
+    # busy_timeout makes a writer that does contend for the file wait and
+    # retry instead of raising "database is locked" immediately. Needed for
+    # poller.run_poll_cycle_concurrent, where several worker threads each
+    # hold their own connection to this same file; harmless and a
+    # reasonable default for the single-connection case too.
+    conn.execute("PRAGMA journal_mode = WAL")
+    conn.execute("PRAGMA busy_timeout = 5000")
     return conn
 
 

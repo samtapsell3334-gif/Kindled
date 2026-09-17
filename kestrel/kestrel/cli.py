@@ -12,7 +12,9 @@ Command-line entry point.
     python -m kestrel watchlist grade-price list <id>
     python -m kestrel watchlist grade-price remove <id> PSA 9
     python -m kestrel poll        # one cycle — good for cron
+    python -m kestrel poll --workers 8   # same, but rows checked concurrently (much faster on a big watchlist)
     python -m kestrel run         # loop forever, sleeping between cycles
+    python -m kestrel run --workers 8
     python -m kestrel alerts unreviewed          # what's new since the last review pass
     python -m kestrel alerts mark <id> looks_good --notes "..."
     python -m kestrel alerts best [--limit 10]   # ranked, reviewed, not-rejected
@@ -39,7 +41,7 @@ from kestrel.db import get_connection, init_db
 from kestrel.ebay_client import EbayClient
 from kestrel.grading import list_graded_prices, remove_graded_price, set_graded_price
 from kestrel.models import PriceSource, PurchaseStatus, ReviewVerdict, Tier
-from kestrel.poller import run_poll_cycle
+from kestrel.poller import run_poll_cycle, run_poll_cycle_concurrent
 from kestrel.purchases import add_purchase, add_purchase_from_alert, list_purchases, mark_listed, mark_sold
 from kestrel.watchlist import (
     add_item,
@@ -198,24 +200,30 @@ def _cmd_watchlist_remove(args: argparse.Namespace) -> None:
     print(f"Removed row {args.id}")
 
 
-def _cmd_poll(_args: argparse.Namespace) -> None:
+def _cmd_poll(args: argparse.Namespace) -> None:
     init_db(CONFIG.db_path)
-    session = requests.Session()
-    ebay = EbayClient(CONFIG, session)
-    with get_connection(CONFIG.db_path) as conn:
-        run_poll_cycle(conn, CONFIG, ebay, session)
+    if args.workers > 1:
+        run_poll_cycle_concurrent(CONFIG, max_workers=args.workers)
+    else:
+        session = requests.Session()
+        ebay = EbayClient(CONFIG, session)
+        with get_connection(CONFIG.db_path) as conn:
+            run_poll_cycle(conn, CONFIG, ebay, session)
 
 
-def _cmd_run(_args: argparse.Namespace) -> None:
+def _cmd_run(args: argparse.Namespace) -> None:
     init_db(CONFIG.db_path)
-    session = requests.Session()
-    ebay = EbayClient(CONFIG, session)
     logger = logging.getLogger("kestrel.cli")
     logger.info("Starting Kestrel loop, polling every %ds (Ctrl+C to stop)", CONFIG.poll_interval_seconds)
+    session = requests.Session()
+    ebay = EbayClient(CONFIG, session)
     while True:
         try:
-            with get_connection(CONFIG.db_path) as conn:
-                run_poll_cycle(conn, CONFIG, ebay, session)
+            if args.workers > 1:
+                run_poll_cycle_concurrent(CONFIG, max_workers=args.workers)
+            else:
+                with get_connection(CONFIG.db_path) as conn:
+                    run_poll_cycle(conn, CONFIG, ebay, session)
         except Exception:
             logger.exception("Poll cycle failed — will retry next cycle")
         time.sleep(CONFIG.poll_interval_seconds)
@@ -422,8 +430,13 @@ def build_parser() -> argparse.ArgumentParser:
     gp_remove.add_argument("grade")
     gp_remove.set_defaults(func=_cmd_watchlist_grade_price_remove)
 
-    sub.add_parser("poll", help="Run a single poll cycle (use with cron)").set_defaults(func=_cmd_poll)
-    sub.add_parser("run", help="Loop forever, polling every POLL_INTERVAL_SECONDS").set_defaults(func=_cmd_run)
+    poll = sub.add_parser("poll", help="Run a single poll cycle (use with cron)")
+    poll.add_argument("--workers", type=int, default=1, help="Evaluate rows concurrently across N threads (default 1 = sequential)")
+    poll.set_defaults(func=_cmd_poll)
+
+    run = sub.add_parser("run", help="Loop forever, polling every POLL_INTERVAL_SECONDS")
+    run.add_argument("--workers", type=int, default=1, help="Evaluate rows concurrently across N threads (default 1 = sequential)")
+    run.set_defaults(func=_cmd_run)
 
     alerts = sub.add_parser("alerts", help="The persisted alert log + review workflow")
     alerts_sub = alerts.add_subparsers(dest="alerts_command", required=True)

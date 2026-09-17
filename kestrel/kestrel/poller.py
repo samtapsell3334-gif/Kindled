@@ -7,6 +7,7 @@ alerts log. Drift detection still isn't built.
 
 from __future__ import annotations
 
+import concurrent.futures
 import logging
 import sqlite3
 from datetime import datetime, timezone
@@ -17,6 +18,7 @@ import requests
 from kestrel import telegram_client
 from kestrel.alerts import log_alert
 from kestrel.config import Config
+from kestrel.db import get_connection
 from kestrel.ebay_client import EbayApiError, EbayClient
 from kestrel.grading import detect_grade, get_graded_price, list_graded_prices
 from kestrel.matcher import discount_percentage, evaluate_listing, price_confidence_pct
@@ -265,6 +267,89 @@ def run_poll_cycle(conn: sqlite3.Connection, config: Config, ebay: EbayClient, s
                 if not sent:
                     logger.warning("Telegram alert failed for item %s — see console output above instead", match.listing.item_id)
         all_matches.extend(matches)
+
+    if not all_matches:
+        logger.info("No new deals this cycle.")
+
+    return all_matches
+
+
+def _evaluate_watchlist_row_standalone(config: Config, item: WatchlistItem) -> list[MatchResult]:
+    """
+    Thread-safe entry point for run_poll_cycle_concurrent: opens its own DB
+    connection, eBay client, and requests.Session, sharing no mutable state
+    with any other concurrent worker. run_poll_cycle above deliberately
+    keeps sharing one connection/session across rows instead — there's
+    nothing to protect against when nothing runs concurrently, and a fresh
+    connection/session per row would just be wasted setup cost there.
+    """
+    session = requests.Session()
+    ebay = EbayClient(config, session)
+    with get_connection(config.db_path) as conn:
+        return _evaluate_watchlist_row(conn, session, config, ebay, item)
+
+
+def run_poll_cycle_concurrent(config: Config, max_workers: int = 8) -> list[MatchResult]:
+    """
+    Same as run_poll_cycle, but evaluates watchlist rows in parallel
+    instead of one at a time. Built after a real 485-row scan took
+    50-60 minutes end-to-end, entirely from per-row network latency (eBay
+    search + pricing lookup, each a network round trip) — never from
+    hitting the eBay call budget, which had huge headroom throughout.
+    Concurrency attacks that latency directly instead of a budget that was
+    never actually the bottleneck.
+
+    Each worker thread gets its own DB connection, eBay client, and HTTP
+    session (see _evaluate_watchlist_row_standalone) — no shared mutable
+    state to race on. SQLite handles the concurrent connections via WAL
+    mode + a busy_timeout (see db.connect); alerts are still logged and
+    Telegram-sent from the main thread as each worker's result comes in,
+    in whatever order that happens to be — match ordering across rows was
+    never meaningful (each row is a different card), so this changes
+    nothing a caller could observe besides wall-clock time.
+    """
+    with get_connection(config.db_path) as conn:
+        all_items = list_items(conn, active_only=True)
+    params = ScheduleParams(
+        poll_interval_seconds=config.poll_interval_seconds,
+        daily_call_budget=config.ebay_daily_call_budget,
+    )
+    due_items = select_rows_for_cycle(all_items, params)
+
+    logger.info(
+        "Poll cycle (concurrent, %d workers): %d/%d active rows due this cycle (budget allows %d rows/cycle)",
+        max_workers,
+        len(due_items),
+        len(all_items),
+        params.rows_per_cycle,
+    )
+
+    telegram_enabled = telegram_client.is_configured(config)
+    all_matches: list[MatchResult] = []
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_item = {executor.submit(_evaluate_watchlist_row_standalone, config, item): item for item in due_items}
+        for future in concurrent.futures.as_completed(future_to_item):
+            item = future_to_item[future]
+            try:
+                matches = future.result()
+            except Exception:
+                logger.exception("Concurrent poll worker failed for row %s (%s)", item.id, item.card_name)
+                continue
+
+            for match in matches:
+                print_match(match)
+                with get_connection(config.db_path) as conn:
+                    log_alert(conn, match)
+                if telegram_enabled:
+                    telegram_session = requests.Session()
+                    sent = telegram_client.send_alert(config, match, telegram_session)
+                    if not sent:
+                        logger.warning(
+                            "Telegram alert failed for item %s — see console output above instead",
+                            match.listing.item_id,
+                        )
+            all_matches.extend(matches)
 
     if not all_matches:
         logger.info("No new deals this cycle.")
