@@ -23,6 +23,12 @@ class ListingType(str, Enum):
     BUY_IT_NOW = "buy_it_now"
 
 
+class ReviewVerdict(str, Enum):
+    LOOKS_GOOD = "looks_good"
+    FLAGGED = "flagged"
+    REJECTED = "rejected"
+
+
 @dataclass
 class WatchlistItem:
     id: int
@@ -85,3 +91,29 @@ class MatchResult:
     # Purely informational: doesn't affect whether this counted as a match.
     estimated_net_profit_gbp: Decimal = Decimal("0")
     net_breakeven_cap_gbp: Decimal = Decimal("0")
+
+
+@dataclass
+class AlertRecord:
+    """One persisted row from the `alerts` table -- a match, as logged, plus
+    whatever a review pass has (or hasn't) recorded about it. See
+    kestrel/alerts.py."""
+
+    id: int
+    item_id: str
+    watchlist_id: int
+    card_name: str
+    game: str
+    listing_type: ListingType
+    listing_url: str
+    image_url: str | None
+    total_price_gbp: Decimal
+    market_price_gbp: Decimal
+    discount_pct: Decimal
+    condition_hint: str
+    estimated_net_profit_gbp: Decimal
+    net_breakeven_cap_gbp: Decimal
+    detected_at: datetime
+    reviewed_at: datetime | None
+    review_verdict: ReviewVerdict | None
+    review_notes: str | None

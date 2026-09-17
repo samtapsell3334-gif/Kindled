@@ -9,6 +9,9 @@ Command-line entry point.
     python -m kestrel watchlist set-price <id> 12.50
     python -m kestrel poll        # one cycle — good for cron
     python -m kestrel run         # loop forever, sleeping between cycles
+    python -m kestrel alerts unreviewed          # what's new since the last review pass
+    python -m kestrel alerts mark <id> looks_good --notes "..."
+    python -m kestrel alerts best [--limit 10]   # ranked, reviewed, not-rejected
 """
 
 from __future__ import annotations
@@ -21,10 +24,11 @@ from decimal import Decimal, InvalidOperation
 
 import requests
 
+from kestrel.alerts import get_alert, list_best, list_unreviewed, mark_reviewed
 from kestrel.config import CONFIG
 from kestrel.db import get_connection, init_db
 from kestrel.ebay_client import EbayClient
-from kestrel.models import PriceSource, Tier
+from kestrel.models import PriceSource, ReviewVerdict, Tier
 from kestrel.poller import run_poll_cycle
 from kestrel.watchlist import (
     add_item,
@@ -166,6 +170,51 @@ def _cmd_run(_args: argparse.Namespace) -> None:
         time.sleep(CONFIG.poll_interval_seconds)
 
 
+def _format_alert_row(a) -> str:
+    reviewed = f"[{a.review_verdict.value}]" if a.review_verdict else "[unreviewed]"
+    return (
+        f"[{a.id:>4}] {reviewed:16} {a.card_name} — £{a.total_price_gbp} "
+        f"({a.discount_pct}% off, est. net £{a.estimated_net_profit_gbp}) "
+        f"condition={a.condition_hint!r} {a.listing_url}"
+    )
+
+
+def _cmd_alerts_unreviewed(_args: argparse.Namespace) -> None:
+    with get_connection(CONFIG.db_path) as conn:
+        rows = list_unreviewed(conn)
+    if not rows:
+        print("(nothing unreviewed — you're caught up)")
+        return
+    for row in rows:
+        print(_format_alert_row(row))
+
+
+def _cmd_alerts_mark(args: argparse.Namespace) -> None:
+    try:
+        verdict = ReviewVerdict(args.verdict)
+    except ValueError:
+        print(f"error: verdict must be one of {[v.value for v in ReviewVerdict]}", file=sys.stderr)
+        sys.exit(1)
+    with get_connection(CONFIG.db_path) as conn:
+        if get_alert(conn, args.id) is None:
+            print(f"error: no alert with id {args.id}", file=sys.stderr)
+            sys.exit(1)
+        mark_reviewed(conn, args.id, verdict, args.notes)
+    print(f"Alert {args.id} marked {verdict.value}" + (f": {args.notes}" if args.notes else ""))
+
+
+def _cmd_alerts_best(args: argparse.Namespace) -> None:
+    with get_connection(CONFIG.db_path) as conn:
+        rows = list_best(conn, limit=args.limit)
+    if not rows:
+        print("(nothing reviewed and not-rejected yet)")
+        return
+    for row in rows:
+        print(_format_alert_row(row))
+        if row.review_notes:
+            print(f"       notes: {row.review_notes}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="kestrel", description="Local eBay UK trading card deal scanner")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -214,6 +263,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("poll", help="Run a single poll cycle (use with cron)").set_defaults(func=_cmd_poll)
     sub.add_parser("run", help="Loop forever, polling every POLL_INTERVAL_SECONDS").set_defaults(func=_cmd_run)
+
+    alerts = sub.add_parser("alerts", help="The persisted alert log + review workflow")
+    alerts_sub = alerts.add_subparsers(dest="alerts_command", required=True)
+
+    alerts_sub.add_parser("unreviewed", help="Everything logged since the last review pass").set_defaults(
+        func=_cmd_alerts_unreviewed
+    )
+
+    mark = alerts_sub.add_parser("mark", help="Record a review verdict for one alert")
+    mark.add_argument("id", type=int)
+    mark.add_argument("verdict", choices=[v.value for v in ReviewVerdict])
+    mark.add_argument("--notes", default=None)
+    mark.set_defaults(func=_cmd_alerts_mark)
+
+    best = alerts_sub.add_parser("best", help="Reviewed, not-rejected alerts ranked by estimated net profit")
+    best.add_argument("--limit", type=int, default=10)
+    best.set_defaults(func=_cmd_alerts_best)
 
     return parser
 

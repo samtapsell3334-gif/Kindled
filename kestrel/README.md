@@ -79,14 +79,45 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-110 tests cover the matcher (discount/cap math, postage inclusion, auction
+121 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion), the
 eBay client (token caching, 429/5xx backoff, filter-string construction),
-watchlist CRUD/validation, and the Telegram alert formatting (HTML escaping,
-photo-vs-text branching, the buy-link button, graceful failure). None of
-them hit the network — the eBay, pricing, and Telegram HTTP clients all take
-an injectable `requests.Session`-shaped object, swapped for a fake in tests.
+watchlist CRUD/validation, the Telegram alert formatting (HTML escaping,
+photo-vs-text branching, the buy-link button, graceful failure), and the
+alerts log/review workflow. None of them hit the network — the eBay,
+pricing, and Telegram HTTP clients all take an injectable
+`requests.Session`-shaped object, swapped for a fake in tests.
+
+## The alerts log and review workflow
+
+Every match is now persisted (`alerts` table), not just printed/sent — the
+foundation for a "find me the best deals since our last check" workflow:
+
+```bash
+python -m kestrel alerts unreviewed        # what's new since the last review pass
+python -m kestrel alerts mark <id> looks_good|flagged|rejected --notes "..."
+python -m kestrel alerts best [--limit 10] # reviewed, not-rejected, ranked by net profit
+```
+
+The review pass itself is deliberately **not automated** — `reviewed_at IS
+NULL` is the query for "since last check", but marking rows reviewed is a
+manual (or Claude-assisted) step, on purpose. A real first pass on 12 live
+alerts found something no automated check catches: **4 of 12 "genuine 1999
+Base Set" listings were actually different printings** —
+
+- 3 were the Pokémon Celebrations **25th Anniversary reprint**, which
+  deliberately reuses the exact same card number (`2/102`) as a homage.
+  None of the three disclosed this in the title; only the small Pikachu "25"
+  stamp visible in the photo gave it away.
+- 1 was **Base Set 2** (`2/130`, a real, later, different reprint set) —
+  the seller's own title text didn't even match their own photo.
+
+Every automated check passed on all four: title-matching, printing-number
+matching, condition data, price math. Only looking at the actual photo
+caught it. That's the case for this workflow existing at all — it's not
+duplicate checking, it's covering the one gap (see "Images" in the phase 2
+section) that nothing else here can close without a paid vision API.
 
 ## Design decisions and things worth flagging
 

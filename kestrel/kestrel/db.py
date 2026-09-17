@@ -1,8 +1,6 @@
 """
 SQLite schema and connection helper.
 
-Phase 1 needs three tables:
-
 - `watchlist`   — the rules (see build brief: "store the rule, not the
                    price"). One row per card.
 - `price_cache` — 12-hour cache of API-sourced market prices, keyed by a
@@ -10,11 +8,16 @@ Phase 1 needs three tables:
                    so two rows chasing the same card don't double the API
                    calls.
 - `seen_items`  — eBay item IDs we've already surfaced, so a still-matching
-                   listing isn't reprinted every 5-minute cycle. This is
-                   deliberately minimal for phase 1 (just enough for usable
-                   console output); phase 3's full alert log ("log every
-                   listing that triggers an alert... re-check after it
-                   ends") is a separate, richer table built in that phase.
+                   listing isn't reprinted every 5-minute cycle.
+- `alerts`      — a persisted record of every match, phase 3's "log every
+                   listing that triggers an alert" brought forward: it's
+                   the foundation for "find me the best deals since our
+                   last check" (query reviewed_at IS NULL for what's new)
+                   and, later, for re-checking ended auctions' final
+                   prices. `reviewed_at`/`review_verdict`/`review_notes`
+                   record a deliberate human-or-Claude review pass — things
+                   automated matching can't do on its own, like actually
+                   looking at the listing photos (see README).
 
 All money is stored as TEXT and parsed back into `decimal.Decimal` — sqlite
 has no fixed-point type, and round-tripping through REAL/float would defeat
@@ -63,8 +66,34 @@ CREATE TABLE IF NOT EXISTS seen_items (
     first_seen_at   TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS alerts (
+    id                        INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_id                   TEXT NOT NULL,
+    watchlist_id              INTEGER NOT NULL REFERENCES watchlist(id),
+    card_name                 TEXT NOT NULL,
+    game                      TEXT NOT NULL,
+    listing_type              TEXT NOT NULL CHECK (listing_type IN ('auction', 'buy_it_now')),
+    listing_url               TEXT NOT NULL,
+    image_url                 TEXT,
+    total_price_gbp           TEXT NOT NULL,
+    market_price_gbp          TEXT NOT NULL,
+    discount_pct              TEXT NOT NULL,
+    condition_hint            TEXT NOT NULL,
+    estimated_net_profit_gbp  TEXT NOT NULL,
+    net_breakeven_cap_gbp     TEXT NOT NULL,
+    detected_at               TEXT NOT NULL,
+    -- Populated by a deliberate review pass (see kestrel/alerts.py), not by
+    -- the automated poll cycle. NULL reviewed_at is exactly "since our last
+    -- check" -- the query the whole review workflow is built around.
+    reviewed_at               TEXT,
+    review_verdict            TEXT CHECK (review_verdict IN ('looks_good', 'flagged', 'rejected') OR review_verdict IS NULL),
+    review_notes              TEXT
+);
+
 CREATE INDEX IF NOT EXISTS idx_watchlist_active ON watchlist(active);
 CREATE INDEX IF NOT EXISTS idx_seen_items_watchlist ON seen_items(watchlist_id);
+CREATE INDEX IF NOT EXISTS idx_alerts_reviewed_at ON alerts(reviewed_at);
+CREATE INDEX IF NOT EXISTS idx_alerts_watchlist ON alerts(watchlist_id);
 """
 
 
