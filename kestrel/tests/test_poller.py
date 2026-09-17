@@ -5,7 +5,7 @@ import pytest
 
 from kestrel.db import get_connection, init_db
 from kestrel.grading import set_graded_price
-from kestrel.models import EbayListing, ListingType, MatchResult, PriceSource, Tier, WatchlistItem
+from kestrel.models import DetectedGrade, EbayListing, ListingType, MatchResult, PriceSource, Tier, WatchlistItem
 from kestrel.poller import _enrich_condition_from_item_detail, _enrich_grade_from_manual_price, _enrich_price_confidence
 from kestrel.watchlist import add_item
 
@@ -129,7 +129,10 @@ class TestEnrichGradeFromManualPrice:
         # listing total_price is 80.00 + 3.00 postage = 83.00
         assert match.graded_discount_pct == Decimal("30.83")
 
-    def test_grade_detected_but_no_price_entered_leaves_result_untouched(self, conn):
+    def test_grade_detected_but_no_price_entered_still_surfaces_the_grade(self, conn):
+        # detected_grade is set even without a price, so the alert visibly
+        # flags "this is graded" rather than silently looking like a normal
+        # raw-priced deal -- only the price/discount fields stay empty.
         watchlist_id = add_item(
             conn, game="pokemon", card_name="Gengar", set_name="Fossil", card_number="5/62",
             price_source=PriceSource.API, manual_market_price=None, discount_threshold=Decimal("0.25"),
@@ -139,7 +142,7 @@ class TestEnrichGradeFromManualPrice:
 
         _enrich_grade_from_manual_price(conn, match)
 
-        assert match.detected_grade is None
+        assert match.detected_grade == DetectedGrade(company="PSA", grade=Decimal("9"))
         assert match.graded_market_price_gbp is None
         assert match.graded_discount_pct is None
 

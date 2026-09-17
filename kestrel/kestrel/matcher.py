@@ -19,6 +19,7 @@ import re
 from datetime import datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
 
+from kestrel.grading import detect_grade
 from kestrel.models import EbayListing, ListingType, MatchResult, PriceSource, WatchlistItem
 
 TWO_PLACES = Decimal("0.01")
@@ -301,6 +302,7 @@ def evaluate_listing(
     fee_rate: Decimal = Decimal("0.13"),
     resale_postage: Decimal = Decimal("3.00"),
     offer_negotiation_margin: Decimal = Decimal("0.10"),
+    graded_prices: dict[tuple[str, Decimal], Decimal] | None = None,
 ) -> MatchResult | None:
     """
     Return a MatchResult if this listing clears the deal bar for this
@@ -321,6 +323,22 @@ def evaluate_listing(
     see suggest_offer_gbp. Also purely informational: a listing already has
     to clear the gross cap at its *asking* price to match at all; Best
     Offer isn't used to rescue an otherwise-too-expensive listing here.
+
+    graded_prices matters more than any of that: a slab's title is checked
+    for a grade (PSA 9, BGS 9.5, ...) via kestrel.grading.detect_grade, and
+    if graded_prices has a manual price for that exact (company, grade) --
+    built by the caller from kestrel.grading.list_graded_prices, since this
+    function stays DB-free -- *that* price is what the cap and discount are
+    computed against, not market_price_gbp. Without this, a genuinely
+    graded listing was always judged against the raw/ungraded reference
+    price: a slab priced above the raw-based cap but still a real deal
+    against its actual graded value would be silently rejected before ever
+    reaching a human, and a slab priced attractively vs. raw but unremarkable
+    against its real graded value would look like a false "deal". When a
+    grade is detected but no manual price exists for it yet, detected_grade
+    is still set on the result (so the alert visibly flags "this is graded,
+    the discount below is against the RAW price and may not mean much") --
+    only the cap/discount computation itself falls back to market_price_gbp.
     """
     if title_is_excluded(listing.title, watchlist_item.exclude_terms_list):
         return None
@@ -329,7 +347,15 @@ def evaluate_listing(
     if not title_matches_printing(listing.title, watchlist_item.card_number):
         return None
 
-    cap = max_bid(market_price_gbp, watchlist_item.discount_threshold)
+    detected_grade = detect_grade(listing.title)
+    graded_price = (
+        (graded_prices or {}).get((detected_grade.company, detected_grade.grade))
+        if detected_grade is not None
+        else None
+    )
+    effective_price = graded_price if graded_price is not None else market_price_gbp
+
+    cap = max_bid(effective_price, watchlist_item.discount_threshold)
     total_price = listing.total_price
 
     if listing.listing_type == ListingType.BUY_IT_NOW:
@@ -348,7 +374,7 @@ def evaluate_listing(
     else:  # pragma: no cover - defensive, ListingType is exhaustive today
         return None
 
-    breakeven_cap = net_breakeven_cap(market_price_gbp, fee_rate, resale_postage)
+    breakeven_cap = net_breakeven_cap(effective_price, fee_rate, resale_postage)
     suggested_offer = (
         suggest_offer_gbp(listing, breakeven_cap, offer_negotiation_margin) if listing.accepts_best_offer else None
     )
@@ -358,9 +384,12 @@ def evaluate_listing(
         watchlist_item=watchlist_item,
         market_price_gbp=market_price_gbp,
         max_bid_gbp=cap,
-        discount_pct=discount_percentage(total_price, market_price_gbp),
+        discount_pct=discount_percentage(total_price, effective_price),
         condition_hint=guess_condition_hint(listing.title),
-        estimated_net_profit_gbp=estimate_net_profit(total_price, market_price_gbp, fee_rate, resale_postage),
+        estimated_net_profit_gbp=estimate_net_profit(total_price, effective_price, fee_rate, resale_postage),
         net_breakeven_cap_gbp=breakeven_cap,
         suggested_offer_gbp=suggested_offer,
+        detected_grade=detected_grade,
+        graded_market_price_gbp=graded_price,
+        graded_discount_pct=discount_percentage(total_price, graded_price) if graded_price is not None else None,
     )

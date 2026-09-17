@@ -249,6 +249,16 @@ def _shipping_cost(raw: dict[str, Any]) -> Decimal:
     return min(costs) if costs else Decimal("0")
 
 
+def _seller_feedback_pct(seller: dict[str, Any]) -> Decimal | None:
+    raw = seller.get("feedbackPercentage")
+    if raw in (None, ""):
+        return None
+    try:
+        return Decimal(str(raw))
+    except InvalidOperation:
+        return None
+
+
 def normalize_item(raw: dict[str, Any]) -> EbayListing:
     buying_options = raw.get("buyingOptions") or []
     listing_type = ListingType.AUCTION if "AUCTION" in buying_options else ListingType.BUY_IT_NOW
@@ -260,6 +270,7 @@ def normalize_item(raw: dict[str, Any]) -> EbayListing:
         )
 
     image_url = (raw.get("image") or {}).get("imageUrl")
+    seller = raw.get("seller") or {}
 
     return EbayListing(
         item_id=raw["itemId"],
@@ -273,4 +284,7 @@ def normalize_item(raw: dict[str, Any]) -> EbayListing:
         bid_count=int(raw["bidCount"]) if raw.get("bidCount") is not None else None,
         item_end_date=item_end_date,
         accepts_best_offer="BEST_OFFER" in buying_options,
+        seller_username=seller.get("username"),
+        seller_feedback_score=int(seller["feedbackScore"]) if seller.get("feedbackScore") is not None else None,
+        seller_feedback_pct=_seller_feedback_pct(seller),
     )

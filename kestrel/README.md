@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-174 tests cover the matcher (discount/cap math, postage inclusion, auction
+181 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion and the
 Yu-Gi-Oh set-specific-vs-generic-price logic), the eBay client (token
@@ -289,6 +289,53 @@ flagged anomalous (≥3x swing vs. the last known price — the same real
 18x-swing bug documented above) overrides everything else and drops to 25.
 Read it as "how much extra scrutiny this alert's own number deserves," not
 as a probability of profit.
+
+## Three refinements: slab pricing, currency display, seller trust
+
+Prompted by real questions after the vintage watchlist went live and
+started alerting on graded listings.
+
+**Graded listings now gate on their real graded value, not the raw
+price.** Previously grade-vs-value was purely cosmetic — every cap/discount
+decision used the raw/ungraded reference price regardless of whether the
+listing was a slab, so `evaluate_listing` could reject a genuinely
+underpriced PSA 9 outright (its asking price above the raw-based cap) even
+though it was a real deal against its actual graded value, and it could
+also wave through a raw-priced-looking "discount" on a slab that was
+actually unremarkable once you accounted for the grade. Fixed: a detected
+grade (PSA 9, BGS 9.5, ...) with a manual price entered for that exact
+grade now makes the *graded* price the one the cap, discount %, net profit,
+and Make Offer suggestion are all computed against — confirmed live: a real
+£266.50 PSA 9 Charizard listing matched correctly against a test £400 PSA 9
+entry (cap £300), while PSA 3/6/7/7.5/8 listings on the same card (no
+manual price entered for those grades) correctly fell back to the raw
+reference and were rejected as too expensive against it. When a grade is
+detected but has no manual price, the alert still visibly says so — "GRADED
+(PSA 9) — no manual price entered" — instead of silently presenting a
+raw-based discount % that's likely meaningless for a graded card.
+
+**Currency display is £ everywhere now.** Console/log output previously
+mixed `GBP 16.90` (poll output) with `£16.90` (Telegram, `alerts` CLI) —
+all now use the £ symbol consistently.
+
+**Seller feedback is now surfaced on every alert.** eBay's item search
+already returns `seller.feedbackScore`/`feedbackPercentage` at no extra API
+cost — confirmed live: a real £312 "PSA 3" Charizard listing came from a
+seller with **0 feedback score, 0.0% rating**, invisible before this
+change. Purely informational (never gates a match — a new seller isn't
+necessarily a bad one), shown as `Seller: username (N feedback, X%
+positive)` so it's part of what you weigh before buying, not a hidden
+factor.
+
+**Authenticity/image review is still not automated, and can't be from
+here.** It's the one gap nothing in this pipeline closes on its own — see
+"The alerts log and review workflow" above. Checking a listing's actual
+photos (catching reprint stamps, wrong set numbers, resealed slabs) still
+needs a real look, mine or yours, on request (`alerts unreviewed` /
+`alerts mark`). Given graded listings are now correctly weighted by real
+value, they're also the ones most worth spending that manual review on —
+a plausible-looking high grade is exactly the kind of claim worth a second
+look before trusting the number.
 
 ## Design decisions and things worth flagging
 

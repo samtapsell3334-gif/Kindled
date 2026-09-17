@@ -10,16 +10,15 @@ from __future__ import annotations
 import logging
 import sqlite3
 from datetime import datetime, timezone
+from decimal import Decimal
 
 import requests
-
-from decimal import Decimal
 
 from kestrel import telegram_client
 from kestrel.alerts import log_alert
 from kestrel.config import Config
 from kestrel.ebay_client import EbayApiError, EbayClient
-from kestrel.grading import detect_grade, get_graded_price
+from kestrel.grading import detect_grade, get_graded_price, list_graded_prices
 from kestrel.matcher import discount_percentage, evaluate_listing, price_confidence_pct
 from kestrel.models import MatchResult, PriceSource, WatchlistItem
 from kestrel.pricing import PRICE_ANOMALY_RATIO, get_market_price_gbp
@@ -46,18 +45,33 @@ def mark_seen(conn: sqlite3.Connection, item_id: str, watchlist_id: int, listing
 def print_match(match: MatchResult) -> None:
     listing = match.listing
     item = match.watchlist_item
+    is_graded_priced = match.detected_grade is not None and match.graded_market_price_gbp is not None
+
     lines = [
         "=" * 60,
         f"DEAL: {item.card_name}" + (f" ({item.set_name})" if item.set_name else ""),
         f"  Game:            {item.game}",
         f"  Listing type:    {listing.listing_type.value}",
-        f"  Listing price:   GBP {listing.total_price} (incl. postage GBP {listing.shipping_price})",
-        f"  Market price:    GBP {match.market_price_gbp}",
-        f"  Discount:        {match.discount_pct}% below market (gross, before fees)",
-        f"  Max bid (cap):   GBP {match.max_bid_gbp}",
+        f"  Listing price:   £{listing.total_price} (incl. postage £{listing.shipping_price})",
+    ]
+
+    if match.detected_grade is not None:
+        grade_label = f"{match.detected_grade.company} {match.detected_grade.grade}"
+        if is_graded_priced:
+            lines.append(f"  GRADED:          {grade_label} — your entered price £{match.graded_market_price_gbp}")
+            lines.append(f"  Discount:        {match.discount_pct}% below YOUR GRADED PRICE (cap/est. profit below are against it too, not raw)")
+        else:
+            lines.append(f"  GRADED:          {grade_label} — no manual price entered for this grade (`watchlist grade-price set`)")
+            lines.append(f"  Discount:        {match.discount_pct}% below RAW/ungraded market — likely meaningless for a graded card, treat with real caution")
+    else:
+        lines.append(f"  Discount:        {match.discount_pct}% below market (gross, before fees)")
+
+    lines += [
+        f"  Market price:    £{match.market_price_gbp} (raw/ungraded reference price)",
+        f"  Max bid (cap):   £{match.max_bid_gbp}",
         f"  Condition:       {match.condition_hint} (eBay's seller-declared field when available, else a title guess — always check the listing)",
-        f"  Est. net profit: GBP {match.estimated_net_profit_gbp} (after est. resale fee + postage — tune the estimate in .env)",
-        f"  Net breakeven:   GBP {match.net_breakeven_cap_gbp} (most you could pay and still break even after resale costs)",
+        f"  Est. net profit: £{match.estimated_net_profit_gbp} (after est. resale fee + postage — tune the estimate in .env)",
+        f"  Net breakeven:   £{match.net_breakeven_cap_gbp} (most you could pay and still break even after resale costs)",
     ]
     if match.price_confidence_pct is not None:
         lines.append(
@@ -65,22 +79,23 @@ def print_match(match: MatchResult) -> None:
         )
     if listing.accepts_best_offer:
         offer_line = (
-            f"  Make Offer:      accepted — suggest offering GBP {match.suggested_offer_gbp}"
+            f"  Make Offer:      accepted — suggest offering £{match.suggested_offer_gbp}"
             if match.suggested_offer_gbp is not None
             else "  Make Offer:      accepted, but no offer below asking still clears a profitable margin"
         )
         lines.append(offer_line)
-    if match.detected_grade is not None and match.graded_market_price_gbp is not None:
-        lines.append(
-            f"  Graded value:    {match.detected_grade.company} {match.detected_grade.grade} = "
-            f"GBP {match.graded_market_price_gbp} (your entered price for this exact grade) "
-            f"-> {match.graded_discount_pct}% below that, vs {match.discount_pct}% below raw/ungraded market"
+    if listing.seller_username:
+        feedback = (
+            f"{listing.seller_feedback_score} feedback, {listing.seller_feedback_pct}% positive"
+            if listing.seller_feedback_score is not None
+            else "no feedback history"
         )
+        lines.append(f"  Seller:          {listing.seller_username} ({feedback})")
     if listing.item_end_date:
         remaining = listing.item_end_date - datetime.now(timezone.utc)
         minutes = max(int(remaining.total_seconds() // 60), 0)
         lines.append(f"  Ends in:         ~{minutes} min ({listing.item_end_date.isoformat()})")
-        lines.append(f"  Current bid:     GBP {listing.current_bid_price} ({listing.bid_count} bids)")
+        lines.append(f"  Current bid:     £{listing.current_bid_price} ({listing.bid_count} bids)")
     lines.append(f"  Listing:         {listing.item_web_url}")
     if listing.image_url:
         lines.append(f"  Image:           {listing.image_url}")
@@ -104,19 +119,25 @@ def _enrich_condition_from_item_detail(ebay: EbayClient, result: MatchResult) ->
 
 def _enrich_grade_from_manual_price(conn: sqlite3.Connection, result: MatchResult) -> None:
     """
-    If the title or the (real, seller-declared) condition text names a
-    grade this watchlist row has a manual price for, attach the real
-    grade-vs-value comparison. No grade detected, or no price entered for
-    that exact grade -> nothing changes, the listing still carries only its
-    ungraded discount_pct as before. See kestrel/grading.py.
+    Catches only the case matcher.evaluate_listing's own (title-only, since
+    it stays DB-free) grade detection can't: a grade named in eBay's real
+    structured condition text (see _enrich_condition_from_item_detail,
+    which runs first) but not in the title at all. When evaluate_listing
+    already found and priced a grade from the title, this is a no-op —
+    it never overwrites a decision that already gated the match. When it
+    finds one here that evaluate_listing missed, it's purely informational:
+    the cap/discount this listing already matched on used the raw price,
+    since nothing in the title flagged it as graded at match time.
     """
+    if result.graded_market_price_gbp is not None:
+        return
     detected = detect_grade(result.listing.title) or detect_grade(result.condition_hint)
     if detected is None:
         return
     price = get_graded_price(conn, result.watchlist_item.id, detected.company, detected.grade)
+    result.detected_grade = detected
     if price is None:
         return
-    result.detected_grade = detected
     result.graded_market_price_gbp = price
     result.graded_discount_pct = discount_percentage(result.listing.total_price, price)
 
@@ -169,6 +190,12 @@ def _evaluate_watchlist_row(
         logger.warning("Skipping row %s (%s) — no market price available this cycle", item.id, item.card_name)
         return []
 
+    # Built once per row per cycle and passed into evaluate_listing so a
+    # detected grade can gate the cap/discount on its real graded value
+    # instead of always falling back to the raw price — see grading.py and
+    # evaluate_listing's own docstring for why this matters.
+    graded_prices = {(gp.grading_company, gp.grade): gp.price_gbp for gp in list_graded_prices(conn, item.id)}
+
     matches: list[MatchResult] = []
     try:
         bin_listings = ebay.search_buy_it_now(item.search_terms)
@@ -194,6 +221,7 @@ def _evaluate_watchlist_row(
             fee_rate=config.ebay_seller_fee_rate,
             resale_postage=config.resale_postage_gbp,
             offer_negotiation_margin=config.offer_negotiation_margin,
+            graded_prices=graded_prices,
         )
         # Mark seen regardless of match, so a listing that doesn't clear the
         # cap today doesn't get re-evaluated (and potentially re-logged in

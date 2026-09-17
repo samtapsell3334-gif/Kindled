@@ -39,13 +39,28 @@ def _format_message(match: MatchResult) -> str:
     listing = match.listing
     item = match.watchlist_item
 
+    is_graded_priced = match.detected_grade is not None and match.graded_market_price_gbp is not None
+
     lines = [
         f"<b>{html.escape(item.card_name)}</b>" + (f" ({html.escape(item.set_name)})" if item.set_name else ""),
         f"{html.escape(item.game)} · {listing.listing_type.value.replace('_', ' ')}",
         "",
         f"Listing price: <b>£{listing.total_price}</b> (incl. postage £{listing.shipping_price})",
-        f"Market price: £{match.market_price_gbp}",
-        f"Discount: <b>{match.discount_pct}% below market</b> (gross, before fees)",
+    ]
+
+    if match.detected_grade is not None:
+        grade_label = f"{html.escape(match.detected_grade.company)} {match.detected_grade.grade}"
+        if is_graded_priced:
+            lines.append(f"GRADED ({grade_label}) — your entered price: <b>£{match.graded_market_price_gbp}</b>")
+            lines.append(f"Discount: <b>{match.discount_pct}% below YOUR GRADED PRICE</b> (cap/est. profit below are against it too, not raw)")
+        else:
+            lines.append(f"GRADED ({grade_label}) — no manual price entered for this grade (<code>watchlist grade-price set</code>)")
+            lines.append(f"Discount: <b>{match.discount_pct}% below RAW/ungraded market</b> — likely meaningless for a graded card, treat with real caution")
+    else:
+        lines.append(f"Discount: <b>{match.discount_pct}% below market</b> (gross, before fees)")
+
+    lines += [
+        f"Market price: £{match.market_price_gbp} (raw/ungraded reference price)",
         f"Condition (seller-declared where available, else a title guess): <b>{html.escape(match.condition_hint)}</b>",
         f"Est. net profit after fees/postage: <b>£{match.estimated_net_profit_gbp}</b> (breakeven cap: £{match.net_breakeven_cap_gbp})",
     ]
@@ -59,12 +74,13 @@ def _format_message(match: MatchResult) -> str:
         else:
             lines.append("Make Offer accepted, but no offer below asking still clears a profitable margin")
 
-    if match.detected_grade is not None and match.graded_market_price_gbp is not None:
-        lines.append(
-            f"Graded value ({html.escape(match.detected_grade.company)} {match.detected_grade.grade}): "
-            f"<b>£{match.graded_market_price_gbp}</b> → <b>{match.graded_discount_pct}% below that</b> "
-            f"(vs {match.discount_pct}% below raw/ungraded market)"
+    if listing.seller_username:
+        feedback = (
+            f"{listing.seller_feedback_score} feedback, {listing.seller_feedback_pct}% positive"
+            if listing.seller_feedback_score is not None
+            else "no feedback history"
         )
+        lines.append(f"Seller: {html.escape(listing.seller_username)} ({html.escape(feedback)})")
 
     if listing.listing_type == ListingType.AUCTION:
         lines.append(f"Current bid: £{listing.current_bid_price} ({listing.bid_count} bids)")

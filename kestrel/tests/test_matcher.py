@@ -385,6 +385,69 @@ class TestEvaluateListingBestOffer:
         assert result.suggested_offer_gbp is None
 
 
+class TestEvaluateListingGradedPricing:
+    """A slab's cap/discount must be judged against its real graded value
+    when one's been entered, not the raw/ungraded reference price -- see
+    evaluate_listing's docstring for the real gap this closes: a slab
+    priced above the raw-based cap but genuinely cheap for its actual grade
+    was previously rejected before ever reaching a human."""
+
+    def test_manual_graded_price_is_used_for_the_cap_not_raw_price(self):
+        item = make_item(discount_threshold=Decimal("0.25"))
+        # Raw market is 60.00 -> a 25%-off cap of 45.00 would reject this
+        # 70.00 listing outright. But it's PSA 9, and the real PSA 9 value
+        # (200.00) makes 70.00 a genuine 65%+ discount.
+        listing = make_bin_listing(
+            title="Charizard Base Set 4/102 PSA 9 Holo", item_price=Decimal("70.00"), shipping_price=Decimal("0")
+        )
+        result = evaluate_listing(
+            listing, item, Decimal("60.00"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW,
+            graded_prices={("PSA", Decimal("9")): Decimal("200.00")},
+        )
+        assert result is not None
+        assert result.detected_grade.company == "PSA"
+        assert result.graded_market_price_gbp == Decimal("200.00")
+        assert result.max_bid_gbp == Decimal("150.00")  # 200 * (1 - 0.25), not 60 * 0.75
+        assert result.discount_pct == Decimal("65.00")  # against the graded price
+        assert result.market_price_gbp == Decimal("60.00")  # raw reference still recorded, just not used for the gate
+
+    def test_graded_listing_priced_above_graded_cap_is_still_rejected(self):
+        item = make_item(discount_threshold=Decimal("0.25"))
+        listing = make_bin_listing(
+            title="Charizard Base Set 4/102 PSA 9 Holo", item_price=Decimal("180.00"), shipping_price=Decimal("0")
+        )
+        result = evaluate_listing(
+            listing, item, Decimal("60.00"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW,
+            graded_prices={("PSA", Decimal("9")): Decimal("200.00")},
+        )
+        assert result is None  # 180 > 150 (the graded cap), even though it's well under the raw-based one
+
+    def test_grade_detected_but_no_manual_price_falls_back_to_raw_and_still_flags_it(self):
+        item = make_item(discount_threshold=Decimal("0.25"))
+        listing = make_bin_listing(
+            title="Charizard Base Set 4/102 PSA 9 Holo", item_price=Decimal("40.00"), shipping_price=Decimal("0")
+        )
+        result = evaluate_listing(
+            listing, item, Decimal("60.00"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW,
+            graded_prices={("BGS", Decimal("9.5")): Decimal("300.00")},  # a different grade, doesn't apply
+        )
+        assert result is not None
+        assert result.detected_grade.company == "PSA"  # still surfaced...
+        assert result.graded_market_price_gbp is None  # ...but not priced
+        assert result.max_bid_gbp == Decimal("45.00")  # falls back to the raw-based cap (60 * 0.75)
+
+    def test_no_grade_in_title_is_unaffected_by_a_populated_graded_prices_dict(self):
+        item = make_item(discount_threshold=Decimal("0.25"))
+        listing = make_bin_listing(item_price=Decimal("40.00"), shipping_price=Decimal("0"))  # no grade in title
+        result = evaluate_listing(
+            listing, item, Decimal("60.00"), auction_window_minutes=10, auction_max_bid_count=2, now=NOW,
+            graded_prices={("PSA", Decimal("9")): Decimal("200.00")},
+        )
+        assert result is not None
+        assert result.detected_grade is None
+        assert result.max_bid_gbp == Decimal("45.00")
+
+
 class TestEvaluateAuction:
     def test_matches_within_window_and_bid_cap(self):
         item = make_item()

@@ -69,6 +69,12 @@ class EbayListing:
     # price alongside (or instead of) its stated one. See
     # matcher.suggest_offer_gbp.
     accepts_best_offer: bool = False
+    # Seller trust signals -- present on every item_summary at no extra API
+    # cost. A 0-feedback or low-feedback seller on an expensive/graded
+    # listing is a real, cheap-to-surface red flag (see README).
+    seller_username: str | None = None
+    seller_feedback_score: int | None = None
+    seller_feedback_pct: Decimal | None = None
 
     @property
     def total_price(self) -> Decimal:

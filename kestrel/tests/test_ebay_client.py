@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from decimal import Decimal
 
 import pytest
 
@@ -207,6 +208,48 @@ class TestNormalizeItem:
     def test_no_best_offer_option_defaults_false(self):
         listing = normalize_item(SEARCH_BODY["itemSummaries"][0])
         assert listing.accepts_best_offer is False
+
+    def test_seller_feedback_is_captured(self):
+        raw = {
+            "itemId": "v1|999|0",
+            "title": "Charizard with seller info",
+            "buyingOptions": ["FIXED_PRICE"],
+            "price": {"value": "50.00", "currency": "GBP"},
+            "itemWebUrl": "https://ebay.co.uk/itm/999",
+            "seller": {"username": "cardshop99", "feedbackScore": 4200, "feedbackPercentage": "99.6"},
+        }
+        listing = normalize_item(raw)
+        assert listing.seller_username == "cardshop99"
+        assert listing.seller_feedback_score == 4200
+        assert listing.seller_feedback_pct == Decimal("99.6")
+
+    def test_zero_feedback_seller_is_captured_not_dropped(self):
+        # A real red flag (brand-new/no-history seller) must survive
+        # normalization, not look the same as "no seller data at all".
+        raw = {
+            "itemId": "v1|998|0",
+            "title": "Charizard from a new seller",
+            "buyingOptions": ["FIXED_PRICE"],
+            "price": {"value": "50.00", "currency": "GBP"},
+            "itemWebUrl": "https://ebay.co.uk/itm/998",
+            "seller": {"username": "nimattin-0", "feedbackScore": 0, "feedbackPercentage": "0.0"},
+        }
+        listing = normalize_item(raw)
+        assert listing.seller_feedback_score == 0
+        assert listing.seller_feedback_pct == Decimal("0.0")
+
+    def test_missing_seller_block_defaults_to_none(self):
+        raw = {
+            "itemId": "v1|997|0",
+            "title": "Charizard no seller block",
+            "buyingOptions": ["FIXED_PRICE"],
+            "price": {"value": "50.00", "currency": "GBP"},
+            "itemWebUrl": "https://ebay.co.uk/itm/997",
+        }
+        listing = normalize_item(raw)
+        assert listing.seller_username is None
+        assert listing.seller_feedback_score is None
+        assert listing.seller_feedback_pct is None
 
 
 class TestGetItemConditionDetail:
