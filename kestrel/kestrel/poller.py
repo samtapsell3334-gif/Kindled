@@ -1,8 +1,8 @@
 """
 One poll cycle: pick the watchlist rows due for a check (scheduler.py),
-fetch each row's market price, search eBay, evaluate matches, and print any
-new deal to the console. This is phase 1 — no Telegram, no alert log, no
-drift detection yet (those are phases 2 and 3).
+fetch each row's market price, search eBay, evaluate matches, print any new
+deal to the console/log, and (phase 2) send a Telegram alert. Phase 3's
+alert log and drift detection still aren't built.
 """
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 
 import requests
 
+from kestrel import telegram_client
 from kestrel.config import Config
 from kestrel.ebay_client import EbayApiError, EbayClient
 from kestrel.matcher import evaluate_listing
@@ -123,11 +124,17 @@ def run_poll_cycle(conn: sqlite3.Connection, config: Config, ebay: EbayClient, s
         params.rows_per_cycle,
     )
 
+    telegram_enabled = telegram_client.is_configured(config)
+
     all_matches: list[MatchResult] = []
     for item in due_items:
         matches = _evaluate_watchlist_row(conn, session, config, ebay, item)
         for match in matches:
             print_match(match)
+            if telegram_enabled:
+                sent = telegram_client.send_alert(config, match, session)
+                if not sent:
+                    logger.warning("Telegram alert failed for item %s — see console output above instead", match.listing.item_id)
         all_matches.extend(matches)
 
     if not all_matches:

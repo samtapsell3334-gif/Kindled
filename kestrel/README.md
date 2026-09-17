@@ -1,12 +1,13 @@
 # Kestrel
 
 A local deal scanner for trading cards. Watches eBay UK for cards on your
-watchlist and prints a deal to the console when one is priced far enough
-below market. **It never bids or buys — every purchase decision is yours.**
+watchlist and alerts you when one is priced far enough below market.
+**It never bids or buys — every purchase decision is yours.**
 
-This is **phase 1 only**: watchlist management, eBay polling, and console
-output. Telegram alerts (phase 2) and the alert log / drift detection
-(phase 3) are not built yet — see [Roadmap](#roadmap--not-built-yet).
+**Phases 1 and 2 are built**: watchlist management, eBay polling, console
+output, and Telegram alerts with a link straight to the listing. The alert
+log / drift detection (phase 3) isn't built yet — see
+[Roadmap](#roadmap--not-built-yet).
 
 Kestrel is a standalone Python project, unrelated to and independent of the
 Kindled web app elsewhere in this repository. It has its own dependencies,
@@ -32,6 +33,14 @@ API access needs separate eBay approval (see [eBay access](#ebay-access)
 below). `POKEMONTCG_API_KEY` is optional (raises the pokemontcg.io limit
 from 1,000/day to 20,000/day) — get one free at pokemontcg.io. No key is
 needed for YGOPRODeck.
+
+`TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` are optional — leave both blank and
+Kestrel just prints matches to the console/log instead. To get them:
+1. Message [@BotFather](https://t.me/BotFather) on Telegram, send `/newbot`,
+   follow the prompts. It replies with a token like `123456789:AAExample...`.
+2. Send your new bot any message (e.g. "hi") so it has something to read.
+3. Open `https://api.telegram.org/bot<your-token>/getUpdates` in a browser —
+   your chat id is at `.result[0].message.chat.id` in the JSON response.
 
 ## Usage
 
@@ -70,13 +79,14 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-52 tests cover the matcher (discount/cap math, postage inclusion, auction
+68 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion), the
 eBay client (token caching, 429/5xx backoff, filter-string construction),
-and watchlist CRUD/validation. None of them hit the network — the eBay and
-pricing HTTP clients take an injectable `requests.Session`-shaped object,
-swapped for a fake in tests.
+watchlist CRUD/validation, and the Telegram alert formatting (HTML escaping,
+photo-vs-text branching, the buy-link button, graceful failure). None of
+them hit the network — the eBay, pricing, and Telegram HTTP clients all take
+an injectable `requests.Session`-shaped object, swapped for a fake in tests.
 
 ## Design decisions and things worth flagging
 
@@ -159,15 +169,25 @@ this one.
 needed to pause a row (e.g. "I found this one, stop checking it for a
 while") without losing its configured rule. Rows are enabled by default.
 
+## What phase 2 (Telegram) actually sends
+
+One message per new match (deduplicated via `seen_items`, same as console
+output): card name, game, listing type, listing price with postage broken
+out, market price, discount %, and — for auctions — current bid, bid count,
+time remaining, and the computed max bid as plain copyable text for a
+sniping service. The card image is sent as a real Telegram photo (`sendPhoto`)
+when the listing has one, falling back to a text message otherwise. Every
+message carries one button: **View listing on eBay**, linking straight to
+the real listing — Kestrel never bids or buys, that button just opens the
+listing in your own browser for you to act on. A Telegram outage or bad
+credentials never stops a poll cycle — it logs a warning and console output
+still happens regardless.
+
 ## Roadmap — not built yet
 
-Per the brief, phase 2 and phase 3 are deliberately **not** scaffolded
-alongside phase 1:
+Per the brief, phase 3 is deliberately **not** scaffolded alongside phases
+1 and 2:
 
-- **Phase 2 — Telegram alerts.** Bot notification with card name, game,
-  listing price, market price, discount %, time remaining (auctions), card
-  image, listing link, and the computed max bid for auctions. No sniping
-  integration, no bidding.
 - **Phase 3 — Logging, close-price capture, drift detection.** The full
   alert log (every triggering listing, acted on or not), a job that
   re-checks logged auctions after `itemEndDate` and records the final

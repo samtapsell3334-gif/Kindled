@@ -42,3 +42,8 @@ coverage/
 next-env.d.ts
 .vercel
 .env*
+# ...except the committed, secret-free templates (Kestrel is a separate
+# Python project under kestrel/ with its own .env.example — this blanket
+# .env* rule was silently swallowing it since it was never yet tracked).
+!.env.example
+!kestrel/.env.example

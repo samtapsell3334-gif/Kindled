@@ -101,6 +101,14 @@ class Config:
     fx_eur_to_gbp: Decimal = field(default_factory=lambda: _env_decimal("FX_EUR_TO_GBP_RATE", "0.86"))
     fx_usd_to_gbp: Decimal = field(default_factory=lambda: _env_decimal("FX_USD_TO_GBP_RATE", "0.79"))
 
+    # --- Telegram alerts (phase 2) -----------------------------------------
+    # Both empty by default -> Telegram is simply skipped (console/log output
+    # still happens regardless). Get a bot token from @BotFather, and a chat
+    # id by messaging the bot once and reading it back from getUpdates — see
+    # README for the exact steps.
+    telegram_bot_token: str | None = field(default_factory=lambda: _env_optional("TELEGRAM_BOT_TOKEN"))
+    telegram_chat_id: str | None = field(default_factory=lambda: _env_optional("TELEGRAM_CHAT_ID"))
+
     # --- Logging -----------------------------------------------------------
     log_level: str = field(default_factory=lambda: _env_str("KESTREL_LOG_LEVEL", "INFO"))
 
