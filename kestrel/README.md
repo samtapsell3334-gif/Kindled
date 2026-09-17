@@ -79,15 +79,15 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-121 tests cover the matcher (discount/cap math, postage inclusion, auction
+140 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion), the
 eBay client (token caching, 429/5xx backoff, filter-string construction),
 watchlist CRUD/validation, the Telegram alert formatting (HTML escaping,
-photo-vs-text branching, the buy-link button, graceful failure), and the
-alerts log/review workflow. None of them hit the network — the eBay,
-pricing, and Telegram HTTP clients all take an injectable
-`requests.Session`-shaped object, swapped for a fake in tests.
+photo-vs-text branching, the buy-link button, graceful failure), the alerts
+log/review workflow, and the manual grade-vs-value comparison. None of them
+hit the network — the eBay, pricing, and Telegram HTTP clients all take an
+injectable `requests.Session`-shaped object, swapped for a fake in tests.
 
 ## The alerts log and review workflow
 
@@ -118,6 +118,50 @@ matching, condition data, price math. Only looking at the actual photo
 caught it. That's the case for this workflow existing at all — it's not
 duplicate checking, it's covering the one gap (see "Images" in the phase 2
 section) that nothing else here can close without a paid vision API.
+
+## Grade-vs-value comparison
+
+A graded slab (PSA 9, BGS 9.5, CGC 10...) is a different market from a raw
+card — the headline discount %, computed against the *raw/ungraded* market
+price, is meaningless on a graded listing (it'll usually read as a huge
+"discount" because a raw price sits far below what any graded copy is
+actually worth). This closes that gap, manually:
+
+```bash
+python -m kestrel watchlist grade-price set <id> PSA 9 120.00   # this row's card, PSA 9, is worth £120
+python -m kestrel watchlist grade-price list <id>
+python -m kestrel watchlist grade-price remove <id> PSA 9
+```
+
+Every match still runs through the normal pipeline — title, printing,
+price cap — same as always. On top of that, `kestrel/grading.py` reads the
+title (and eBay's structured condition text, e.g. `"Graded PSA 9 — Mint"`)
+for a graded-card mention (PSA/BGS/CGC/SGC/ACE, standard 1–10 half-point
+scale). If one's found **and** you've entered a price for that exact grade
+on that watchlist row, the alert carries a second, real comparison —
+`graded_market_price_gbp` / `graded_discount_pct` — alongside the existing
+gross one, on the console, in Telegram, and via `MatchResult`. No manual
+price for the detected grade → nothing changes, same as today.
+
+**Why manual, not another API integration**: this followed directly from
+checking what PSA's own public API actually returns (see "Grading
+verification (PSA) and full descriptions" below) — cert lookup verifies
+*authenticity and grade*, never price. The only API-legal source we found
+with real per-grade pricing
+is PriceCharting, a $49/mo subscription that isn't wired up (no scraping,
+and no untested paid integration going in on spec — see CLAUDE.md's rule
+against unvalidated code paths). Given that, a manual table — the same
+shape as `WatchlistItem.manual_market_price`, just keyed by grade — is the
+one that's actually usable today, and it's what you asked to build.
+
+It's deliberately scoped to *comparison*, not persistence: `graded_prices`
+prices don't get written back into the `alerts` log table, since that
+table's already live in production with real rows from the review workflow
+above, and adding columns to it would need a real migration path this
+project doesn't have yet (SQLite's `CREATE TABLE IF NOT EXISTS` is a no-op
+against an existing table). The comparison still shows up on every alert
+where it applies — console, Telegram, `MatchResult` — it's just not queried
+back out of `alerts best` yet.
 
 ## Design decisions and things worth flagging
 

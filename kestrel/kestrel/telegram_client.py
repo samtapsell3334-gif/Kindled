@@ -50,6 +50,13 @@ def _format_message(match: MatchResult) -> str:
         f"Est. net profit after fees/postage: <b>£{match.estimated_net_profit_gbp}</b> (breakeven cap: £{match.net_breakeven_cap_gbp})",
     ]
 
+    if match.detected_grade is not None and match.graded_market_price_gbp is not None:
+        lines.append(
+            f"Graded value ({html.escape(match.detected_grade.company)} {match.detected_grade.grade}): "
+            f"<b>£{match.graded_market_price_gbp}</b> → <b>{match.graded_discount_pct}% below that</b> "
+            f"(vs {match.discount_pct}% below raw/ungraded market)"
+        )
+
     if listing.listing_type == ListingType.AUCTION:
         lines.append(f"Current bid: £{listing.current_bid_price} ({listing.bid_count} bids)")
         if listing.item_end_date:

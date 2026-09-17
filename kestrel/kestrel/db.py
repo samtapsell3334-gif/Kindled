@@ -18,6 +18,9 @@ SQLite schema and connection helper.
                    record a deliberate human-or-Claude review pass — things
                    automated matching can't do on its own, like actually
                    looking at the listing photos (see README).
+- `graded_prices` — manual per-grade market prices ("this row's card, PSA 9,
+                   is worth £120"), keyed per watchlist row. See
+                   kestrel/grading.py for why this is manual, not API-sourced.
 
 All money is stored as TEXT and parsed back into `decimal.Decimal` — sqlite
 has no fixed-point type, and round-tripping through REAL/float would defeat
@@ -90,10 +93,27 @@ CREATE TABLE IF NOT EXISTS alerts (
     review_notes              TEXT
 );
 
+-- Manual per-grade market prices, one row per (watchlist row, grading
+-- company, grade) -- e.g. "this row's Blastoise, PSA 9, is worth £120".
+-- Nothing populates this automatically: PSA's own API verifies a cert's
+-- authenticity/grade but returns no pricing at any grade, and the only
+-- API-legal source that does (PriceCharting) is a paid subscription not
+-- wired up. See kestrel/grading.py.
+CREATE TABLE IF NOT EXISTS graded_prices (
+    id                INTEGER PRIMARY KEY AUTOINCREMENT,
+    watchlist_id      INTEGER NOT NULL REFERENCES watchlist(id),
+    grading_company   TEXT NOT NULL,
+    grade             TEXT NOT NULL,
+    price_gbp         TEXT NOT NULL,
+    created_at        TEXT NOT NULL,
+    UNIQUE(watchlist_id, grading_company, grade)
+);
+
 CREATE INDEX IF NOT EXISTS idx_watchlist_active ON watchlist(active);
 CREATE INDEX IF NOT EXISTS idx_seen_items_watchlist ON seen_items(watchlist_id);
 CREATE INDEX IF NOT EXISTS idx_alerts_reviewed_at ON alerts(reviewed_at);
 CREATE INDEX IF NOT EXISTS idx_alerts_watchlist ON alerts(watchlist_id);
+CREATE INDEX IF NOT EXISTS idx_graded_prices_watchlist ON graded_prices(watchlist_id);
 """
 
 

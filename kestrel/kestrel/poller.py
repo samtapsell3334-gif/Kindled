@@ -17,7 +17,8 @@ from kestrel import telegram_client
 from kestrel.alerts import log_alert
 from kestrel.config import Config
 from kestrel.ebay_client import EbayApiError, EbayClient
-from kestrel.matcher import evaluate_listing
+from kestrel.grading import detect_grade, get_graded_price
+from kestrel.matcher import discount_percentage, evaluate_listing
 from kestrel.models import MatchResult, WatchlistItem
 from kestrel.pricing import get_market_price_gbp
 from kestrel.scheduler import ScheduleParams, select_rows_for_cycle
@@ -55,6 +56,12 @@ def print_match(match: MatchResult) -> None:
         f"  Est. net profit: GBP {match.estimated_net_profit_gbp} (after est. resale fee + postage — tune the estimate in .env)",
         f"  Net breakeven:   GBP {match.net_breakeven_cap_gbp} (most you could pay and still break even after resale costs)",
     ]
+    if match.detected_grade is not None and match.graded_market_price_gbp is not None:
+        lines.append(
+            f"  Graded value:    {match.detected_grade.company} {match.detected_grade.grade} = "
+            f"GBP {match.graded_market_price_gbp} (your entered price for this exact grade) "
+            f"-> {match.graded_discount_pct}% below that, vs {match.discount_pct}% below raw/ungraded market"
+        )
     if listing.item_end_date:
         remaining = listing.item_end_date - datetime.now(timezone.utc)
         minutes = max(int(remaining.total_seconds() // 60), 0)
@@ -79,6 +86,25 @@ def _enrich_condition_from_item_detail(ebay: EbayClient, result: MatchResult) ->
     detail = ebay.get_item_condition_detail(result.listing.item_id)
     if detail:
         result.condition_hint = detail
+
+
+def _enrich_grade_from_manual_price(conn: sqlite3.Connection, result: MatchResult) -> None:
+    """
+    If the title or the (real, seller-declared) condition text names a
+    grade this watchlist row has a manual price for, attach the real
+    grade-vs-value comparison. No grade detected, or no price entered for
+    that exact grade -> nothing changes, the listing still carries only its
+    ungraded discount_pct as before. See kestrel/grading.py.
+    """
+    detected = detect_grade(result.listing.title) or detect_grade(result.condition_hint)
+    if detected is None:
+        return
+    price = get_graded_price(conn, result.watchlist_item.id, detected.company, detected.grade)
+    if price is None:
+        return
+    result.detected_grade = detected
+    result.graded_market_price_gbp = price
+    result.graded_discount_pct = discount_percentage(result.listing.total_price, price)
 
 
 def _evaluate_watchlist_row(
@@ -124,6 +150,7 @@ def _evaluate_watchlist_row(
         mark_seen(conn, listing.item_id, item.id, listing.listing_type.value)
         if result is not None:
             _enrich_condition_from_item_detail(ebay, result)
+            _enrich_grade_from_manual_price(conn, result)
             matches.append(result)
 
     mark_polled(conn, item.id)

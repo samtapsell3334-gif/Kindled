@@ -7,6 +7,9 @@ Command-line entry point.
     python -m kestrel watchlist enable|disable|remove <id>
     python -m kestrel watchlist set-threshold <id> 0.25
     python -m kestrel watchlist set-price <id> 12.50
+    python -m kestrel watchlist grade-price set <id> PSA 9 120.00
+    python -m kestrel watchlist grade-price list <id>
+    python -m kestrel watchlist grade-price remove <id> PSA 9
     python -m kestrel poll        # one cycle — good for cron
     python -m kestrel run         # loop forever, sleeping between cycles
     python -m kestrel alerts unreviewed          # what's new since the last review pass
@@ -28,6 +31,7 @@ from kestrel.alerts import get_alert, list_best, list_unreviewed, mark_reviewed
 from kestrel.config import CONFIG
 from kestrel.db import get_connection, init_db
 from kestrel.ebay_client import EbayClient
+from kestrel.grading import list_graded_prices, remove_graded_price, set_graded_price
 from kestrel.models import PriceSource, ReviewVerdict, Tier
 from kestrel.poller import run_poll_cycle
 from kestrel.watchlist import (
@@ -133,6 +137,39 @@ def _cmd_watchlist_set_price(args: argparse.Namespace) -> None:
     with get_connection(CONFIG.db_path) as conn:
         set_manual_market_price(conn, args.id, price)
     print(f"Row {args.id}: manual_market_price set to {price}")
+
+
+def _cmd_watchlist_grade_price_set(args: argparse.Namespace) -> None:
+    try:
+        grade = Decimal(args.grade)
+        price = Decimal(args.price)
+    except InvalidOperation:
+        print(f"error: invalid grade {args.grade!r} or price {args.price!r}", file=sys.stderr)
+        sys.exit(1)
+    with get_connection(CONFIG.db_path) as conn:
+        set_graded_price(conn, args.id, args.company, grade, price)
+    print(f"Row {args.id}: {args.company.upper()} {grade} = £{price}")
+
+
+def _cmd_watchlist_grade_price_list(args: argparse.Namespace) -> None:
+    with get_connection(CONFIG.db_path) as conn:
+        rows = list_graded_prices(conn, args.id)
+    if not rows:
+        print("(no graded prices set for this row)")
+        return
+    for row in rows:
+        print(f"  {row.grading_company} {row.grade} = £{row.price_gbp}")
+
+
+def _cmd_watchlist_grade_price_remove(args: argparse.Namespace) -> None:
+    try:
+        grade = Decimal(args.grade)
+    except InvalidOperation:
+        print(f"error: invalid grade {args.grade!r}", file=sys.stderr)
+        sys.exit(1)
+    with get_connection(CONFIG.db_path) as conn:
+        remove_graded_price(conn, args.id, args.company, grade)
+    print(f"Row {args.id}: removed {args.company.upper()} {grade}")
 
 
 def _cmd_watchlist_disable(args: argparse.Namespace) -> None:
@@ -260,6 +297,28 @@ def build_parser() -> argparse.ArgumentParser:
     set_price.add_argument("id", type=int)
     set_price.add_argument("price")
     set_price.set_defaults(func=_cmd_watchlist_set_price)
+
+    grade_price = watchlist_sub.add_parser(
+        "grade-price", help="Manual per-grade market prices for this row (see kestrel/grading.py)"
+    )
+    grade_price_sub = grade_price.add_subparsers(dest="grade_price_command", required=True)
+
+    gp_set = grade_price_sub.add_parser("set", help="Set/update the price for one grade")
+    gp_set.add_argument("id", type=int)
+    gp_set.add_argument("company", help="PSA, BGS, CGC, SGC, or ACE")
+    gp_set.add_argument("grade", help="e.g. 9, 9.5, 10")
+    gp_set.add_argument("price", help="What this exact card at that exact grade is worth, in GBP")
+    gp_set.set_defaults(func=_cmd_watchlist_grade_price_set)
+
+    gp_list = grade_price_sub.add_parser("list", help="List graded prices set for this row")
+    gp_list.add_argument("id", type=int)
+    gp_list.set_defaults(func=_cmd_watchlist_grade_price_list)
+
+    gp_remove = grade_price_sub.add_parser("remove", help="Remove a graded price")
+    gp_remove.add_argument("id", type=int)
+    gp_remove.add_argument("company")
+    gp_remove.add_argument("grade")
+    gp_remove.set_defaults(func=_cmd_watchlist_grade_price_remove)
 
     sub.add_parser("poll", help="Run a single poll cycle (use with cron)").set_defaults(func=_cmd_poll)
     sub.add_parser("run", help="Loop forever, polling every POLL_INTERVAL_SECONDS").set_defaults(func=_cmd_run)

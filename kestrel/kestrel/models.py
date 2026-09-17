@@ -75,6 +75,30 @@ class EbayListing:
 
 
 @dataclass
+class DetectedGrade:
+    """A graded-card mention read out of free text (a title, or eBay's
+    condition field) -- e.g. ("PSA", 9). See kestrel/grading.py."""
+
+    company: str
+    grade: Decimal
+
+
+@dataclass
+class GradedPrice:
+    """One row of a manual per-grade price table for a watchlist item --
+    what that exact card is worth at that exact grade, entered by hand
+    since no API-legal source returns real per-grade pricing (see
+    kestrel/grading.py for why)."""
+
+    id: int
+    watchlist_id: int
+    grading_company: str
+    grade: Decimal
+    price_gbp: Decimal
+    created_at: datetime
+
+
+@dataclass
 class MatchResult:
     listing: EbayListing
     watchlist_item: WatchlistItem
@@ -91,6 +115,13 @@ class MatchResult:
     # Purely informational: doesn't affect whether this counted as a match.
     estimated_net_profit_gbp: Decimal = Decimal("0")
     net_breakeven_cap_gbp: Decimal = Decimal("0")
+    # Grade-aware comparison -- set only when a grade was detected in the
+    # title/condition text AND a manual price for that exact grade exists
+    # on this watchlist row (kestrel/grading.py). None/None/None otherwise,
+    # meaning: no grade comparison available, fall back to discount_pct.
+    detected_grade: DetectedGrade | None = None
+    graded_market_price_gbp: Decimal | None = None
+    graded_discount_pct: Decimal | None = None
 
 
 @dataclass
