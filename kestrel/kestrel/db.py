@@ -21,6 +21,8 @@ SQLite schema and connection helper.
 - `graded_prices` — manual per-grade market prices ("this row's card, PSA 9,
                    is worth £120"), keyed per watchlist row. See
                    kestrel/grading.py for why this is manual, not API-sourced.
+- `purchases`   — cards actually bought, the "what do I need to list this
+                   at to sell it" inventory. See kestrel/purchases.py.
 
 All money is stored as TEXT and parsed back into `decimal.Decimal` — sqlite
 has no fixed-point type, and round-tripping through REAL/float would defeat
@@ -109,11 +111,34 @@ CREATE TABLE IF NOT EXISTS graded_prices (
     UNIQUE(watchlist_id, grading_company, grade)
 );
 
+-- Cards actually bought -- the "what do I need to list this at to sell it"
+-- inventory. alert_id links back to the alert that surfaced it when there
+-- was one; manual purchases (not sourced from a Kestrel alert) leave it
+-- NULL. Market rate and suggested list price are deliberately NOT stored
+-- here -- they're refreshed live from the pricing APIs each time the sheet
+-- is generated, since a stored price would just go stale. See
+-- kestrel/purchases.py.
+CREATE TABLE IF NOT EXISTS purchases (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    alert_id            INTEGER REFERENCES alerts(id),
+    card_name           TEXT NOT NULL,
+    game                TEXT NOT NULL,
+    set_name            TEXT,
+    card_number         TEXT,
+    bought_price_gbp    TEXT NOT NULL,
+    bought_at           TEXT NOT NULL,
+    status              TEXT NOT NULL DEFAULT 'to_list' CHECK (status IN ('to_list', 'listed', 'sold')),
+    listed_price_gbp    TEXT,
+    sold_price_gbp      TEXT,
+    notes               TEXT
+);
+
 CREATE INDEX IF NOT EXISTS idx_watchlist_active ON watchlist(active);
 CREATE INDEX IF NOT EXISTS idx_seen_items_watchlist ON seen_items(watchlist_id);
 CREATE INDEX IF NOT EXISTS idx_alerts_reviewed_at ON alerts(reviewed_at);
 CREATE INDEX IF NOT EXISTS idx_alerts_watchlist ON alerts(watchlist_id);
 CREATE INDEX IF NOT EXISTS idx_graded_prices_watchlist ON graded_prices(watchlist_id);
+CREATE INDEX IF NOT EXISTS idx_purchases_status ON purchases(status);
 """
 
 

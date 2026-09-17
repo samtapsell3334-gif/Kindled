@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-181 tests cover the matcher (discount/cap math, postage inclusion, auction
+194 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion and the
 Yu-Gi-Oh set-specific-vs-generic-price logic), the eBay client (token
@@ -336,6 +336,39 @@ needs a real look, mine or yours, on request (`alerts unreviewed` /
 value, they're also the ones most worth spending that manual review on —
 a plausible-looking high grade is exactly the kind of claim worth a second
 look before trusting the number.
+
+## Purchases: the "what do I need to list this at" inventory
+
+Separate from alerts (a candidate to maybe buy) and the review workflow
+(is this real): a purchase is money already spent. Once you tell me what
+you bought, it gets logged here.
+
+```bash
+python -m kestrel purchases add-from-alert <alert_id> <price_paid>   # pulls card identity from the alert's watchlist row
+python -m kestrel purchases add --card-name ... --game ... --price ...  # manual, no source alert
+python -m kestrel purchases list [--status to_list|listed|sold]
+python -m kestrel purchases mark-listed <id> <price>
+python -m kestrel purchases mark-sold <id> <price>
+```
+
+The "master sheet" is generated fresh, not stored: `kestrel/scripts/export_sell_sheet.py`
+re-fetches each purchase's **live** market rate at export time (bypassing
+`price_cache` deliberately — a handful of one-off "what's this worth now"
+checks isn't worth adding staleness for) and computes a suggested list
+price and estimated profit using the same fee/postage assumptions the
+buying side uses. Confirmed live end-to-end, including retrying through
+pokemontcg.io's characteristic transient 500/502s (same fix pattern as the
+seed scripts) rather than reporting "no rate" on what's usually a blip.
+
+```bash
+python -m kestrel.scripts.export_sell_sheet [output_path]
+```
+
+Same caveat as the vintage watchlist's reference prices applies here too:
+the market rate shown is whichever Cardmarket/TCGplayer field the pricing
+module prefers (trendPrice for Pokemon), which can run high for some
+cards — sanity-check against the card's other price signals before
+actually listing at the suggested figure.
 
 ## Design decisions and things worth flagging
 

@@ -29,6 +29,12 @@ class ReviewVerdict(str, Enum):
     REJECTED = "rejected"
 
 
+class PurchaseStatus(str, Enum):
+    TO_LIST = "to_list"
+    LISTED = "listed"
+    SOLD = "sold"
+
+
 @dataclass
 class WatchlistItem:
     id: int
@@ -171,3 +177,24 @@ class AlertRecord:
     reviewed_at: datetime | None
     review_verdict: ReviewVerdict | None
     review_notes: str | None
+
+
+@dataclass
+class Purchase:
+    """A card actually bought -- the inventory record behind "what do I need
+    to list this at to sell it." alert_id links back to the alert that
+    surfaced it, when there was one (manual purchases have none). See
+    kestrel/purchases.py."""
+
+    id: int
+    alert_id: int | None
+    card_name: str
+    game: str
+    set_name: str | None
+    card_number: str | None
+    bought_price_gbp: Decimal
+    bought_at: datetime
+    status: PurchaseStatus
+    listed_price_gbp: Decimal | None
+    sold_price_gbp: Decimal | None
+    notes: str | None

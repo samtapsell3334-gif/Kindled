@@ -16,6 +16,11 @@ Command-line entry point.
     python -m kestrel alerts unreviewed          # what's new since the last review pass
     python -m kestrel alerts mark <id> looks_good --notes "..."
     python -m kestrel alerts best [--limit 10]   # ranked, reviewed, not-rejected
+    python -m kestrel purchases add-from-alert <alert_id> <price_paid> [--notes "..."]
+    python -m kestrel purchases add --card-name ... --game ... --price ... [--set-name ...] [--card-number ...]
+    python -m kestrel purchases list [--status to_list|listed|sold]
+    python -m kestrel purchases mark-listed <id> <price>
+    python -m kestrel purchases mark-sold <id> <price>
 """
 
 from __future__ import annotations
@@ -33,8 +38,9 @@ from kestrel.config import CONFIG
 from kestrel.db import get_connection, init_db
 from kestrel.ebay_client import EbayClient
 from kestrel.grading import list_graded_prices, remove_graded_price, set_graded_price
-from kestrel.models import PriceSource, ReviewVerdict, Tier
+from kestrel.models import PriceSource, PurchaseStatus, ReviewVerdict, Tier
 from kestrel.poller import run_poll_cycle
+from kestrel.purchases import add_purchase, add_purchase_from_alert, list_purchases, mark_listed, mark_sold
 from kestrel.watchlist import (
     add_item,
     delete_item,
@@ -260,6 +266,89 @@ def _cmd_alerts_best(args: argparse.Namespace) -> None:
             print(f"       notes: {row.review_notes}")
 
 
+def _format_purchase_row(p) -> str:
+    parts = [f"[{p.id:>4}] {p.status.value:8} {p.card_name}"]
+    if p.set_name:
+        parts.append(f"({p.set_name} {p.card_number or ''})".strip())
+    parts.append(f"bought £{p.bought_price_gbp}")
+    if p.listed_price_gbp is not None:
+        parts.append(f"listed £{p.listed_price_gbp}")
+    if p.sold_price_gbp is not None:
+        parts.append(f"sold £{p.sold_price_gbp}")
+    if p.notes:
+        parts.append(f"— {p.notes}")
+    return " ".join(parts)
+
+
+def _cmd_purchases_add_from_alert(args: argparse.Namespace) -> None:
+    try:
+        price = Decimal(args.price)
+    except InvalidOperation:
+        print(f"error: invalid price {args.price!r}", file=sys.stderr)
+        sys.exit(1)
+    init_db(CONFIG.db_path)
+    with get_connection(CONFIG.db_path) as conn:
+        try:
+            purchase_id = add_purchase_from_alert(conn, args.alert_id, price, notes=args.notes)
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            sys.exit(1)
+    print(f"Logged purchase {purchase_id} from alert {args.alert_id}: £{price}")
+
+
+def _cmd_purchases_add(args: argparse.Namespace) -> None:
+    try:
+        price = Decimal(args.price)
+    except InvalidOperation:
+        print(f"error: invalid price {args.price!r}", file=sys.stderr)
+        sys.exit(1)
+    init_db(CONFIG.db_path)
+    with get_connection(CONFIG.db_path) as conn:
+        purchase_id = add_purchase(
+            conn,
+            card_name=args.card_name,
+            game=args.game,
+            set_name=args.set_name,
+            card_number=args.card_number,
+            bought_price_gbp=price,
+            notes=args.notes,
+        )
+    print(f"Logged purchase {purchase_id}: {args.card_name} £{price}")
+
+
+def _cmd_purchases_list(args: argparse.Namespace) -> None:
+    status = PurchaseStatus(args.status) if args.status else None
+    with get_connection(CONFIG.db_path) as conn:
+        rows = list_purchases(conn, status=status)
+    if not rows:
+        print("(no purchases logged yet)")
+        return
+    for row in rows:
+        print(_format_purchase_row(row))
+
+
+def _cmd_purchases_mark_listed(args: argparse.Namespace) -> None:
+    try:
+        price = Decimal(args.price)
+    except InvalidOperation:
+        print(f"error: invalid price {args.price!r}", file=sys.stderr)
+        sys.exit(1)
+    with get_connection(CONFIG.db_path) as conn:
+        mark_listed(conn, args.id, price)
+    print(f"Purchase {args.id} marked listed at £{price}")
+
+
+def _cmd_purchases_mark_sold(args: argparse.Namespace) -> None:
+    try:
+        price = Decimal(args.price)
+    except InvalidOperation:
+        print(f"error: invalid price {args.price!r}", file=sys.stderr)
+        sys.exit(1)
+    with get_connection(CONFIG.db_path) as conn:
+        mark_sold(conn, args.id, price)
+    print(f"Purchase {args.id} marked sold at £{price}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="kestrel", description="Local eBay UK trading card deal scanner")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -352,6 +441,38 @@ def build_parser() -> argparse.ArgumentParser:
     best = alerts_sub.add_parser("best", help="Reviewed, not-rejected alerts ranked by estimated net profit")
     best.add_argument("--limit", type=int, default=10)
     best.set_defaults(func=_cmd_alerts_best)
+
+    purchases = sub.add_parser("purchases", help="Cards actually bought -- the 'what to list it at' inventory")
+    purchases_sub = purchases.add_subparsers(dest="purchases_command", required=True)
+
+    add_from_alert = purchases_sub.add_parser("add-from-alert", help="Log a purchase, pulling card identity from an alert")
+    add_from_alert.add_argument("alert_id", type=int)
+    add_from_alert.add_argument("price", help="What you actually paid, in GBP")
+    add_from_alert.add_argument("--notes", default=None)
+    add_from_alert.set_defaults(func=_cmd_purchases_add_from_alert)
+
+    add_manual = purchases_sub.add_parser("add", help="Log a purchase manually (no source alert)")
+    add_manual.add_argument("--card-name", required=True)
+    add_manual.add_argument("--game", required=True)
+    add_manual.add_argument("--set-name", default=None)
+    add_manual.add_argument("--card-number", default=None)
+    add_manual.add_argument("--price", required=True, help="What you actually paid, in GBP")
+    add_manual.add_argument("--notes", default=None)
+    add_manual.set_defaults(func=_cmd_purchases_add)
+
+    list_purchases_parser = purchases_sub.add_parser("list", help="List logged purchases")
+    list_purchases_parser.add_argument("--status", choices=[s.value for s in PurchaseStatus], default=None)
+    list_purchases_parser.set_defaults(func=_cmd_purchases_list)
+
+    mark_listed_parser = purchases_sub.add_parser("mark-listed", help="Record the price you actually listed it at")
+    mark_listed_parser.add_argument("id", type=int)
+    mark_listed_parser.add_argument("price")
+    mark_listed_parser.set_defaults(func=_cmd_purchases_mark_listed)
+
+    mark_sold_parser = purchases_sub.add_parser("mark-sold", help="Record the price it actually sold for")
+    mark_sold_parser.add_argument("id", type=int)
+    mark_sold_parser.add_argument("price")
+    mark_sold_parser.set_defaults(func=_cmd_purchases_mark_sold)
 
     return parser
 
