@@ -12,6 +12,7 @@ from kestrel.watchlist import (
     mark_polled,
     set_active,
     set_discount_threshold,
+    set_exclude_terms,
     set_manual_market_price,
 )
 
@@ -194,3 +195,21 @@ def test_set_manual_market_price_updates_the_row(conn):
     )
     set_manual_market_price(conn, item_id, Decimal("15.50"))
     assert get_item(conn, item_id).manual_market_price == Decimal("15.50")
+
+
+def test_set_exclude_terms_updates_the_row(conn):
+    item_id = add_item(
+        conn,
+        game="pokemon",
+        card_name="Pikachu",
+        set_name=None,
+        card_number=None,
+        price_source=PriceSource.API,
+        manual_market_price=None,
+        discount_threshold=Decimal("0.40"),
+        search_terms="pikachu",
+        exclude_terms="proxy",
+        tier=Tier.STANDARD,
+    )
+    set_exclude_terms(conn, item_id, "proxy,custom,french,german")
+    assert get_item(conn, item_id).exclude_terms == "proxy,custom,french,german"

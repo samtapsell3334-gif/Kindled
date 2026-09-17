@@ -14,6 +14,7 @@ from kestrel.matcher import (
     title_is_excluded,
     title_matches_card_name,
     title_matches_printing,
+    with_non_english_guard,
 )
 from kestrel.models import EbayListing, ListingType, PriceSource, Tier, WatchlistItem
 
@@ -130,6 +131,44 @@ class TestTitleExclusion:
 
     def test_empty_terms_never_excludes(self):
         assert not title_is_excluded("anything", [])
+
+
+class TestNonEnglishGuard:
+    """title_matches_card_name only checks the English name is present
+    somewhere in the title -- a bilingual listing like "Charizard 4/102
+    Glurak Base Set DE" still passes that check, so a foreign-language
+    print needs its own guard via exclude_terms."""
+
+    def test_appends_guard_terms_to_existing_exclude_terms(self):
+        merged = with_non_english_guard("proxy,custom")
+        terms = merged.split(",")
+        assert terms[:2] == ["proxy", "custom"]
+        assert "french" in terms
+        assert "(jp)" in terms
+
+    def test_does_not_duplicate_a_guard_term_already_present(self):
+        merged = with_non_english_guard("proxy,French")
+        terms = [t.lower() for t in merged.split(",")]
+        assert terms.count("french") == 1
+
+    def test_empty_exclude_terms_still_gets_the_guard(self):
+        merged = with_non_english_guard("")
+        assert "german" in merged.split(",")
+
+    def test_guard_actually_excludes_a_foreign_listing(self):
+        exclude_terms = with_non_english_guard("proxy").split(",")
+        assert title_is_excluded("Charizard 4/102 Glurak Base Set German Print Holo", exclude_terms)
+
+    def test_guard_never_excludes_a_plain_english_listing(self):
+        exclude_terms = with_non_english_guard("proxy").split(",")
+        assert not title_is_excluded("Charizard 4/102 Base Set Holo Near Mint", exclude_terms)
+
+    def test_guard_does_not_falsely_exclude_common_english_words(self):
+        # The whole reason bare 2-letter codes ("fr", "de") aren't used --
+        # they'd substring-match ordinary English words and silently
+        # exclude huge numbers of genuine listings.
+        exclude_terms = with_non_english_guard("").split(",")
+        assert not title_is_excluded("Card shipped from the UK, a great deal", exclude_terms)
 
 
 class TestTitleMatchesCardName:

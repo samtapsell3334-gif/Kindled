@@ -73,6 +73,43 @@ def title_is_excluded(title: str, exclude_terms: list[str]) -> bool:
     return any(term in lowered for term in exclude_terms if term)
 
 
+# Common markers for a non-English printing on a cross-listed EU/Asia
+# listing -- both Pokemon and Yu-Gi-Oh have wide multi-language reprints,
+# and title_matches_card_name() only checks the English card name appears
+# somewhere in the title, not that the physical card is the English print
+# (a bilingual listing like "Charizard 4/102 Glurak Base Set DE" still
+# passes that check). A foreign-language copy is a different, usually
+# less valuable, print of "the same" card, so it's excluded the same way
+# condition/scam terms are. Full words and bracket tags only, deliberately
+# never bare 2-letter codes ("fr", "de") -- those would substring-match
+# "from"/"deal" and silently exclude huge numbers of genuine English
+# listings, which is a worse failure than occasionally missing a
+# foreign-language listing that doesn't label itself.
+NON_ENGLISH_GUARD_TERMS = [
+    "french", "français", "francais",
+    "german", "deutsch",
+    "italian", "italiano",
+    "spanish", "español", "espanol",
+    "japanese",
+    "korean",
+    "chinese",
+    "portuguese",
+    "dutch", "nederlands",
+    "polska",
+    "(fr)", "(de)", "(it)", "(es)", "(jp)", "(kr)", "(cn)", "(pt)", "(nl)", "(pl)",
+]
+
+
+def with_non_english_guard(exclude_terms: str) -> str:
+    """Append NON_ENGLISH_GUARD_TERMS to a row's comma-separated
+    exclude_terms, skipping any already present (case-insensitive) so this
+    is safe to re-apply to a row more than once."""
+    existing = [t.strip() for t in exclude_terms.split(",") if t.strip()]
+    existing_lower = {t.lower() for t in existing}
+    merged = existing + [t for t in NON_ENGLISH_GUARD_TERMS if t not in existing_lower]
+    return ",".join(merged)
+
+
 _PUNCTUATION_RE = re.compile(r"[\-|:/,.!\[\]()]+")
 _WHITESPACE_RE = re.compile(r"\s+")
 

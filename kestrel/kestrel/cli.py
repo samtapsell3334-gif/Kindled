@@ -7,6 +7,7 @@ Command-line entry point.
     python -m kestrel watchlist enable|disable|remove <id>
     python -m kestrel watchlist set-threshold <id> 0.25
     python -m kestrel watchlist set-price <id> 12.50
+    python -m kestrel watchlist set-exclude <id> "proxy,custom,lot,digital,french,german"
     python -m kestrel watchlist grade-price set <id> PSA 9 120.00
     python -m kestrel watchlist grade-price list <id>
     python -m kestrel watchlist grade-price remove <id> PSA 9
@@ -40,6 +41,7 @@ from kestrel.watchlist import (
     list_items,
     set_active,
     set_discount_threshold,
+    set_exclude_terms,
     set_manual_market_price,
 )
 
@@ -172,6 +174,12 @@ def _cmd_watchlist_grade_price_remove(args: argparse.Namespace) -> None:
     print(f"Row {args.id}: removed {args.company.upper()} {grade}")
 
 
+def _cmd_watchlist_set_exclude(args: argparse.Namespace) -> None:
+    with get_connection(CONFIG.db_path) as conn:
+        set_exclude_terms(conn, args.id, args.terms)
+    print(f"Row {args.id}: exclude_terms set to {args.terms!r}")
+
+
 def _cmd_watchlist_disable(args: argparse.Namespace) -> None:
     with get_connection(CONFIG.db_path) as conn:
         set_active(conn, args.id, False)
@@ -297,6 +305,11 @@ def build_parser() -> argparse.ArgumentParser:
     set_price.add_argument("id", type=int)
     set_price.add_argument("price")
     set_price.set_defaults(func=_cmd_watchlist_set_price)
+
+    set_exclude = watchlist_sub.add_parser("set-exclude", help="Replace a row's comma-separated exclude_terms")
+    set_exclude.add_argument("id", type=int)
+    set_exclude.add_argument("terms", help='e.g. "proxy,custom,lot,digital,french,german"')
+    set_exclude.set_defaults(func=_cmd_watchlist_set_exclude)
 
     grade_price = watchlist_sub.add_parser(
         "grade-price", help="Manual per-grade market prices for this row (see kestrel/grading.py)"

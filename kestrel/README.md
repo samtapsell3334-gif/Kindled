@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-145 tests cover the matcher (discount/cap math, postage inclusion, auction
+152 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion and the
 Yu-Gi-Oh set-specific-vs-generic-price logic), the eBay client (token
@@ -201,6 +201,20 @@ top-39 LOB / top-40 Metal Raiders / top-40 Pharaoh's Servant by real
 set-specific price, excluding anything over £500 raw, `exclude_terms`
 including `unlimited` to bias away from non-first-edition listings.
 Idempotent — safe to re-run after tweaking the set list or the £500 cap.
+
+**English only, per the brief**: `title_matches_card_name()` only checks
+that the English card name appears somewhere in the title — it doesn't
+check the physical card is the English print, and both Pokemon and Yu-Gi-Oh
+have wide multi-language reprints cross-listed on eBay UK (a bilingual
+title like "Charizard 4/102 Glurak Base Set DE" still passes that check).
+`matcher.with_non_english_guard()` appends French/German/Italian/Spanish/
+Japanese/Korean/Chinese/Portuguese/Dutch/Polish markers (full words and
+`(XX)` bracket tags only — deliberately never bare 2-letter codes like "fr"
+or "de", which would substring-match "from"/"deal" and silently exclude
+huge numbers of genuine English listings) to a row's `exclude_terms`.
+Applied to all 131 live rows, and baked into the seed script for future
+runs. Not bulletproof — a foreign listing that doesn't label its language
+at all won't be caught — but a real improvement over no check at all.
 
 The equivalent Pokemon pass (Base Set 1st Edition, Base Set, Jungle,
 Fossil, Gym Heroes, Neo Genesis, Neo Destiny, 151, Ascended Heroes,

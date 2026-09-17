@@ -121,6 +121,14 @@ def set_manual_market_price(conn: sqlite3.Connection, item_id: int, price: Decim
     conn.commit()
 
 
+def set_exclude_terms(conn: sqlite3.Connection, item_id: int, exclude_terms: str) -> None:
+    conn.execute(
+        "UPDATE watchlist SET exclude_terms = ?, updated_at = ? WHERE id = ?",
+        (exclude_terms, datetime.now(timezone.utc).isoformat(), item_id),
+    )
+    conn.commit()
+
+
 def delete_item(conn: sqlite3.Connection, item_id: int) -> None:
     conn.execute("DELETE FROM watchlist WHERE id = ?", (item_id,))
     conn.commit()

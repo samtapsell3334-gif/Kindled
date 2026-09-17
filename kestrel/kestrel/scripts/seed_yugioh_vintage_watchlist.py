@@ -24,6 +24,7 @@ import requests
 
 from kestrel.config import CONFIG
 from kestrel.db import get_connection, init_db
+from kestrel.matcher import with_non_english_guard
 from kestrel.models import PriceSource, Tier
 from kestrel.pricing.yugioh import _PLAIN_SET_CODE_RE
 from kestrel.watchlist import add_item, list_items
@@ -38,7 +39,11 @@ SETS: list[tuple[str, int]] = [
 # Per the brief: no raw card over this, in GBP.
 MAX_RAW_PRICE_GBP = Decimal("500")
 
-EXCLUDE_TERMS = "proxy,custom,lot,digital,playmat,unlimited"
+# English-only, per the brief: with_non_english_guard() appends the
+# French/German/Italian/etc. markers a cross-listed foreign print's title
+# tends to carry (see kestrel/matcher.py for why bare 2-letter codes aren't
+# used — too many false-positive collisions with ordinary English words).
+EXCLUDE_TERMS = with_non_english_guard("proxy,custom,lot,digital,playmat,unlimited")
 
 
 def _pick_set_entry(card: dict, set_name: str) -> dict | None:
