@@ -103,6 +103,24 @@ def set_active(conn: sqlite3.Connection, item_id: int, active: bool) -> None:
     conn.commit()
 
 
+def set_discount_threshold(conn: sqlite3.Connection, item_id: int, threshold: Decimal) -> None:
+    if threshold < 0 or threshold >= 1:
+        raise ValueError("discount_threshold must be between 0 and 1 (exclusive of 1) — e.g. 0.25 for 25%")
+    conn.execute(
+        "UPDATE watchlist SET discount_threshold = ?, updated_at = ? WHERE id = ?",
+        (str(threshold), datetime.now(timezone.utc).isoformat(), item_id),
+    )
+    conn.commit()
+
+
+def set_manual_market_price(conn: sqlite3.Connection, item_id: int, price: Decimal) -> None:
+    conn.execute(
+        "UPDATE watchlist SET manual_market_price = ?, updated_at = ? WHERE id = ?",
+        (str(price), datetime.now(timezone.utc).isoformat(), item_id),
+    )
+    conn.commit()
+
+
 def delete_item(conn: sqlite3.Connection, item_id: int) -> None:
     conn.execute("DELETE FROM watchlist WHERE id = ?", (item_id,))
     conn.commit()

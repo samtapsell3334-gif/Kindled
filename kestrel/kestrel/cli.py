@@ -5,6 +5,8 @@ Command-line entry point.
     python -m kestrel watchlist add ...
     python -m kestrel watchlist list
     python -m kestrel watchlist enable|disable|remove <id>
+    python -m kestrel watchlist set-threshold <id> 0.25
+    python -m kestrel watchlist set-price <id> 12.50
     python -m kestrel poll        # one cycle — good for cron
     python -m kestrel run         # loop forever, sleeping between cycles
 """
@@ -24,7 +26,14 @@ from kestrel.db import get_connection, init_db
 from kestrel.ebay_client import EbayClient
 from kestrel.models import PriceSource, Tier
 from kestrel.poller import run_poll_cycle
-from kestrel.watchlist import add_item, delete_item, list_items, set_active
+from kestrel.watchlist import (
+    add_item,
+    delete_item,
+    list_items,
+    set_active,
+    set_discount_threshold,
+    set_manual_market_price,
+)
 
 
 def _configure_logging() -> None:
@@ -100,6 +109,28 @@ def _cmd_watchlist_enable(args: argparse.Namespace) -> None:
     print(f"Enabled row {args.id}")
 
 
+def _cmd_watchlist_set_threshold(args: argparse.Namespace) -> None:
+    try:
+        threshold = Decimal(args.threshold)
+    except InvalidOperation:
+        print(f"error: invalid threshold {args.threshold!r}", file=sys.stderr)
+        sys.exit(1)
+    with get_connection(CONFIG.db_path) as conn:
+        set_discount_threshold(conn, args.id, threshold)
+    print(f"Row {args.id}: discount_threshold set to {threshold}")
+
+
+def _cmd_watchlist_set_price(args: argparse.Namespace) -> None:
+    try:
+        price = Decimal(args.price)
+    except InvalidOperation:
+        print(f"error: invalid price {args.price!r}", file=sys.stderr)
+        sys.exit(1)
+    with get_connection(CONFIG.db_path) as conn:
+        set_manual_market_price(conn, args.id, price)
+    print(f"Row {args.id}: manual_market_price set to {price}")
+
+
 def _cmd_watchlist_disable(args: argparse.Namespace) -> None:
     with get_connection(CONFIG.db_path) as conn:
         set_active(conn, args.id, False)
@@ -170,6 +201,16 @@ def build_parser() -> argparse.ArgumentParser:
     remove = watchlist_sub.add_parser("remove", help="Delete a row")
     remove.add_argument("id", type=int)
     remove.set_defaults(func=_cmd_watchlist_remove)
+
+    set_threshold = watchlist_sub.add_parser("set-threshold", help="Change a row's discount_threshold")
+    set_threshold.add_argument("id", type=int)
+    set_threshold.add_argument("threshold", help="e.g. 0.25 for 25%%")
+    set_threshold.set_defaults(func=_cmd_watchlist_set_threshold)
+
+    set_price = watchlist_sub.add_parser("set-price", help="Change a manual row's manual_market_price")
+    set_price.add_argument("id", type=int)
+    set_price.add_argument("price")
+    set_price.set_defaults(func=_cmd_watchlist_set_price)
 
     sub.add_parser("poll", help="Run a single poll cycle (use with cron)").set_defaults(func=_cmd_poll)
     sub.add_parser("run", help="Loop forever, polling every POLL_INTERVAL_SECONDS").set_defaults(func=_cmd_run)

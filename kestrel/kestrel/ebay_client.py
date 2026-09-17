@@ -161,7 +161,15 @@ class EbayClient:
     ) -> list[EbayListing]:
         now = now or datetime.now(timezone.utc)
         window_end = now + timedelta(minutes=window_minutes)
-        end_range = f"itemEndDate:[{_iso(now)}..{_iso(window_end)}]"
+        # End-only range, deliberately no lower bound: eBay rejects
+        # itemEndDate ranges whose start isn't strictly in the future
+        # (errorId 12002, "filter value is invalid") -- and "now" is
+        # already technically past by the time the request lands, even a
+        # few hundred ms later. An end-only bound (confirmed against the
+        # real API) captures anything ending before the cutoff; anything
+        # already-ended is filtered client-side in matcher.evaluate_listing
+        # via minutes_remaining, so nothing stale slips through.
+        end_range = f"itemEndDate:[..{_iso(window_end)}]"
         bid_range = f"bidCount:[0..{max_bid_count}]"
         params = {
             "q": search_terms,
@@ -174,8 +182,10 @@ class EbayClient:
 
 
 def _iso(dt: datetime) -> str:
-    """eBay expects UTC timestamps like 2026-09-14T20:00:00.000Z."""
-    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    """eBay expects UTC timestamps like 2026-09-14T20:00:00Z (verified against
+    the real API — a `.000` milliseconds suffix isn't required, and isn't
+    used here since it wasn't part of the confirmed-working format)."""
+    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _decimal_or_zero(raw: dict[str, Any] | None, key: str = "value") -> Decimal:

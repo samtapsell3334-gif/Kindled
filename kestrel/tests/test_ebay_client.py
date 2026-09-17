@@ -129,7 +129,24 @@ class TestFilterBuilding:
         filter_value = kwargs["params"]["filter"]
         assert "buyingOptions:{AUCTION}" in filter_value
         assert "bidCount:[0..2]" in filter_value
-        assert "itemEndDate:[2026-09-14T20:00:00.000Z..2026-09-14T20:10:00.000Z]" in filter_value
+        # End-only range, no lower bound (see ebay_client.search_auctions for
+        # why: eBay rejects a range whose start isn't strictly in the future,
+        # errorId 12002 — confirmed against the real production API).
+        assert "itemEndDate:[..2026-09-14T20:10:00Z]" in filter_value
+
+    def test_auction_search_end_date_has_no_lower_bound(self):
+        """Regression test: an itemEndDate range starting at "now" is silently
+        rejected by the real eBay API (errorId 12002) and the whole filter
+        gets dropped -- found by testing against production, not a guess."""
+        session = FakeSession(get_responses=[FakeResponse(200, {"itemSummaries": []})])
+        client = EbayClient(make_config(), session)
+
+        client.search_auctions("charizard", window_minutes=10, max_bid_count=2, now=NOW)
+
+        _, kwargs = session.get_calls[0]
+        filter_value = kwargs["params"]["filter"]
+        assert "itemEndDate:[.." in filter_value
+        assert "2026-09-14T20:00:00" not in filter_value  # the old (now) lower bound must be gone
 
     def test_buy_it_now_search_filters_fixed_price_only(self):
         session = FakeSession(get_responses=[FakeResponse(200, {"itemSummaries": []})])

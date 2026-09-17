@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-68 tests cover the matcher (discount/cap math, postage inclusion, auction
+72 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion), the
 eBay client (token caching, 429/5xx backoff, filter-string construction),
@@ -124,6 +124,22 @@ names:
   UI) before adding a row is the reliable way to get this right; an
   incorrect `set_name` doesn't error, it just silently returns zero
   results, which means the row never triggers.
+
+**eBay `itemEndDate` filter — the "future dates only" gotcha (found testing
+against the real production API, not sandbox).** A two-sided range with
+`now` as the lower bound (`itemEndDate:[<now>..<now+10min>]`) is silently
+rejected — eBay returns `errorId 12002 ("filter value is invalid")` in the
+response's `warnings` array and drops the whole filter, which means every
+auction search was quietly returning auctions ending *days* away instead of
+minutes, with no visible error. Root cause: eBay requires the range's start
+to be strictly in the future, and `now` is already technically past by the
+time the request lands on their servers. Fixed by using an **end-only**
+range (`itemEndDate:[..<now+10min>]`, no lower bound) — confirmed against
+production to return correctly-scoped, real near-term-ending auctions with
+zero warnings. Anything already ended is still caught and excluded
+client-side by `matcher.evaluate_listing`'s `minutes_remaining` check, so
+this was never a risk of alerting on a dead auction — just a risk of
+missing genuinely live ones by scanning the wrong 50.
 
 **eBay call-budgeting (added beyond the brief; watchlist expected to reach
 40+ rows).** Each watchlist check costs two Browse API calls (Buy It Now
