@@ -6,10 +6,12 @@ import pytest
 from kestrel.matcher import (
     discount_percentage,
     evaluate_listing,
+    guess_condition_hint,
     max_bid,
     quantize_money,
     title_is_excluded,
     title_matches_card_name,
+    title_matches_printing,
 )
 from kestrel.models import EbayListing, ListingType, PriceSource, Tier, WatchlistItem
 
@@ -132,6 +134,55 @@ class TestTitleMatchesCardName:
     def test_empty_card_name_never_blocks(self):
         # Defensive: a blank card_name shouldn't silently reject everything.
         assert title_matches_card_name("anything at all", "")
+
+
+class TestTitleMatchesPrinting:
+    """Regression coverage for a real finding: for common creature names
+    reprinted many times, a name-only check isn't enough. A row tracking
+    the £171 1999 Fossil Gengar (5/62) matched a £2.23 modern reprint
+    ("Gengar 050/088 130 HP") -- same name, completely different card and
+    price tier."""
+
+    def test_collector_format_number_matches(self):
+        assert title_matches_printing("Gengar 5/62 Fossil Holo Rare Unlimited", "5/62")
+
+    def test_numerator_only_in_title_still_matches(self):
+        # Sellers sometimes write just "#5" rather than the full "5/62".
+        assert title_matches_printing("Gengar Fossil Holo #5 Rare Card", "5/62")
+
+    def test_real_wrong_printing_is_rejected(self):
+        assert not title_matches_printing("Pokémon TCG Gengar 050/088 130 HP Holo Rare Card", "5/62")
+
+    def test_no_card_number_on_row_never_blocks(self):
+        # Yu-Gi-Oh rows have no card_number at all (see pricing/yugioh.py) --
+        # this check must be a no-op for them, not reject everything.
+        assert title_matches_printing("Ten Thousand Dragon BLAR-EN10K Secret Rare", None)
+        assert title_matches_printing("Ten Thousand Dragon BLAR-EN10K Secret Rare", "")
+
+
+class TestGuessConditionHint:
+    def test_graded_from_psa(self):
+        assert guess_condition_hint("1999 Pokemon Fossil Gengar PSA 9") == "graded"
+
+    def test_near_mint(self):
+        assert guess_condition_hint("Gengar 5/62 Fossil Holo Card NM") == "near mint"
+
+    def test_lightly_played(self):
+        assert guess_condition_hint("Gengar 5/62 Fossil Holo LP") == "lightly played"
+
+    def test_heavily_played(self):
+        assert guess_condition_hint("Gengar 5/62 Fossil Holo Card WOTC MP+") == "moderately played"
+
+    def test_damaged_takes_priority_over_heavily_played(self):
+        # "HP/DMG" -- damaged is the more severe, more accurate read, and is
+        # checked first for exactly that reason.
+        assert guess_condition_hint("Gengar 5/62 Fossil Holo Rare Pokemon HP/DMG") == "damaged"
+
+    def test_unstated_condition(self):
+        assert guess_condition_hint("Gengar 5/62 Holo Fossil") == "not stated"
+
+    def test_case_insensitive(self):
+        assert guess_condition_hint("GENGAR FOSSIL psa 8") == "graded"
 
 
 class TestEvaluateBuyItNow:

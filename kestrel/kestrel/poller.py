@@ -50,6 +50,7 @@ def print_match(match: MatchResult) -> None:
         f"  Market price:    GBP {match.market_price_gbp}",
         f"  Discount:        {match.discount_pct}% below market",
         f"  Max bid (cap):   GBP {match.max_bid_gbp}",
+        f"  Condition:       {match.condition_hint} (read from title, not authoritative — check the listing)",
     ]
     if listing.item_end_date:
         remaining = listing.item_end_date - datetime.now(timezone.utc)

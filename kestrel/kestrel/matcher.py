@@ -77,6 +77,83 @@ def title_matches_card_name(title: str, card_name: str) -> bool:
     return _normalize_for_match(card_name) in _normalize_for_match(title)
 
 
+def title_matches_printing(title: str, card_number: str | None) -> bool:
+    """
+    When the watchlist row has a card_number, require it (or its numerator,
+    since sellers write "5/62" but Pokemon's own catalog sometimes just
+    "5") to appear in the title too.
+
+    Found live: a card_name-only check isn't enough for common creature
+    names reprinted many times across a game's history. Searching "Gengar"
+    against a row tracking the £171 1999 Fossil Gengar (5/62) matched, and
+    passed the name check, a totally different modern reprint ("Gengar
+    050/088 130 HP") at £2.23 — the "130 HP" alone marks it as a modern
+    card the 1999 print never had. Without this, that reads as a 98%-off
+    deal instead of the wrong printing entirely. Only applies when
+    card_number is set — YGOPRODeck-priced rows have none (see README) and
+    always pass.
+    """
+    if not card_number or not card_number.strip():
+        return True
+    numerator = card_number.split("/", 1)[0].strip()
+    normalized_title = _normalize_for_match(title)
+
+    if _normalize_for_match(card_number) in normalized_title:
+        return True
+    # The numerator alone (e.g. "5") needs a digit-boundary check, not a
+    # plain substring one -- otherwise "5" matches inside "050" or "130"
+    # (exactly how the real 050/088 false positive above got through on a
+    # first pass). (?<!\d)...(?!\d) requires it not be glued to other digits.
+    return bool(re.search(rf"(?<!\d){re.escape(_normalize_for_match(numerator))}(?!\d)", normalized_title))
+
+
+# Keyword -> normalized condition label, checked in this order (most
+# specific/important first) against the title. eBay's own structured
+# `condition` field is useless for trading cards -- almost every listing is
+# "Ungraded" regardless of the card's actual physical grade -- so the title
+# is the only real signal, and only when a seller bothers to state it.
+_CONDITION_KEYWORDS: list[tuple[str, str]] = [
+    ("psa", "graded"),
+    ("bgs", "graded"),
+    ("cgc", "graded"),
+    ("ace grading", "graded"),
+    ("graded", "graded"),
+    ("damaged", "damaged"),
+    ("dmg", "damaged"),
+    ("poor", "damaged"),
+    ("heavily played", "heavily played"),
+    (" hp ", "heavily played"),  # spaced to avoid matching "hp" inside "50 hp" etc.
+    ("moderately played", "moderately played"),
+    ("mp+", "moderately played"),
+    (" mp ", "moderately played"),
+    ("lightly played", "lightly played"),
+    ("lp+", "lightly played"),
+    (" lp ", "lightly played"),
+    ("light wear", "lightly played"),
+    ("near mint", "near mint"),
+    (" nm ", "near mint"),
+    ("mint", "near mint"),
+    ("excellent", "excellent"),
+]
+
+
+def guess_condition_hint(title: str) -> str:
+    """
+    Best-effort condition read from the title text — never authoritative,
+    just enough to stop a bare discount % from hiding "this is a heavily
+    played copy" or "this is a professionally graded slab" (a different
+    market entirely) behind an eye-catching percentage. Returns "not
+    stated" when nothing recognizable is found, which is itself useful
+    information -- treat an unstated condition as a reason to look closer,
+    not as "presumably fine."
+    """
+    padded = f" {title.lower()} "
+    for keyword, label in _CONDITION_KEYWORDS:
+        if keyword in padded:
+            return label
+    return "not stated"
+
+
 def minutes_remaining(item_end_date: datetime, now: datetime | None = None) -> Decimal:
     now = now or datetime.now(timezone.utc)
     delta = item_end_date - now
@@ -105,6 +182,8 @@ def evaluate_listing(
         return None
     if not title_matches_card_name(listing.title, watchlist_item.card_name):
         return None
+    if not title_matches_printing(listing.title, watchlist_item.card_number):
+        return None
 
     cap = max_bid(market_price_gbp, watchlist_item.discount_threshold)
     total_price = listing.total_price
@@ -131,4 +210,5 @@ def evaluate_listing(
         market_price_gbp=market_price_gbp,
         max_bid_gbp=cap,
         discount_pct=discount_percentage(total_price, market_price_gbp),
+        condition_hint=guess_condition_hint(listing.title),
     )

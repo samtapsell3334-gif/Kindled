@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-72 tests cover the matcher (discount/cap math, postage inclusion, auction
+96 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion), the
 eBay client (token caching, 429/5xx backoff, filter-string construction),
@@ -140,6 +140,46 @@ zero warnings. Anything already ended is still caught and excluded
 client-side by `matcher.evaluate_listing`'s `minutes_remaining` check, so
 this was never a risk of alerting on a dead auction — just a risk of
 missing genuinely live ones by scanning the wrong 50.
+
+**Title matching is stricter than the brief specified — found because the
+first real watchlist batch was flooded with false "deals" (found testing
+against production, not sandbox).** eBay's `q` search does loose keyword
+matching, not exact-phrase matching, which surfaced two distinct failure
+modes once real cards were on the watchlist:
+- A search for "ten thousand dragon yugioh" matched "Manju of the Ten
+  Thousand Hands" — a different card entirely — at 1% of the real card's
+  price, because it shares two of three search words.
+- A row tracking the £171 1999 Fossil Gengar (5/62) matched a £2.23 modern
+  reprint ("Gengar 050/088 130 HP") — same name, completely different
+  printing and price tier, decades apart.
+
+`matcher.title_matches_card_name()` requires the card's actual name to
+appear in the listing title (punctuation/case-normalized, so "Ten-Thousand
+Dragon" still matches). `matcher.title_matches_printing()` additionally
+requires the card_number (or its numerator, with a digit-boundary check so
+"5" doesn't match inside "050") when the row has one — Yu-Gi-Oh rows don't,
+and always pass. Both run before the price comparison in
+`evaluate_listing()`. Neither is foolproof — a seller who mistitles a
+listing can still slip through — but they closed off the two concrete
+failure modes actually observed.
+
+**No condition awareness — found the same way, and it's not fully
+fixable.** A first real poll returned 20+ "deals" on one card, which turned
+out to mostly be genuine copies of the right printing sitting at very
+different prices — because eBay's structured `condition` field is useless
+for trading cards (nearly every listing is `Ungraded` regardless of actual
+grade), and the market price reference has no condition dimension at all.
+`matcher.guess_condition_hint()` does a best-effort keyword read of the
+title (PSA/BGS/CGC → `graded`, NM → `near mint`, LP → `lightly played`, HP
+or DMG → `damaged`/`heavily played`, prioritized roughly by severity, else
+`not stated`) and surfaces it on every alert (console and Telegram) so a
+big discount % next to a damaged or heavily-played copy doesn't read as a
+real deal. This is explicitly not authoritative — a seller who doesn't
+mention condition returns `not stated`, which should read as "look closer,"
+not "presumably fine." There's no way to properly correct the cap itself
+for condition without per-condition comp data, which is a further reason
+phase 3's closing-price log matters — it's the only route to real,
+condition-aware pricing over time.
 
 **eBay call-budgeting (added beyond the brief; watchlist expected to reach
 40+ rows).** Each watchlist check costs two Browse API calls (Buy It Now

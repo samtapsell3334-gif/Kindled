@@ -75,3 +75,8 @@ class MatchResult:
     market_price_gbp: Decimal
     max_bid_gbp: Decimal
     discount_pct: Decimal  # e.g. Decimal("42.50") meaning 42.50% below market
+    # Best-effort condition read from the listing title (eBay's structured
+    # `condition` field is useless for trading cards -- almost everything is
+    # "Ungraded" regardless of actual physical grade). See
+    # matcher.guess_condition_hint for what this can and can't tell you.
+    condition_hint: str = "not stated"
