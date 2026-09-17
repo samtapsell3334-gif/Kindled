@@ -79,7 +79,7 @@ Cron example (every 5 minutes, matching `POLL_INTERVAL_SECONDS`):
 python -m pytest -q
 ```
 
-170 tests cover the matcher (discount/cap math, postage inclusion, auction
+174 tests cover the matcher (discount/cap math, postage inclusion, auction
 window/bid-count rules, exclusion terms), the call-budgeting scheduler, the
 price cache, the two pricing sources (including currency conversion and the
 Yu-Gi-Oh set-specific-vs-generic-price logic), the eBay client (token
@@ -216,11 +216,51 @@ Applied to all 131 live rows, and baked into the seed script for future
 runs. Not bulletproof — a foreign listing that doesn't label its language
 at all won't be caught — but a real improvement over no check at all.
 
-The equivalent Pokemon pass (Base Set 1st Edition, Base Set, Jungle,
-Fossil, Gym Heroes, Neo Genesis, Neo Destiny, 151, Ascended Heroes,
-Prismatic Evolutions, Surging Sparks, Evolving Skies, Legendary Collection)
-is still pending — pokemontcg.io's API was down (site up, API 500/502)
-when this was built.
+The equivalent Pokemon pass — `kestrel/scripts/seed_pokemon_vintage_watchlist.py`
+— is done: top-40 cards (Pokemon-supertype only, Energy/Trainer excluded
+per the brief) from Base Set, Jungle, Fossil, Gym Heroes, Neo Genesis, Neo
+Destiny, 151, Prismatic Evolutions, Surging Sparks, Evolving Skies, and
+Legendary Collection — 354 new rows, 485 active rows total, comfortably
+inside the eBay call budget (1125 rows/cycle capacity). "Ascended Heroes"
+was dropped — not a real Pokemon TCG set in pokemontcg.io's database, and
+never confirmed by the user as anything else.
+
+**"Base Set 1st Edition" and "Base Set" collapse into one set.** Checked
+live against the entire Base Set: `tcgplayer.prices` only ever has
+`holofoil`/`normal` keys, never a `1stEditionHolofoil` or similar —
+pokemontcg.io has no edition-specific pricing split at all (unlike
+Yu-Gi-Oh's YGOPRODeck, which does). The reference price is therefore
+blended across both editions, and likely skewed toward the far more common
+Unlimited copies — meaning it will tend to **undervalue** a genuine 1st
+Edition listing, the same safe-direction bias (missed deals over false
+positives) as the Yu-Gi-Oh vintage rows above. A real fix needs manual
+per-card 1st Edition pricing or a paid source like PriceCharting; neither
+is built.
+
+**A second real pricing gap found and fixed along the way**: brand-new
+sets can have `cardmarket: null` entirely — confirmed live, every single
+card in both Prismatic Evolutions and Surging Sparks had no Cardmarket
+(EUR) data at all, only `tcgplayer` (USD). Without a fallback, every card
+in a set like that would have silently never priced. `pricing/pokemon.py`
+now falls back to `tcgplayer.prices` (preferring holofoil, then
+reverseHolofoil, then normal) converted via `FX_USD_TO_GBP_RATE` when
+Cardmarket has nothing usable.
+
+**A live poll cycle surfaced a real caveat worth flagging plainly**: one
+cycle logged 289 alerts, ~40 of them for a single card (Machamp, Base Set)
+at prices from £8–£40 against a £97.05 reference. Checked 3 of the actual
+listings directly against eBay's item API — all genuinely described as
+authentic 1999 English Base Set cards, not reprints, so this wasn't a
+matching bug. The far more likely explanation is Cardmarket's reference
+price itself being inflated for that specific card (the same
+data-reliability issue as the documented 18x Charizard swing) rather than
+275 genuine simultaneous steals. Every one of those alerts scored 60% price
+confidence — correctly, since it was each card's first-ever fetch with
+nothing yet to cross-check it against (see "Make Offer and price
+confidence" below). Practical upshot: a freshly-added row's first alert is
+inherently less trustworthy than a repeat one, and a large batch of new
+rows can produce a real spike in alert (and Telegram) volume on its first
+poll — worth expecting, not a sign anything is broken.
 
 ## Make Offer and price confidence
 

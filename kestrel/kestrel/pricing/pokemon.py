@@ -6,6 +6,17 @@ pokemontcg.io doesn't return GBP. We prefer the `cardmarket` block (EUR,
 European secondary market — closer to a UK eBay comp than the US TCGplayer
 figures) and convert with the static FX_EUR_TO_GBP_RATE from config. See
 config.py for why this is a static rate rather than a live feed.
+
+Real gap found and fixed here: brand-new sets can have `cardmarket: null`
+entirely — confirmed live against the whole of Prismatic Evolutions and
+Surging Sparks (both released within the last year), where every single
+card came back with no cardmarket block at all, only `tcgplayer` (USD).
+Without a fallback, every card in a set like that silently prices as "no
+market price available" forever, the same class of quiet failure as the
+Yu-Gi-Oh generic-price bug (see pricing/yugioh.py). Falls back to
+`tcgplayer.prices` (any variant — normal/holofoil/reverseHolofoil/etc.,
+preferring holofoil since these are usually a set's holo-rarity chase
+cards) converted via FX_USD_TO_GBP_RATE when cardmarket has nothing usable.
 """
 
 from __future__ import annotations
@@ -18,6 +29,13 @@ import requests
 from kestrel.config import Config
 
 BASE_QUERY_FIELDS = ["cardmarket"]
+
+# Preference order when a card has more than one tcgplayer price variant —
+# holofoil/reverseHolofoil are usually a set's premium prints (what most
+# vintage 1st-Edition-era watchlist rows care about); "normal" is the
+# common/no-holo print. Neither is "the edition" — pokemontcg.io doesn't
+# split by print edition at all, see the seed script's own caveat.
+_TCGPLAYER_VARIANT_PREFERENCE = ("holofoil", "reverseHolofoil", "normal", "1stEditionHolofoil", "1stEditionNormal")
 
 
 def _build_query(card_name: str, set_name: str | None, card_number: str | None) -> str:
@@ -41,6 +59,24 @@ def _extract_price_eur(card: dict[str, Any]) -> Decimal | None:
         value = prices.get(field)
         if value:
             return Decimal(str(value))
+    return None
+
+
+def _extract_price_usd(card: dict[str, Any]) -> Decimal | None:
+    tcgplayer = card.get("tcgplayer") or {}
+    prices = tcgplayer.get("prices") or {}
+    if not prices:
+        return None
+
+    ordered_variants = [v for v in _TCGPLAYER_VARIANT_PREFERENCE if v in prices]
+    ordered_variants += [v for v in prices if v not in _TCGPLAYER_VARIANT_PREFERENCE]
+
+    for variant in ordered_variants:
+        entry = prices.get(variant) or {}
+        for field in ("market", "mid", "low"):
+            value = entry.get(field)
+            if value:
+                return Decimal(str(value))
     return None
 
 
@@ -68,8 +104,13 @@ def fetch_market_price_gbp(
     if not cards:
         return None
 
-    price_eur = _extract_price_eur(cards[0])
-    if price_eur is None:
-        return None
+    card = cards[0]
+    price_eur = _extract_price_eur(card)
+    if price_eur is not None:
+        return (price_eur * config.fx_eur_to_gbp).quantize(Decimal("0.01"))
 
-    return (price_eur * config.fx_eur_to_gbp).quantize(Decimal("0.01"))
+    price_usd = _extract_price_usd(card)
+    if price_usd is not None:
+        return (price_usd * config.fx_usd_to_gbp).quantize(Decimal("0.01"))
+
+    return None

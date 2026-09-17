@@ -64,6 +64,46 @@ class TestPokemonPricing:
         assert 'number:"4"' in kwargs["params"]["q"]
 
 
+class TestPokemonTcgplayerFallback:
+    """Regression coverage for a real finding: brand-new sets (checked live
+    against the whole of Prismatic Evolutions and Surging Sparks) can have
+    `cardmarket: null` entirely -- every card in the set would silently
+    never price without a fallback to tcgplayer (USD)."""
+
+    def test_falls_back_to_tcgplayer_when_cardmarket_is_null(self):
+        body = {"data": [{
+            "cardmarket": None,
+            "tcgplayer": {"prices": {"holofoil": {"market": 12.50}}},
+        }]}
+        session = FakeSession(FakeResponse(200, body))
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Pinsir", "Prismatic Evolutions", None)
+        assert price == Decimal("10.00")  # 12.50 * 0.80 (fx_usd_to_gbp)
+
+    def test_cardmarket_present_and_nonzero_wins_over_tcgplayer(self):
+        body = {"data": [{
+            "cardmarket": {"prices": {"trendPrice": 100.0}},
+            "tcgplayer": {"prices": {"holofoil": {"market": 999.0}}},
+        }]}
+        session = FakeSession(FakeResponse(200, body))
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Charizard", "Base", "4")
+        assert price == Decimal("85.00")  # 100.0 * 0.85 (fx_eur_to_gbp), not the tcgplayer figure
+
+    def test_prefers_holofoil_variant_over_normal(self):
+        body = {"data": [{
+            "cardmarket": None,
+            "tcgplayer": {"prices": {"normal": {"market": 1.00}, "holofoil": {"market": 50.00}}},
+        }]}
+        session = FakeSession(FakeResponse(200, body))
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Pinsir", None, None)
+        assert price == Decimal("40.00")  # 50.00 * 0.80, the holofoil variant
+
+    def test_no_price_data_anywhere_returns_none(self):
+        body = {"data": [{"cardmarket": None, "tcgplayer": None}]}
+        session = FakeSession(FakeResponse(200, body))
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Nonexistent", None, None)
+        assert price is None
+
+
 class TestYugiohPricing:
     def test_prefers_cardmarket_price_over_tcgplayer(self):
         body = {"data": [{"card_prices": [{"cardmarket_price": "20.00", "tcgplayer_price": "30.00"}]}]}
