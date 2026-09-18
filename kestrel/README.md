@@ -404,6 +404,21 @@ row's `manual_market_price` to the PriceCharting-verified figure (the same
 `price_source='manual'` mechanism already used for football cards with no
 usable price API).
 
+**A real gotcha found fixing two of these (Clefable, Bulbasaur) the "lighter"
+way first** — leaving `price_source='api'` and trusting the cardmarket-vs-
+tcgplayer sanity check alone, rather than pinning to manual. Both produced
+the exact same bad alert again on the next poll, because `get_market_price_gbp`
+checks `pricing.cache` (a 12-hour TTL keyed by card identity) *before* ever
+calling the pricing module — a stale cache entry written before the code fix
+shadows it completely until the entry naturally expires. Verifying a fix by
+calling `pricing.pokemon.fetch_market_price_gbp` directly (as done live for
+both cards) proves the function is fixed; it does **not** prove the next
+poll will use it. The reliable fix for a specific bad-priced row is what
+was used for all four originally: pin it to `price_source='manual'`, which
+bypasses the cache/API path entirely — and delete its stale
+`price_cache` row (`DELETE FROM price_cache WHERE cache_key = '<game>:<set>:<number>:<name>'`,
+all lowercase) so nothing else reads the old number in the meantime.
+
 ## Three refinements: slab pricing, currency display, seller trust
 
 Prompted by real questions after the vintage watchlist went live and
