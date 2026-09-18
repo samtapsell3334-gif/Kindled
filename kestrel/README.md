@@ -279,9 +279,8 @@ Yu-Gi-Oh's YGOPRODeck, which does). The reference price is therefore
 blended across both editions, and likely skewed toward the far more common
 Unlimited copies — meaning it will tend to **undervalue** a genuine 1st
 Edition listing, the same safe-direction bias (missed deals over false
-positives) as the Yu-Gi-Oh vintage rows above. A real fix needs manual
-per-card 1st Edition pricing or a paid source like PriceCharting; neither
-is built.
+positives) as the Yu-Gi-Oh vintage rows above. A real per-card fix needs
+manual 1st Edition pricing; not built.
 
 **A second real pricing gap found and fixed along the way**: brand-new
 sets can have `cardmarket: null` entirely — confirmed live, every single
@@ -335,6 +334,50 @@ flagged anomalous (≥3x swing vs. the last known price — the same real
 18x-swing bug documented above) overrides everything else and drops to 25.
 Read it as "how much extra scrutiny this alert's own number deserves," not
 as a probability of profit.
+
+## Real-sold-comp cross-check via PriceCharting
+
+Neither of the above fully closes the pricing-reliability gap — cardmarket
+and tcgplayer are both "trend"/reference prices, not sold comps, and
+`pricing/pokemon.py`'s cardmarket-vs-tcgplayer sanity check only catches a
+bad cardmarket number when tcgplayer *disagrees* with it. It can't catch
+the two sources quietly agreeing on the same bad number, which happened
+live: Raichu, Meowth, Dragonair, and a Yu-Gi-Oh card (Change of Heart, a
+different pricing pipeline entirely — `pricing/yugioh.py`) all had
+`market_price_gbp` 5x–64x their real value with no internal disagreement
+to flag it.
+
+eBay's own real sold-comp API (Marketplace Insights) isn't usable here —
+confirmed live, this account's OAuth credentials get a clean `400
+invalid_scope` requesting it; it's gated to approved partners. eBay's
+public sold-listings *webpage* is also blocked (403 to a direct fetch,
+same as the item-detail page — see "Images" section). 130point.com, a
+sold-comp aggregator built specifically for trading cards, is blocked too
+(403). **PriceCharting.com is fetchable directly** (no API key, robots.txt
+allows the price-guide pages) and publishes a real "Ungraded" price point
+per card, sourced from tracked sold listings — `pricing/pricecharting.py`
+resolves a card by browsing its set's console page
+(`/console/<set-slug>`) and matching by collector number, since
+PriceCharting's own `/search-products` endpoint is JS-rendered and returns
+nothing useful to a direct fetch.
+
+This is a **cross-check tool, not a wired-in pricing source** —
+`python -m kestrel alerts cross-check <id>` compares one alert's
+`market_price_gbp` against PriceCharting's live number and flags a >3x (or
+<1/3x) disagreement. It isn't run automatically on every poll for two
+reasons: (1) set-slug mapping is manual per set (`_POKEMON_SET_SLUGS` /
+`_YUGIOH_SET_SLUGS` in `pricing/pricecharting.py`) and only the sets this
+session actually checked are mapped so far; (2) it makes two page fetches
+per card with a polite delay between them, which doesn't scale to a full
+poll cycle across ~485 rows without real rate-limiting work. Confirmed
+live against the whole buy-list review that triggered building this: 11 of
+18 cards agreed with our own price within a reasonable band, 2 disagreed
+in the buyer's favour (PriceCharting *higher* — not a red flag, just an
+unresolved discrepancy), 2 disagreed enough to need a manual look, and 4
+were the confirmed-bad cases above, each fixed by pinning that watchlist
+row's `manual_market_price` to the PriceCharting-verified figure (the same
+`price_source='manual'` mechanism already used for football cards with no
+usable price API).
 
 ## Three refinements: slab pricing, currency display, seller trust
 

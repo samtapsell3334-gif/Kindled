@@ -46,6 +46,7 @@ from kestrel.purchases import add_purchase, add_purchase_from_alert, list_purcha
 from kestrel.watchlist import (
     add_item,
     delete_item,
+    get_item,
     list_items,
     set_active,
     set_discount_threshold,
@@ -274,6 +275,44 @@ def _cmd_alerts_best(args: argparse.Namespace) -> None:
             print(f"       notes: {row.review_notes}")
 
 
+def _cmd_alerts_cross_check(args: argparse.Namespace) -> None:
+    """Cross-check an alert's market_price_gbp against PriceCharting's real
+    Ungraded sold-comp price -- catches the class of bug where
+    pokemontcg.io's cardmarket AND tcgplayer feeds happen to agree on a
+    bad number (the pokemon.py sanity check can't catch that, since it
+    only compares those two sources against each other)."""
+    import requests
+
+    from kestrel.pricing.pricecharting import fetch_ungraded_price_gbp
+
+    with get_connection(CONFIG.db_path) as conn:
+        alert = get_alert(conn, args.id)
+        if alert is None:
+            print(f"error: no alert with id {args.id}", file=sys.stderr)
+            sys.exit(1)
+        item = get_item(conn, alert.watchlist_id)
+
+    if item is None:
+        print(f"error: watchlist row for alert {args.id} no longer exists", file=sys.stderr)
+        sys.exit(1)
+
+    session = requests.Session()
+    pc_price = fetch_ungraded_price_gbp(
+        session, CONFIG.fx_usd_to_gbp, item.game, item.set_name, item.card_name, item.card_number
+    )
+    print(f"{item.card_name} ({item.set_name} {item.card_number})")
+    print(f"  Our market_price_gbp:      £{alert.market_price_gbp}")
+    if pc_price is None:
+        print("  PriceCharting Ungraded:    not resolvable (set not mapped, or card not found)")
+        return
+    print(f"  PriceCharting Ungraded:    £{pc_price}")
+    ratio = float(alert.market_price_gbp) / float(pc_price) if pc_price else None
+    if ratio is not None:
+        print(f"  Ratio (ours / theirs):     {ratio:.2f}x")
+        if ratio > 3 or ratio < 1 / 3:
+            print("  -> Large disagreement. Treat our price as unreliable for this card.")
+
+
 def _format_purchase_row(p) -> str:
     parts = [f"[{p.id:>4}] {p.status.value:8} {p.card_name}"]
     if p.set_name:
@@ -454,6 +493,12 @@ def build_parser() -> argparse.ArgumentParser:
     best = alerts_sub.add_parser("best", help="Reviewed, not-rejected alerts ranked by estimated net profit")
     best.add_argument("--limit", type=int, default=10)
     best.set_defaults(func=_cmd_alerts_best)
+
+    cross_check = alerts_sub.add_parser(
+        "cross-check", help="Compare an alert's market_price_gbp against PriceCharting's real sold-comp price"
+    )
+    cross_check.add_argument("id", type=int)
+    cross_check.set_defaults(func=_cmd_alerts_cross_check)
 
     purchases = sub.add_parser("purchases", help="Cards actually bought -- the 'what to list it at' inventory")
     purchases_sub = purchases.add_subparsers(dest="purchases_command", required=True)
