@@ -146,6 +146,45 @@ class TestPokemonTcgplayerFallback:
         assert price is None
 
 
+class TestPokemonCardmarketSanityCheck:
+    """Regression coverage for a real finding, confirmed live twice: the
+    cardmarket feed sometimes returns a badly wrong price with no signal
+    it's wrong -- Jungle Clefable priced at ~5x its real value, and a
+    common 151-set Bulbasaur at ~300x (tcgplayer's own price for the same
+    card, in the same response, was sane both times). When both sources
+    are present and disagree by more than the sanity ratio, tcgplayer
+    wins."""
+
+    def test_falls_back_to_tcgplayer_when_cardmarket_wildly_exceeds_it(self):
+        # Real case: Bulbasaur -- cardmarket trendPrice ~EUR115 (~£98),
+        # tcgplayer market $0.25 (~£0.20). ~490x apart.
+        body = {"data": [{
+            "cardmarket": {"prices": {"trendPrice": 115.86}},
+            "tcgplayer": {"prices": {"normal": {"market": 0.25}}},
+        }]}
+        session = FakeSession(FakeResponse(200, body))
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Bulbasaur", "151", "1")
+        assert price == Decimal("0.20")  # 0.25 * 0.80 (fx_usd_to_gbp), not the broken cardmarket figure
+
+    def test_moderate_cardmarket_tcgplayer_spread_still_prefers_cardmarket(self):
+        # A real cross-market gap (well under the sanity ratio) is not an
+        # error -- cardmarket should still win, same as the existing
+        # "present and nonzero wins" behaviour.
+        body = {"data": [{
+            "cardmarket": {"prices": {"trendPrice": 100.0}},  # -> £85
+            "tcgplayer": {"prices": {"normal": {"market": 40.0}}},  # -> £32, 2.66x under
+        }]}
+        session = FakeSession(FakeResponse(200, body))
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Charizard", "Base", "4")
+        assert price == Decimal("85.00")
+
+    def test_no_tcgplayer_data_to_cross_check_against_uses_cardmarket_unchecked(self):
+        body = {"data": [{"cardmarket": {"prices": {"trendPrice": 999.0}}, "tcgplayer": None}]}
+        session = FakeSession(FakeResponse(200, body))
+        price = pokemon.fetch_market_price_gbp(session, make_config(), "Charizard", None, None)
+        assert price == Decimal("849.15")  # no tcgplayer figure to sanity-check against
+
+
 class TestYugiohPricing:
     def test_prefers_cardmarket_price_over_tcgplayer(self):
         body = {"data": [{"card_prices": [{"cardmarket_price": "20.00", "tcgplayer_price": "30.00"}]}]}

@@ -42,6 +42,11 @@ BASE_QUERY_FIELDS = ["cardmarket"]
 _MAX_RETRIES = 3
 _RETRY_BACKOFF_SECONDS = 2.0
 
+# How far cardmarket's GBP-converted price is allowed to exceed tcgplayer's
+# before it's treated as a bad data point rather than a genuine cross-market
+# price gap (real cardmarket/tcgplayer spreads run at most ~2x in practice).
+_CARDMARKET_SANITY_RATIO = Decimal("3")
+
 # Preference order when a card has more than one tcgplayer price variant —
 # holofoil/reverseHolofoil are usually a set's premium prints (what most
 # vintage 1st-Edition-era watchlist rows care about); "normal" is the
@@ -124,11 +129,23 @@ def fetch_market_price_gbp(
 
     card = cards[0]
     price_eur = _extract_price_eur(card)
-    if price_eur is not None:
-        return (price_eur * config.fx_eur_to_gbp).quantize(Decimal("0.01"))
-
     price_usd = _extract_price_usd(card)
-    if price_usd is not None:
-        return (price_usd * config.fx_usd_to_gbp).quantize(Decimal("0.01"))
+    gbp_from_cardmarket = (price_eur * config.fx_eur_to_gbp).quantize(Decimal("0.01")) if price_eur is not None else None
+    gbp_from_tcgplayer = (price_usd * config.fx_usd_to_gbp).quantize(Decimal("0.01")) if price_usd is not None else None
+
+    if gbp_from_cardmarket is not None:
+        # Cardmarket's own feed is occasionally badly wrong -- confirmed live
+        # twice: Jungle Clefable priced at ~5x its real value, and a common
+        # 151-set Bulbasaur at ~300x (tcgplayer's own $0.25 market price for
+        # the same card, on the same response, was sane). Neither case was a
+        # missing-data gap _extract_price_eur already handles -- the feed
+        # just returns a bad number with no signal that it's bad, so the only
+        # available cross-check is tcgplayer, when both happen to be present.
+        if gbp_from_tcgplayer is not None and gbp_from_cardmarket > gbp_from_tcgplayer * _CARDMARKET_SANITY_RATIO:
+            return gbp_from_tcgplayer
+        return gbp_from_cardmarket
+
+    if gbp_from_tcgplayer is not None:
+        return gbp_from_tcgplayer
 
     return None
