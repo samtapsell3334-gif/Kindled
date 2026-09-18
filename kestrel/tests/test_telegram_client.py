@@ -34,7 +34,9 @@ def make_config(**overrides) -> Config:
     return Config(**base)
 
 
-def make_match(listing_type=ListingType.BUY_IT_NOW, image_url="https://img/1.jpg") -> MatchResult:
+def make_match(
+    listing_type=ListingType.BUY_IT_NOW, image_url="https://img/1.jpg", end_in_minutes: int | None = None
+) -> MatchResult:
     item = WatchlistItem(
         id=1, game="pokemon", card_name="Charizard", set_name="Base", card_number="4",
         price_source=PriceSource.API, manual_market_price=None,
@@ -48,7 +50,11 @@ def make_match(listing_type=ListingType.BUY_IT_NOW, image_url="https://img/1.jpg
         image_url=image_url,
         current_bid_price=Decimal("110.39") if listing_type == ListingType.AUCTION else None,
         bid_count=1 if listing_type == ListingType.AUCTION else None,
-        item_end_date=NOW + timedelta(minutes=5) if listing_type == ListingType.AUCTION else None,
+        item_end_date=(
+            (datetime.now(timezone.utc) + timedelta(minutes=end_in_minutes))
+            if listing_type == ListingType.AUCTION and end_in_minutes is not None
+            else (NOW + timedelta(minutes=5) if listing_type == ListingType.AUCTION else None)
+        ),
     )
     return MatchResult(
         listing=listing, watchlist_item=item, market_price_gbp=Decimal("197.30"),
@@ -121,6 +127,34 @@ class TestSendAlert:
         text = kwargs["data"]["text"]
         assert "118.38" in text  # the max bid, copyable into a sniper
         assert "bids" in text
+
+    def test_auction_ending_soon_gets_a_prominent_header(self):
+        session = FakeSession()
+        send_alert(make_config(), make_match(listing_type=ListingType.AUCTION, image_url=None, end_in_minutes=15), session)
+        _, kwargs = session.calls[0]
+        text = kwargs["data"]["text"]
+        assert "ENDING IN 15 MIN" in text
+        # the header is the very first line, ahead of the card name
+        assert text.index("ENDING IN 15 MIN") < text.index("Charizard")
+
+    def test_ends_line_shows_minutes_remaining_alongside_the_clock_time(self):
+        session = FakeSession()
+        send_alert(make_config(), make_match(listing_type=ListingType.AUCTION, image_url=None, end_in_minutes=15), session)
+        _, kwargs = session.calls[0]
+        text = kwargs["data"]["text"]
+        assert "min left" in text
+
+    def test_buy_it_now_listing_never_gets_the_auction_header(self):
+        session = FakeSession()
+        send_alert(make_config(), make_match(listing_type=ListingType.BUY_IT_NOW, image_url=None), session)
+        _, kwargs = session.calls[0]
+        assert "ENDING IN" not in kwargs["data"]["text"]
+
+    def test_auction_already_ended_omits_the_header_without_crashing(self):
+        session = FakeSession()
+        send_alert(make_config(), make_match(listing_type=ListingType.AUCTION, image_url=None, end_in_minutes=-5), session)
+        _, kwargs = session.calls[0]
+        assert "ENDING IN" not in kwargs["data"]["text"]
 
     def test_buy_button_links_to_the_real_listing(self):
         session = FakeSession()

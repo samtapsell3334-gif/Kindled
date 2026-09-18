@@ -20,6 +20,7 @@ from __future__ import annotations
 import html
 import json
 import logging
+from datetime import datetime, timezone
 
 import requests
 
@@ -41,7 +42,13 @@ def _format_message(match: MatchResult) -> str:
 
     is_graded_priced = match.detected_grade is not None and match.graded_market_price_gbp is not None
 
-    lines = [
+    lines = []
+    if listing.listing_type == ListingType.AUCTION and listing.item_end_date:
+        minutes_left = round((listing.item_end_date - datetime.now(timezone.utc)).total_seconds() / 60)
+        if minutes_left >= 0:
+            lines.append(f"⏰ <b>AUCTION ENDING IN {minutes_left} MIN</b> ⏰")
+
+    lines += [
         f"<b>{html.escape(item.card_name)}</b>" + (f" ({html.escape(item.set_name)})" if item.set_name else ""),
         f"{html.escape(item.game)} · {listing.listing_type.value.replace('_', ' ')}",
         "",
@@ -85,7 +92,8 @@ def _format_message(match: MatchResult) -> str:
     if listing.listing_type == ListingType.AUCTION:
         lines.append(f"Current bid: £{listing.current_bid_price} ({listing.bid_count} bids)")
         if listing.item_end_date:
-            lines.append(f"Ends: {listing.item_end_date.strftime('%H:%M UTC')}")
+            minutes_left = round((listing.item_end_date - datetime.now(timezone.utc)).total_seconds() / 60)
+            lines.append(f"Ends: {listing.item_end_date.strftime('%H:%M UTC')} (~{max(minutes_left, 0)} min left)")
         # Plain, copyable text for a sniping service — never used by Kestrel itself.
         lines.append(f"Max bid to copy into a sniper: <b>£{match.max_bid_gbp}</b>")
 
