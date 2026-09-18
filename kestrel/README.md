@@ -120,6 +120,52 @@ caught it. That's the case for this workflow existing at all — it's not
 duplicate checking, it's covering the one gap (see "Images" in the phase 2
 section) that nothing else here can close without a paid vision API.
 
+### Day-to-day operating procedure ("go")
+
+The owner's working pattern: open a Claude Code session against this repo
+and say **"go"** (or similar — "Jarvis go", "run the scan"). That single
+word means run the whole pipeline, unattended except for the final
+report:
+
+1. `python -m kestrel poll --workers 8` — full poll cycle against all
+   active watchlist rows. If eBay 429s (a real daily quota, not a bug —
+   see "Design decisions" below), back off and retry later in the same
+   session rather than burning the whole budget hammering it.
+2. `python -m kestrel alerts unreviewed`, sorted by `estimated_net_profit_gbp`
+   descending — the quick scan.
+3. For each new high-profit or ambiguous alert: fetch the listing photo
+   from `i.ebayimg.com` (works even when the eBay *search* API is
+   rate-limited — separate host, separate limit) and manually verify it's
+   a real card, the right printing, and priced against a plausible
+   reference. `mark_reviewed` each one (`looks_good` / `flagged` /
+   `rejected`, with a one-line reason).
+4. Watch for **recurring fake-merchandise patterns** — sellers printing
+   "Card not included" / "Slab not included" on display panels, slab-skin
+   decals, and fan-art prints that still match a real card's name in
+   title search. Several distinct brands of this have been found live
+   (CYAN CITY, Border Breakers, CARDAURA, THE ALT ART CO, plus unbranded
+   ones) — `matcher.with_merchandise_guard()` catches the ones whose
+   *listing title* carries the disclaimer, but several only put it on the
+   photo, so this step doesn't fully automate away. If a whole watchlist
+   row's reference price looks structurally wrong (not just one bad
+   listing — see the Jungle Clefable case), fix it at the source:
+   deactivate that row (`watchlist.set_active(conn, item_id, False)`)
+   rather than rejecting the same bad alert every cycle.
+5. Rebuild the buy list from `alerts best`: rank by profit, prefer one
+   copy of each distinct genuine card before adding a second copy of
+   anything (real resale demand for a £200+ vintage card is thin — two
+   buyers competing to sell the same card is a self-inflicted problem),
+   and cap total spend to whatever budget the owner set.
+6. Report back: what changed since last time, what's newly confirmed vs.
+   newly rejected and why, and the refined buy list.
+
+None of this is scripted end-to-end on purpose — step 3 is the one a
+script can't do (see above), so "the whole workflow" still means a Claude
+session doing it live, not a cron job. A *separate*, unattended routine
+polls on a schedule and reports new alert counts, but explicitly skips
+the manual review step — see its own trigger config for what it does and
+doesn't do.
+
 ## Grade-vs-value comparison
 
 A graded slab (PSA 9, BGS 9.5, CGC 10...) is a different market from a raw
