@@ -335,6 +335,31 @@ flagged anomalous (≥3x swing vs. the last known price — the same real
 Read it as "how much extra scrutiny this alert's own number deserves," not
 as a probability of profit.
 
+## Condition gate: Near Mint/Mint or graded only
+
+Every reference price this tool uses — cardmarket, tcgplayer, PriceCharting's
+Ungraded figure — is priced for a clean copy. `matcher.evaluate_listing`
+never adjusted for a played copy being genuinely worth less, so
+`condition_hint` was purely informational: a Heavily Played card compared
+against an NM reference price produced a real, correctly-computed discount
+percentage on a fundamentally wrong comparison — the card isn't underpriced,
+it's just a different, lower-value item than the one the price is for. Real
+case that surfaced this: a batch of low-value auction alerts (Electrode,
+Magmar, Growlithe, ...) that looked like steals were, without exception,
+played-condition copies.
+
+Fixed by gating the match itself, not just displaying a hint:
+`matcher.is_condition_acceptable()` requires eBay's real structured
+condition (`Near mint or better — ...`) or a detected grade (PSA/BGS/CGC/
+ACE) before a listing can become a match at all — Lightly/Moderately/
+Heavily Played, Damaged, and unstated condition are all excluded now. Wired
+into `poller._evaluate_watchlist_row` right after the condition-detail
+enrichment step, so it sees the best available signal (real eBay data when
+fetched, the title guess otherwise), and applies to both the sequential and
+concurrent poll paths (both funnel through the same function). This changes
+what counts as a match going forward — it doesn't touch already-logged
+alerts, which stay in the DB as history.
+
 ## Real-sold-comp cross-check via PriceCharting
 
 Neither of the above fully closes the pricing-reliability gap — cardmarket

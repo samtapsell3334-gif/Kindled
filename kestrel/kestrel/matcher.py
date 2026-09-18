@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
 
 from kestrel.grading import detect_grade
-from kestrel.models import EbayListing, ListingType, MatchResult, PriceSource, WatchlistItem
+from kestrel.models import DetectedGrade, EbayListing, ListingType, MatchResult, PriceSource, WatchlistItem
 
 TWO_PLACES = Decimal("0.01")
 
@@ -321,6 +321,42 @@ def guess_condition_hint(title: str) -> str:
         if keyword in padded:
             return label
     return "not stated"
+
+
+# eBay's real, structured "Card Condition" field (fetched by
+# get_item_condition_detail) always starts with exactly this phrase for the
+# top tier -- confirmed against every listing checked this session
+# ("Near mint or better — Minor corner and edge wear"). Everything below it
+# ("Lightly played (Excellent)", "Moderately played (Very good)", "Heavily
+# played (Poor)") is a genuinely different, lower-value item, not an
+# underpriced copy of the clean one -- see is_condition_acceptable.
+_CLEAN_CONDITION_PREFIX = "near mint"
+_GRADED_CONDITION_KEYWORDS = ("graded", "psa", "bgs", "cgc", "ace grading")
+
+
+def is_condition_acceptable(condition_hint: str, detected_grade: DetectedGrade | None = None) -> bool:
+    """
+    Only Mint/Near Mint or professionally graded listings pass. Added after
+    a real finding: every inflated "profit" figure in a batch of low-value
+    auction alerts (Electrode, Magmar, Growlithe, ...) traced back to
+    Heavily/Moderately/Lightly played copies being compared against
+    market_price_gbp, which is an untouched NM/Mint reference price (see
+    the Neo Genesis Lugia finding documented in the README's price-
+    confidence section) -- the discount percentage was real arithmetic, but
+    a played copy is a genuinely different, lower-value item, not an
+    underpriced NM one. This gates matching itself, not just what
+    condition_hint displays, so a played copy never becomes a match at all.
+
+    A real detected grade always passes regardless of what condition_hint
+    says -- a graded slab is its own, separately priced market (see
+    grading.py), not something this label describes.
+    """
+    if detected_grade is not None:
+        return True
+    lowered = condition_hint.strip().lower()
+    if lowered.startswith(_CLEAN_CONDITION_PREFIX):
+        return True
+    return any(keyword in lowered for keyword in _GRADED_CONDITION_KEYWORDS)
 
 
 def minutes_remaining(item_end_date: datetime, now: datetime | None = None) -> Decimal:

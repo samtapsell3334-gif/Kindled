@@ -13,13 +13,14 @@ from kestrel.matcher import (
     quantize_money,
     price_confidence_pct,
     suggest_offer_gbp,
+    is_condition_acceptable,
     title_is_excluded,
     title_matches_card_name,
     title_matches_printing,
     with_merchandise_guard,
     with_non_english_guard,
 )
-from kestrel.models import EbayListing, ListingType, PriceSource, Tier, WatchlistItem
+from kestrel.models import DetectedGrade, EbayListing, ListingType, PriceSource, Tier, WatchlistItem
 
 NOW = datetime(2026, 9, 14, 20, 0, 0, tzinfo=timezone.utc)
 
@@ -214,6 +215,46 @@ class TestMerchandiseGuard:
     def test_guard_never_excludes_a_plain_english_listing(self):
         exclude_terms = with_merchandise_guard("proxy").split(",")
         assert not title_is_excluded("Charizard 4/102 Base Set Holo Near Mint", exclude_terms)
+
+
+class TestIsConditionAcceptable:
+    """Gate added after a real finding: every inflated 'profit' figure in a
+    batch of low-value auction alerts traced back to played copies being
+    compared against an untouched NM/Mint reference price. Only Near
+    Mint+/Mint or professionally graded listings should ever become a
+    match now."""
+
+    def test_ebays_real_near_mint_field_passes(self):
+        assert is_condition_acceptable("Near mint or better — Minor corner and edge wear")
+
+    def test_title_guess_near_mint_label_passes(self):
+        assert is_condition_acceptable("near mint")
+
+    def test_lightly_played_is_rejected(self):
+        assert not is_condition_acceptable("Lightly played (Excellent) — Moderate surface scuffing")
+
+    def test_moderately_played_is_rejected(self):
+        assert not is_condition_acceptable("Moderately played (Very good) — Moderate creasing")
+
+    def test_heavily_played_is_rejected(self):
+        assert not is_condition_acceptable("Heavily played (Poor) — Major creasing, Heavily worn corners")
+
+    def test_damaged_is_rejected(self):
+        assert not is_condition_acceptable("damaged")
+
+    def test_not_stated_is_rejected(self):
+        assert not is_condition_acceptable("not stated")
+
+    def test_graded_condition_text_passes(self):
+        assert is_condition_acceptable("graded")
+
+    def test_psa_mentioned_in_condition_text_passes(self):
+        assert is_condition_acceptable("PSA 9 — see photos")
+
+    def test_a_detected_grade_always_passes_regardless_of_condition_text(self):
+        grade = DetectedGrade(company="PSA", grade=Decimal("9"))
+        # even a condition string that would otherwise fail
+        assert is_condition_acceptable("Heavily played (Poor)", detected_grade=grade)
 
 
 class TestTitleMatchesCardName:

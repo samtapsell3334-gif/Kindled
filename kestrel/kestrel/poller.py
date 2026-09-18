@@ -21,7 +21,7 @@ from kestrel.config import Config
 from kestrel.db import get_connection
 from kestrel.ebay_client import EbayApiError, EbayClient
 from kestrel.grading import detect_grade, get_graded_price, list_graded_prices
-from kestrel.matcher import discount_percentage, evaluate_listing, price_confidence_pct
+from kestrel.matcher import discount_percentage, evaluate_listing, is_condition_acceptable, price_confidence_pct
 from kestrel.models import MatchResult, PriceSource, WatchlistItem
 from kestrel.pricing import PRICE_ANOMALY_RATIO, get_market_price_gbp
 from kestrel.pricing.cache import get_last_price_any_age, normalize_cache_key
@@ -232,6 +232,8 @@ def _evaluate_watchlist_row(
         if result is not None:
             _enrich_condition_from_item_detail(ebay, result)
             _enrich_grade_from_manual_price(conn, result)
+            if not is_condition_acceptable(result.condition_hint, result.detected_grade):
+                continue
             _enrich_price_confidence(item, market_price, previous_price, result)
             matches.append(result)
 
