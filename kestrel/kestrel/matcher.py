@@ -204,6 +204,8 @@ MERCHANDISE_GUARD_TERMS = [
     "fanart",
     "inspired art",
     "slab skin",
+    "doujin",
+    "binder art insert",
 ]
 
 
