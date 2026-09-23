@@ -206,6 +206,8 @@ MERCHANDISE_GUARD_TERMS = [
     "slab skin",
     "doujin",
     "binder art insert",
+    "extended art case",
+    "phone case",
 ]
 
 
