@@ -223,6 +223,31 @@ def with_merchandise_guard(exclude_terms: str) -> str:
     return ",".join(merged)
 
 
+# Real, confirmed case found live during a full review pass: a modern 2026
+# "30th Anniversary"/"30th Celebration(s)" reprint set reuses old chase
+# cards' exact set numbers (e.g. Shining Celebi 106/105 -- identical to the
+# real Neo Destiny card this watchlist targets), so it title-matches and
+# number-matches every vintage-card row here, but is a far lower-value
+# mass reprint, not the vintage original the market price is based on.
+# Every watchlist row here targets a vintage-era print, never this reprint
+# set, so excluding it globally is safe.
+REPRINT_GUARD_TERMS = [
+    "30th anniversary",
+    "30th celebration",
+    "30th celebrations",
+]
+
+
+def with_reprint_guard(exclude_terms: str) -> str:
+    """Append REPRINT_GUARD_TERMS to a row's comma-separated exclude_terms,
+    skipping any already present (case-insensitive) so this is safe to
+    re-apply to a row more than once."""
+    existing = [t.strip() for t in exclude_terms.split(",") if t.strip()]
+    existing_lower = {t.lower() for t in existing}
+    merged = existing + [t for t in REPRINT_GUARD_TERMS if t not in existing_lower]
+    return ",".join(merged)
+
+
 # Real, confirmed case found live during a review pass: a seller listing
 # several different current chase cards (Leafeon ex, Espeon ex, Vaporeon ex,
 # Glaceon ex, Flareon ex, Eevee ex -- all correct set/number) at a uniform,

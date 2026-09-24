@@ -20,6 +20,7 @@ from kestrel.matcher import (
     title_matches_printing,
     with_merchandise_guard,
     with_non_english_guard,
+    with_reprint_guard,
 )
 from kestrel.models import DetectedGrade, EbayListing, ListingType, PriceSource, Tier, WatchlistItem
 
@@ -220,6 +221,43 @@ class TestMerchandiseGuard:
     def test_guard_excludes_an_extended_artwork_case_listing(self):
         exclude_terms = with_merchandise_guard("proxy").split(",")
         assert title_is_excluded("Pokemon Lugia 9/111 Neo Genesis Extended Artwork Case", exclude_terms)
+
+
+class TestWithReprintGuard:
+    """Real, confirmed case: a 2026 '30th Anniversary'/'30th Celebration(s)'
+    reprint reuses a vintage chase card's exact set number (Shining Celebi
+    106/105, same as the real Neo Destiny card), so it number-matches and
+    name-matches every vintage-targeting row -- but is a much lower-value
+    mass reprint, not the card the market price is based on."""
+
+    def test_appends_reprint_guard_terms(self):
+        merged = with_reprint_guard("proxy,custom")
+        terms = merged.split(",")
+        assert terms[:2] == ["proxy", "custom"]
+        assert "30th anniversary" in terms
+
+    def test_does_not_duplicate_a_term_already_present(self):
+        merged = with_reprint_guard("proxy,30th Anniversary")
+        terms = [t.lower() for t in merged.split(",")]
+        assert terms.count("30th anniversary") == 1
+
+    def test_guard_excludes_a_30th_anniversary_reprint_listing(self):
+        exclude_terms = with_reprint_guard("proxy").split(",")
+        assert title_is_excluded(
+            "Pokémon TCG Shining Celebi 106/105 30th Anniversary Unlimited English", exclude_terms
+        )
+
+    def test_guard_excludes_a_30th_celebrations_reprint_listing(self):
+        exclude_terms = with_reprint_guard("proxy").split(",")
+        assert title_is_excluded(
+            "Shining Celebi 106/105 30th Celebrations Holo Rare Pokémon TCG Card 2026 English", exclude_terms
+        )
+
+    def test_guard_never_excludes_the_genuine_vintage_listing(self):
+        exclude_terms = with_reprint_guard("proxy").split(",")
+        assert not title_is_excluded(
+            "Pokémon TCG Shining Celebi 106/105 Neo Destiny Secret Rare Holo English 2000", exclude_terms
+        )
 
 
 class TestDescriptionIsGuarded:
