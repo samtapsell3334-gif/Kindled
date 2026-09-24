@@ -4,6 +4,7 @@ from decimal import Decimal
 import pytest
 
 from kestrel.matcher import (
+    description_is_guarded,
     discount_percentage,
     estimate_net_profit,
     evaluate_listing,
@@ -215,6 +216,35 @@ class TestMerchandiseGuard:
     def test_guard_never_excludes_a_plain_english_listing(self):
         exclude_terms = with_merchandise_guard("proxy").split(",")
         assert not title_is_excluded("Charizard 4/102 Base Set Holo Near Mint", exclude_terms)
+
+    def test_guard_excludes_an_extended_artwork_case_listing(self):
+        exclude_terms = with_merchandise_guard("proxy").split(",")
+        assert title_is_excluded("Pokemon Lugia 9/111 Neo Genesis Extended Artwork Case", exclude_terms)
+
+
+class TestDescriptionIsGuarded:
+    """Real finding: a seller listed several correctly-numbered chase cards
+    at a uniform, far-below-market price with a title clean of every
+    MERCHANDISE_GUARD_TERMS phrase. Only the listing's shortDescription
+    ("As this is a handmade card...") revealed it was a custom/fan print,
+    not a real one -- see EbayClient.get_item_description."""
+
+    def test_flags_a_handmade_card_disclaimer(self):
+        assert description_is_guarded(
+            "As this is a handmade card, it may contain imperfections in cutting and centering."
+        )
+
+    def test_flags_a_replica_disclaimer(self):
+        assert description_is_guarded("High quality replica of the original card.")
+
+    def test_flags_a_reproduction_disclaimer(self):
+        assert description_is_guarded("This is a reproduction for display purposes only.")
+
+    def test_still_catches_title_level_guard_terms(self):
+        assert description_is_guarded("Card not included, display stand only.")
+
+    def test_never_flags_a_genuine_description(self):
+        assert not description_is_guarded("Genuine card from my personal collection, ships same day.")
 
 
 class TestIsConditionAcceptable:

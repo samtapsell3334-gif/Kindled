@@ -187,11 +187,13 @@ class TestEnrichGradeFromManualPrice:
 
 class FakeSearchEbayClient:
     """Fake covering everything _evaluate_watchlist_row calls on its ebay
-    client: two searches plus the per-match condition-detail lookup."""
+    client: two searches plus the per-match condition-detail and
+    description lookups."""
 
-    def __init__(self, bin_listings, condition_detail=None):
+    def __init__(self, bin_listings, condition_detail=None, description=None):
         self._bin_listings = bin_listings
         self._condition_detail = condition_detail
+        self._description = description
 
     def search_buy_it_now(self, search_terms):
         return self._bin_listings
@@ -201,6 +203,9 @@ class FakeSearchEbayClient:
 
     def get_item_condition_detail(self, item_id):
         return self._condition_detail
+
+    def get_item_description(self, item_id):
+        return self._description
 
 
 def _make_listing(item_id, title, condition_detail_hint=None):
@@ -247,3 +252,50 @@ class TestConditionGateInEvaluateWatchlistRow:
         matches = _evaluate_watchlist_row(conn, session=None, config=Config(), ebay=ebay, item=item)
         assert len(matches) == 1
         assert matches[0].condition_hint.startswith("Near mint or better")
+
+
+class TestDescriptionGuardInEvaluateWatchlistRow:
+    """Integration coverage for the real finding that triggered
+    description_is_guarded: a seller listing correct set/number, clean
+    "Near mint or better" condition, and a title with no guard terms --
+    but a shortDescription reading "As this is a handmade card...", i.e. a
+    custom/fan print, not a real one. Must never become a match.
+    """
+
+    def test_handmade_disclaimer_in_description_blocks_the_match(self, conn, monkeypatch):
+        watchlist_id = add_item(
+            conn, game="pokemon", card_name="Gengar", set_name="Fossil", card_number="5/62",
+            price_source=PriceSource.API, manual_market_price=None, discount_threshold=Decimal("0.25"),
+            search_terms="gengar fossil", exclude_terms="", tier=Tier.STANDARD,
+        )
+        item = get_item(conn, watchlist_id)
+        monkeypatch.setattr(poller_module, "get_market_price_gbp", lambda *a, **kw: Decimal("171.53"))
+        listing = _make_listing("v1|3|0", "Gengar Fossil Holo 5/62")
+        ebay = FakeSearchEbayClient(
+            [listing],
+            condition_detail="Near mint or better — Minor corner and edge wear",
+            description="As this is a handmade card, it may contain imperfections in cutting and centering.",
+        )
+        from kestrel.config import Config
+
+        matches = _evaluate_watchlist_row(conn, session=None, config=Config(), ebay=ebay, item=item)
+        assert matches == []
+
+    def test_clean_description_still_becomes_a_match(self, conn, monkeypatch):
+        watchlist_id = add_item(
+            conn, game="pokemon", card_name="Gengar", set_name="Fossil", card_number="5/62",
+            price_source=PriceSource.API, manual_market_price=None, discount_threshold=Decimal("0.25"),
+            search_terms="gengar fossil", exclude_terms="", tier=Tier.STANDARD,
+        )
+        item = get_item(conn, watchlist_id)
+        monkeypatch.setattr(poller_module, "get_market_price_gbp", lambda *a, **kw: Decimal("171.53"))
+        listing = _make_listing("v1|4|0", "Gengar Fossil Holo 5/62")
+        ebay = FakeSearchEbayClient(
+            [listing],
+            condition_detail="Near mint or better — Minor corner and edge wear",
+            description="Genuine card from my personal collection, ships same day.",
+        )
+        from kestrel.config import Config
+
+        matches = _evaluate_watchlist_row(conn, session=None, config=Config(), ebay=ebay, item=item)
+        assert len(matches) == 1

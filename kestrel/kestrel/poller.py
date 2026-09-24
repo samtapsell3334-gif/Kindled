@@ -21,7 +21,7 @@ from kestrel.config import Config
 from kestrel.db import get_connection
 from kestrel.ebay_client import EbayApiError, EbayClient
 from kestrel.grading import detect_grade, get_graded_price, list_graded_prices
-from kestrel.matcher import discount_percentage, evaluate_listing, is_condition_acceptable, price_confidence_pct
+from kestrel.matcher import description_is_guarded, discount_percentage, evaluate_listing, is_condition_acceptable, price_confidence_pct
 from kestrel.models import MatchResult, PriceSource, WatchlistItem
 from kestrel.pricing import PRICE_ANOMALY_RATIO, get_market_price_gbp
 from kestrel.pricing.cache import get_last_price_any_age, normalize_cache_key
@@ -117,6 +117,19 @@ def _enrich_condition_from_item_detail(ebay: EbayClient, result: MatchResult) ->
     detail = ebay.get_item_condition_detail(result.listing.item_id)
     if detail:
         result.condition_hint = detail
+
+
+def _listing_description_is_guarded(ebay: EbayClient, result: MatchResult) -> bool:
+    """
+    One more extra call, same budget rule as _enrich_condition_from_item_detail
+    (only spent on listings that already cleared price/title/printing/condition):
+    catches the "handmade card" / custom-print disclaimer sellers put in the
+    description but not the title -- see matcher.DESCRIPTION_GUARD_TERMS.
+    """
+    description = ebay.get_item_description(result.listing.item_id)
+    if not description:
+        return False
+    return description_is_guarded(description)
 
 
 def _enrich_grade_from_manual_price(conn: sqlite3.Connection, result: MatchResult) -> None:
@@ -233,6 +246,8 @@ def _evaluate_watchlist_row(
             _enrich_condition_from_item_detail(ebay, result)
             _enrich_grade_from_manual_price(conn, result)
             if not is_condition_acceptable(result.condition_hint, result.detected_grade):
+                continue
+            if _listing_description_is_guarded(ebay, result):
                 continue
             _enrich_price_confidence(item, market_price, previous_price, result)
             matches.append(result)

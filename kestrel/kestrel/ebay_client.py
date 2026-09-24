@@ -189,6 +189,24 @@ class EbayClient:
             return content
         return None
 
+    def get_item_description(self, item_id: str) -> str | None:
+        """
+        Same "only spent on listings that already cleared every other
+        filter" budget rule as get_item_condition_detail (a separate call,
+        not folded into it, since the two are independent enrichment steps
+        gating on different things). Exists because real sellers have been
+        found disclosing "this is a handmade card" — i.e. a custom/fan
+        print, not a real one -- only in shortDescription, never in the
+        title, so title_is_excluded's exclude_terms check never sees it.
+        Returns None on any failure, same as get_item_condition_detail.
+        """
+        try:
+            body = self._get_with_backoff(f"{ITEM_PATH}/{quote(item_id, safe='')}", {})
+        except EbayApiError:
+            logger.warning("Could not fetch item detail for %s — description guard skipped this listing", item_id, exc_info=True)
+            return None
+        return body.get("shortDescription")
+
     def search_auctions(
         self,
         search_terms: str,

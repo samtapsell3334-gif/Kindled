@@ -207,6 +207,8 @@ MERCHANDISE_GUARD_TERMS = [
     "doujin",
     "binder art insert",
     "extended art case",
+    "extended artwork case",
+    "artwork case",
     "phone case",
 ]
 
@@ -219,6 +221,34 @@ def with_merchandise_guard(exclude_terms: str) -> str:
     existing_lower = {t.lower() for t in existing}
     merged = existing + [t for t in MERCHANDISE_GUARD_TERMS if t not in existing_lower]
     return ",".join(merged)
+
+
+# Real, confirmed case found live during a review pass: a seller listing
+# several different current chase cards (Leafeon ex, Espeon ex, Vaporeon ex,
+# Glaceon ex, Flareon ex, Eevee ex -- all correct set/number) at a uniform,
+# far-below-market price, titles clean of every MERCHANDISE_GUARD_TERMS
+# phrase. The listing's shortDescription read "As this is a handmade card,
+# it may contain imperfections in cutting and centering." -- i.e. a
+# custom/fan print, not a real one -- disclosed only in the description,
+# never the title, so title_is_excluded never saw it. Checked separately
+# from MERCHANDISE_GUARD_TERMS (title-only) because the description is a
+# different field, fetched by a different, budget-gated API call -- see
+# EbayClient.get_item_description.
+DESCRIPTION_GUARD_TERMS = [
+    *MERCHANDISE_GUARD_TERMS,
+    "handmade",
+    "hand made",
+    "replica",
+    "reproduction",
+    "custom made",
+    "not an official",
+    "unofficial",
+]
+
+
+def description_is_guarded(description: str) -> bool:
+    lowered = description.lower()
+    return any(term in lowered for term in DESCRIPTION_GUARD_TERMS if term)
 
 
 _PUNCTUATION_RE = re.compile(r"[\-|:/,.!\[\]()]+")
